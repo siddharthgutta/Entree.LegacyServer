@@ -1,10 +1,10 @@
 echo "invoked when branch is cloned"
 
+export NODE_ENV=production # run grunt in production
+
 npm cache clear
 npm install
 
-export NODE_ENV=production
-
-grunt build
+grunt build -v
 
 # set up db

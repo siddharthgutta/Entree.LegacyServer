@@ -9,26 +9,35 @@ ssh -i  <pem> ubuntu@<public-dns>
 
 ### Setup
 ```bash
+# general env setup
 sudo apt-get update
 sudo apt-get install git
-sudo apt-get -y install ruby
-sudo gem install sass
 sudo apt-get -y install build-essential
+echo "sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000" >> ~/.bashrc
+echo "export PORT=3000" >> ~/.bashrc
 
+# node via. nvm
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash
 source ~/.bashrc
 nvm install stable
+
+# node global
 npm install pm2 -g
 npm install grunt-cli -g
+
+# sass engine
+sudo apt-get -y install ruby
+sudo gem install sass
+
+# clone
 git config --global credential.helper store
 mkdir Github && cd Github
-git clone https://github.com/siddharthgutta/Entree.Server
-cd Entree.Server
-echo "sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000" >> ~/.bashrc
-echo "export PORT=3000" >> ~/.bashrc
-npm install
-grunt build
+git clone https://github.com/siddharthgutta/Entree.Server && cd Entree.Server
 
+# install app dependencies
+npm install
+
+# launch app with branch-off
 ./node_modules/branch-off/dist/cli
 ```
 
