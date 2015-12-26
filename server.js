@@ -16,7 +16,7 @@ import sio from './message/sio'
 // Imports standard/websocket routers
 import BasicRouter from './routes/basic'
 import NotifyRouter from './routes/notify'
-// ???
+// Git Branch Auto-Deployment (Mathew's Tool)
 import * as BranchOff from 'branch-off'
 
 
@@ -31,7 +31,7 @@ sio.attach(server);
 app.set('views', path.join(__dirname, 'views'));
 // Sets the view engine to jade
 app.set('view engine', 'jade');
-// ???
+// Connects webhook to the postreceive endpoint
 app.use('/postreceive', BranchOff.getRouter());
 
 /* Morgan Logger Settings
