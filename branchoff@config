@@ -1,0 +1,9 @@
+{
+    "startPort": 3000,
+    "endPort": 4000,
+    "uri": "https://github.com/siddharthgutta/Entree.Server",
+    "debug": true,
+    "pm2": {
+        "script": "./bin/www"
+    }
+}
