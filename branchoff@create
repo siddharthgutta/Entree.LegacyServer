@@ -1,5 +1,8 @@
 echo "invoked when branch is cloned"
 
+npm cache clear
 npm install
+
+grunt build
 
 # set up db

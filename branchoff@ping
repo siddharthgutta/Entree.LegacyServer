@@ -1,3 +1,6 @@
 echo "invoked by github webhook ping"
 
+npm cache clear
 npm install
+
+grunt build
