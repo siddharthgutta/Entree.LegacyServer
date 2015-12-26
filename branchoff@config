@@ -4,6 +4,9 @@
     "uri": "https://github.com/siddharthgutta/Entree.Server",
     "debug": true,
     "pm2": {
-        "script": "./bin/www"
+        "script": "./bin/www",
+        "env": {
+            "NODE_ENV": "production"
+        }
     }
 }

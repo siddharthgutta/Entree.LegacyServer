@@ -26,7 +26,6 @@ git clone https://github.com/siddharthgutta/Entree.Server
 cd Entree.Server
 echo "sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000" >> ~/.bashrc
 echo "export PORT=3000" >> ~/.bashrc
-echo "export NODE_ENV=production" >> ~/.bashrc
 npm install
 grunt build
 
