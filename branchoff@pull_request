@@ -1,1 +1,3 @@
 echo "invoked on pull_request"
+
+npm install
