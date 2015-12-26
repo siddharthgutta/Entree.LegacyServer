@@ -1,3 +1,5 @@
 echo "invoked by github push"
 
+export NODE_ENV=production
+
 npm install

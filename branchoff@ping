@@ -1,5 +1,7 @@
 echo "invoked by github webhook ping"
 
+export NODE_ENV=production
+
 npm cache clear
 npm install
 
