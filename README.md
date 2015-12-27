@@ -13,7 +13,7 @@ http://ec2-52-26-163-35.us-west-2.compute.amazonaws.com:5000/
 - Username: build
 - Password: build
 
-##### Commands
+##### Useful Commands
 
 ```bash
 pm2 list # see running apps

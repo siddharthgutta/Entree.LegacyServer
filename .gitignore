@@ -36,3 +36,5 @@ node_modules
 /public/styles
 
 deps.json
+
+.idea
