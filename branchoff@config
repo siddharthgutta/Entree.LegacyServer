@@ -5,7 +5,11 @@
     "debug": true,
     "pm2": {
         "script": "./bin/www",
+        "exec_mode": "cluster",
+        "instances": 1,
+        "max_memory_restart": "200M",
         "env": {
+            "NODE_DEBUG": "lockfile",
             "NODE_ENV": "production"
         }
     }

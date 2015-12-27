@@ -37,4 +37,6 @@ node_modules
 
 deps.json
 
-.idea
+.idea/
+.idea/workspace.xml
+.idea/*

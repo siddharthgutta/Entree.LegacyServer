@@ -23,11 +23,13 @@ pm2 restart <app_name>  # restart specific app/branch
 pm2 restart all # restart all apps/branches
 pm2 kill # never do this please! conflicts with branch-off atm
 
+htop # activity monitor; press t for accessing sub-processes
+
 cd ~/Github/Entree.Server # root repo directory
 cd ~/Github/Entree.Server && npm install # reinstall the modules for the app
 npm cache clear # if modules need to be downloaded again
 ```
-
+ 
 ### Setup
 ```bash
 # general env setup
