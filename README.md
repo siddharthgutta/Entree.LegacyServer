@@ -7,6 +7,27 @@
 ssh -i  <pem> ubuntu@<public-dns>
 ```
 
+#### Online-shell
+http://ec2-52-26-163-35.us-west-2.compute.amazonaws.com:5000/
+
+- Username: build
+- Password: build
+
+##### Commands
+
+```bash
+pm2 list # see running apps
+pm2 monit # watch deployment occur live
+pm2 logs # live log viewer
+pm2 restart <app_name>  # restart specific app/branch
+pm2 restart all # restart all apps/branches
+pm2 kill # never do this please! conflicts with branch-off atm
+
+cd ~/Github/Entree.Server # root repo directory
+cd ~/Github/Entree.Server && npm install # reinstall the modules for the app
+npm cache clear # if modules need to be downloaded again
+```
+
 ### Setup
 ```bash
 # general env setup
@@ -20,9 +41,13 @@ echo "export PORT=3000" >> ~/.bashrc
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash
 source ~/.bashrc
 nvm install stable
+echo "echo 'Shitty solution but whatevs' && nvm install stable" >> ~/.bashrc # fix me in the future
 
 # node global
 npm install pm2 -g
+pm2 install pm2-webshell
+pm2 conf pm2-webshell:username build
+pm2 conf pm2-webshell:password build
 npm install grunt-cli -g
 
 # sass engine
