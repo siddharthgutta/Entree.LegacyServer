@@ -66,3 +66,14 @@ npm install
 ./node_modules/branch-off/dist/cli
 ```
 
+### Third Party Libraries/References:
+
+[path](https://nodejs.org/api/path.html): Module for handling/transforming file paths  
+[serve-favicon](https://github.com/expressjs/serve-favicon): Middleware for serving a favicon  
+[morgan](https://github.com/expressjs/morgan): HTTP request logger middleware  
+[cookie-parser](https://github.com/expressjs/cookie-parser): Cookie Parser  
+[body-parser](https://github.com/expressjs/body-parser): Body Parser  
+[underscore](http://underscorejs.org/): Functional Programming JS Helper Library  
+[http](https://nodejs.org/api/http.html): HTTP Interfaces  
+[socket-io](http://socket.io/docs/): WebSockets for Node.js  
+[branch-off](https://github.com/bluejamesbond/BranchOff.js): Git Branch Auto-Deployment (Mathew's Tool)  
