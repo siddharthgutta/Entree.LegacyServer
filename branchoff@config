@@ -5,7 +5,7 @@
     "debug": true,
     "pm2": {
         "script": "./bin/www",
-        "exec_mode": "cluster",
+        "exec_mode": "fork",
         "instances": 1,
         "max_memory_restart": "200M",
         "env": {
