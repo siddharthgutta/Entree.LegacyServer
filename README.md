@@ -78,4 +78,13 @@ npm install
 [underscore](http://underscorejs.org/): Functional Programming JS Helper Library  
 [http](https://nodejs.org/api/http.html): HTTP Interfaces  
 [socket-io](http://socket.io/docs/): WebSockets for Node.js  
-[branch-off](https://github.com/bluejamesbond/BranchOff.js): Git Branch Auto-Deployment (Mathew's Tool)  
+[branch-off](https://github.com/bluejamesbond/BranchOff.js): Git Branch Auto-Deployment (Mathew's Tool)
+
+### MySQL
+Recommended to use MySQL Workbench
+ - Create a new connection
+    - Username: root
+    - Password: 123456
+ - Use the .pem file
+
+![](http://i.imgur.com/MQ379m8.jpg)
