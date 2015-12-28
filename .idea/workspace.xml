@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ef1b9e67-4db3-4738-b0ff-123ea365c120" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/other/mysql-workbench-setup.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" afterPath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-    </list>
+    <list default="true" id="ef1b9e67-4db3-4738-b0ff-123ea365c120" name="Default" comment="" />
     <ignored path="Entree.Server.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -187,7 +182,64 @@
     </option>
   </component>
   <component name="JsBuildToolGruntFileManager" detection-done="true">
-    <gruntfile path="$PROJECT_DIR$/Gruntfile.js" />
+    <gruntfile path="$PROJECT_DIR$/Gruntfile.js">
+      <alias-task name="auto-build-scripts" info="Alias for &quot;browserify:dev&quot; task." file-path="$PROJECT_DIR$/Gruntfile.js">
+        <dependency value="browserify:dev" />
+      </alias-task>
+      <alias-task name="auto-build-styles" info="Alias for &quot;sass:dev&quot;, &quot;watch:sass&quot; tasks." file-path="$PROJECT_DIR$/Gruntfile.js">
+        <dependency value="sass:dev" />
+        <dependency value="watch:sass" />
+      </alias-task>
+      <alias-task name="build" info="Alias for &quot;get-deps&quot;, &quot;sass:dist&quot;, &quot;postcss:dist&quot;, &quot;browserify:dist&quot;, &quot;uglify:dist&quot;, &quot;copy&quot;, &quot;imagemin&quot; tasks." file-path="$PROJECT_DIR$/Gruntfile.js">
+        <dependency value="get-deps" />
+        <dependency value="sass:dist" />
+        <dependency value="postcss:dist" />
+        <dependency value="browserify:dist" />
+        <dependency value="uglify:dist" />
+        <dependency value="copy" />
+        <dependency value="imagemin" />
+      </alias-task>
+      <alias-task name="default" info="Alias for &quot;build&quot; task." file-path="$PROJECT_DIR$/Gruntfile.js">
+        <dependency value="build" />
+      </alias-task>
+      <alias-task name="production" info="Alias for &quot;env-force-production&quot;, &quot;clean&quot;, &quot;build&quot;, &quot;env-restore&quot; tasks." file-path="$PROJECT_DIR$/Gruntfile.js">
+        <dependency value="env-force-production" />
+        <dependency value="clean" />
+        <dependency value="build" />
+        <dependency value="env-restore" />
+      </alias-task>
+      <alias-task name="styles" info="Alias for &quot;sass:dist&quot;, &quot;postcss:dist&quot; tasks." file-path="$PROJECT_DIR$/Gruntfile.js">
+        <dependency value="sass:dist" />
+        <dependency value="postcss:dist" />
+      </alias-task>
+      <core-task name="browserify" info="Grunt task for browserify." file-path="$PROJECT_DIR$/node_modules/grunt-browserify/tasks/browserify.js" multi="true">
+        <target value="dist" />
+        <target value="dev" />
+      </core-task>
+      <core-task name="clean" info="Clean files and folders." file-path="$PROJECT_DIR$/node_modules/grunt-contrib-clean/tasks/clean.js" multi="true" />
+      <core-task name="copy" info="Copy files." file-path="$PROJECT_DIR$/node_modules/grunt-contrib-copy/tasks/copy.js" multi="true">
+        <target value="dist" />
+      </core-task>
+      <core-task name="env-force-production" info="Custom task." file-path="$PROJECT_DIR$/Gruntfile.js" multi="false" />
+      <core-task name="env-restore" info="Custom task." file-path="$PROJECT_DIR$/Gruntfile.js" multi="false" />
+      <core-task name="get-deps" info="Custom task." file-path="$PROJECT_DIR$/Gruntfile.js" multi="false" />
+      <core-task name="imagemin" info="Minify PNG, JPEG, GIF and SVG images" file-path="$PROJECT_DIR$/node_modules/grunt-contrib-imagemin/tasks/imagemin.js" multi="true">
+        <target value="dist" />
+      </core-task>
+      <core-task name="postcss" info="Process CSS files." file-path="$PROJECT_DIR$/node_modules/grunt-postcss/tasks/postcss.js" multi="true">
+        <target value="dist" />
+      </core-task>
+      <core-task name="sass" info="Compile Sass to CSS" file-path="$PROJECT_DIR$/node_modules/grunt-contrib-sass/tasks/sass.js" multi="true">
+        <target value="dev" />
+        <target value="dist" />
+      </core-task>
+      <core-task name="uglify" info="Minify files with UglifyJS." file-path="$PROJECT_DIR$/node_modules/grunt-contrib-uglify/tasks/uglify.js" multi="true">
+        <target value="dist" />
+      </core-task>
+      <core-task name="watch" info="Run predefined tasks whenever watched files change." file-path="$PROJECT_DIR$/node_modules/grunt-contrib-watch/tasks/watch.js" multi="false">
+        <target value="sass" />
+      </core-task>
+    </gruntfile>
   </component>
   <component name="JsBuildToolPackageJson" detection-done="true" />
   <component name="JsGulpfileManager">
