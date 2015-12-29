@@ -5,7 +5,7 @@
 ### Connect
 ```bash
 ssh -i  <pem> ubuntu@<public-dns>
-ssh -i keys/ec2-52-26-163-35.us-west-2.compute.amazonaws.com.pem ubuntu@ec2-52-26-163-35.us-west-2.compute.amazonaws.com
+ssh -i <path_to_pem_file_in_keys_directory> ubuntu@ec2-52-26-163-35.us-west-2.compute.amazonaws.com
 ```
 
 #### Online-shell
