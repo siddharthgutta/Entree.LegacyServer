@@ -39,4 +39,5 @@ deps.json
 
 .idea/
 .idea/workspace.xml
+.DS_STORE
 .idea/*
