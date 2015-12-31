@@ -5,6 +5,7 @@
 ### Connect
 ```bash
 ssh -i  <pem> ubuntu@<public-dns>
+ssh -i <path_to_pem_file_in_keys_directory> ubuntu@ec2-52-26-163-35.us-west-2.compute.amazonaws.com
 ```
 
 #### Online-shell
@@ -43,8 +44,8 @@ echo "export PORT=3000" >> ~/.bashrc
 # node via. nvm
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash
 source ~/.bashrc
-nvm install 5.0.0
-echo "echo 'Shitty solution but whatevs' && nvm install 5.0.0" >> ~/.bashrc # fix me in the future
+nvm install 5.0.0 # test PM2 API access with > 5.1.0 later
+echo "5.0.0" > ~/.nvmrc
 
 # node global
 npm install pm2 -g
