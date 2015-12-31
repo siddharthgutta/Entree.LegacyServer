@@ -43,8 +43,8 @@ echo "export PORT=3000" >> ~/.bashrc
 # node via. nvm
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash
 source ~/.bashrc
-nvm install 5.0.0
-echo "echo 'Mathew\'s shitty solution but whatevs' && nvm use 5.0.0" >> ~/.bashrc # fix me in the future
+nvm install 5.0.0 # test PM2 API access with > 5.1.0 later
+echo "5.0.0" > ~/.nvmrc
 
 # node global
 npm install pm2 -g
