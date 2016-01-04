@@ -4,7 +4,7 @@
 
 ### Connect
 ```bash
-ssh -i  <pem> ubuntu@<public-dns>
+ssh -i <pem> ubuntu@<public-dns>
 ssh -i <path_to_pem_file_in_keys_directory> ubuntu@ec2-52-26-163-35.us-west-2.compute.amazonaws.com
 ```
 
@@ -49,6 +49,7 @@ echo "5.0.0" > ~/.nvmrc
 
 # node global
 npm install pm2 -g
+npm install mocha -g
 pm2 install pm2-webshell
 pm2 conf pm2-webshell:port 5000
 pm2 conf pm2-webshell:username build

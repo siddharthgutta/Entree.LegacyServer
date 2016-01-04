@@ -1,56 +1,46 @@
 import express from 'express'
-// Module for handling/transforming file paths
-import path from 'path'
-// Middleware for serving a favicon
-import favicon from 'serve-favicon'
-// HTTP request logger middleware
-import logger from 'morgan'
+import path from 'path'                     // module for handling/transforming file paths
+import favicon from 'serve-favicon'         // middleware for serving a favicon
+import logger from 'morgan'                 // http request logger middleware
 import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
-// Functional Programming JS Helper Library 
-import _ from 'underscore'
+import _ from 'underscore'                  // functional programming library
 import http from 'http'
-// Socket-io (WebSockets)
-import sio from './message/sio'
-
-// imports standard/websocket routers
-import BasicRouter from './routes/basic'
+import sio from './message/sio'             // socket-io (websockets)
+import BasicRouter from './routes/basic'    // imports standard/websocket routers
 import NotifyRouter from './routes/notify'
-// Git Branch Auto-Deployment (Mathew's Tool)
-import * as BranchOff from 'branch-off'
+import ApiRouter from './routes/api'
+import * as BranchOff from 'branch-off'     // git branch auto-deployment (Mathew's Tool)
+import sequelize from './models'            // mysql orm
 
-// Server Creation
-const app = express();
+const app = express();                            // server creation
 const server = http.createServer(app);
 
-// Attaches server to socket.io instance
-sio.attach(server);
+sio.attach(server);                               // attaches server to socket.io instance
 
-// Points app to location of the views
-app.set('views', path.join(__dirname, 'views'));
-// Sets the view engine to jade
-app.set('view engine', 'jade');
-// Connects webhook to the postreceive endpoint
-app.use('/postreceive', BranchOff.getRouter());
+app.set('sequelize', sequelize);
+app.set('views', path.join(__dirname, 'views'));  // points app to location of the views
+app.set('view engine', 'jade');                   // sets the view engine to jade
+app.use('/postreceive', BranchOff.getRouter());   // connects webhook to the postreceive endpoint
 
-/* Morgan Logger Settings
-Concise output colored by response status for development use. 
-The :status token will be colored red for server error codes, 
-yellow for client error codes, cyan for redirection codes, and 
-uncolored for all other codes.
-*/
+/**
+ * Morgan Logger Settings
+ * Concise output colored by response status for development use.
+ * The :status token will be colored red for server error codes,
+ * yellow for client error codes, cyan for redirection codes, and
+ * uncolored for all other codes.
+ */
 app.use(logger('dev'));
-// Sets app to use middleware that only parses json
-app.use(bodyParser.json());
-// Body object from parsed data can have values of strings/arrays
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(cookieParser());
-// Points app to public directory for static files
-app.use(express.static(path.join(__dirname, 'public')));
 
-// Sets up specific routes
+app.use(bodyParser.urlencoded({extended: false}));       // body object from parsed data can have values of strings/arrays
+app.use(bodyParser.json());                              // sets app to use middleware that only parses json
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public'))); // points app to public directory for static files
+
+// sets up specific routes
 app.use('/', BasicRouter);
 app.use('/notify', NotifyRouter);
+app.use('/api', ApiRouter);
 
 export const expressApp = app;
 export default server;
