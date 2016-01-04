@@ -91,7 +91,9 @@ Recommended to use MySQL Workbench
 ![](http://i.imgur.com/MQ379m8.jpg)
 
 ### Tests
+```bash
 npm run test ./tests/*.test.js
+```
 
 ### Pojo Generation
 ```bash
