@@ -12,6 +12,7 @@ describe('Create User', ()=> {
           expect('jim').to.equal(select('body.data.username', res));
           expect('halpert').to.equal(select('body.data.password', res));
           expect('jhalpert@dunder.com').to.equal(select('body.data.email', res));
+          console.info(JSON.stringify(res.body, null, 4));
           done();
         });
   });

@@ -43,3 +43,7 @@ deps.json
 .idea/*
 
 branchoff@instance
+
+/temp
+
+.gradle

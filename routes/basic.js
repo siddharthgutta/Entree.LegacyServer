@@ -8,23 +8,14 @@ const route = Router();
 route.get('/', (req, res) => res.render('app', {title: 'yolo-not used atm'}));
 route.get('/tools', (req, res) => res.render('tools'));
 route.get('/tests', (req, res) => {
-  let out = '';
-  async.each(fs.readdirSync(`${__dirname}/../tests`), (file, callback) => {
-    if (!/(\.test\.js)/g.test(file)) return callback();
-    const child = exec(`npm run test ${__dirname}/../tests/${file}`, {async: true, silent: true});
-    let data = '';
-    child.stdout.on('data', o => data += o);
-    child.stderr.on('data', o => data += o);
-    child.stdout.on('message', o => data += o);
-    child.stdout.on('end', () => {
-      out += data;
-      callback();
-    });
-  }, ()=> {
-    process.nextTick(()=> {
-      res.type('text/plain');
-      res.send(out);
-    });
+  let capture = '';
+  const child = exec(`npm run test ${__dirname}/../tests/*.test.js`, {async: true, silent: true});
+  child.stdout.on('data', data => capture += data);
+  child.stderr.on('data', data => capture += data);
+  child.stdout.on('message', data => capture += data);
+  child.stdout.on('end', () => {
+    res.type('text/plain');
+    res.send(capture);
   });
 });
 

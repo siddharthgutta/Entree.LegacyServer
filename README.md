@@ -55,7 +55,8 @@ pm2 conf pm2-webshell:port 5000
 pm2 conf pm2-webshell:username build
 pm2 conf pm2-webshell:password build
 npm install grunt-cli -g
-
+npm install json2pojo -g
+ 
 # clone
 git config --global credential.helper store
 mkdir Github && cd Github
@@ -88,3 +89,13 @@ Recommended to use MySQL Workbench
  - Use the .pem file
 
 ![](http://i.imgur.com/MQ379m8.jpg)
+
+### Tests
+npm run test ./tests/*.test.js
+
+### Pojo Generation
+```bash
+brew install gradle  # mac
+# ...
+gradle build
+```

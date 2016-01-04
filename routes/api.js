@@ -31,7 +31,6 @@ route.post('/token/destroy', (req, res) => {
 // user
 route.post('/user/create', (req, res) => {
   const {username,email,password, other} = req.body;
-  console.log(req.body);
   User.create(username, email, password, other).then(res.ok).catch(res.fail);
 });
 
