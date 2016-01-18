@@ -1,5 +1,7 @@
 # Entree.Server
 
+[Suggested IDE](https://www.jetbrains.com/webstorm/)
+[SQL Fiddle](http://sqlfiddle.com/#!9/921ef/1)
 ## EC2
 
 ### Connect
@@ -100,3 +102,8 @@ brew install gradle  # mac
 # ...
 gradle build
 ```
+
+### Webhooks
+[https://developer.github.com/webhooks/](https://developer.github.com/webhooks/)
+[Securing Webhooks](https://developer.github.com/webhooks/securing/)
+[3rd Party Webhook Tool](https://github.com/rvagg/github-webhook-handler)
