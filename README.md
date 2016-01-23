@@ -1,6 +1,6 @@
 # Entree.Server
 
-[Suggested IDE](https://www.jetbrains.com/webstorm/)
+[Suggested IDE](https://index.jetbrains.com/webstorm/)
 [SQL Fiddle](http://sqlfiddle.com/#!9/921ef/1)
 
 ## Build Status
