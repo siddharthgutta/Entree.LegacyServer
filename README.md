@@ -43,7 +43,7 @@ npm cache clear # if modules need to be downloaded again
 ```bash
 # general env setup
 sudo apt-get update
-sudo apt-get install git
+sudo apt-get -y install git
 sudo apt-get -y install build-essential git ruby libpam0g-dev
 sudo gem install sass
 echo "sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000" >> ~/.bashrc
@@ -58,6 +58,8 @@ echo "5.0.0" > ~/.nvmrc
 # node global
 npm install pm2 -g
 npm install mocha -g
+pm2 install branch-off
+pm2 conf branch-off:port 4000
 pm2 install pm2-webshell
 pm2 conf pm2-webshell:port 5000
 pm2 conf pm2-webshell:username build
