@@ -6,6 +6,7 @@
     "pm2": {
         "script": "./bin/www",
         "exec_mode": "fork",
+	"max_memory_restart": "1G",
         "instances": 1,
         "env": {
             "NODE_ENV": "production"
