@@ -9,7 +9,6 @@ import sio from './message/sio'             // socket-io (websockets)
 import BasicRouter from './routes/basic'    // imports standard/websocket routers
 import NotifyRouter from './routes/notify'
 import ApiRouter from './routes/api'
-import * as BranchOff from 'branch-off'     // git branch auto-deployment (Mathew's Tool)
 import sequelize from './models'            // mysql orm
 
 const app = express();                            // server creation
@@ -24,8 +23,6 @@ app.set('view engine', 'jade');                   // sets the view engine to jad
 // console access
 app.use(console.middleware('express'));
 app.use('/scribe', console.viewer());
-
-app.use('/postreceive', BranchOff.getRouter());   // connects webhook to the postreceive endpoint
 
 app.use(bodyParser.urlencoded({extended: false}));       // body object from parsed data can have values of strings/arrays
 app.use(bodyParser.json());                              // sets app to use middleware that only parses json
