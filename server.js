@@ -1,7 +1,6 @@
 import express from 'express'
 import path from 'path'                     // module for handling/transforming file paths
 import favicon from 'serve-favicon'         // middleware for serving a favicon
-import logger from 'morgan'                 // http request logger middleware
 import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
 import _ from 'underscore'                  // functional programming library
@@ -28,7 +27,7 @@ app.set('view engine', 'jade');                   // sets the view engine to jad
  * yellow for client error codes, cyan for redirection codes, and
  * uncolored for all other codes.
  */
-app.use(logger('dev'));
+app.use(console.middleware('express'));
 
 app.use(bodyParser.urlencoded({extended: false}));       // body object from parsed data can have values of strings/arrays
 app.use(bodyParser.json());                              // sets app to use middleware that only parses json
