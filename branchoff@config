@@ -7,7 +7,7 @@
         "script": "./index.js",
 	           "max_memory_restart": "1G",
         "env": {
-            "NODE_ENV": "production"
+            "NODE_ENV": "staging"
         }
     }
 }
