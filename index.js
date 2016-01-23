@@ -107,6 +107,6 @@ console.persistent('tags', [NAME, process.env.NODE_ENV]);
 console.override();
 //console.build().then(()=> console.log('Created native apps!')).catch(err => console.error(err));
 
-var server = require('../server').default;
+var server = require('./server').default;
 
 server.listen(PORT, () => console.log(`Listening on ${PORT}`));
