@@ -96,13 +96,6 @@ Recommended to use MySQL Workbench
 npm run test ./tests/*.test.js
 ```
 
-### Pojo Generation
-```bash
-brew install gradle  # mac
-# ...
-gradle build
-```
-
 ### Webhooks
 [https://developer.github.com/webhooks/](https://developer.github.com/webhooks/)
 [Securing Webhooks](https://developer.github.com/webhooks/securing/)
