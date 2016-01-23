@@ -10,7 +10,6 @@ import sio from './message/sio'             // socket-io (websockets)
 import BasicRouter from './routes/basic'    // imports standard/websocket routers
 import NotifyRouter from './routes/notify'
 import ApiRouter from './routes/api'
-import * as BranchOff from 'branch-off'     // git branch auto-deployment (Mathew's Tool)
 import sequelize from './models'            // mysql orm
 
 const app = express();                            // server creation
@@ -21,7 +20,6 @@ sio.attach(server);                               // attaches server to socket.i
 app.set('sequelize', sequelize);
 app.set('views', path.join(__dirname, 'views'));  // points app to location of the views
 app.set('view engine', 'jade');                   // sets the view engine to jade
-app.use('/postreceive', BranchOff.getRouter());   // connects webhook to the postreceive endpoint
 
 /**
  * Morgan Logger Settings

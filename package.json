@@ -14,7 +14,6 @@
     "babelify": "^7.2.0",
     "body-parser": "^1.14.2",
     "brace": "^0.7.0",
-    "branch-off": "git://github.com/bluejamesbond/BranchOff.js.git",
     "config-browserify": "^1.0.5",
     "cookie-parser": "^1.4.0",
     "expect.js": "^0.3.1",
