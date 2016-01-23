@@ -21,10 +21,14 @@ app.set('sequelize', sequelize);
 app.set('views', path.join(__dirname, 'views'));  // points app to location of the views
 app.set('view engine', 'jade');                   // sets the view engine to jade
 
-// console access
+/**
+ * Morgan Logger Settings
+ * Concise output colored by response status for development use.
+ * The :status token will be colored red for server error codes,
+ * yellow for client error codes, cyan for redirection codes, and
+ * uncolored for all other codes.
+ */
 app.use(console.middleware('express'));
-app.use('/scribe', console.viewer());
-
 app.use(bodyParser.urlencoded({extended: false}));       // body object from parsed data can have values of strings/arrays
 app.use(bodyParser.json());                              // sets app to use middleware that only parses json
 app.use(cookieParser());
