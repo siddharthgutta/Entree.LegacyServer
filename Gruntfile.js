@@ -29,7 +29,7 @@ module.exports = function (grunt) {
         },
         files: [{
           expand: true,
-          cwd: 'styles',
+          cwd: 'resources/styles',
           src: ['*.scss'],
           dest: 'public/styles',
           ext: '.min.css'
@@ -42,7 +42,7 @@ module.exports = function (grunt) {
         },
         files: [{
           expand: true,
-          cwd: 'styles',
+          cwd: 'resources/styles',
           src: ['*.scss'],
           dest: 'public/styles',
           ext: '.min.css'

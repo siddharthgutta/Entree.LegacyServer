@@ -2,6 +2,12 @@
 
 [Suggested IDE](https://www.jetbrains.com/webstorm/)
 [SQL Fiddle](http://sqlfiddle.com/#!9/921ef/1)
+
+## Build Status
+```
+http://ec2-52-26-163-35.us-west-2.compute.amazonaws.com:3000/postreceive
+```
+
 ## EC2
 
 ### Connect
