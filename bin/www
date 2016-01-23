@@ -49,7 +49,7 @@ var console = new Scribe(process.pid, {
 
 // override default console
 console.override();
-console.build().then(()=> console.log('Created native apps!')).catch(err => console.error(err));
+//console.build().then(()=> console.log('Created native apps!')).catch(err => console.error(err));
 
 var server = require('../server').default;
 
