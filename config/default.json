@@ -1,4 +1,5 @@
 {
+  "publicUri": "http://localhost",
   "Client": {
     "testProperty": "hello!"
   }

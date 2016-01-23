@@ -4,17 +4,19 @@
 require('babel-register');
 
 var Scribe = require('scribe-js');
+var config = require('config');
 
-var port = parseInt(process.env.BRANCHOFF_PORT) || process.env.PORT || 3000;
-var socketPort = port + 50000;
+var PORT = parseInt(process.env.BRANCHOFF_PORT) || process.env.PORT || 3000;
+var SOCKET_PORT = PORT + 1000;
+var NAME = process.env.BRANCHOFF_BRANCH || PORT;
 
 // improved logging
-var console = new Scribe(process.pid, {
-  name: 'Entree.Server',
+var console = new Scribe(NAME, {
+  name: 'Entree',
   mongoUri: 'mongodb://localhost/scribe',
-  publicUri: 'http://ec2-52-26-163-35.us-west-2.compute.amazonaws.com/',
+  publicUri: config.get('publicUri'),
   basePath: 'scribe/',
-  socketPort: socketPort,
+  socketPort: SOCKET_PORT,
   nwjs: {
     buildDir: `${__dirname}/../public/native`
   },
@@ -28,8 +30,8 @@ var console = new Scribe(process.pid, {
       useSession: true
     },
     client: {
-      port: port,
-      socketPorts: [socketPort],
+      port: PORT,
+      socketPorts: [SOCKET_PORT],
       exposed: {
         all: {label: 'all', query: {expose: {$exists: true}}},
         error: {label: 'error', query: {expose: 'error'}},
@@ -53,4 +55,4 @@ console.override();
 
 var server = require('../server').default;
 
-server.listen(port, () => console.log(`Listening on ${port}`));
+server.listen(PORT, () => console.log(`Listening on ${PORT}`));

@@ -20,11 +20,11 @@ app.set('sequelize', sequelize);
 app.set('views', path.join(__dirname, 'views'));  // points app to location of the views
 app.set('view engine', 'jade');                   // sets the view engine to jade
 
-app.use('/postreceive', BranchOff.getRouter());   // connects webhook to the postreceive endpoint
-
 // console access
 app.use(console.middleware('express'));
 app.use('/scribe', console.viewer());
+
+app.use('/postreceive', BranchOff.getRouter());   // connects webhook to the postreceive endpoint
 
 app.use(bodyParser.urlencoded({extended: false}));       // body object from parsed data can have values of strings/arrays
 app.use(bodyParser.json());                              // sets app to use middleware that only parses json
