@@ -62,8 +62,6 @@ var PORT = parseInt(process.env.BRANCHOFF_PORT) || process.env.PORT || 3000;
 var SOCKET_PORT = PORT + 50000;
 var NAME = process.env.BRANCHOFF_BRANCH || PORT;
 
-console.persistent('tags', [process.env.NODE_ENV]);
-
 // improved logging
 var console = new Scribe(NAME, {
   name: 'Entree',
@@ -102,6 +100,8 @@ var console = new Scribe(NAME, {
   native: {},
   debug: false
 });
+
+console.persistent('tags', [NAME, process.env.NODE_ENV]);
 
 // override default console
 console.override();
