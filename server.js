@@ -24,8 +24,6 @@ app.set('view engine', 'jade');                   // sets the view engine to jad
 app.use(console.middleware('express'));
 app.use('/scribe', console.viewer());
 
-app.use('/postreceive', BranchOff.getRouter());   // connects webhook to the postreceive endpoint
-
 app.use(bodyParser.urlencoded({extended: false}));       // body object from parsed data can have values of strings/arrays
 app.use(bodyParser.json());                              // sets app to use middleware that only parses json
 app.use(cookieParser());
