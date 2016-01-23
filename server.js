@@ -20,8 +20,8 @@ sio.attach(server);                               // attaches server to socket.i
 app.set('sequelize', sequelize);
 app.set('views', path.join(__dirname, 'views'));  // points app to location of the views
 app.set('view engine', 'jade');                   // sets the view engine to jade
+
 app.use('/postreceive', BranchOff.getRouter());   // connects webhook to the postreceive endpoint
-app.use('/scribe', console.viewer());
 
 // console access
 app.use(console.middleware('express'));
