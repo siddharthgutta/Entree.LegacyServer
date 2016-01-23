@@ -59,7 +59,7 @@ var Scribe = require('scribe-js');
 var config = require('config');
 
 var PORT = parseInt(process.env.BRANCHOFF_PORT) || process.env.PORT || 3000;
-var SOCKET_PORT = PORT + 1000;
+var SOCKET_PORT = PORT + 50000;
 var NAME = process.env.BRANCHOFF_BRANCH || PORT;
 
 // improved logging
