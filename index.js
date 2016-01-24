@@ -53,7 +53,6 @@ console.persistent('tags', [NAME, process.env.NODE_ENV]);
 //// override default console
 console.override();
 
->>>>>>> 82c32626acf9f494f1cd62274b1a9f65736e9db3
 var server = require('./server').default;
 var port = parseInt(process.env.BRANCHOFF_PORT) || process.env.PORT || 3000;
 
