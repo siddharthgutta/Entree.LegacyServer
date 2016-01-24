@@ -11,16 +11,22 @@ const TWILIO_TEST_AUTH_TOKEN = "3e7ae8aebc9dc023b66ee071065089b0";
 // Storing keys into config objects
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
 export var twilio_config = {};
 export var twilio_test_config = {};
 =======
 var twilio_config = {};
 var twilio_test_config = {};
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
+<<<<<<< HEAD
 =======
 export var twilio_config = {};
 export var twilio_test_config = {};
 >>>>>>> removed unnecessary module.exports
+=======
+>>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
 
 twilio_config.accountSid = TWILIO_ACCOUNT_SID;
 twilio_config.authToken = TWILIO_AUTH_TOKEN;
@@ -43,12 +49,18 @@ if (!requiredConfig.every(getConfigValue)) {
     'TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_NUMBER must be set.';
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
 =======
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
 =======
   console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
 >>>>>>> added tagged logging
+=======
+  console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
+=======
+>>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
+>>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
   throw new Error(errorMessage);
 }
 
@@ -57,8 +69,11 @@ if (!requiredTestConfig.every(getConfigValue)) {
     'TWILIO_TEST_ACCOUNT_SID, TWILIO_TEST_AUTH_TOKEN, and TWILIO_NUMBER must be set.';
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> added tagged logging
+=======
+>>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
   console.tag("Twilio", "Configuration", "Test", "Error").log(errorMessage);
   throw new Error(errorMessage);
 }
@@ -66,11 +81,17 @@ if (!requiredTestConfig.every(getConfigValue)) {
   throw new Error(errorMessage);
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
 
 // Export configuration object
 module.exports = {
   twilio_config, twilio_test_config
 };
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
+<<<<<<< HEAD
 =======
 >>>>>>> removed unnecessary module.exports
+=======
+>>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
