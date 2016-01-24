@@ -101,13 +101,10 @@ var console = new Scribe(NAME, {
   debug: false
 });
 
-console.log("Whats up! Git is pulling :)");
-
 console.persistent('tags', [NAME, process.env.NODE_ENV]);
 
-// override default console
+//// override default console
 console.override();
-//console.build().then(()=> console.log('Created native apps!')).catch(err => console.error(err));
 
 var server = require('./server').default;
 
