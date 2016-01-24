@@ -1,6 +1,4 @@
 echo "invoked by github push"
 
-export NODE_ENV=production # run grunt in production
-
 npm install
 npm update

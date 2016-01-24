@@ -7,6 +7,7 @@ const route = Router();
 
 route.get('/', (req, res) => res.render('app', {title: 'yolo-not used atm'}));
 route.get('/tools', (req, res) => res.render('tools'));
+route.get('/restaurant', (req, res) => res.render('restaurant'));
 route.get('/tests', (req, res) => {
   let capture = '';
   const child = exec(`npm run test ${__dirname}/../tests/*.test.js`, {async: true, silent: true});

@@ -1,7 +1,5 @@
 echo "invoked by github webhook ping"
 
-export NODE_ENV=production # run grunt in production
-
 npm cache clear
 npm install
 

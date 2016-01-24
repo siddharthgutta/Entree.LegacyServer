@@ -1,7 +1,5 @@
 echo "invoked on pull_request"
 
-export NODE_ENV=production # run grunt in production
-
 npm cache clear
 npm install
 

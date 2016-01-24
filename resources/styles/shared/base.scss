@@ -17,7 +17,7 @@ code {
 
 .ace_content *, .ace_gutter * {
   @extend .monospaced;
-  font-size: 11px;
+  //font-size: 11px;
 }
 
 .icon {
@@ -33,8 +33,9 @@ code {
   "pop" ,
   "settings" ,
   "archive" ,
-  "console" ,
-  "menu" ;
+  "check" ,
+  "menu" ,
+  "phone" ;
 
   @each $i in $icons {
     &.#{nth($i, 1)}:before {

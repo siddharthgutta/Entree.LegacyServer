@@ -4,6 +4,114 @@
 @import "shared/scroll";
 @import "shared/layouts";
 
-* {
-  font-size: 20px;
+html {
+  font-size: 1rem;
+  background: #111;
+  line-height: 100%;
+}
+
+.group {
+  position: relative;
+  width: 100%;
+  .header {
+    background: #FFF;
+    color: #000;
+    padding: 20px;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+  }
+}
+
+.order {
+  background: #111;
+  border-bottom: 1px solid #222;
+  height: 60px;
+  padding: 0 10px;
+  position: absolute;
+  width: 100%;
+  transition: all 1250ms ease;
+  .date {
+    font-size: 70%;
+    color: #999;
+    text-align: left;
+    padding-right: 10px;
+    position: relative;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .name {
+    color: #FFF;
+    text-transform: uppercase;
+    text-align: left;
+    font-size: 90%;
+    letter-spacing: 1px;
+    margin-top: 16px;
+  }
+  .id {
+    &:before {
+      content: '# ';
+      font-size: 15px;
+      color: #999;
+      position: relative;
+      top: -10px;
+    }
+    padding-right: 5px;
+    font-size: 30px;
+    line-height: 60px;
+    color: #FFF;
+    font-weight: 100;
+    min-width: 20px;
+  }
+  .cost {
+    &:before {
+      content: '$ ';
+      font-size: 15px;
+      color: #999;
+      position: relative;
+      top: -3px;
+    }
+    text-align: right;
+    font-size: 20px;
+    line-height: 60px;
+    color: #FFF;
+    padding-right: 10px;
+    font-weight: 100;
+  }
+  .button {
+    padding: 0 15px;
+    border-radius: 50px;
+    color: #FFF;
+    border: 1px solid #333;
+    font-size: 70%;
+    letter-spacing: 1px;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-right: 8px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    &.blue {
+      background: #00A7E6;
+      border: none;
+    }
+    &.icon:before {
+      left: -5px;
+      position: relative;
+      font-size: 110%;
+    }
+    &.icon-only {
+      &.icon:before {
+        left: 0;
+      }
+      padding: 0;
+      max-width: 40px;
+      min-width: 40px;
+    }
+  }
 }
