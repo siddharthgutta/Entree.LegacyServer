@@ -10,7 +10,6 @@ var PORT = parseInt(process.env.BRANCHOFF_PORT) || process.env.PORT || 3000;
 var SOCKET_PORT = PORT + 50000;
 var NAME = process.env.BRANCHOFF_BRANCH || PORT;
 
-// improved logging
 var console = new Scribe(NAME, {
   name: 'Entree',
   mongoUri: 'mongodb://localhost/scribe',
@@ -49,9 +48,7 @@ var console = new Scribe(NAME, {
   debug: false
 });
 
-console.persistent('tags', [NAME, process.env.NODE_ENV]);
-
-//// override default console
+console.persistent('tags', [NAME, process.env.NODE_ENV || "LOCAL_BUILD?"]);
 console.override();
 
 var server = require('./server').default;

@@ -8,7 +8,7 @@ class Header extends Influx.Component {
 
   render() {
     return (
-        <div>Whats up!</div>
+        <div></div>
     )
   }
 }

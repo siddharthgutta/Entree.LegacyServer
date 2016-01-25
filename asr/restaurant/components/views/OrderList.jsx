@@ -2,6 +2,8 @@ import React from 'react'
 import Influx from 'react-influx'
 import OrderStore from '../../stores/OrderStore'
 import Order from './elements/Order.jsx'
+import TabbedPane from './general/TabbedPane.jsx'
+import _ from 'underscore'
 
 class OrderList extends Influx.Component {
   constructor(...args) {
@@ -17,7 +19,11 @@ class OrderList extends Influx.Component {
   }
 
   _onOrderStoreOrderReceived(nextOrder) {
-    this.setState({orders: OrderStore.getOrders()});
+    const orders = OrderStore.getOrders();
+    this.setState({
+      orders: this.props.status ?
+          _.filter(orders, order => order.status === this.props.status) : orders
+    });
   }
 
   render() {
@@ -30,9 +36,9 @@ class OrderList extends Influx.Component {
 
     // manually animating for now
     return (
-        <div className="group">
-          <div className="header">Orders</div>
-          <div className="items" style={{height:items.length * 80}}>{items}</div>
+        <div className="group full">
+          { !items.length ? <div className="empty center-vertical">{`No ${this.props.status} orders`}</div> :
+              <div className="items" style={{height:items.length * 80}}>{items}</div>  }
         </div>
     )
   }

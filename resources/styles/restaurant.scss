@@ -3,6 +3,7 @@
 @import "shared/base";
 @import "shared/scroll";
 @import "shared/layouts";
+@import "shared/tabs";
 
 html {
   font-size: 1rem;
@@ -13,9 +14,17 @@ html {
 .group {
   position: relative;
   width: 100%;
+  .empty {
+    font-size: 20px;
+    text-align: center;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #777;
+  }
   .header {
-    background: #FFF;
-    color: #000;
+    background: #111;
+    border-bottom: 1px solid #222;
     padding: 20px;
     font-size: 15px;
     text-transform: uppercase;
@@ -81,7 +90,7 @@ html {
   }
   .button {
     padding: 0 20px;
-    border-radius: 50px;
+    border-radius: 4px;
     color: #FFF;
     border: 1px solid #333;
     font-size: 70%;
@@ -94,7 +103,8 @@ html {
     text-align: center;
     white-space: nowrap;
     text-overflow: ellipsis;
-    max-width: 120px;
+    max-width: 140px;
+    min-width: 140px;
     &.blue {
       background: #00A7E6;
       border: none;
