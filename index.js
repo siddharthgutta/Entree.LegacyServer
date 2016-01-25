@@ -13,7 +13,6 @@ var NAME = process.env.BRANCHOFF_BRANCH || PORT;
 var console = new Scribe(NAME, {
   name: 'Entree',
   mongoUri: 'mongodb://localhost/scribe',
-  publicUri: config.get('publicUri'),
   basePath: 'scribe/',
   socketPort: SOCKET_PORT,
   nwjs: {
