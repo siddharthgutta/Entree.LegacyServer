@@ -35,7 +35,11 @@ code {
   "archive" ,
   "check" ,
   "menu" ,
-  "phone" ;
+  "phone" ,
+  "eye" ,
+  "clock" ,
+  "cross" ,
+  "mail" ;
 
   @each $i in $icons {
     &.#{nth($i, 1)}:before {

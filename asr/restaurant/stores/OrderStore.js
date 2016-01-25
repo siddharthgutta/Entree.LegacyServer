@@ -3,10 +3,13 @@ import Dispatcher from '../dispatchers/Dispatcher.js'
 import keyMirror from 'keymirror'
 import moment from 'moment'
 import extend from 'extend'
+import Chance from 'chance'
 
 const Events = keyMirror({
   ORDER_RECEIVED: null
 });
+
+const chance = new Chance();
 
 const sampleData = [
   {
@@ -60,8 +63,10 @@ class OrderStore extends Influx.Store {
       setTimeout(()=> {
         const nextOrder = extend({}, sampleData[parseInt(Math.random() * sampleData.length)]);
         nextOrder.id = ++counter;
+        nextOrder.name = chance.name();
         nextOrder.date = Date.now();
         nextOrder.cost = Number((Math.random() * 50).toFixed(2));
+        nextOrder.status = chance.pick(["received","accepted","completed","declined"]);
         this.data.orders.unshift(nextOrder);
         this.emit(Events.ORDER_RECEIVED, nextOrder);
       }, parseInt(Math.random() * 500));

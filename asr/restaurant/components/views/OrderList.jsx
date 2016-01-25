@@ -32,7 +32,7 @@ class OrderList extends Influx.Component {
     return (
         <div className="group">
           <div className="header">Orders</div>
-          <div className="items" style={{height:items.length * 60}}>{items}</div>
+          <div className="items" style={{height:items.length * 80}}>{items}</div>
         </div>
     )
   }

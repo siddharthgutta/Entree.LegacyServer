@@ -27,7 +27,6 @@ html {
 .order {
   background: #111;
   border-bottom: 1px solid #222;
-  height: 60px;
   padding: 0 10px;
   position: absolute;
   width: 100%;
@@ -47,7 +46,6 @@ html {
     text-align: left;
     font-size: 90%;
     letter-spacing: 1px;
-    margin-top: 16px;
   }
   .id {
     &:before {
@@ -55,14 +53,17 @@ html {
       font-size: 15px;
       color: #999;
       position: relative;
-      top: -10px;
+      top: -6px;
+      left: -3px;
     }
+    padding-left: 5px;
     padding-right: 5px;
     font-size: 30px;
-    line-height: 60px;
     color: #FFF;
     font-weight: 100;
-    min-width: 20px;
+    max-width: 40px;
+    min-width: 40px;
+    width: 40px;
   }
   .cost {
     &:before {
@@ -70,17 +71,16 @@ html {
       font-size: 15px;
       color: #999;
       position: relative;
-      top: -3px;
+      left: -3px;
     }
     text-align: right;
     font-size: 20px;
-    line-height: 60px;
     color: #FFF;
     padding-right: 10px;
     font-weight: 100;
   }
   .button {
-    padding: 0 15px;
+    padding: 0 20px;
     border-radius: 50px;
     color: #FFF;
     border: 1px solid #333;
@@ -90,8 +90,7 @@ html {
     text-transform: uppercase;
     font-weight: bold;
     margin-right: 8px;
-    height: 40px;
-    line-height: 40px;
+    height: 35px;
     text-align: center;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -113,5 +112,25 @@ html {
       max-width: 40px;
       min-width: 40px;
     }
+  }
+
+  .bgRed {
+    background: #F44336 !important;
+  }
+
+  .bgGreen {
+    background: #4CAF50 !important;
+  }
+
+  .bgBlue {
+    background: #2196F3 !important;
+  }
+
+  .bgGray {
+    background: #888 !important;
+  }
+
+  .bgYellow {
+    background: #FFC107 !important;
   }
 }

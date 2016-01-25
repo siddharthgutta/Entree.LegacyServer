@@ -34,6 +34,20 @@
       max-width: 50%;
     }
   }
+  &.left {
+    align-items: center;
+    justify-content: flex-start;
+    > .centered {
+      max-width: 50%;
+    }
+  }
+  &.right {
+    align-items: center;
+    justify-content: flex-end;
+    > .centered {
+      max-width: 50%;
+    }
+  }
 }
 
 .center-vertical {
