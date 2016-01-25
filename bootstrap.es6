@@ -1,7 +1,8 @@
-import Scribe from 'scribe-js';
-import config from 'config';
-import cluster from 'cluster';
-import {exec} from 'shelljs';
+import Scribe from 'scribe-js'
+import config from 'config'
+import cluster from 'cluster'
+import {exec} from 'shelljs'
+import models from './models'
 
 export function resolveContext() {
   var port = parseInt(process.env.BRANCHOFF_PORT) || process.env.PORT || 3000;
@@ -80,8 +81,7 @@ export function initScribe(override = true, mongo = true, socket = true, colors=
 
 export function initDatabase() {
   var context = resolveContext();
-
-  // todo
+  models.sequelize.sync({force: true}); // Remove once we finalize model
 }
 
 export function initServer() {
