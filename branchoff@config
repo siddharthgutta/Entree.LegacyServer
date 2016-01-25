@@ -6,8 +6,6 @@
     "pm2": {
         "script": "./index.js",
 	"max_memory_restart": "1G",
-        "instances": 1,
-        "max_memory_restart": "1G",
         "env": {
             "NODE_ENV": "staging"
         }
