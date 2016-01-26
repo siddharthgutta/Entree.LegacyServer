@@ -108,6 +108,7 @@ body {
     text-overflow: ellipsis;
     max-width: 140px;
     min-width: 140px;
+    user-select: none;
     &.blue {
       background: #00A7E6;
       border: none;
@@ -389,6 +390,7 @@ body {
       border-radius: 6px;
       width: 100%;
       margin-bottom: 10px;
+      user-select: none;
       span {
         color: #FFF;
       }

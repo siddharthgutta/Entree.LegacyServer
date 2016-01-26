@@ -101,7 +101,7 @@ class App extends Influx.Component {
                     className="icon add"/> 1
                   Minute
                 </div>
-                <div className="button navy flex center" onClick={this._addTime.bind(this, 15)}><span
+                <div className="button navy flex center" onClick={this._addTime.bind(this, 5)}><span
                     className="icon add"/> 5
                   Minutes
                 </div>
