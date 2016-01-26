@@ -35,6 +35,7 @@ code {
   "archive" ,
   "check" ,
   "menu" ,
+  "add" ,
   "phone" ,
   "eye" ,
   "clock" ,
@@ -54,8 +55,7 @@ code {
   display: inline-block;
   text-align: center;
 
-  $icons:
-  "message" ,
+  $icons: "message" ,
   "mail" ,
   "menu" ,
   "back" ;

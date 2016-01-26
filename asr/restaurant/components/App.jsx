@@ -10,11 +10,15 @@ class App extends Influx.Component {
   constructor(...args) {
     super(...args);
 
-    this.state = {showDialog: false};
+    this.state = {showDialog: false, time: 0};
   }
 
   componentDidMount() {
     Dispatcher.emit(Dispatcher.Events.CONNECT_STREAM);
+  }
+
+  _addTime(time) {
+    this.setState({time: this.state.time + time});
   }
 
   _handleAccept() {
@@ -88,11 +92,20 @@ class App extends Influx.Component {
                 </div>
                 <hr />
                 <div className="desc bold normal" style={{marginBottom:20}}>Select a preparation time</div>
-                <div className="button navy">5 Minutes</div>
-                <div className="button navy">15 Minutes</div>
-                <div className="button navy">30 Minutes</div>
+                <div className="button navy flex center" onClick={this._addTime.bind(this, 1)}><span
+                    className="icon add"/> 1
+                  Minute
+                </div>
+                <div className="button navy flex center" onClick={this._addTime.bind(this, 15)}><span
+                    className="icon add"/> 5
+                  Minutes
+                </div>
+                <div className="button navy flex center" onClick={this._addTime.bind(this, 15)}><span
+                    className="icon add"/> 15
+                  Minutes
+                </div>
                 <div className="desc" style={{marginBottom:10}}>OR</div>
-                <input placeholder="minutes"/>
+                <input placeholder="minutes" value={this.state.time}/>
                 <div className="button">submit</div>
               </div>
             </div>

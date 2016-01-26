@@ -389,6 +389,13 @@ body {
       border-radius: 6px;
       width: 100%;
       margin-bottom: 10px;
+      span {
+        color: #FFF;
+      }
+      .add {
+        font-size: 12px;
+        margin-right: 10px;
+      }
       &.orange {
         background: #FFC107;
       }
