@@ -20,6 +20,7 @@
     "expect.js": "^0.3.1",
     "express": "^4.13.3",
     "extend": "^3.0.0",
+    "fastclick": "^1.0.6",
     "grunt": "^0.4.5",
     "grunt-browserify": "git://github.com/bluejamesbond/grunt-browserify.git",
     "grunt-contrib-clean": "^0.7.0",
