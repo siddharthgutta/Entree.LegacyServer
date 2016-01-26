@@ -2,7 +2,7 @@
 import {twilio_config, twilio_test_config} from './config';
 
 // importing the twilio node module
-var twilio  = require('twilio');
+var twilio = require('twilio');
 
 // Creating twilio clients for production and test
 var twilioClient = twilio(twilio_config.accountSid, twilio_config.authToken);
@@ -14,8 +14,8 @@ function sendSMS(toNumber, fromNumber, textBody, specificTwilioClient) {
     from: fromNumber,
     body: textBody
 
-  //this function is executed when a response is received from Twilio
-  }, function(error, responseData) {
+    //this function is executed when a response is received from Twilio
+  }, function (error, responseData) {
     // "err" is an error received during the request, if any
     if (!error) {
 
@@ -30,10 +30,12 @@ function sendSMS(toNumber, fromNumber, textBody, specificTwilioClient) {
   })
 }
 
-export var sendStandardSMS = (toNumber, textBody) => {
+export function sendStandardSMS(toNumber, textBody) {
+  console.tag("sendStandardSMS").log(arguments);
   sendSMS(toNumber, twilio_config.sendingNumber, textBody, twilioClient);
 }
 
-export var sendTestSMS = (toNumber, textBody) => {
+export function sendTestSMS(toNumber, textBody) {
+  console.tag("sendTestSMS").log(arguments);
   sendSMS(toNumber, twilio_test_config.sendingNumber, textBody, twilioTestClient);
 }
