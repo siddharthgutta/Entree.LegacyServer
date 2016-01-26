@@ -8,7 +8,7 @@ $spreadTabHeight: 40px;
   max-height: $tabHeight;
   min-height: $tabHeight;
   padding-top: 2px;
-  background: rgba(0, 0, 0, 0.2);
+  //background: rgba(0, 0, 0, 0.2);
   .light & {
     background: #EEE;
     border-bottom: 1px solid #DDD;
@@ -73,7 +73,7 @@ $spreadTabHeight: 40px;
         border-color: #DDD;
       }
       &.selected {
-        box-shadow: inset 0 -2px 0 #FF9800;
+        //box-shadow: inset 0 -2px 0 #FF9800;
         line-height: $spreadTabHeight !important;
         margin: 0;
         top: 0;
