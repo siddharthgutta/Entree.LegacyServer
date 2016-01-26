@@ -24,7 +24,7 @@ class App extends Influx.Component {
 
     return (
         <div className="full flex vertical">
-          <Header title="Order" subtitle="#56645" height={185}>
+          <Header title="Order" subtitle="#56645" style={{minHeight:185}}>
             <div className="flex" style={{padding:'30px 0'}}>
               <div className="box flex center vertical" style={{borderRight: '1px solid rgba(255, 255, 255, 0.1)'}}>
                 <div className="value">$15.35</div>
@@ -35,7 +35,7 @@ class App extends Influx.Component {
               </div>
             </div>
           </Header>
-          <div className="flex status" style={{height:53}}>
+          <div className="flex status" style={{minHeight:53}}>
             <div className="box event active">RECEIVED</div>
             <div className="box event">COOKING</div>
             <div className="box event">COMPLETE</div>
@@ -62,7 +62,7 @@ class App extends Influx.Component {
               <div className="box flex cost center right vertical">$5.60</div>
             </div>
           </div>
-          <div style={{padding:"0px 20px",background:"#222",height:62}}>
+          <div style={{padding:"0px 20px",background:"#222",minHeight:62}}>
             <div className="floater">
               <div className="flex">
                 <div className="button box dim">DECLINE</div>
