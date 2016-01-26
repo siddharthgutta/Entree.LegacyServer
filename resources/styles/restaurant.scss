@@ -6,9 +6,7 @@
 @import "shared/tabs";
 
 html {
-  font-size: 1rem;
-  background: #111;
-  line-height: 100%;
+  background: linear-gradient(to bottom, #3F51B5, #000);
 }
 
 .group {
@@ -142,5 +140,166 @@ html {
 
   .bgYellow {
     background: #FFC107 !important;
+  }
+}
+
+.header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  .nav-left, .nav-right {
+    max-width: 50px;
+    min-width: 50px;
+    color: #FFF;
+    &.back {
+      font-size: 40px;
+    }
+    &.menu {
+      font-size: 25px;
+    }
+  }
+
+  .title {
+    text-align: center;
+    color: #FFF;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 15px;
+    letter-spacing: 1px;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .text {
+    padding: 10px 0;
+  }
+
+  .children {
+    padding: 20px;
+  }
+}
+
+.value {
+  font-size: 50px;
+  text-align: center;
+  color: #FFF;
+  .small & {
+    font-size: 30px;
+  }
+}
+
+.desc {
+  font-size: 14px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.52);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  .small & {
+    font-size: 12px;
+  }
+}
+
+.nav {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 30px 15px;
+
+  .quantity {
+    font-size: 15px;
+    font-weight: bold;
+    color: #FFF;
+    width: 30px;
+    max-width: 30px;
+    max-height: 30px;
+    height: 30px;
+    line-height: 35px;
+    border-radius: 5px;
+    text-align: center;
+    border: 2px solid rgba(255, 255, 255, 0.42);
+  }
+
+  .name {
+    color: #FFF;
+    font-weight: bold;
+    align-items: flex-start;
+    padding-left: 15px;
+  }
+
+  .cost {
+    text-align: right;
+    align-items: flex-end;
+    color: rgba(255, 255, 255, 0.53);
+    letter-spacing: 1px;
+    font-size: 15px;
+    align-items: flex-end;
+    justify-content: center;
+  }
+}
+
+.floater {
+  padding: 8px;
+  border-radius: 4px 4px 0 0;
+  background: #2F3C4F;
+  .button {
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #FFF;
+    font-size: 13px;
+    padding: 15px 0;
+    /* background: linear-gradient(to bottom, #36DBDB, #36DBA6); */
+    border-radius: 3px;
+    /* margin-right: 5px; */
+    margin-right: 10px;
+    /* box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); */
+    /* border: 1px solid rgba(255, 255, 255, 0.26); */
+    &:last-child {
+      margin-right: 0;
+    }
+    &.dim {
+      background: #4B5A73;
+    }
+    &.bright {
+      background: #03A9F4;
+    }
+    &.red {
+      background: #FF5722;
+    }
+    &.green {
+      background: #3AE041;
+    }
+  }
+}
+
+.status {
+  background: rgba(0, 0, 0, 0.24);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  .event {
+    margin: 11px 10px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.11);
+    padding: 9px;
+    border-radius: 100px;
+    font-weight: bold;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.64);
+    //border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .event.active {
+    background: #FF5722;
+    color: #FFF;
+    /* border: none; */
+    /* box-shadow: 0 1px 30px rgba(0, 0, 0, 0.32); */
+    /* color: #000; */
   }
 }
