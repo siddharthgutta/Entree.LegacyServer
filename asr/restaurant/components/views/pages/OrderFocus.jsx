@@ -86,6 +86,9 @@ class OrderFocus extends React.Component {
                     <div className="value">#{order.id}</div>
                     <div className="desc">ID</div>
                   </div><div className="box flex left vertical small info">
+                    <div className="value">{order.name}</div>
+                    <div className="desc">NAME</div>
+                  </div><div className="box flex left vertical small info hide">
                     <div className="value">{order.status.substring(0, 1).toUpperCase() + order.status.substring(1)}</div>
                     <div className="desc">STATUS</div>
                   </div><div className="box flex left vertical small info">
