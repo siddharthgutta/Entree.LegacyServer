@@ -44,8 +44,8 @@ class OrderHistory extends React.Component {
               <TabbedPane spread={true}
                           onChange={this._handleChange.bind(this)}
                           Received={<OrderList onOrderClick={this.props.onOrderClick} status="received"/>}
-                          Progress={<OrderList onOrderClick={this.props.onOrderClick}  status="accepted"/>}
                           Completed={<OrderList onOrderClick={this.props.onOrderClick}  status="completed"/>}
+                          Progress={<OrderList onOrderClick={this.props.onOrderClick}  status="accepted"/>}
                           tabs={["Received", "Progress", "Completed"]}/>
               <div style={{padding:"0px 20px",background:"rgba(0,0,0,0.7)",minHeight:45}}>
                 <div className="floater">

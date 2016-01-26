@@ -64,7 +64,7 @@ class OrderStore extends Influx.Store {
     order.name = chance.name();
     order.date = Date.now();
     order.cost = Number((Math.random() * 50).toFixed(2));
-    order.status = chance.pick(["received", "accepted", "completed", "declined"]);
+    order.status = chance.pick(["received", "accepted", "completed"]);
 
     this.data.orders.unshift(order);
     this.emit(Events.ORDER_RECEIVED, order);

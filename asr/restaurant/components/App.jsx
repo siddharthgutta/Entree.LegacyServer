@@ -32,7 +32,6 @@ class App extends React.Component {
   }
 
   _selectOrder(order) {
-    console.log(this, order);
     this.setState({selectedOrder: order});
   }
 

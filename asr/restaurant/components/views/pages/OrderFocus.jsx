@@ -5,6 +5,7 @@ import Dispatcher from '../../../dispatchers/Dispatcher'
 import TabbedPane from '../../views/general/TabbedPane.jsx'
 import Header from '../../views/elements/Header.jsx'
 import {ifcat} from '../../../libs/utils'
+import moment from 'moment'
 
 class OrderFocus extends React.Component {
   constructor(...args) {
@@ -32,14 +33,18 @@ class OrderFocus extends React.Component {
   }
 
   render() {
+    const {order} = this.props;
+
+    console.log(order);
+
     return (
         <div className="full">
           <div className="full-abs">
             <div className="full flex vertical">
-              <Header title="Order" subtitle="#56645" style={{minHeight:185}}>
+              <Header title={"#" + order.id} subtitle={"ORDER"} style={{minHeight:185}}>
                 <div className="flex" style={{padding:'30px 0'}}>
                   <div className="box flex center vertical" style={{borderRight: '1px solid rgba(255, 255, 255, 0.1)'}}>
-                    <div className="value">$15.35</div>
+                    <div className="value">${order.cost}</div>
                     <div className="desc">TOTAL COST</div>
                   </div>
                   <div className="box small flex center vertical">
@@ -50,9 +55,9 @@ class OrderFocus extends React.Component {
               <TabbedPane spread={true} Items={
               <div className="full  flex vertical">
               <div className="flex status" style={{minHeight:53}}>
-                <div className="box event active">RECEIVED</div>
-                <div className="box event">COOKING</div>
-                <div className="box event">COMPLETE</div>
+                <div className={ifcat("box event", {active: order.status === "received"})}>RECEIVED</div>
+                <div className={ifcat("box event", {active: order.status === "accepted"})}>PROGRESS</div>
+                <div className={ifcat("box event", {active: order.status === "completed"})}>COMPLETE</div>
               </div>
               <div className="full" style={{padding:"10px 15px 0",overflow:'scroll',background:"rgba(0,0,0,0.7)"}}>
                 <div className="item flex">
@@ -76,8 +81,17 @@ class OrderFocus extends React.Component {
                   <div className="box flex cost center right vertical">$5.60</div>
                 </div>
               </div>
-              </div>} Details={<div className="full" style={{padding:"5px 15px",overflow:'scroll',background:"rgba(0,0,0,0.7)"}}>
-
+              </div>} Details={<div className="full" style={{padding:"30px",overflow:'scroll',background:"rgba(0,0,0,0.7)"}}>
+                  <div className="box flex left vertical small info">
+                    <div className="value">#{order.id}</div>
+                    <div className="desc">ID</div>
+                  </div><div className="box flex left vertical small info">
+                    <div className="value">{order.status.substring(0, 1).toUpperCase() + order.status.substring(1)}</div>
+                    <div className="desc">STATUS</div>
+                  </div><div className="box flex left vertical small info">
+                    <div className="value">{moment(order.date).calendar()}</div>
+                    <div className="desc">DATE</div>
+                  </div>
               </div>} tabs={["Items", "Details"]}/>
               <div style={{padding:"0px 20px",background:"rgba(0,0,0,0.7)",minHeight:62}}>
                 <div className="floater">
