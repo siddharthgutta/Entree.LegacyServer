@@ -1,0 +1,6 @@
+{
+  "publicUri": "http://ec2-52-11-141-187.us-west-2.compute.amazonaws.com",
+  "Client": {
+    "testProperty": "hello!"
+  }
+}
