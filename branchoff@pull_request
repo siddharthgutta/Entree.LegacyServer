@@ -1,6 +1,0 @@
-echo "invoked on pull_request"
-
-npm cache clear
-npm install
-
-grunt build -v
