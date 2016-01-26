@@ -39,6 +39,7 @@
     "react": "^0.14.6",
     "react-ace": "^3.0.0",
     "react-dom": "^0.14.6",
+    "react-fastclick": "^2.0.0",
     "react-influx": "^1.0.7",
     "react-prefixr": "^0.1.0",
     "scribe-js": "git://github.com/bluejamesbond/Scribe.js.git#dev",

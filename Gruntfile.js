@@ -183,7 +183,9 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('styles', ['sass:dist', 'postcss:dist']);
-  grunt.registerTask('build', ['get-deps', 'sass:dist', 'postcss:dist', 'browserify:dist', 'uglify:dist', 'jade:dist', 'imagemin', 'jade', 'copy', 'rename:dist']);
+
+  // FIXME dont' uglify if in dev mode
+  grunt.registerTask('build', ['get-deps', 'sass:dist', 'postcss:dist', 'browserify:dist', 'uglify:dist', 'jade:dist', 'imagemin', 'copy', 'rename:dist']);
   grunt.registerTask('default', 'build');
   grunt.registerTask('auto-build-scripts', ['browserify:dev']);
   grunt.registerTask('auto-build-styles', ['sass:dev', 'watch:sass']);

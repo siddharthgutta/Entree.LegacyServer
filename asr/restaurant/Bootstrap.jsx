@@ -1,9 +1,7 @@
 import App from './components/App.jsx'
 import React from 'react'
 import { render, unmountComponentAtNode } from 'react-dom'
-//import FastClick from 'fastclick'
-
-//FastClick.attach(document.body);
+//import 'react-fastclick'; // FIXME
 
 ///*
 // * Licensed to the Apache Software Foundation (ASF) under one

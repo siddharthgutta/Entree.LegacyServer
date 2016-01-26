@@ -17,6 +17,7 @@ body {
   -webkit-touch-callout: none; /* prevent callout to copy image, etc when tap to hold */
   -webkit-text-size-adjust: none; /* prevent webkit from resizing text to fit */
   -webkit-user-select: none; /* prevent copy paste, to allow, change 'none' to 'text' */
+  overflow: hidden;
 }
 
 body {
@@ -29,6 +30,10 @@ body {
   &.green {
     background: linear-gradient(to bottom, #3FB5B0, #573273);
   }
+}
+
+#app {
+  overflow: hidden;
 }
 
 .group {
