@@ -2,41 +2,46 @@ import Influx from 'react-influx'
 import Dispatcher from '../dispatchers/Dispatcher.js'
 import keyMirror from 'keymirror'
 import moment from 'moment'
+import extend from 'extend'
+import Chance from 'chance'
 
 const Events = keyMirror({
   ORDER_RECEIVED: null
 });
+
+const chance = new Chance();
 
 const sampleData = [
   {
     id: 1,
     phone: '713-505-1837',
     name: 'Tiraj Parikh',
-    cost: Number((Math.random() * 50).toFixed(2)),
     items: [],
     status: 'NEW'
   }, {
     id: 2,
     phone: '713-505-1837',
     name: 'Calvin Bench',
-    cost: Number((Math.random() * 50).toFixed(2)),
     items: [],
     status: 'ACCEPTED'
   }, {
     id: 3,
     phone: '713-505-1837',
     name: 'Kevin Fu',
-    cost: Number((Math.random() * 50).toFixed(2)),
     items: [],
     status: 'NEW'
   }
 ];
 
+let counter = 0;
+
 class OrderStore extends Influx.Store {
   constructor() {
     super(Dispatcher);
 
-    this.data.orders = [];
+    this.data = {orders: []};
+
+    window.orders = this.data.orders;
   }
 
   sendStatus(id, status) {
@@ -56,13 +61,16 @@ class OrderStore extends Influx.Store {
   _onDispatcherConnectStream() {
     setInterval(()=> {
       setTimeout(()=> {
-        const nextOrder = sampleData[parseInt(Math.random() * sampleData.length)];
-        nextOrder.id = Date.now();
-        nextOrder.time = Date.now();
-        this.data.order.push(nextOrder);
+        const nextOrder = extend({}, sampleData[parseInt(Math.random() * sampleData.length)]);
+        nextOrder.id = ++counter;
+        nextOrder.name = chance.name();
+        nextOrder.date = Date.now();
+        nextOrder.cost = Number((Math.random() * 50).toFixed(2));
+        nextOrder.status = chance.pick(["received","accepted","completed","declined"]);
+        this.data.orders.unshift(nextOrder);
         this.emit(Events.ORDER_RECEIVED, nextOrder);
-      }, parseInt(Math.random() * 4000));
-    }, 10000)
+      }, parseInt(Math.random() * 500));
+    }, 5000)
   }
 }
 

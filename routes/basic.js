@@ -5,7 +5,7 @@ import async from 'async'
 
 const route = Router();
 
-route.get('/', (req, res) => res.render('app', {title: 'yolo-not used atm'}));
+route.get('/', (req, res) => res.render('restaurant'));
 route.get('/tools', (req, res) => res.render('tools'));
 route.get('/tests', (req, res) => {
   let capture = '';
