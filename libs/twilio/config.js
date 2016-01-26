@@ -9,8 +9,8 @@ const TWILIO_TEST_ACCOUNT_SID = "AC170b40ecf9e378bc5b414c60801d7178";
 const TWILIO_TEST_AUTH_TOKEN = "3e7ae8aebc9dc023b66ee071065089b0";
 
 // Storing keys into config objects
-var twilio_config = {};
-var twilio_test_config = {};
+export var twilio_config = {};
+export var twilio_test_config = {};
 
 twilio_config.accountSid = TWILIO_ACCOUNT_SID;
 twilio_config.authToken = TWILIO_AUTH_TOKEN;
@@ -39,8 +39,3 @@ if (!requiredTestConfig.every(getConfigValue)) {
     'TWILIO_TEST_ACCOUNT_SID, TWILIO_TEST_AUTH_TOKEN, and TWILIO_NUMBER must be set.';
   throw new Error(errorMessage);
 }
-
-// Export configuration object
-module.exports = {
-  twilio_config, twilio_test_config
-};

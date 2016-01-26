@@ -28,14 +28,10 @@ function sendSMS(toNumber, fromNumber, textBody, specificTwilioClient) {
   })
 }
 
-var sendStandardSMS = (toNumber, textBody) => {
+export var sendStandardSMS = (toNumber, textBody) => {
   sendSMS(toNumber, twilio_config.sendingNumber, textBody, twilioClient);
 }
 
-var sendTestSMS = (toNumber, textBody) => {
+export var sendTestSMS = (toNumber, textBody) => {
   sendSMS(toNumber, twilio_test_config.sendingNumber, textBody, twilioTestClient);
 }
-
-module.exports = {
-  sendStandardSMS, sendTestSMS
-};
