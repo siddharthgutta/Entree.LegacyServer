@@ -32,9 +32,13 @@
     "license-report": "^1.0.8",
     "load-grunt-tasks": "^3.4.0",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "mocha": "^2.3.4",
 =======
 >>>>>>> Prepping for prod launches
+=======
+    "mocha": "^2.3.4",
+>>>>>>> added mocha and twilio to package.json
     "mysql": "^2.10.0",
     "react": "^0.14.3",
     "react-ace": "^3.0.0",
