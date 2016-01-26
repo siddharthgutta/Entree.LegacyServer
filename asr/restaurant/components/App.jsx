@@ -36,12 +36,17 @@ class App extends Influx.Component {
           <div className="full-abs">
             <div className="full flex vertical">
               <Header title="Order" subtitle="HISTORY" style={{minHeight:55}}/>
-              <div className="full">
-                <TabbedPane spread={true}
-                            Received={<OrderList status="received"/>}
-                            Progress={<OrderList status="accepted"/>}
-                            Completed={<OrderList status="completed"/>}
-                            tabs={["Received", "Progress", "Completed"]}/>
+              <TabbedPane spread={true}
+                          Received={<OrderList status="received"/>}
+                          Progress={<OrderList status="accepted"/>}
+                          Completed={<OrderList status="completed"/>}
+                          tabs={["Received", "Progress", "Completed"]}/>
+              <div style={{padding:"0px 20px",background:"#222",minHeight:45}}>
+                <div className="floater">
+                  <div className="flex">
+                    <div className="button box dim">HAVING ISSUES?</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
