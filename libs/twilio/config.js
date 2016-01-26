@@ -31,11 +31,13 @@ function getConfigValue(configValue) {
 if (!requiredConfig.every(getConfigValue)) {
   var errorMessage =
     'TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_NUMBER must be set.';
+  console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
   throw new Error(errorMessage);
 }
 
 if (!requiredTestConfig.every(getConfigValue)) {
   var errorMessage =
     'TWILIO_TEST_ACCOUNT_SID, TWILIO_TEST_AUTH_TOKEN, and TWILIO_NUMBER must be set.';
+  console.tag("Twilio", "Configuration", "Test", "Error").log(errorMessage);
   throw new Error(errorMessage);
 }
