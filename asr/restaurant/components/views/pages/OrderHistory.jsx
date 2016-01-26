@@ -40,7 +40,7 @@ class OrderHistory extends React.Component {
         <div className="full">
           <div className="full-abs">
             <div className="full flex vertical">
-              <Header title="Order" subtitle="HISTORY" style={{minHeight:55}}/>
+              <Header title="Order" subtitle="HISTORY" style={{minHeight:55,borderBottom:"none"}}/>
               <TabbedPane spread={true}
                           onChange={this._handleChange.bind(this)}
                           Received={<OrderList onOrderClick={this.props.onOrderClick} status="received"/>}

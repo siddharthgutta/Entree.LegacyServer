@@ -35,8 +35,6 @@ class OrderFocus extends React.Component {
   render() {
     const {order} = this.props;
 
-    console.log(order);
-
     return (
         <div className="full">
           <div className="full-abs">
