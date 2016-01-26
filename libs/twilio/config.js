@@ -10,12 +10,17 @@ const TWILIO_TEST_AUTH_TOKEN = "3e7ae8aebc9dc023b66ee071065089b0";
 
 // Storing keys into config objects
 <<<<<<< HEAD
+<<<<<<< HEAD
 export var twilio_config = {};
 export var twilio_test_config = {};
 =======
 var twilio_config = {};
 var twilio_test_config = {};
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
+=======
+export var twilio_config = {};
+export var twilio_test_config = {};
+>>>>>>> removed unnecessary module.exports
 
 twilio_config.accountSid = TWILIO_ACCOUNT_SID;
 twilio_config.authToken = TWILIO_AUTH_TOKEN;
@@ -53,9 +58,12 @@ if (!requiredTestConfig.every(getConfigValue)) {
 =======
   throw new Error(errorMessage);
 }
+<<<<<<< HEAD
 
 // Export configuration object
 module.exports = {
   twilio_config, twilio_test_config
 };
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
+=======
+>>>>>>> removed unnecessary module.exports
