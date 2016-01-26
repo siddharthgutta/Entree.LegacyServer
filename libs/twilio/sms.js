@@ -37,7 +37,3 @@ export var sendStandardSMS = (toNumber, textBody) => {
 export var sendTestSMS = (toNumber, textBody) => {
   sendSMS(toNumber, twilio_test_config.sendingNumber, textBody, twilioTestClient);
 }
-
-module.exports = {
-  sendStandardSMS, sendTestSMS
-};

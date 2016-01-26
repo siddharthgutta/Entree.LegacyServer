@@ -12,8 +12,11 @@ const TWILIO_TEST_AUTH_TOKEN = "3e7ae8aebc9dc023b66ee071065089b0";
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
+=======
+>>>>>>> removed unnecessary module.exports
 export var twilio_config = {};
 export var twilio_test_config = {};
 =======
@@ -21,12 +24,18 @@ var twilio_config = {};
 var twilio_test_config = {};
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> removed unnecessary module.exports
 =======
 export var twilio_config = {};
 export var twilio_test_config = {};
 >>>>>>> removed unnecessary module.exports
+<<<<<<< HEAD
 =======
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
+=======
+>>>>>>> removed unnecessary module.exports
 
 twilio_config.accountSid = TWILIO_ACCOUNT_SID;
 twilio_config.authToken = TWILIO_AUTH_TOKEN;
@@ -82,8 +91,11 @@ if (!requiredTestConfig.every(getConfigValue)) {
 }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
+=======
+>>>>>>> removed unnecessary module.exports
 
 // Export configuration object
 module.exports = {
@@ -91,7 +103,12 @@ module.exports = {
 };
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> removed unnecessary module.exports
 =======
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
+=======
+=======
+>>>>>>> removed unnecessary module.exports
+>>>>>>> removed unnecessary module.exports
