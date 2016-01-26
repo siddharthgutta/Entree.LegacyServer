@@ -5,9 +5,10 @@ require('babel-register');
 
 var Scribe = require('scribe-js');
 var config = require('config');
+var cluster = require('cluster');
 
 var PORT = parseInt(process.env.BRANCHOFF_PORT) || process.env.PORT || 3000;
-var SOCKET_PORT = PORT + 50000;
+var SOCKET_PORT = 50000 + Number(process.env.pm_idg) || PORT;
 var NAME = process.env.BRANCHOFF_BRANCH || PORT;
 
 var console = new Scribe(NAME, {
