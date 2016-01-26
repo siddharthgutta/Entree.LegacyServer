@@ -2,7 +2,6 @@
   font-family: 'Proxima Nova', "Helvetica", "Helvetic Neue", "Open Sans", sans-serif;
   vertical-align: top;
   box-sizing: border-box;
-  color: #0c1a2e;
   outline: none;
   -webkit-font-smoothing: subpixel-antialiased;
 }
@@ -58,6 +57,7 @@ code {
   $icons: "message" ,
   "mail" ,
   "menu" ,
+  "forward" ,
   "back" ;
 
   @each $i in $icons {
