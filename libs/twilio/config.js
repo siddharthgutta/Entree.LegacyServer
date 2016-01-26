@@ -9,23 +9,8 @@ const TWILIO_TEST_ACCOUNT_SID = "AC170b40ecf9e378bc5b414c60801d7178";
 const TWILIO_TEST_AUTH_TOKEN = "3e7ae8aebc9dc023b66ee071065089b0";
 
 // Storing keys into config objects
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 export var twilio_config = {};
 export var twilio_test_config = {};
-=======
-var twilio_config = {};
-var twilio_test_config = {};
->>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
-=======
-export var twilio_config = {};
-export var twilio_test_config = {};
->>>>>>> removed unnecessary module.exports
-=======
-export var twilio_config = {};
-export var twilio_test_config = {};
->>>>>>> 506e85a6f694bee4fcb399379617c19f5e5c3621
 
 twilio_config.accountSid = TWILIO_ACCOUNT_SID;
 twilio_config.authToken = TWILIO_AUTH_TOKEN;
@@ -46,46 +31,13 @@ function getConfigValue(configValue) {
 if (!requiredConfig.every(getConfigValue)) {
   var errorMessage =
     'TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_NUMBER must be set.';
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
-=======
->>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
-=======
-  console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
->>>>>>> added tagged logging
-=======
-  console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
->>>>>>> 506e85a6f694bee4fcb399379617c19f5e5c3621
   throw new Error(errorMessage);
 }
 
 if (!requiredTestConfig.every(getConfigValue)) {
   var errorMessage =
     'TWILIO_TEST_ACCOUNT_SID, TWILIO_TEST_AUTH_TOKEN, and TWILIO_NUMBER must be set.';
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> added tagged logging
   console.tag("Twilio", "Configuration", "Test", "Error").log(errorMessage);
   throw new Error(errorMessage);
 }
-=======
-  throw new Error(errorMessage);
-}
-<<<<<<< HEAD
-
-// Export configuration object
-module.exports = {
-  twilio_config, twilio_test_config
-};
->>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
-=======
->>>>>>> removed unnecessary module.exports
-=======
-  console.tag("Twilio", "Configuration", "Test", "Error").log(errorMessage);
-  throw new Error(errorMessage);
-}
->>>>>>> 506e85a6f694bee4fcb399379617c19f5e5c3621

@@ -31,18 +31,7 @@
     "keymirror": "^0.1.1",
     "license-report": "^1.0.8",
     "load-grunt-tasks": "^3.4.0",
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     "mocha": "^2.3.4",
-=======
->>>>>>> Prepping for prod launches
-=======
-    "mocha": "^2.3.4",
->>>>>>> added mocha and twilio to package.json
-=======
-    "mocha": "^2.3.4",
->>>>>>> 506e85a6f694bee4fcb399379617c19f5e5c3621
     "mysql": "^2.10.0",
     "react": "^0.14.3",
     "react-ace": "^3.0.0",
@@ -61,7 +50,7 @@
     "underscore": "^1.8.3"
   },
   "scripts": {
-    "test": "mocha --compilers js:babel-register --timeout 5000",
+    "test": "mocha -R spec --compilers js:babel-register --timeout 5000",
     "tests": "npm run test ./tests/*.test.js",
     "start": "node index.js"
   },

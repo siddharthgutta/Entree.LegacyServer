@@ -18,28 +18,9 @@ route.use((req, res, next)=> {
 route.post('/receive', (req, res) => {
   // Twilio received a real text message
   if (twilio.validateExpressRequest(req, twilio_config.authToken)) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     console.tag("Twilio", "SMS", "Receive", "Production").log("Real text message received\n" + JSON.stringify(req));
     var resp = new twilio.TwimlResponse();
         resp.say('express sez - hello twilio!');
-=======
-    console.log("Twilio: received a real text message\n" + JSON.stringify(req));
-    var resp = new twilio.TwimlResponse();
-        resp.say('express sez - hello twilio!');
-
->>>>>>> added basic routing for the twilio POST endpoints that twilio will hit when we receive a text message
-=======
-    console.tag("Twilio", "SMS", "Receive", "Production").log("Real text message received\n" + JSON.stringify(req));
-    var resp = new twilio.TwimlResponse();
-        resp.say('express sez - hello twilio!');
->>>>>>> added tagged logging
-=======
-    console.tag("Twilio", "SMS", "Receive", "Production").log("Real text message received\n" + JSON.stringify(req));
-    var resp = new twilio.TwimlResponse();
-        resp.say('express sez - hello twilio!');
->>>>>>> 506e85a6f694bee4fcb399379617c19f5e5c3621
         res.type('text/xml');
         res.send(resp.toString());
   }
@@ -53,19 +34,7 @@ route.post('/receive', (req, res) => {
 route.post('/testreceive', (req, res) => {
   // Twilio received a real test message
   if (twilio.validateExpressRequest(req, twilio_test_config.authToken)) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     console.tag("Twilio", "SMS", "Receive", "Test").log("Test text message received\n" + JSON.stringify(req));
-=======
-    console.log("Twilio: received a test text message\n" + JSON.stringify(req));
->>>>>>> added basic routing for the twilio POST endpoints that twilio will hit when we receive a text message
-=======
-    console.tag("Twilio", "SMS", "Receive", "Test").log("Test text message received\n" + JSON.stringify(req));
->>>>>>> added tagged logging
-=======
-    console.tag("Twilio", "SMS", "Receive", "Test").log("Test text message received\n" + JSON.stringify(req));
->>>>>>> 506e85a6f694bee4fcb399379617c19f5e5c3621
     var resp = new twilio.TwimlResponse();
         resp.say('express sez - hello twilio!');
 
