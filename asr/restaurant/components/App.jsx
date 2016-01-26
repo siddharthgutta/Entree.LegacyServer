@@ -25,6 +25,11 @@ class App extends Influx.Component {
     this.setState({showDialog: true});
   }
 
+  _handleInput(e) {
+    var val = e.target.value;
+    this.setState({time: isNaN(val) ? 0 : Number(val)});
+  }
+
   render() {
 
     //<TabbedPane spread={true}
@@ -105,7 +110,7 @@ class App extends Influx.Component {
                   Minutes
                 </div>
                 <div className="desc" style={{marginBottom:10}}>OR</div>
-                <input placeholder="minutes" value={this.state.time}/>
+                <input placeholder="minutes" value={this.state.time} onChange={this._handleInput.bind(this)}/>
                 <div className="button">submit</div>
               </div>
             </div>
