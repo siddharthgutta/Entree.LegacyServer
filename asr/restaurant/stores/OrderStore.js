@@ -58,17 +58,28 @@ class OrderStore extends Influx.Store {
     return this.data.orders;
   }
 
+  injectTestOrder() {
+    const order = extend({}, sampleData[parseInt(Math.random() * sampleData.length)]);
+    order.id = ++counter;
+    order.name = chance.name();
+    order.date = Date.now();
+    order.cost = Number((Math.random() * 50).toFixed(2));
+    order.status = chance.pick(["received", "accepted", "completed", "declined"]);
+
+    this.data.orders.unshift(order);
+    this.emit(Events.ORDER_RECEIVED, order);
+
+    return order;
+  }
+
   _onDispatcherConnectStream() {
+    for (var i = 0; i < 20; i++) {
+      this.injectTestOrder();
+    }
+
     setInterval(()=> {
       setTimeout(()=> {
-        const nextOrder = extend({}, sampleData[parseInt(Math.random() * sampleData.length)]);
-        nextOrder.id = ++counter;
-        nextOrder.name = chance.name();
-        nextOrder.date = Date.now();
-        nextOrder.cost = Number((Math.random() * 50).toFixed(2));
-        nextOrder.status = chance.pick(["received","accepted","completed","declined"]);
-        this.data.orders.unshift(nextOrder);
-        this.emit(Events.ORDER_RECEIVED, nextOrder);
+        this.injectTestOrder();
       }, parseInt(Math.random() * 500));
     }, 5000)
   }

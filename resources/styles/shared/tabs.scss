@@ -1,14 +1,14 @@
 @charset "UTF-8";
 
 $tabHeight: 25px;
-$spreadTabHeight: 50px;
+$spreadTabHeight: 40px;
 
 .tabs {
   height: $tabHeight;
   max-height: $tabHeight;
   min-height: $tabHeight;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 2px;
+  background: rgba(0, 0, 0, 0.2);
   .light & {
     background: #EEE;
     border-bottom: 1px solid #DDD;
@@ -69,7 +69,6 @@ $spreadTabHeight: 50px;
       margin: 0;
       left: 0;
       top: 0;
-      border-right: 1px solid rgba(255, 255, 255, 0.1);
       .light & {
         border-color: #DDD;
       }

@@ -3,7 +3,7 @@ import Influx from 'react-influx'
 import moment from 'moment'
 import {ifcat} from '../../../libs/utils'
 
-class Order extends Influx.Component {
+class Order extends React.Component {
   constructor(...args) {
     super(...args);
   }
@@ -11,10 +11,9 @@ class Order extends Influx.Component {
   render() {
     const order = this.props;
 
-    //<div className="button box center-vertical icon icon-only phone"/>
-
     return (
-        <div className="order flex" style={{marginTop:-80,height:80,transform:`translate3d(0,${order.index * 80}px,1px)`}}>
+        <div onClick={this.props.onClick} className="order flex"
+             style={{marginTop:-80,height:80,transform:`translate3d(0,${order.index * 80}px,1px)`}}>
           <div className="id box flex left">{order.id}</div>
           <div className="box flex left">
             <div>

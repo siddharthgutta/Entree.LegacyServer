@@ -1,16 +1,17 @@
 import React from 'react'
 import Influx from 'react-influx'
-import OrderList from './views/OrderList.jsx'
 import Dispatcher from '../dispatchers/Dispatcher'
 import TabbedPane from './views/general/TabbedPane.jsx'
 import Header from './views/elements/Header.jsx'
+import OrderHistory from './views/pages/OrderHistory.jsx'
+import OrderFocus from './views/pages/OrderFocus.jsx'
 import {ifcat} from '../libs/utils'
 
-class App extends Influx.Component {
+class App extends React.Component {
   constructor(...args) {
     super(...args);
 
-    this.state = {showDialog: false, time: 0};
+    this.state = {showDialog: false, time: 0, selectedOrder: null};
   }
 
   componentDidMount() {
@@ -30,28 +31,17 @@ class App extends Influx.Component {
     this.setState({time: Math.abs(isNaN(val) ? 0 : Number(val))});
   }
 
+  _selectOrder(order) {
+    console.log(this, order);
+    this.setState({selectedOrder: order});
+  }
+
   render() {
-    return (
-        <div className="full">
-          <div className="full-abs">
-            <div className="full flex vertical">
-              <Header title="Order" subtitle="HISTORY" style={{minHeight:55}}/>
-              <TabbedPane spread={true}
-                          Received={<OrderList status="received"/>}
-                          Progress={<OrderList status="accepted"/>}
-                          Completed={<OrderList status="completed"/>}
-                          tabs={["Received", "Progress", "Completed"]}/>
-              <div style={{padding:"0px 20px",background:"#222",minHeight:45}}>
-                <div className="floater">
-                  <div className="flex">
-                    <div className="button box dim">HAVING ISSUES?</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-    )
+    if (this.state.selectedOrder) {
+      return <OrderFocus order={this.state.selectedOrder}/>
+    }
+
+    return <OrderHistory onOrderClick={this._selectOrder.bind(this)}/>;
   }
 }
 

@@ -1,12 +1,12 @@
 import React from 'react'
 import Influx from 'react-influx'
-import OrderList from '../../views/OrderList.jsx'
+import OrderList from '../elements/OrderList.jsx'
 import Dispatcher from '../../../dispatchers/Dispatcher'
 import TabbedPane from '../../views/general/TabbedPane.jsx'
 import Header from '../../views/elements/Header.jsx'
 import {ifcat} from '../../../libs/utils'
 
-class OrderFocus extends Influx.Component {
+class OrderFocus extends React.Component {
   constructor(...args) {
     super(...args);
 
@@ -15,6 +15,7 @@ class OrderFocus extends Influx.Component {
 
   componentDidMount() {
     //Dispatcher.emit(Dispatcher.Events.CONNECT_STREAM);
+    document.body.classList.add(this.props.color);
   }
 
   _addTime(time) {
@@ -31,13 +32,6 @@ class OrderFocus extends Influx.Component {
   }
 
   render() {
-
-    //<TabbedPane spread={true}
-    //            Received={<OrderList status="received"/>}
-    //            Progress={<OrderList status="accepted"/>}
-    //            Completed={<OrderList status="completed"/>}
-    //            tabs={["Received", "Progress", "Completed"]}/>
-
     return (
         <div className="full">
           <div className="full-abs">
@@ -53,12 +47,14 @@ class OrderFocus extends Influx.Component {
                   </div>
                 </div>
               </Header>
+              <TabbedPane spread={true} Items={
+              <div className="full  flex vertical">
               <div className="flex status" style={{minHeight:53}}>
                 <div className="box event active">RECEIVED</div>
                 <div className="box event">COOKING</div>
                 <div className="box event">COMPLETE</div>
               </div>
-              <div className="full" style={{padding:"5px 15px",overflow:'scroll',background:"#222"}}>
+              <div className="full" style={{padding:"10px 15px 0",overflow:'scroll',background:"rgba(0,0,0,0.7)"}}>
                 <div className="item flex">
                   <div className="box flex quantity center vertical">1</div>
                   <div className="box flex name center vertical">Big Combo Box</div>
@@ -80,7 +76,10 @@ class OrderFocus extends Influx.Component {
                   <div className="box flex cost center right vertical">$5.60</div>
                 </div>
               </div>
-              <div style={{padding:"0px 20px",background:"#222",minHeight:62}}>
+              </div>} Details={<div className="full" style={{padding:"5px 15px",overflow:'scroll',background:"rgba(0,0,0,0.7)"}}>
+
+              </div>} tabs={["Items", "Details"]}/>
+              <div style={{padding:"0px 20px",background:"rgba(0,0,0,0.7)",minHeight:62}}>
                 <div className="floater">
                   <div className="flex">
                     <div className="button box dim">DECLINE</div>

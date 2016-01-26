@@ -35,6 +35,10 @@ class TabbedPane extends Influx.Component {
           'transform', 'translate3d(-' + (index / this.props.tabs.length * 100) + '%, 0, 0)');
       this.activeTab = tab;
 
+      if (this.props.onChange) {
+        this.props.onChange(tab);
+      }
+
       if (!this.state[tab]) {
         var state = {};
         state[tab] = true;

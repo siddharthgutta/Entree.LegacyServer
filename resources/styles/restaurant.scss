@@ -6,12 +6,19 @@
 @import "shared/tabs";
 
 html {
-  background: linear-gradient(to bottom, #3F51B5, #000);
   overflow: hidden;
 }
 
 body {
   overflow: hidden;
+  background: linear-gradient(to bottom, #3F51B5, #000);
+  transition: background 300ms;
+  &.red {
+    background: linear-gradient(to bottom, #FF5722, #573273);
+  }
+  &.green {
+    background: linear-gradient(to bottom, #3FB5B0, #573273);
+  }
 }
 
 .group {
@@ -27,7 +34,6 @@ body {
   }
   .header {
     background: #111;
-    border-bottom: 1px solid #222;
     padding: 20px;
     font-size: 15px;
     text-transform: uppercase;
@@ -63,9 +69,9 @@ body {
   .name {
     color: #fff;
     text-align: left;
-    font-size: 19px;
+    font-size: 16px;
     font-weight: bold;
-    letter-spacing: 1px;
+    letter-spacing: 0px;
   }
   .id {
     &:before {
@@ -77,22 +83,30 @@ body {
       display: none;
       left: -3px;
     }
-    font-size: 16px;
+    transition: background 300ms;
+    font-size: 18px;
     color: #fff;
     font-weight: bold;
-    max-width: 30px;
-    min-width: 30px;
-    width: 30px;
-    text-align: left;
-    background: #FF5722;
-    /* margin: 10px; */
+    max-width: 50px;
+    min-width: 50px;
+    width: 50px;
     text-align: center;
-    border-radius: 5px;
+    border-radius: 100px;
+    -webkit-justify-content: center;
     justify-content: center;
-    height: 30px;
+    height: 50px;
     letter-spacing: 1px;
-    margin: 25px;
+    margin: 15px;
     margin-left: 0;
+    .red & {
+      background: #FF5722;
+    }
+    .green & {
+      background: rgba(64, 172, 172, 0.67);
+    }
+    .blue & {
+      background: rgba(64, 88, 181, 0.6);
+    }
   }
   .cost {
     &:before {
@@ -106,7 +120,7 @@ body {
     font-size: 18px;
     color: #fff;
     padding-right: 10px;
-    font-weight: 100;
+    font-weight: bold;
   }
   .button {
     padding: 0 20px;
@@ -231,7 +245,7 @@ body {
 
 .item {
   border-bottom: 1px solid rgba(255, 255, 255, 0.09);
-  padding: 30px 15px;
+  padding: 15px 15px;
 
   .quantity {
     font-size: 15px;
@@ -301,9 +315,9 @@ body {
 }
 
 .status {
-  background: rgba(0, 0, 0, 0.24);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
+  //background: rgba(0, 0, 0, 0.24);
+  background: rgba(0, 0, 0, 0.7);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
   .event {
     text-align: center;
     background: rgba(255, 255, 255, 0.11);
@@ -340,10 +354,27 @@ body {
   }
 
   .event.active {
-    background: #FF5722;
     color: #FFF;
+    .red & {
+      background: #FF5722;
+    }
+    .green & {
+      background: rgba(64, 172, 172, 0.67);
+    }
+    .blue & {
+      background: rgba(64, 88, 181, 0.6);
+    }
     &:after {
       border-left-color: #FF5722;
+      .red & {
+        border-left-color: #FF5722;
+      }
+      .green & {
+        border-left-color: rgba(64, 172, 172, 0.67);
+      }
+      .blue & {
+        border-left-color: rgba(64, 88, 181, 0.6);
+      }
     }
   }
 }
