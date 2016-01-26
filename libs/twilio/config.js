@@ -1,4 +1,5 @@
 const TWILIO_NUMBER = "5125200133";
+const TWILIO_TEST_NUMBER = "+15005550006";
 
 // Production Twilio API Credentials
 const TWILIO_ACCOUNT_SID = "AC98c288dd56d31217abb621f81b1415e4";
@@ -48,7 +49,7 @@ twilio_config.sendingNumber = TWILIO_NUMBER;
 
 twilio_test_config.accountSid = TWILIO_TEST_ACCOUNT_SID;
 twilio_test_config.authToken = TWILIO_TEST_AUTH_TOKEN;
-twilio_test_config.sendingNumber = TWILIO_NUMBER;
+twilio_test_config.sendingNumber = TWILIO_TEST_NUMBER;
 
 // Functions to check that configuration exists for twilio usage.
 var requiredConfig = [twilio_config.accountSid, twilio_config.authToken, twilio_config.sendingNumber];

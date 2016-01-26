@@ -22,10 +22,10 @@ function sendSMS(toNumber, fromNumber, textBody, specificTwilioClient) {
       // "responseData" is a JavaScript object containing data received from Twilio.
       // A sample response from sending an SMS message is here (click "JSON" to see how the data appears in JavaScript):
       // http://www.twilio.com/docs/api/rest/sending-sms#example-1
-      console.tag("Twilio", "SMS", "Send", "Success").log(responseData.from + ":" + responseData.body);
+      console.log(responseData.from + ":" + responseData.body);
 
     } else {
-      console.tag("Twilio", "SMS", "Send", "Error").log(error + "\n" + responseData.from + ":" + responseData.body);
+      console.log(JSON.stringify(error) + "\n" + responseData);
     }
   })
 }
