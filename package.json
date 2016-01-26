@@ -68,5 +68,8 @@
   "browserify": {
     "transform": "config-browserify"
   },
-  "homepage": "https://github.com/siddharthgutta/Entree.Server#readme"
+  "homepage": "https://github.com/siddharthgutta/Entree.Server#readme",
+  "devDependencies": {
+    "babel-cli": "^6.4.5"
+  }
 }
