@@ -8,7 +8,7 @@ class Header extends Influx.Component {
 
   render() {
     return (
-        <div className="header">
+        <div className="header" style={{height:this.props.height}}>
           <div className="nav flex">
             <div className="box flex center vertical evil-icon back nav-left"/>
             <div className="text" style={{flex:1}}>
