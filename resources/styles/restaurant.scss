@@ -282,23 +282,90 @@ html {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
   .event {
-    margin: 11px 10px;
     text-align: center;
     background: rgba(255, 255, 255, 0.11);
     padding: 9px;
-    border-radius: 100px;
+    border-radius: 5px 0 0 5px;
     font-weight: bold;
     font-size: 11px;
     letter-spacing: 1px;
     color: rgba(255, 255, 255, 0.64);
+    position: relative;
     //border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 11px 12px;
+    &:last-child {
+      margin-right: 30px;
+    }
+
+    &:after {
+      left: 100%;
+      top: 50%;
+      border: solid transparent;
+      content: " ";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+      /* border-color: #88b7d5; */
+      border-width: 30px;
+      margin-top: -15px;
+      border-top: solid 15px transparent;
+      border-left: solid 15px rgba(255, 255, 255, 0.11);
+      border-bottom: solid 15px transparent;
+      margin-left: 0px;
+    }
   }
 
   .event.active {
     background: #FF5722;
     color: #FFF;
-    /* border: none; */
-    /* box-shadow: 0 1px 30px rgba(0, 0, 0, 0.32); */
-    /* color: #000; */
+    &:after {
+      border-left-color: #FF5722;
+    }
+  }
+}
+
+.vignette {
+  background: rgba(0, 0, 0, 0.5);
+  top: 0;
+  z-index: 999;
+  position: absolute;
+  padding: 10px;
+  .dialog {
+    padding: 20px;
+    width: 100%;
+    background: #FFF;
+    box-shadow: 0 0px 60px #000;
+    border-bottom: 1px solid #3D4B90; /* margin: 20px; */
+    border-radius: 5px;
+    input {
+      padding: 10px 15px;
+      font-size: 15px;
+      background: rgba(255, 255, 255, 0.35);
+      border: 2px solid #E0E0E0;
+      /* border: none; */
+      border-radius: 7px;
+      display: inline-block;
+      width: 100%;
+      color: #000;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .button {
+      display: block;
+      text-align: center;
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: #FFF;
+      font-size: 16px;
+      padding: 15px 0;
+      background: #8BC34A;
+      border-radius: 3px;
+      width: 100%
+    }
   }
 }
