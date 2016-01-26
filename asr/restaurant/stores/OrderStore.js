@@ -72,6 +72,10 @@ class OrderStore extends Influx.Store {
     return order;
   }
 
+  off(type, listener) {
+    return super.removeListener(type, listener);
+  }
+
   _onDispatcherConnectStream() {
     for (var i = 0; i < 20; i++) {
       this.injectTestOrder();
