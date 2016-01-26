@@ -7,6 +7,11 @@
 
 html {
   background: linear-gradient(to bottom, #3F51B5, #000);
+  overflow: hidden;
+}
+
+body {
+  overflow: hidden;
 }
 
 .group {
