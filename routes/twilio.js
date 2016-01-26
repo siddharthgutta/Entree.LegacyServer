@@ -18,10 +18,9 @@ route.use((req, res, next)=> {
 route.post('/receive', (req, res) => {
   // Twilio received a real text message
   if (twilio.validateExpressRequest(req, twilio_config.authToken)) {
-    console.log("Twilio: received a real text message\n" + JSON.stringify(req));
+    console.tag("Twilio", "SMS", "Receive", "Production").log("Real text message received\n" + JSON.stringify(req));
     var resp = new twilio.TwimlResponse();
         resp.say('express sez - hello twilio!');
-
         res.type('text/xml');
         res.send(resp.toString());
   }
@@ -35,7 +34,7 @@ route.post('/receive', (req, res) => {
 route.post('/testreceive', (req, res) => {
   // Twilio received a real test message
   if (twilio.validateExpressRequest(req, twilio_test_config.authToken)) {
-    console.log("Twilio: received a test text message\n" + JSON.stringify(req));
+    console.tag("Twilio", "SMS", "Receive", "Test").log("Test text message received\n" + JSON.stringify(req));
     var resp = new twilio.TwimlResponse();
         resp.say('express sez - hello twilio!');
 
