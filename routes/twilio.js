@@ -19,6 +19,7 @@ route.post('/receive', (req, res) => {
   // Twilio received a real text message
   if (twilio.validateExpressRequest(req, twilio_config.authToken)) {
 <<<<<<< HEAD
+<<<<<<< HEAD
     console.tag("Twilio", "SMS", "Receive", "Production").log("Real text message received\n" + JSON.stringify(req));
     var resp = new twilio.TwimlResponse();
         resp.say('express sez - hello twilio!');
@@ -28,6 +29,11 @@ route.post('/receive', (req, res) => {
         resp.say('express sez - hello twilio!');
 
 >>>>>>> added basic routing for the twilio POST endpoints that twilio will hit when we receive a text message
+=======
+    console.tag("Twilio", "SMS", "Receive", "Production").log("Real text message received\n" + JSON.stringify(req));
+    var resp = new twilio.TwimlResponse();
+        resp.say('express sez - hello twilio!');
+>>>>>>> added tagged logging
         res.type('text/xml');
         res.send(resp.toString());
   }
@@ -42,10 +48,14 @@ route.post('/testreceive', (req, res) => {
   // Twilio received a real test message
   if (twilio.validateExpressRequest(req, twilio_test_config.authToken)) {
 <<<<<<< HEAD
+<<<<<<< HEAD
     console.tag("Twilio", "SMS", "Receive", "Test").log("Test text message received\n" + JSON.stringify(req));
 =======
     console.log("Twilio: received a test text message\n" + JSON.stringify(req));
 >>>>>>> added basic routing for the twilio POST endpoints that twilio will hit when we receive a text message
+=======
+    console.tag("Twilio", "SMS", "Receive", "Test").log("Test text message received\n" + JSON.stringify(req));
+>>>>>>> added tagged logging
     var resp = new twilio.TwimlResponse();
         resp.say('express sez - hello twilio!');
 

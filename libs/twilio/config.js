@@ -59,17 +59,23 @@ if (!requiredConfig.every(getConfigValue)) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> added tagged logging
   console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
 =======
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
 =======
   console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
 >>>>>>> added tagged logging
+<<<<<<< HEAD
 =======
   console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
 =======
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
+=======
+>>>>>>> added tagged logging
   throw new Error(errorMessage);
 }
 
@@ -79,10 +85,15 @@ if (!requiredTestConfig.every(getConfigValue)) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> added tagged logging
 =======
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
+=======
+=======
+>>>>>>> added tagged logging
+>>>>>>> added tagged logging
   console.tag("Twilio", "Configuration", "Test", "Error").log(errorMessage);
   throw new Error(errorMessage);
 }
