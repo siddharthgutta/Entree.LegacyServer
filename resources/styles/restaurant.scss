@@ -331,18 +331,17 @@ body {
 }
 
 .vignette {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.8);
   top: 0;
   z-index: 999;
   position: absolute;
-  padding: 10px;
   .dialog {
     padding: 20px;
     width: 100%;
     background: #FFF;
-    box-shadow: 0 0px 60px #000;
+    box-shadow: 0 0 60px #000;
     border-bottom: 1px solid #3D4B90; /* margin: 20px; */
-    border-radius: 5px;
+    border-radius: 0;
     input {
       padding: 10px 15px;
       font-size: 15px;
@@ -359,6 +358,24 @@ body {
       letter-spacing: 1px;
       margin-bottom: 10px;
     }
+    hr {
+      opacity: 0.5;
+      margin: 20px 0;
+    }
+    .value {
+      color: #000;
+    }
+    .desc {
+      color: #AAA;
+      text-align: center;
+      &.normal {
+        text-transform: none;
+      }
+      &.bold {
+        color: #888;
+        font-size: 18px;
+      }
+    }
     .button {
       display: block;
       text-align: center;
@@ -368,9 +385,28 @@ body {
       color: #FFF;
       font-size: 16px;
       padding: 15px 0;
-      background: #8BC34A;
-      border-radius: 3px;
-      width: 100%
+      background: #3AE041;
+      border-radius: 6px;
+      width: 100%;
+      margin-bottom: 10px;
+      &.orange {
+        background: #FFC107;
+      }
+      &.red {
+        background: #FF5722;
+      }
+      &.teal {
+        background: #009688;
+      }
+      &.navy {
+        background: #607D8B;
+      }
+      &.purple {
+        background: #00BCD4;
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 }

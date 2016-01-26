@@ -4,14 +4,21 @@ import OrderList from './views/OrderList.jsx'
 import Dispatcher from '../dispatchers/Dispatcher'
 import TabbedPane from './views/general/TabbedPane.jsx'
 import Header from './views/elements/Header.jsx'
+import {ifcat} from '../libs/utils'
 
 class App extends Influx.Component {
   constructor(...args) {
     super(...args);
+
+    this.state = {showDialog: false};
   }
 
   componentDidMount() {
     Dispatcher.emit(Dispatcher.Events.CONNECT_STREAM);
+  }
+
+  _handleAccept() {
+    this.setState({showDialog: true});
   }
 
   render() {
@@ -68,13 +75,23 @@ class App extends Influx.Component {
                 <div className="floater">
                   <div className="flex">
                     <div className="button box dim">DECLINE</div>
-                    <div className="button box green">ACCEPT</div>
+                    <div className="button box green" onClick={this._handleAccept.bind(this)}>ACCEPT</div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="full-abs vignette">
+            <div className={ifcat("full-abs vignette", {hide: !this.state.showDialog})}>
               <div className="dialog center">
+                <div className="box flex center vertical" style={{padding:15}}>
+                  <div className="value">$15.35</div>
+                  <div className="desc">TOTAL COST</div>
+                </div>
+                <hr />
+                <div className="desc bold normal" style={{marginBottom:20}}>Select a preparation time</div>
+                <div className="button navy">5 Minutes</div>
+                <div className="button navy">15 Minutes</div>
+                <div className="button navy">30 Minutes</div>
+                <div className="desc" style={{marginBottom:10}}>OR</div>
                 <input placeholder="minutes"/>
                 <div className="button">submit</div>
               </div>
