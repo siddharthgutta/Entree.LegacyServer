@@ -15,6 +15,9 @@
         },
         "cordova-plugin-console": {
             "PACKAGE_NAME": "com.entree"
+        },
+        "cordova-plugin-statusbar": {
+            "PACKAGE_NAME": "com.entree"
         }
     },
     "dependent_plugins": {}
