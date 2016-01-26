@@ -36,7 +36,7 @@ class OrderList extends Influx.Component {
 
     // manually animating for now
     return (
-        <div className="group full" style={{padding:20,paddingTop:80,background:"#222"}}>
+        <div className="group full" style={{padding:15,paddingTop:80,background:"#222"}}>
           { !items.length ? <div className="empty">{`No ${this.props.status} orders`}</div> :
               <div className="items" style={{height:items.length * 80}}>{items}</div>  }
         </div>
