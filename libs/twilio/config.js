@@ -15,6 +15,7 @@ const TWILIO_TEST_AUTH_TOKEN = "3e7ae8aebc9dc023b66ee071065089b0";
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
 =======
@@ -42,6 +43,10 @@ export var twilio_test_config = {};
 export var twilio_config = {};
 export var twilio_test_config = {};
 >>>>>>> think i fixed all of the merge conflicts/rebasing
+=======
+export var twilio_config = {};
+export var twilio_test_config = {};
+>>>>>>> 3af0a2065caa84c8895c5299585eef8081f1a8c6
 
 twilio_config.accountSid = TWILIO_ACCOUNT_SID;
 twilio_config.authToken = TWILIO_AUTH_TOKEN;
@@ -67,6 +72,7 @@ if (!requiredConfig.every(getConfigValue)) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> added tagged logging
   console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
@@ -86,12 +92,16 @@ if (!requiredConfig.every(getConfigValue)) {
 =======
   console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
 >>>>>>> think i fixed all of the merge conflicts/rebasing
+=======
+  console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
+>>>>>>> 3af0a2065caa84c8895c5299585eef8081f1a8c6
   throw new Error(errorMessage);
 }
 
 if (!requiredTestConfig.every(getConfigValue)) {
   var errorMessage =
     'TWILIO_TEST_ACCOUNT_SID, TWILIO_TEST_AUTH_TOKEN, and TWILIO_NUMBER must be set.';
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -139,3 +149,8 @@ module.exports = {
   throw new Error(errorMessage);
 }
 >>>>>>> think i fixed all of the merge conflicts/rebasing
+=======
+  console.tag("Twilio", "Configuration", "Test", "Error").log(errorMessage);
+  throw new Error(errorMessage);
+}
+>>>>>>> 3af0a2065caa84c8895c5299585eef8081f1a8c6
