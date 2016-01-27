@@ -300,7 +300,7 @@
 				LastUpgradeCheck = 510;
 				TargetAttributes = {
 					1D6058900D05DD3D006BFB54 = {
-						DevelopmentTeam = X6TK45D968;
+						DevelopmentTeam = ST24KEDF2P;
 					};
 				};
 			};
@@ -451,7 +451,7 @@
 					"-weak-lSystem",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.entreeapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.entreeapp.producer;
 				PRODUCT_NAME = Entree;
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -486,7 +486,7 @@
 					"-weak-lSystem",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.entreeapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.entreeapp.producer;
 				PRODUCT_NAME = Entree;
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
