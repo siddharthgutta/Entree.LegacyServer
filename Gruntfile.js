@@ -137,6 +137,12 @@ module.exports = function (grunt) {
         files: [
           {expand: true, cwd: 'public/', src: ['**/*'], dest: 'cordova/www'}
         ]
+      },
+      builds: {
+        files: {
+          "cordova/build/android-debug.apk": "cordova/platforms/android/build/outputs/apk/android-debug.apk",
+          "cordova/build/Entree.ipa": "cordova/platforms/ios/build/device/Entree.ipa"
+        }
       }
     },
     watch: {
@@ -203,7 +209,8 @@ module.exports = function (grunt) {
     'imagemin',
     'copy:dist',
     'rename:dist',
-    'copy:cordova'
+    'copy:cordova',
+    'copy:builds'
   ]);
 
   grunt.registerTask('default', 'build');
