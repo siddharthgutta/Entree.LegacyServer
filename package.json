@@ -43,6 +43,7 @@
     "react-fastclick": "^2.0.0",
     "react-influx": "^1.0.7",
     "react-prefixr": "^0.1.0",
+    "react-tap-event-plugin": "^0.2.1",
     "scribe-js": "git://github.com/bluejamesbond/Scribe.js.git#dev",
     "selectn": "^0.10.0",
     "sequelize": "^3.15.1",

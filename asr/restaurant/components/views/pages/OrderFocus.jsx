@@ -23,8 +23,8 @@ class OrderFocus extends React.Component {
     this.setState({time: this.state.time + time});
   }
 
-  _handleAccept() {
-    this.setState({showDialog: true});
+  _handleAccept(a) {
+    this.setState({showDialog: a});
   }
 
   _handleInput(e) {
@@ -98,7 +98,9 @@ class OrderFocus extends React.Component {
                 <div className="floater">
                   <div className="flex">
                     <div className="button box dim">DECLINE</div>
-                    <div className="button box green" onClick={this._handleAccept.bind(this)}>ACCEPT</div>
+                    <div className="button box green" onTouchTap={this._handleAccept.bind(this, true)}
+                         onClick={this._handleAccept.bind(this, true)}>ACCEPT
+                    </div>
                   </div>
                 </div>
               </div>
@@ -111,15 +113,18 @@ class OrderFocus extends React.Component {
                 </div>
                 <hr />
                 <div className="desc bold normal" style={{marginBottom:20}}>Select a preparation time</div>
-                <div className="button navy flex center" onClick={this._addTime.bind(this, 1)}><span
+                <div className="button navy flex center" onTouchTap={this._addTime.bind(this, 1)}
+                     onClick={this._addTime.bind(this, 1)}><span
                     className="icon add"/> 1
                   Minute
                 </div>
-                <div className="button navy flex center" onClick={this._addTime.bind(this, 5)}><span
+                <div className="button navy flex center" onTouchTap={this._addTime.bind(this, 5)}
+                     onClick={this._addTime.bind(this, 5)}><span
                     className="icon add"/> 5
                   Minutes
                 </div>
-                <div className="button navy flex center" onClick={this._addTime.bind(this, 15)}><span
+                <div className="button navy flex center" onTouchTap={this._addTime.bind(this, 15)}
+                     onClick={this._addTime.bind(this, 15)}><span
                     className="icon add"/> 15
                   Minutes
                 </div>

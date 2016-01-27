@@ -74,7 +74,7 @@ class TabbedPane extends Influx.Component {
 
     var tabs = this.props.tabs.map(tab => {
       return (
-          <div key={tab} onClick={this._showTab.bind(this, tab)}
+          <div key={tab} onTouchTap={this._showTab.bind(this, tab)} onClick={this._showTab.bind(this, tab)}
                className={'tab ' + (this.props.spread ? 'box' : null)} ref={'button' + tab}>{tab}</div>
       );
     });

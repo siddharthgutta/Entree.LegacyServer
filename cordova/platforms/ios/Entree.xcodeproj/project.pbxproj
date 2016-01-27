@@ -438,6 +438,7 @@
 				GCC_VERSION = "";
 				INFOPLIST_FILE = "Entree/Entree-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-weak_framework",
 					CoreFoundation,
@@ -454,6 +455,7 @@
 				PRODUCT_NAME = Entree;
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 armv7 armv6s armv6 armv7s";
 			};
 			name = Debug;
 		};
@@ -471,6 +473,7 @@
 				GCC_VERSION = "";
 				INFOPLIST_FILE = "Entree/Entree-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-weak_framework",
 					CoreFoundation,
@@ -487,6 +490,7 @@
 				PRODUCT_NAME = Entree;
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 armv7 armv6s armv6 armv7s";
 			};
 			name = Release;
 		};

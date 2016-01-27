@@ -6,6 +6,12 @@
   -webkit-font-smoothing: subpixel-antialiased;
 }
 
+.momentum {
+  overflow-y: scroll; /* has to be scroll, not auto */
+  -webkit-overflow-scrolling: touch;
+  z-index: 1;
+}
+
 .monospaced {
   font-family: 'Monaco', 'Consolas', monospace;
 }
