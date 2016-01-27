@@ -4,3 +4,30 @@ npm install
 npm update
 
 grunt build -v
+
+message=$(git log -1 --pretty=%B)
+
+# push ios release
+ios_raw=$(curl https://api.tryouts.io/v1/applications/NCKHE4E1/releases/ \
+    -F "build=@cordova/platforms/ios/build/device/Entree.ipa" \
+    -F "notes=$message" \
+    -F "notify=1" \
+    -F "status=2" \
+    -H "Authorization: b0fbf0eb2c9fded09aefdcf2eeff759c:73da365b26d0ff39f865f285012538fa69d8405e")
+
+# push android release
+android_raw=$(curl https://api.tryouts.io/v1/applications/6A6cacUG/releases/ \
+    -F "build=@cordova/platforms/android/build/outputs/apk/android-debug.apk" \
+    -F "notes=$message" \
+    -F "notify=1" \
+    -F "status=2" \
+    -H "Authorization: b0fbf0eb2c9fded09aefdcf2eeff759c:73da365b26d0ff39f865f285012538fa69d8405e")
+
+ios_url=$(echo $ios_raw | sed 's/.*"download_url": "\(.*\)", "size".*/\1/p')
+android_url=$(echo $android_raw | sed 's/.*"download_url": "\(.*\)", "size".*/\1/p')
+
+ios_payload=$(echo "{\"text\":\"$message\n$ios_url\"}")
+android_payload=$(echo "{\"text\":\"$messages\n$android_url\"}")
+
+curl -X POST -H 'Content-type: application/json' --data "$ios_payload" https://hooks.slack.com/services/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
+curl -X POST -H 'Content-type: application/json' --data "$android_payload" https://hooks.slack.com/services/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
