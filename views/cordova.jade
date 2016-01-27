@@ -1,8 +1,11 @@
-include restaurant.jade
-script.
-  window.CORDOVA = true;
-style.
-  body {
-    padding-top: 20px;
-    box-shadow: inset 0 20px 0 rgba(0, 0, 0, 0.2);
-  }
+extends restaurant
+
+block body
+  script(type='text/javascript', src='cordova.js')
+  script.
+    window.cordova = window.cordova || true;
+  style.
+    body {
+      padding-top: 20px;
+      box-shadow: inset 0 20px 0 rgba(0, 0, 0, 0.2);
+    }

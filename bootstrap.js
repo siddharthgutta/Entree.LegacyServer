@@ -13,7 +13,7 @@ export function resolveContext() {
   return ctx;
 }
 
-export function initScribe(override = true, ...exposers) {
+export function initScribe(override = true, socket = true, ...exposers) {
 
   var context = resolveContext();
 
@@ -22,6 +22,7 @@ export function initScribe(override = true, ...exposers) {
     mongoUri: 'mongodb://localhost/scribe',
     basePath: 'scribe/',
     socketPort: context.socketPort,
+    socket: socket,
     nwjs: {
       buildDir: `${__dirname}/../public/native`
     },
