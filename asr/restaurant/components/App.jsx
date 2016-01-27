@@ -1,87 +1,46 @@
 import React from 'react'
 import Influx from 'react-influx'
-import OrderList from './views/OrderList.jsx'
 import Dispatcher from '../dispatchers/Dispatcher'
 import TabbedPane from './views/general/TabbedPane.jsx'
 import Header from './views/elements/Header.jsx'
+import OrderHistory from './views/pages/OrderHistory.jsx'
+import OrderFocus from './views/pages/OrderFocus.jsx'
+import {ifcat} from '../libs/utils'
 
-class App extends Influx.Component {
+class App extends React.Component {
   constructor(...args) {
     super(...args);
+
+    this.state = {showDialog: false, time: 0, selectedOrder: null};
   }
 
   componentDidMount() {
     Dispatcher.emit(Dispatcher.Events.CONNECT_STREAM);
   }
 
+  _addTime(time) {
+    this.setState({time: this.state.time + time});
+  }
+
+  _handleAccept() {
+    this.setState({showDialog: true});
+  }
+
+  _handleInput(e) {
+    var val = e.target.value;
+    this.setState({time: Math.abs(isNaN(val) ? 0 : Number(val))});
+  }
+
+  _selectOrder(order) {
+    this.setState({selectedOrder: order});
+  }
+
   render() {
+    if (this.state.selectedOrder) {
+      return <OrderFocus order={this.state.selectedOrder}/>
+    }
 
-    //<TabbedPane spread={true}
-    //            Received={<OrderList status="received"/>}
-    //            Progress={<OrderList status="accepted"/>}
-    //            Completed={<OrderList status="completed"/>}
-    //            tabs={["Received", "Progress", "Completed"]}/>
-
-    return (
-        <div className="full">
-          <div className="full-abs">
-            <div className="full flex vertical">
-              <Header title="Order" subtitle="#56645" style={{minHeight:185}}>
-                <div className="flex" style={{padding:'30px 0'}}>
-                  <div className="box flex center vertical" style={{borderRight: '1px solid rgba(255, 255, 255, 0.1)'}}>
-                    <div className="value">$15.35</div>
-                    <div className="desc">TOTAL COST</div>
-                  </div>
-                  <div className="box small flex center vertical">
-                    <div className="value icon message"></div>
-                  </div>
-                </div>
-              </Header>
-              <div className="flex status" style={{minHeight:53}}>
-                <div className="box event active">RECEIVED</div>
-                <div className="box event">COOKING</div>
-                <div className="box event">COMPLETE</div>
-              </div>
-              <div className="full" style={{padding:"5px 15px",overflow:'scroll',background:"#222"}}>
-                <div className="item flex">
-                  <div className="box flex quantity center vertical">1</div>
-                  <div className="box flex name center vertical">Big Combo Box</div>
-                  <div className="box flex cost center right vertical">$15.00</div>
-                </div>
-                <div className="item flex">
-                  <div className="box flex quantity center vertical">1</div>
-                  <div className="box flex name center vertical">Large Fries</div>
-                  <div className="box flex cost center right vertical">$5.60</div>
-                </div>
-                <div className="item flex">
-                  <div className="box flex quantity center vertical">1</div>
-                  <div className="box flex name center vertical">Big Combo Box</div>
-                  <div className="box flex cost center right vertical">$15.00</div>
-                </div>
-                <div className="item flex">
-                  <div className="box flex quantity center vertical">1</div>
-                  <div className="box flex name center vertical">Large Fries</div>
-                  <div className="box flex cost center right vertical">$5.60</div>
-                </div>
-              </div>
-              <div style={{padding:"0px 20px",background:"#222",minHeight:62}}>
-                <div className="floater">
-                  <div className="flex">
-                    <div className="button box dim">DECLINE</div>
-                    <div className="button box green">ACCEPT</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="full-abs vignette">
-              <div className="dialog center">
-                <input placeholder="minutes"/>
-                <div className="button">submit</div>
-              </div>
-            </div>
-          </div>
-        </div>
-    )
+    return <OrderHistory onOrderClick={this._selectOrder.bind(this)}/>;
   }
 }
 

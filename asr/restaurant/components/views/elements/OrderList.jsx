@@ -1,8 +1,8 @@
 import React from 'react'
 import Influx from 'react-influx'
-import OrderStore from '../../stores/OrderStore'
-import Order from './elements/Order.jsx'
-import TabbedPane from './general/TabbedPane.jsx'
+import OrderStore from '../../../stores/OrderStore'
+import Order from './Order.jsx'
+import TabbedPane from './../general/TabbedPane.jsx'
 import _ from 'underscore'
 
 class OrderList extends Influx.Component {
@@ -30,14 +30,14 @@ class OrderList extends Influx.Component {
     const {orders} = this.state;
     const items = orders.map((order, i) => {
       return (
-          <Order key={order.id} {...order} index={i}/>
+          <Order onClick={this.props.onOrderClick.bind(null, order)} key={order.id} {...order} index={i}/>
       );
     });
 
     // manually animating for now
     return (
-        <div className="group full">
-          { !items.length ? <div className="empty center-vertical">{`No ${this.props.status} orders`}</div> :
+        <div className="group full" style={{padding:15,paddingTop:80,background:"rgba(0,0,0,0.7)",overflow:"scroll"}}>
+          { !items.length ? <div className="empty">{`No ${this.props.status} orders`}</div> :
               <div className="items" style={{height:items.length * 80}}>{items}</div>  }
         </div>
     )

@@ -3,7 +3,7 @@ import Influx from 'react-influx'
 import moment from 'moment'
 import {ifcat} from '../../../libs/utils'
 
-class Order extends Influx.Component {
+class Order extends React.Component {
   constructor(...args) {
     super(...args);
   }
@@ -11,19 +11,18 @@ class Order extends Influx.Component {
   render() {
     const order = this.props;
 
-    //<div className="button box center-vertical icon icon-only phone"/>
-
     return (
-        <div className="order flex" style={{height:'80px',transform:`translate3d(0,${order.index * 80}px,1px)`}}>
+        <div onClick={this.props.onClick} className="order flex"
+             style={{marginTop:-80,height:80,transform:`translate3d(0,${order.index * 80}px,1px)`}}>
           <div className="id box flex left">{order.id}</div>
-          <div className="box flex center">
+          <div className="box flex left">
             <div>
               <div className="name">{order.name.split(' ')[0]}</div>
               <div className="date">{moment(order.date).format('h:mm A')}</div>
             </div>
           </div>
           <div className="cost box flex center">{order.cost.toFixed(2)}</div>
-          <div className="box flex right">
+          <div className="box flex right hide">
             <div className={ifcat("button blue box icon flex center", {
                   clock:order.status === 'accepted',
                   check:order.status === 'completed',
@@ -36,6 +35,7 @@ class Order extends Influx.Component {
                   })}>{order.status}
             </div>
           </div>
+          <div className="box flex center vertical evil-icon forward"/>
         </div>
     )
   }

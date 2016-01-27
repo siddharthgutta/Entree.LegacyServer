@@ -112,10 +112,25 @@ module.exports = function (grunt) {
         }]
       }
     },
+    jade: {
+      dist: {
+        options: {
+          optimizationLevel: 3
+        },
+        files: [{
+          expand: true,
+          cwd: 'views/',
+          src: ['**/*.jade'],
+          dest: 'public/',
+          ext: '.html'
+        }]
+      }
+    },
     copy: {
       dist: {
         files: [
-          {expand: true, cwd: 'resources/fonts', src: ['**/*'], dest: 'public/fonts'}
+          {expand: true, cwd: 'resources/fonts', src: ['**/*'], dest: 'public/fonts'},
+          {expand: true, cwd: 'public/', src: ['**/*'], dest: 'cordova/www'}
         ]
       }
     },
@@ -128,7 +143,14 @@ module.exports = function (grunt) {
         }
       }
     },
-    clean: ["public/", "./package.noDevDeps.json"]
+    clean: ["public/", "./package.noDevDeps.json"],
+    rename: {
+      dist: {
+        files: [
+          {src: ['cordova/www/cordova.html'], dest: 'cordova/www/index.html'}
+        ]
+      }
+    }
   });
 
   var lastNodeEnv;
@@ -152,16 +174,18 @@ module.exports = function (grunt) {
     fs.writeFileSync('package.noDevDeps.json', JSON.stringify(pkg), "utf8");
 
     exec('node node_modules/license-report/index.js --package=./package.noDevDeps.json --output=json',
-      function (err, stdout, stderr) {
-        if (err || stderr) console.error(err, stderr);
-        else fs.writeFileSync('deps.json', JSON.stringify(JSON.parse(stdout), null, 2), "utf8");
-        fs.unlinkSync('package.noDevDeps.json');
-        done();
-      })
+        function (err, stdout, stderr) {
+          if (err || stderr) console.error(err, stderr);
+          else fs.writeFileSync('deps.json', JSON.stringify(JSON.parse(stdout), null, 2), "utf8");
+          fs.unlinkSync('package.noDevDeps.json');
+          done();
+        })
   });
 
   grunt.registerTask('styles', ['sass:dist', 'postcss:dist']);
-  grunt.registerTask('build', ['get-deps', 'sass:dist', 'postcss:dist', 'browserify:dist', 'uglify:dist', 'copy', 'imagemin']);
+
+  // FIXME dont' uglify if in dev mode
+  grunt.registerTask('build', ['get-deps', 'sass:dist', 'postcss:dist', 'browserify:dist', 'uglify:dist', 'jade:dist', 'imagemin', 'copy', 'rename:dist']);
   grunt.registerTask('default', 'build');
   grunt.registerTask('auto-build-scripts', ['browserify:dev']);
   grunt.registerTask('auto-build-styles', ['sass:dev', 'watch:sass']);

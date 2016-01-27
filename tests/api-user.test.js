@@ -17,7 +17,7 @@ describe('Create User', ()=> {
           expect('jim').to.equal(select('body.data.username', res));
           expect('halpert').to.equal(select('body.data.password', res));
           expect('jhalpert@dunder.com').to.equal(select('body.data.email', res));
-          console.test(JSON.stringify(res.body, null, 4));
+          console.test(res.body);
           done();
         });
   });

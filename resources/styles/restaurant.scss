@@ -6,11 +6,33 @@
 @import "shared/tabs";
 
 html {
-  background: linear-gradient(to bottom, #3F51B5, #000);
+  overflow: hidden;
+}
+
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+}
+
+body {
+  -webkit-touch-callout: none; /* prevent callout to copy image, etc when tap to hold */
+  -webkit-text-size-adjust: none; /* prevent webkit from resizing text to fit */
+  -webkit-user-select: none; /* prevent copy paste, to allow, change 'none' to 'text' */
   overflow: hidden;
 }
 
 body {
+  overflow: hidden;
+  background: linear-gradient(to bottom, #3F51B5, #000);
+  transition: background 300ms;
+  &.red {
+    background: linear-gradient(to bottom, #FF5722, #573273);
+  }
+  &.green {
+    background: linear-gradient(to bottom, #3FB5B0, #573273);
+  }
+}
+
+#app {
   overflow: hidden;
 }
 
@@ -27,7 +49,6 @@ body {
   }
   .header {
     background: #111;
-    border-bottom: 1px solid #222;
     padding: 20px;
     font-size: 15px;
     text-transform: uppercase;
@@ -37,15 +58,23 @@ body {
 }
 
 .order {
-  background: #111;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 0 10px;
-  position: absolute;
   width: 100%;
   transition: all 1250ms ease;
+  .forward {
+    color: #fff;
+    font-size: 40px;
+    text-align: right;
+    max-width: 20px;
+    min-width: 20px;
+    width: 20px;
+    padding-right: 19px
+  }
+
   .date {
     font-size: 70%;
-    color: #999;
+    color: rgba(255, 255, 255, 0.64);
     text-align: left;
     padding-right: 10px;
     position: relative;
@@ -53,11 +82,11 @@ body {
     text-overflow: ellipsis;
   }
   .name {
-    color: #FFF;
-    text-transform: uppercase;
+    color: #fff;
     text-align: left;
-    font-size: 90%;
-    letter-spacing: 1px;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 0px;
   }
   .id {
     &:before {
@@ -66,30 +95,47 @@ body {
       color: #999;
       position: relative;
       top: -6px;
+      display: none;
       left: -3px;
     }
-    padding-left: 5px;
-    padding-right: 5px;
-    font-size: 30px;
-    color: #FFF;
-    font-weight: 100;
-    max-width: 40px;
-    min-width: 40px;
-    width: 40px;
+    transition: background 300ms;
+    font-size: 18px;
+    color: #fff;
+    font-weight: bold;
+    max-width: 50px;
+    min-width: 50px;
+    width: 50px;
+    text-align: center;
+    border-radius: 100px;
+    -webkit-justify-content: center;
+    justify-content: center;
+    height: 50px;
+    letter-spacing: 1px;
+    margin: 15px;
+    margin-left: 0;
+    .red & {
+      background: #FF5722;
+    }
+    .green & {
+      background: rgba(64, 172, 172, 0.67);
+    }
+    .blue & {
+      background: rgba(64, 88, 181, 0.6);
+    }
   }
   .cost {
     &:before {
       content: '$ ';
-      font-size: 15px;
+      font-size: 18px;
       color: #999;
       position: relative;
       left: -3px;
     }
     text-align: right;
-    font-size: 20px;
-    color: #FFF;
+    font-size: 18px;
+    color: #fff;
     padding-right: 10px;
-    font-weight: 100;
+    font-weight: bold;
   }
   .button {
     padding: 0 20px;
@@ -108,6 +154,7 @@ body {
     text-overflow: ellipsis;
     max-width: 140px;
     min-width: 140px;
+    user-select: none;
     &.blue {
       background: #00A7E6;
       border: none;
@@ -211,9 +258,19 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.info {
+  align-items: flex-start !important;
+  padding: 5px 0;
+  &.small {
+    .value {
+      font-size: 20px !important;
+    }
+  }
+}
+
 .item {
   border-bottom: 1px solid rgba(255, 255, 255, 0.09);
-  padding: 30px 15px;
+  padding: 15px 15px;
 
   .quantity {
     font-size: 15px;
@@ -283,9 +340,9 @@ body {
 }
 
 .status {
-  background: rgba(0, 0, 0, 0.24);
+  //background: rgba(0, 0, 0, 0.24);
+  background: rgba(0, 0, 0, 0.7);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
   .event {
     text-align: center;
     background: rgba(255, 255, 255, 0.11);
@@ -322,29 +379,45 @@ body {
   }
 
   .event.active {
-    background: #FF5722;
     color: #FFF;
+    .red & {
+      background: #FF5722;
+    }
+    .green & {
+      background: rgba(64, 172, 172, 0.67);
+    }
+    .blue & {
+      background: rgba(64, 88, 181, 0.6);
+    }
     &:after {
       border-left-color: #FF5722;
+      .red & {
+        border-left-color: #FF5722;
+      }
+      .green & {
+        border-left-color: rgba(64, 172, 172, 0.67);
+      }
+      .blue & {
+        border-left-color: rgba(64, 88, 181, 0.6);
+      }
     }
   }
 }
 
 .vignette {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.8);
   top: 0;
   z-index: 999;
   position: absolute;
-  padding: 10px;
   .dialog {
     padding: 20px;
     width: 100%;
     background: #FFF;
-    box-shadow: 0 0px 60px #000;
+    box-shadow: 0 0 60px #000;
     border-bottom: 1px solid #3D4B90; /* margin: 20px; */
-    border-radius: 5px;
+    border-radius: 0;
     input {
-      padding: 10px 15px;
+      padding: 5px 15px;
       font-size: 15px;
       background: rgba(255, 255, 255, 0.35);
       border: 2px solid #E0E0E0;
@@ -353,11 +426,29 @@ body {
       display: inline-block;
       width: 100%;
       color: #000;
-      font-size: 18px;
+      font-size: 31px;
       font-weight: bold;
       text-align: center;
       letter-spacing: 1px;
       margin-bottom: 10px;
+    }
+    hr {
+      opacity: 0.5;
+      margin: 20px 0;
+    }
+    .value {
+      color: #000;
+    }
+    .desc {
+      color: #AAA;
+      text-align: center;
+      &.normal {
+        text-transform: none;
+      }
+      &.bold {
+        color: #888;
+        font-size: 18px;
+      }
     }
     .button {
       display: block;
@@ -368,9 +459,33 @@ body {
       color: #FFF;
       font-size: 16px;
       padding: 15px 0;
-      background: #8BC34A;
-      border-radius: 3px;
-      width: 100%
+      background: #3AE041;
+      border-radius: 6px;
+      width: 100%;
+      margin-bottom: 10px;
+      user-select: none;
+      .add {
+        font-size: 12px;
+        margin-right: 10px;
+      }
+      &.orange {
+        background: #FFC107;
+      }
+      &.red {
+        background: #FF5722;
+      }
+      &.teal {
+        background: #009688;
+      }
+      &.navy {
+        background: #607D8B;
+      }
+      &.purple {
+        background: #00BCD4;
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 }
