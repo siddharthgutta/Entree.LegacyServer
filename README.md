@@ -75,8 +75,6 @@ git clone https://github.com/siddharthgutta/Entree.Server && cd Entree.Server
 # install app dependencies
 npm install
 
-# launch app with branch-off
-./node_modules/branch-off/dist/cli
 ```
 
 ### Third Party Libraries/References:
