@@ -19,6 +19,7 @@ export function initScribe(override = true, mongo = true, socket = true, ...expo
   console.log(`Scribe assuming you have mongo installed - ${mongo}!!!`);
   console.log(`Scribe assuming you socket port open - ${socket}!!!`);
 
+
   var context = resolveContext();
 
   var scribeConsole = new Scribe(context.id, {
@@ -79,4 +80,5 @@ export function initServer() {
   var context = resolveContext();
 
   require('./server.es6').default.listen(context.port, () => console.log(`Listening on ${context.port}`));
+
 }
