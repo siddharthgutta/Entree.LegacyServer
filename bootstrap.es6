@@ -14,8 +14,12 @@ export function resolveContext() {
 }
 export function initScribe(override = true, mongo = true, socket = true, ...exposers) {
 
+<<<<<<< HEAD:bootstrap.es6
   console.log(`Scribe assuming you have mongo installed - ${mongo}!!!`);
   console.log(`Scribe assuming you socket port open - ${socket}!!!`);
+=======
+export function initScribe(override = true, socket = true, ...exposers) {
+>>>>>>> Optional socket for scribe:bootstrap.js
 
   var context = resolveContext();
 
@@ -76,5 +80,10 @@ export function initDatabase() {
 export function initServer() {
   var context = resolveContext();
 
+<<<<<<< HEAD:bootstrap.es6
   require('./server.es6').default.listen(context.port, () => console.log(`Listening on ${context.port}`));
 }
+=======
+  require('./server').default.listen(context.port, () => console.log(`Listening on ${context.port}`));
+}
+>>>>>>> Optional socket for scribe:bootstrap.js
