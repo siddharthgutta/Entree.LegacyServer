@@ -5,4 +5,7 @@ npm install
 
 grunt build -v
 
-# set up db
+# set up db, etc
+
+echo "script invoking push script"
+. ./branchoff@push
