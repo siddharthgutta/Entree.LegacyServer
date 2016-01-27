@@ -10,43 +10,8 @@ const TWILIO_TEST_ACCOUNT_SID = "AC170b40ecf9e378bc5b414c60801d7178";
 const TWILIO_TEST_AUTH_TOKEN = "3e7ae8aebc9dc023b66ee071065089b0";
 
 // Storing keys into config objects
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
-=======
->>>>>>> removed unnecessary module.exports
 export var twilio_config = {};
 export var twilio_test_config = {};
-=======
-var twilio_config = {};
-var twilio_test_config = {};
->>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> removed unnecessary module.exports
-=======
-export var twilio_config = {};
-export var twilio_test_config = {};
->>>>>>> removed unnecessary module.exports
-<<<<<<< HEAD
-=======
->>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
-=======
->>>>>>> removed unnecessary module.exports
-=======
-export var twilio_config = {};
-export var twilio_test_config = {};
->>>>>>> think i fixed all of the merge conflicts/rebasing
-=======
-export var twilio_config = {};
-export var twilio_test_config = {};
->>>>>>> 3af0a2065caa84c8895c5299585eef8081f1a8c6
 
 twilio_config.accountSid = TWILIO_ACCOUNT_SID;
 twilio_config.authToken = TWILIO_AUTH_TOKEN;
@@ -67,90 +32,13 @@ function getConfigValue(configValue) {
 if (!requiredConfig.every(getConfigValue)) {
   var errorMessage =
     'TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_NUMBER must be set.';
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> added tagged logging
   console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
-=======
->>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
-=======
-  console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
->>>>>>> added tagged logging
-<<<<<<< HEAD
-=======
-  console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
-=======
->>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
->>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
-=======
->>>>>>> added tagged logging
-=======
-  console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
->>>>>>> think i fixed all of the merge conflicts/rebasing
-=======
-  console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
->>>>>>> 3af0a2065caa84c8895c5299585eef8081f1a8c6
   throw new Error(errorMessage);
 }
 
 if (!requiredTestConfig.every(getConfigValue)) {
   var errorMessage =
     'TWILIO_TEST_ACCOUNT_SID, TWILIO_TEST_AUTH_TOKEN, and TWILIO_NUMBER must be set.';
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> added tagged logging
-=======
->>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
-=======
-=======
->>>>>>> added tagged logging
->>>>>>> added tagged logging
   console.tag("Twilio", "Configuration", "Test", "Error").log(errorMessage);
   throw new Error(errorMessage);
 }
-=======
-  throw new Error(errorMessage);
-}
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
-=======
->>>>>>> removed unnecessary module.exports
-
-// Export configuration object
-module.exports = {
-  twilio_config, twilio_test_config
-};
->>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> removed unnecessary module.exports
-=======
->>>>>>> added SMS sending function and twilio config file with keys... code is not yet tested
-=======
-=======
->>>>>>> removed unnecessary module.exports
->>>>>>> removed unnecessary module.exports
-=======
-  console.tag("Twilio", "Configuration", "Test", "Error").log(errorMessage);
-  throw new Error(errorMessage);
-}
->>>>>>> think i fixed all of the merge conflicts/rebasing
-=======
-  console.tag("Twilio", "Configuration", "Test", "Error").log(errorMessage);
-  throw new Error(errorMessage);
-}
->>>>>>> 3af0a2065caa84c8895c5299585eef8081f1a8c6
