@@ -1,6 +1,10 @@
 import App from './components/App.jsx'
 import React from 'react'
 import { render, unmountComponentAtNode } from 'react-dom'
+import tapInject from 'react-tap-event-plugin'
+
+tapInject();
+
 //import 'react-fastclick'; // FIXME
 
 ///*

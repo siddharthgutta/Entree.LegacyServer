@@ -12,8 +12,7 @@ class Order extends React.Component {
     const order = this.props;
 
     return (
-        <div onClick={this.props.onClick} className="order flex"
-             style={{marginTop:-80,height:80,transform:`translate3d(0,${order.index * 80}px,1px)`}}>
+        <div onClick={this.props.onClick} onTouchTap={this.props.onClick} className="order flex" style={{height:80}}>
           <div className="id box flex left">{order.id}</div>
           <div className="box flex left">
             <div>

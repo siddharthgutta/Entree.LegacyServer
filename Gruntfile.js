@@ -130,6 +130,11 @@ module.exports = function (grunt) {
       dist: {
         files: [
           {expand: true, cwd: 'resources/fonts', src: ['**/*'], dest: 'public/fonts'},
+          {expand: true, cwd: 'resources/scripts', src: ['**/*'], dest: 'public/scripts'}
+        ]
+      },
+      cordova: {
+        files: [
           {expand: true, cwd: 'public/', src: ['**/*'], dest: 'cordova/www'}
         ]
       }
@@ -182,12 +187,40 @@ module.exports = function (grunt) {
         })
   });
 
-  grunt.registerTask('styles', ['sass:dist', 'postcss:dist']);
+  grunt.registerTask('styles', [
+    'sass:dist',
+    'postcss:dist'
+  ]);
 
   // FIXME dont' uglify if in dev mode
-  grunt.registerTask('build', ['get-deps', 'sass:dist', 'postcss:dist', 'browserify:dist', 'uglify:dist', 'jade:dist', 'imagemin', 'copy', 'rename:dist']);
+  grunt.registerTask('build', [
+    'get-deps',
+    'sass:dist',
+    'postcss:dist',
+    'browserify:dist',
+    'uglify:dist',
+    'jade:dist',
+    'imagemin',
+    'copy:dist',
+    'rename:dist',
+    'copy:cordova'
+  ]);
+
   grunt.registerTask('default', 'build');
-  grunt.registerTask('auto-build-scripts', ['browserify:dev']);
-  grunt.registerTask('auto-build-styles', ['sass:dev', 'watch:sass']);
-  grunt.registerTask('production', ['env-force-production', 'clean', 'build', 'env-restore']);
+
+  grunt.registerTask('auto-build-scripts', [
+    'browserify:dev'
+  ]);
+
+  grunt.registerTask('auto-build-styles', [
+    'sass:dev',
+    'watch:sass'
+  ]);
+
+  grunt.registerTask('production', [
+    'env-force-production',
+    'clean',
+    'build',
+    'env-restore'
+  ]);
 };
