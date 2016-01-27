@@ -17,7 +17,7 @@
        under the License.
  */
 
-package com.entreeapp;
+package com.entreeapp.producer;
 
 import android.os.Bundle;
 import org.apache.cordova.*;
