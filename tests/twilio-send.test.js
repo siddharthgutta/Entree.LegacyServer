@@ -3,7 +3,7 @@ import expect from 'expect.js'
 import {initScribe} from '../bootstrap'
 import moment from 'moment';
 
-const console = initScribe(true); // set to true
+const console = initScribe(true, false); // set to true
 
 console.tag(__filename).log("Starting tests");
 
