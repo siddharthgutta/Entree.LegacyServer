@@ -10,8 +10,8 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     closeTime: {
-        type: DataTypes.TIME,
-        allowNull: false
+      type: DataTypes.TIME,
+      allowNull: false
     }
   });
   return RestaurantHours;
