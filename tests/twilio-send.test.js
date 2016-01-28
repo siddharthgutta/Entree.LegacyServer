@@ -3,7 +3,7 @@ import expect from 'expect.js'
 import {initScribe} from '../bootstrap'
 import moment from 'moment';
 
-const console = initScribe(true, false); // set to true
+const console = initScribe(true, false, false); // set to true
 
 console.tag(__filename).log("Starting tests");
 
@@ -14,3 +14,5 @@ describe('Twilio Send', ()=> {
     done();
   });
 });
+
+// process.stdout.write("YOLO-FORCE")
