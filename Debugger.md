@@ -15,7 +15,8 @@ Go to File->Settings-> Tools -> File Watchers
 
 #### Option #2: Import XML
 
-Import [watcher.xml](/other/watcher.xml)
+Import [watcher.xml](/other/watcher.xml)  
+First copy this into a file
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
