@@ -1,13 +1,18 @@
-export default class Strategy {
-  constructor(from) {
-    this.from = from;
+export default class SMSStrategy {
+  constructor(fromNumber) {
+    this.fromNumber = fromNumber;
   }
 
-  send(to, data) {
+  send(toNumber, textBody) {
     throw new Error('Not implemented');
   }
 
-  normalize(to) {
+  changeFromNumber(newFromNumber) {
+    throw new Error('Not implemented');
+  }
+
+  // Unnecessary for now
+  normalize(toNumber) {
     throw new Error('Not implemented');
   }
 }
