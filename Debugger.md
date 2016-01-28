@@ -7,7 +7,15 @@ All server code must have an `.es6` extension.
 ### FileWatcher
 Import the following file watcher rules.
 
-#### Option #1: Manually Copy the following watcher.xml
+#### Option #1: Manually Copy the following configuartion
+
+
+![](/other/webstorm-debugger-1.png)
+
+#### Option #2: Import XML
+
+Import [watcher.xml](/other/watcher.xml)
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <TaskOptions>
@@ -34,12 +42,6 @@ Import the following file watcher rules.
   </TaskOptions>
 </TaskOptions>
 ```
-
-![](/other/webstorm-debugger-1.png)
-
-#### Option #2: Import XML
-
-Import [watcher.xml](/other/watcher.xml)
 
 ![](/other/webstorm-debugger-2.png)
 
