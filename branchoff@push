@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 echo "invoked by github push"
 
 npm install
@@ -27,12 +29,8 @@ android_raw=$(curl https://api.tryouts.io/v1/applications/6A6cacUG/releases/ \
 ios_url=$(echo $ios_raw | sed 's/.*"download_url": "\(.*\)", "size".*/\1/p')
 android_url=$(echo $android_raw | sed 's/.*"download_url": "\(.*\)", "size".*/\1/p')
 
-# split into array
-ios_url=($ios_url)
-android_url=($android_url)
-
-ios_payload=$(echo "{\"text\":\"$message\n${ios_url[0]}\"}")
-android_payload=$(echo "{\"text\":\"$message\n${android_url[0]}\"}")
+ios_payload=$(echo "{\"text\":\"$message\n$ios_url\"}")
+android_payload=$(echo "{\"text\":\"$message\n$android_url\"}")
 
 curl -X POST -H 'Content-type: application/json' --data "$ios_payload" https://hooks.slack.com/services/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
 curl -X POST -H 'Content-type: application/json' --data "$android_payload" https://hooks.slack.com/services/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
