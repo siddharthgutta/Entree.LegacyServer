@@ -2,5 +2,9 @@
   "publicUri": "http://ec2-52-26-163-35.us-west-2.compute.amazonaws.com",
   "Client": {
     "testProperty": "hello!"
+  },
+  "Twilio": {
+    "account": "AC98c288dd56d31217abb621f81b1415e4",
+    "token": "6325c4f809a60e8c9b390a1355f477d7"
   }
 }
