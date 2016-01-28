@@ -1,11 +1,6 @@
-doctype html
-html
-  head
-    meta(charset="UTF-8")
-    script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js')
-    script(src='scripts/tools/Bootstrap.min.js',defer=true)
-    link(rel='stylesheet', type='text/css', href='styles/tools.min.css')
-    style.
-      body,.full {width:100%;height:100%;position:relative;}
-  body
-    #app.full
+extends shared/layout
+
+block header
+  meta(charset="UTF-8")
+  script(src='scripts/tools/Bootstrap.min.js',defer=true)
+  link(rel='stylesheet', type='text/css', href='styles/tools.min.css')

@@ -6,16 +6,17 @@
   "dependencies": {
     "async": "^1.5.0",
     "autoprefixer": "^6.2.1",
+    "babel-core": "^6.4.5",
     "babel-plugin-transform-object-rest-spread": "^6.3.13",
     "babel-plugin-transform-runtime": "^6.3.13",
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-react": "^6.3.13",
-    "babel-register": "^6.3.13",
     "babelify": "^7.2.0",
     "body-parser": "^1.14.2",
     "brace": "^0.7.0",
     "chance": "^0.8.0",
     "config-browserify": "^1.0.5",
+    "convert-source-map": "^1.1.3",
     "cookie-parser": "^1.4.0",
     "expect.js": "^0.3.1",
     "express": "^4.13.3",
@@ -43,6 +44,7 @@
     "react-fastclick": "^2.0.0",
     "react-influx": "^1.0.7",
     "react-prefixr": "^0.1.0",
+    "react-tap-event-plugin": "^0.2.1",
     "scribe-js": "git://github.com/bluejamesbond/Scribe.js.git#dev",
     "selectn": "^0.10.0",
     "sequelize": "^3.15.1",
@@ -56,8 +58,8 @@
   },
   "scripts": {
     "test": "mocha --compilers js:babel-register --timeout 5000",
-    "tests": "npm run test ./tests/*.test.js",
-    "start": "node index.js"
+    "tests": "npm run test ./tests/*.test.compiled.js",
+    "start": "node index.compiled.js"
   },
   "repository": {
     "type": "git",
@@ -71,8 +73,5 @@
   "browserify": {
     "transform": "config-browserify"
   },
-  "homepage": "https://github.com/siddharthgutta/Entree.Server#readme",
-  "devDependencies": {
-    "babel-cli": "^6.4.5"
-  }
+  "homepage": "https://github.com/siddharthgutta/Entree.Server#readme"
 }

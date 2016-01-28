@@ -1,8 +1,11 @@
 'use strict';
 
+var babel = require('./tasks/babel-cli');
+
 module.exports = function (grunt) {
   require('time-grunt')(grunt);
   require('load-grunt-tasks')(grunt);
+  require('./tasks/grunt-filetransform')(grunt);
 
   grunt.initConfig({
     uglify: {
@@ -130,8 +133,19 @@ module.exports = function (grunt) {
       dist: {
         files: [
           {expand: true, cwd: 'resources/fonts', src: ['**/*'], dest: 'public/fonts'},
+          {expand: true, cwd: 'resources/scripts', src: ['**/*'], dest: 'public/scripts'}
+        ]
+      },
+      cordova: {
+        files: [
           {expand: true, cwd: 'public/', src: ['**/*'], dest: 'cordova/www'}
         ]
+      },
+      builds: {
+        files: {
+          "cordova/build/android-debug.apk": "cordova/platforms/android/build/outputs/apk/android-debug.apk",
+          "cordova/build/Entree.ipa": "cordova/platforms/ios/build/device/Entree.ipa"
+        }
       }
     },
     watch: {
@@ -150,10 +164,23 @@ module.exports = function (grunt) {
           {src: ['cordova/www/cordova.html'], dest: 'cordova/www/index.html'}
         ]
       }
+    },
+    filetransform: {
+      babel: {
+        options: {
+          transformer: babel
+        },
+        files: [{
+          expand: true,
+          src: ['**/*.es6'],
+          ext: '.compiled.js'
+        }]
+      }
     }
   });
 
   var lastNodeEnv;
+
   grunt.registerTask('env-force-production', '', function () {
     lastNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
@@ -182,12 +209,41 @@ module.exports = function (grunt) {
         })
   });
 
-  grunt.registerTask('styles', ['sass:dist', 'postcss:dist']);
+  grunt.registerTask('styles', [
+    'sass:dist',
+    'postcss:dist'
+  ]);
 
   // FIXME dont' uglify if in dev mode
-  grunt.registerTask('build', ['get-deps', 'sass:dist', 'postcss:dist', 'browserify:dist', 'uglify:dist', 'jade:dist', 'imagemin', 'copy', 'rename:dist']);
+  grunt.registerTask('build', [
+    'get-deps',
+    'sass:dist',
+    'postcss:dist',
+    'browserify:dist',
+    'uglify:dist',
+    'jade:dist',
+    'imagemin',
+    'copy:dist',
+    'copy:cordova',
+    'copy:builds',
+    'rename:dist'
+  ]);
+
   grunt.registerTask('default', 'build');
-  grunt.registerTask('auto-build-scripts', ['browserify:dev']);
-  grunt.registerTask('auto-build-styles', ['sass:dev', 'watch:sass']);
-  grunt.registerTask('production', ['env-force-production', 'clean', 'build', 'env-restore']);
+
+  grunt.registerTask('auto-build-scripts', [
+    'browserify:dev'
+  ]);
+
+  grunt.registerTask('auto-build-styles', [
+    'sass:dev',
+    'watch:sass'
+  ]);
+
+  grunt.registerTask('production', [
+    'env-force-production',
+    'clean',
+    'build',
+    'env-restore'
+  ]);
 };
