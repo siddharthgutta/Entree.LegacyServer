@@ -224,9 +224,9 @@ module.exports = function (grunt) {
     'jade:dist',
     'imagemin',
     'copy:dist',
-    'rename:dist',
     'copy:cordova',
-    'copy:builds'
+    'copy:builds',
+    'rename:dist'
   ]);
 
   grunt.registerTask('default', 'build');
