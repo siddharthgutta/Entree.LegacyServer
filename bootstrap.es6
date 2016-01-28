@@ -14,6 +14,11 @@ export function resolveContext() {
 }
 export function initScribe(override = true, mongo = true, socket = true, ...exposers) {
 
+<<<<<<< HEAD:bootstrap.es6
+=======
+export function initScribe(override = true, mongo = true, socket = true, ...exposers) {
+
+>>>>>>> got tests working:bootstrap.js
   console.log(`Scribe assuming you have mongo installed - ${mongo}!!!`);
   console.log(`Scribe assuming you socket port open - ${socket}!!!`);
 
