@@ -1,4 +1,7 @@
 import fs from 'fs'
+import {initScribe} from '../bootstrap.es6'
+
+initScribe(true, false, false);
 
 let port = process.env.PORT || 3000;
 

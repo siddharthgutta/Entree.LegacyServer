@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var Bootstrap = require('./bootstrap');
+import * as Bootstrap from './bootstrap'
 
 Bootstrap.initScribe();
 Bootstrap.initDatabase();

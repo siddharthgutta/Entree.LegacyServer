@@ -9,12 +9,12 @@ import sio from './message/sio'             // socket-io (websockets)
 import BasicRouter from './routes/basic'    // imports standard/websocket routers
 import NotifyRouter from './routes/notify'
 import ApiRouter from './routes/api'
-import sequelize from './models'            // mysql orm
+import sequelize from './models/index.es6'            // mysql orm
 
 const app = express();                            // server creation
 const server = http.createServer(app);
 
-sio.attach(server);                               // attaches server to socket.io instance
+sio.attach(server);                                 // attaches server to socket.io instance
 
 app.set('sequelize', sequelize);
 app.set('views', path.join(__dirname, 'views'));  // points app to location of the views

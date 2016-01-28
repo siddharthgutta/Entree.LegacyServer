@@ -4,7 +4,7 @@
     "uri": "https://github.com/siddharthgutta/Entree.Server",
     "debug": true,
     "pm2": {
-        "script": "./index.js",
+        "script": "./index.compiled.js",
 	    "max_memory_restart": "1G",
         "env": {
             "NODE_ENV": "production"
