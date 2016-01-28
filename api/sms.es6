@@ -1,4 +1,4 @@
-import Twilio from '../libs/sms/Twilio.es6'
+import Twilio from '../libs/sms/twilio.es6'
 import config from 'config'
 import _ from 'underscore';
 import Promise from 'bluebird'
@@ -13,7 +13,7 @@ const testCreds = config.get('Twilio.test');
  * @type {Twilio}
  */
 const productionSMS = new Twilio(fromNumber, productionCreds.sid, productionCreds.authToken);
-const testSMS = new Twilio(fromNumber, testCreds.sid, testCreds.authToken);
+export const testSMS = new Twilio(fromNumber, testCreds.sid, testCreds.authToken);
 /**
  * Send a custom message
  * @param to
@@ -38,7 +38,7 @@ export function sendTestSMS(toNumber, textBody) {
  */
 export function broadcast(textBody, to=admins) {
   return Promise.all(_.map(to, ({phone, name}) => {
-    fullMessage = "Server Notification for " + name + ": " + textBody;
+    var fullMessage = "Server Notification for " + name + ": " + textBody;
     sendSMS(phone, fullMessage)
   }));
 }
