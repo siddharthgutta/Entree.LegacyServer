@@ -9,6 +9,7 @@ Import the following file watcher rules.
 
 #### Option #1: Manually Copy the following configuartion
 
+Go to File->Settings-> Tools -> File Watchers
 
 ![](/other/webstorm-debugger-1.png)
 
