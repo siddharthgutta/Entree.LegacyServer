@@ -2,5 +2,14 @@
   "publicUri": "http://localhost",
   "Client": {
     "testProperty": "hello!"
+  },
+  "Admins": [{
+      "name": "Mathew Kurian",
+      "phone": "+17135011837"
+  }],
+  "Twilio": {
+    "from": "+5125200133",
+    "account": "AC98c288dd56d31217abb621f81b1415e4",
+    "auth": "6325c4f809a60e8c9b390a1355f477d7"
   }
 }
