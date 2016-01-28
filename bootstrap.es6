@@ -2,6 +2,7 @@ import Scribe from 'scribe-js'
 import config from 'config'
 import cluster from 'cluster'
 import {exec} from 'shelljs'
+import path from 'path'
 
 export function resolveContext() {
   var port = parseInt(process.env.BRANCHOFF_PORT) || process.env.PORT || 3000;
@@ -12,6 +13,7 @@ export function resolveContext() {
 
   return ctx;
 }
+
 export function initScribe(override = true, mongo = true, socket = true, ...exposers) {
 
   console.log(`Scribe assuming you have mongo installed - ${mongo}!!!`);
