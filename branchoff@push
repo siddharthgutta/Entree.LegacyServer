@@ -4,6 +4,7 @@ npm install
 npm update
 
 grunt build -v
+grunt filetransform:babel
 
 message=$(git log -1 --pretty=%B)
 
