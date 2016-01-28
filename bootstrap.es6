@@ -73,5 +73,5 @@ export function initDatabase() {
 export function initServer() {
   var context = resolveContext();
 
-  require('./server').default.listen(context.port, () => console.log(`Listening on ${context.port}`));
+  require('./server.es6').default.listen(context.port, () => console.log(`Listening on ${context.port}`));
 }

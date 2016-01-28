@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import bodyParser from 'body-parser'
-import * as Token from '../api/token'
-import * as User from '../api/user'
+import * as Token from '../api/token.es6'
+import * as User from '../api/user.es6'
 
 const route = Router();
 

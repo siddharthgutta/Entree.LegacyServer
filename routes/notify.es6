@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import sio from '../message/sio'
+import sio from '../message/sio.es6'
 
 const route = Router();
 

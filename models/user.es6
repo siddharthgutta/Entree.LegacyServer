@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize'
-import sequelize from './index'
+import sequelize from './index.es6'
 
 export default sequelize.define('user', {
   username: {
