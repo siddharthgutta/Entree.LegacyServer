@@ -1,8 +1,11 @@
 'use strict';
 
+var babel = require('./tasks/babel-cli');
+
 module.exports = function (grunt) {
   require('time-grunt')(grunt);
   require('load-grunt-tasks')(grunt);
+  require('./tasks/grunt-filetransform')(grunt);
 
   grunt.initConfig({
     uglify: {
@@ -161,10 +164,23 @@ module.exports = function (grunt) {
           {src: ['cordova/www/cordova.html'], dest: 'cordova/www/index.html'}
         ]
       }
+    },
+    filetransform: {
+      babel: {
+        options: {
+          transformer: babel
+        },
+        files: [{
+          expand: true,
+          src: ['**/*.es6'],
+          ext: '.compiled.js'
+        }]
+      }
     }
   });
 
   var lastNodeEnv;
+
   grunt.registerTask('env-force-production', '', function () {
     lastNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
