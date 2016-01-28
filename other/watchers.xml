@@ -18,7 +18,7 @@
     <option name="trackOnlyRoot" value="false" />
     <option name="workingDir" value="$FileDir$" />
     <envs>
-      <env name="PATH" value="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/opt/local/bin:/Users/mkurian/.nvm/versions/node/v5.0.0/bin" />
+      <env name="PATH" value="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/opt/local/bin:/home/jadesym/.nvm/v5.5.0/bin/node" />
     </envs>
   </TaskOptions>
 </TaskOptions>
