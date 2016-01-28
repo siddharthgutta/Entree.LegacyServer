@@ -13,15 +13,21 @@ export function resolveContext() {
   return ctx;
 }
 
-export function initScribe(override = true, ...exposers) {
+export function initScribe(override = true, mongo = true, socket = true, ...exposers) {
+
+  console.log(`Scribe assuming you have mongo installed - ${mongo}!!!`);
+  console.log(`Scribe assuming you socket port open - ${socket}!!!`);
+
 
   var context = resolveContext();
 
-  var console = new Scribe(context.id, {
+  var scribeConsole = new Scribe(context.id, {
     name: 'Entree',
     mongoUri: 'mongodb://localhost/scribe',
+    mongo,
     basePath: 'scribe/',
     socketPort: context.socketPort,
+    socket,
     nwjs: {
       buildDir: `${__dirname}/../public/native`
     },
@@ -54,13 +60,13 @@ export function initScribe(override = true, ...exposers) {
     debug: false
   }, ...["test", ...exposers]);
 
-  console.persistent('tags', [context.port, context.nodeEnv]);
+  scribeConsole.persistent('tags', [context.port, context.nodeEnv]);
 
   if (override) {
-    console.override();
+    scribeConsole.override();
   }
 
-  return console;
+  return scribeConsole;
 }
 
 export function initDatabase() {
