@@ -179,17 +179,6 @@ module.exports = function (grunt) {
     }
   });
 
-  var lastNodeEnv;
-
-  grunt.registerTask('env-force-production', '', function () {
-    lastNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
-  });
-
-  grunt.registerTask('env-restore', '', function () {
-    process.env.NODE_ENV = lastNodeEnv;
-  });
-
   grunt.registerTask('get-deps', '', function () {
     var done = this.async();
     var pkg = require('./package.json');
@@ -238,12 +227,5 @@ module.exports = function (grunt) {
   grunt.registerTask('auto-build-styles', [
     'sass:dev',
     'watch:sass'
-  ]);
-
-  grunt.registerTask('production', [
-    'env-force-production',
-    'clean',
-    'build',
-    'env-restore'
   ]);
 };
