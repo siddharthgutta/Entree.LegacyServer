@@ -1,32 +1,35 @@
 import Strategy from './strategy.es6'
 import twilio from 'twilio'
+import Promise from 'bluebird'
 
 export default class Twilio extends Strategy {
   constructor(from, account, auth) {
     super(from);
     this.client = twilio(account, auth);
-
-    console.tag('lib', 'twilio').log('Created', from);
+    console.tag('lib', 'twilio').log('Client Created with From Number: ', from);
   }
 
-  send(to, body) {
-    console.tag('lib', 'twilio').log(to, body);
-
-    // to = this.normalize(to);
-
+  send(toNumber, textBody) {
+    console.tag('lib', 'twilio').log("Sent to", toNumber, ":", textBody);
     return new Promise((resolve, reject)=> {
       this.client.messages.create({
-        body: body,
-        to: to,
-        from: this.from
-      }, (err, message) => {
+        body: textBody,
+        to: toNumber,
+        from: this.fromNumber
+      }, (err, response) => {
         if (err) return reject(err);
-        resolve(message);
+        resolve(response);
       });
     });
   }
 
-  normalize(number) {
+  // Currently only used by testing since we only have one twilio number
+  changeFromNumber(newFromNumber) {
+    this.fromNumber = newFromNumber;
+  }
+
+  // Unnecessary for now
+  normalize(toNumber) {
     return `+1${String(number).replace('+1', '')}`;
   }
 }
