@@ -18,9 +18,10 @@ export function initScribe(override = true, mongo = true, socket = true, ...expo
   console.log(`Scribe assuming you have mongo installed - ${mongo}!!!`);
   console.log(`Scribe assuming you socket port open - ${socket}!!!`);
 
+
   var context = resolveContext();
 
-  var console = new Scribe(context.id, {
+  var scribeConsole = new Scribe(context.id, {
     name: 'Entree',
     mongoUri: 'mongodb://localhost/scribe',
     mongo,
@@ -59,13 +60,13 @@ export function initScribe(override = true, mongo = true, socket = true, ...expo
     debug: false
   }, ...["test", ...exposers]);
 
-  console.persistent('tags', [context.port, context.nodeEnv]);
+  scribeConsole.persistent('tags', [context.port, context.nodeEnv]);
 
   if (override) {
-    console.override();
+    scribeConsole.override();
   }
 
-  return console;
+  return scribeConsole;
 }
 
 export function initDatabase() {
