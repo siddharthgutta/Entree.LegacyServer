@@ -58,3 +58,6 @@ xcuserdata
 
 *.compiled.js
 *.compiled.js.map
+
+public/
+cordova/www/
