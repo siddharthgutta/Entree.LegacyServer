@@ -3,10 +3,54 @@ import {twilio_config, twilio_test_config} from './config';
 
 // importing the twilio node module
 var twilio = require('twilio');
+var Promise = require("bluebird");
+
+var administratorPhoneNumbers = require("./config/administrators.json");
+var twilioNumber = require("./config/twilio_numbers.json")[0];
 
 // Creating twilio clients for production and test
-var twilioClient = twilio(twilio_config.accountSid, twilio_config.authToken);
+var twilioProductionClient = twilio(twilio_config.accountSid, twilio_config.authToken);
 var twilioTestClient = twilio(twilio_test_config.accountSid, twilio_test_config.authToken);
+
+class TwilioSMSSendClient {
+  constructor(client, fromNumber) {
+    this.twilioClient = client;
+    this.fromNumber = fromNumber;
+  }
+
+  sendSMS(toNumber, textBody, fromNumber=this.fromNumber) {
+    this.twilioClient.sendMessage({
+      to: toNumber,
+      from: fromNumber,
+      body: textBody
+    })
+  }
+}
+
+class TwilioSMSSendAdministratorsClient extends TwilioSMSSendProductionClient {
+  constructor(initialFromNumber) {
+    super(initialFromNumber);
+  }
+
+  sendServerNotification(textBody) {
+      console.tag("Twilio", "SMS", "Send", "Server Notification").log("Sending the following message to admins: " + textBody);
+      administratorPhoneNumbers.forEach(({phoneNumber, name}) => {
+          sendSMS(phoneNumber, "Hi " + name + ", " + textBody);
+      });
+  }
+}
+
+class TwilioSMSSendProductionClient extends TwilioSMSSendClient {
+  constructor(initalFromNumber) {
+    super(twilioProductionClient, initialFromNumber);
+  }
+}
+
+class TwilioSMSSendTestClient extends TwilioSMSSendClient {
+  constructor(initalFromNumber) {
+    super(twilioTestClient, initalFromNumber);
+  }
+}
 
 function sendSMS(toNumber, fromNumber, textBody, specificTwilioClient) {
   specificTwilioClient.sendMessage({

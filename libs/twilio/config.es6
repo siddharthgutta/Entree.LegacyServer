@@ -1,6 +1,3 @@
-const TWILIO_NUMBER = "5125200133";
-const TWILIO_TEST_NUMBER = "+15005550006";
-
 // Production Twilio API Credentials
 const TWILIO_ACCOUNT_SID = "AC98c288dd56d31217abb621f81b1415e4";
 const TWILIO_AUTH_TOKEN = "6325c4f809a60e8c9b390a1355f477d7";
@@ -15,15 +12,13 @@ export var twilio_test_config = {};
 
 twilio_config.accountSid = TWILIO_ACCOUNT_SID;
 twilio_config.authToken = TWILIO_AUTH_TOKEN;
-twilio_config.sendingNumber = TWILIO_NUMBER;
 
 twilio_test_config.accountSid = TWILIO_TEST_ACCOUNT_SID;
 twilio_test_config.authToken = TWILIO_TEST_AUTH_TOKEN;
-twilio_test_config.sendingNumber = TWILIO_TEST_NUMBER;
 
 // Functions to check that configuration exists for twilio usage.
-var requiredConfig = [twilio_config.accountSid, twilio_config.authToken, twilio_config.sendingNumber];
-var requiredTestConfig = [twilio_test_config.accountSid, twilio_test_config.authToken, twilio_test_config.sendingNumber];
+var requiredConfig = [twilio_config.accountSid, twilio_config.authToken];
+var requiredTestConfig = [twilio_test_config.accountSid, twilio_test_config.authToken];
 
 function getConfigValue(configValue) {
   return configValue || false;
@@ -31,14 +26,14 @@ function getConfigValue(configValue) {
 
 if (!requiredConfig.every(getConfigValue)) {
   var errorMessage =
-    'TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_NUMBER must be set.';
+    'TWILIO_ACCOUNT_SID, and TWILIO_AUTH_TOKEN';
   console.tag("Twilio", "Configuration", "Production", "Error").log(errorMessage);
   throw new Error(errorMessage);
 }
 
 if (!requiredTestConfig.every(getConfigValue)) {
   var errorMessage =
-    'TWILIO_TEST_ACCOUNT_SID, TWILIO_TEST_AUTH_TOKEN, and TWILIO_NUMBER must be set.';
+    'TWILIO_TEST_ACCOUNT_SID and TWILIO_TEST_AUTH_TOKEN';
   console.tag("Twilio", "Configuration", "Test", "Error").log(errorMessage);
   throw new Error(errorMessage);
 }
