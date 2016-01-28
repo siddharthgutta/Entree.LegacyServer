@@ -5,7 +5,7 @@ echo "invoked by github push"
 npm install
 npm update
 
-grunt build -v
+grunt build
 grunt filetransform:babel
 
 message=$(git log -1 --pretty=%B)
