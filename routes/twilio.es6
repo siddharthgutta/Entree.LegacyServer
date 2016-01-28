@@ -1,27 +1,34 @@
 import {Router} from 'express';
 import bodyParser from 'body-parser'
-import {twilio_config, twilio_test_config} from '../libs/twilio/config';
-
+import config from 'config'
 var twilio = require('twilio');
+const productionCreds = config.get('Twilio.production');
+const testCreds = config.get('Twilio.test');
 
 const route = Router();
-
-// Specific middleware for the twilio router
-route.use((req, res, next)=> {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.ok = (data, message) => res.json({status: 0, data: data.toJSON ? data.toJSON() : data, message});
-  res.fail = (cause, message, status) => res.json({status: status || 1, cause, message});
-  next();
-});
 
 // Receiving a text message from a user transferred by Twilio
 route.post('/receive', (req, res) => {
   // Twilio received a real text message
-  if (twilio.validateExpressRequest(req, twilio_config.authToken)) {
-    console.tag("Twilio", "SMS", "Receive", "Production").log("Real text message received\n" + JSON.stringify(req));
+  if (twilio.validateExpressRequest(req, productionCreds.authToken)) {
+    console.tag("routes", "twilio", "production").log("Text message received\n" + JSON.stringify(req));
+
     var resp = new twilio.TwimlResponse();
-        resp.say('express sez - hello twilio!');
-        res.type('text/xml');
+        /*
+        Insert code to respond with appropriate response message using a similaar format
+        */
+        resp.message('We have received your message!');
+        res.type('text/plain');
+        res.send(resp.toString());
+  // if we receive a test message
+  } else if (twilio.validateExpressRequest(req, testCreds.authToken)) {
+    console.tag("routes", "twilio", "test").log("Text message received\n" + JSON.stringify(req));
+    var resp = new twilio.TwimlResponse();
+        /*
+        Insert code to respond with appropriate response message using a similaar format
+        */
+        resp.message('We have received your test message!');
+        res.type('text/plain');
         res.send(resp.toString());
   }
   // Someone besides Twilio is attempting to use this endpoint
@@ -30,21 +37,5 @@ route.post('/receive', (req, res) => {
   }
 });
 
-// Receiving a text message from a user transferred by Twilio
-route.post('/testreceive', (req, res) => {
-  // Twilio received a real test message
-  if (twilio.validateExpressRequest(req, twilio_test_config.authToken)) {
-    console.tag("Twilio", "SMS", "Receive", "Test").log("Test text message received\n" + JSON.stringify(req));
-    var resp = new twilio.TwimlResponse();
-        resp.say('express sez - hello twilio!');
-
-        res.type('text/xml');
-        res.send(resp.toString());
-  }
-  // Someone besides Twilio is attempting to use this endpoint
-  else {
-    res.status(401).send("Sorry, you are not authorized to make requests here.");
-  }
-});
 
 export default route;
