@@ -1,21 +1,22 @@
 import mongoose from 'mongoose';
 
-var MenuItemSchema = new mongoose.Schema({
-    name: String,
-    description: String,
-    price: Number,
-    hasSize: Boolean,
-    sizes: {
-        small: Number,
-        medium: Number,
-        large: Number
-    },
-    mods: [{mod: String, price: Number}]
-});
-
-var MenuSchema = new mongoose.Schema({
+export default new mongoose.Schema({
     id: Number,
-    menu: [{category: String, menuItems: [MenuItemSchema]}]
+    menu: [
+      {
+        category: String,
+        menuItems: {
+          name: String,
+          description: String,
+          price: Number,
+          hasSize: Boolean,
+          sizes: {
+            small: Number,
+            medium: Number,
+            large: Number
+          },
+          mods: [{mod: String, price: Number}]
+        }
+      }
+    ]
 });
-
-export {MenuSchema, MenuItemSchema};
