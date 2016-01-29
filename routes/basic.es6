@@ -9,7 +9,7 @@ route.get('/', (req, res) => res.render('restaurant'));
 route.get('/tools', (req, res) => res.render('tools'));
 route.get('/tests', (req, res) => {
   let capture = '';
-  const child = exec(`npm run test ${__dirname}/../tests/*.test.js`, {async: true, silent: true});
+  const child = exec(`npm run test-no-color ${__dirname}/../tests/*-test.compiled.js`, {async: true, silent: true});
   child.stdout.on('data', data => capture += data);
   child.stderr.on('data', data => capture += data);
   child.stdout.on('message', data => capture += data);

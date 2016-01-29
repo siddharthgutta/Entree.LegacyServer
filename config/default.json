@@ -2,5 +2,34 @@
   "publicUri": "http://localhost",
   "Client": {
     "testProperty": "hello!"
+  },
+  "Admins": [
+    {
+      "phone": "+12149664948",
+      "name": "Kevin Fu"
+    },
+    {
+      "phone": "+17135011837",
+      "name": "Mathew Kurian"
+    },
+    {
+      "phone": "+17138591560",
+      "name": "Jesse Mao"
+    },
+    {
+      "phone": "+18179751584",
+      "name": "Sid Gutta"
+    }
+  ],
+  "Twilio": {
+    "fromNumbers": "+15125200133",
+    "production":  {
+      "sid": "AC98c288dd56d31217abb621f81b1415e4",
+      "authToken": "6325c4f809a60e8c9b390a1355f477d7"
+    },
+    "test": {
+      "sid": "AC170b40ecf9e378bc5b414c60801d7178",
+      "authToken": "3e7ae8aebc9dc023b66ee071065089b0"
+    }
   }
 }
