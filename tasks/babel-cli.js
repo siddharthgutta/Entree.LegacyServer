@@ -5,7 +5,7 @@ var fs = require('fs');
 var path = require('path');
 var convert = require('convert-source-map');
 
-exports.transform = function (input) {
+exports.transform = function (input, output) {
   var source = fs.readFileSync(input, 'utf8');
   var generated = babel.transform(source, {
     filename: input,
@@ -23,18 +23,13 @@ exports.transform = function (input) {
   var sourcemapfile = output + '.map';
   var ccode = convert.removeMapFileComments(code) + "\n//# sourceMappingURL=" + path.basename(sourcemapfile);
 
-  return {
-    code: ccode,
-    sourcemapfile: sourcemapfile,
-    sourcemap: sourcemap
-  }
+  fs.writeFileSync(output, ccode, 'utf8');
+  fs.writeFileSync(sourcemapfile, sourcemap.toJSON(), 'utf8');
 };
 
 if (process.argv.length > 3) {
   var input = process.argv[3];
   var output = process.argv[2];
-  var gen = exports.transform(input);
 
-  fs.writeFileSync(output, gen.code, 'utf8');
-  fs.writeFileSync(output + '.map', gen.sourcemap.toJSON(), 'utf8');
+  exports.transform(input, output);
 }

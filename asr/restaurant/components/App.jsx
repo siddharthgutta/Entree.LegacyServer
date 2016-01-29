@@ -6,6 +6,7 @@ import Header from './views/elements/Header.jsx'
 import OrderHistory from './views/pages/OrderHistory.jsx'
 import OrderFocus from './views/pages/OrderFocus.jsx'
 import {ifcat} from '../libs/utils'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
 class App extends React.Component {
   constructor(...args) {
@@ -36,11 +37,16 @@ class App extends React.Component {
   }
 
   render() {
-    if (this.state.selectedOrder) {
-      return <OrderFocus order={this.state.selectedOrder}/>
-    }
+    var items = [
+      this.state.selectedOrder ? <OrderFocus key="OrderFocus" order={this.state.selectedOrder}/> :
+          <OrderHistory key="OrderHistory" onOrderClick={this._selectOrder.bind(this)}/>
+    ];
 
-    return <OrderHistory onOrderClick={this._selectOrder.bind(this)}/>;
+    return (
+        <ReactCSSTransitionGroup transitionName="example" transitionEnterTimeout={500} transitionLeaveTimeout={300}>
+          {items}
+        </ReactCSSTransitionGroup>
+    );
   }
 }
 
