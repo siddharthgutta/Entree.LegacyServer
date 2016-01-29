@@ -60,7 +60,7 @@
   },
   "scripts": {
     "test": "mocha --timeout 5000",
-    "tests": "npm run test ./tests/*.test.compiled.js",
+    "tests": "npm run test ./tests/*-test.compiled.js",
     "start": "node index.compiled.js"
   },
   "repository": {
