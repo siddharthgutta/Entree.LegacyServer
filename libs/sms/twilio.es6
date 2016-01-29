@@ -9,8 +9,9 @@ export default class Twilio extends Strategy {
     console.tag('lib', 'twilio').log('Client Created with From Number: ', from);
   }
 
-  send(toNumber, textBody) {
-    console.tag('lib', 'twilio').log("Sent to", toNumber, ":", textBody);
+  send(toNumber, textBody, verboseLogging=false) {
+    if (verboseLogging)
+      console.tag('lib', 'twilio').log("Sent to", toNumber, ":", textBody);
     return new Promise((resolve, reject)=> {
       this.client.messages.create({
         body: textBody,
