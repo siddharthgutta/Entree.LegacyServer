@@ -1,17 +1,17 @@
-'use strict';
+import fs from 'fs';
+import path from 'path';
+import Sequelize from 'sequelize';
+import config from 'config';
 
-var fs        = require('fs');
-var path      = require('path');
-var Sequelize = require('sequelize');
+var mysqlConfig = config['mysql'];
 var basename  = path.basename(module.filename);
-var config    = require('config')['mysql'];
 var db        = {};
-var sequelize = new Sequelize(config.database, config.username, config.password, config);
+var sequelize = new Sequelize(mysqlConfig.database, mysqlConfig.username, mysqlConfig.password, mysqlConfig);
 
 fs
   .readdirSync(__dirname)
   .filter(function(file) {
-    return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
+    return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-4) === '.es6');
   })
   .forEach(function(file) {
     var model = sequelize['import'](path.join(__dirname, file));
@@ -27,4 +27,4 @@ Object.keys(db).forEach(function(modelName) {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-module.exports = db;
+export default db;

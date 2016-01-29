@@ -1,5 +1,4 @@
-'use strict';
-module.exports = function(sequelize, DataTypes) {
+export default function(sequelize, DataTypes) {
   var Location = sequelize.define('Location', {
     firstAddress: {
       type: DataTypes.STRING(64),

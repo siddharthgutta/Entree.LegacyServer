@@ -2,7 +2,7 @@ import Scribe from 'scribe-js'
 import config from 'config'
 import cluster from 'cluster'
 import {exec} from 'shelljs'
-import models from './models/mysql'
+import models from './models/mysql/index.es6'
 import mongoose from 'mongoose'
 
 

@@ -1,4 +1,4 @@
-var mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
 var MenuItemSchema = new mongoose.Schema({
     name: String,
@@ -18,7 +18,4 @@ var MenuSchema = new mongoose.Schema({
     menu: [{category: String, menuItems: [MenuItemSchema]}]
 });
 
-module.exports = {
-    MenuItem: MenuItemSchema,
-    Menu: MenuSchema
-}
+export {MenuSchema, MenuItemSchema};

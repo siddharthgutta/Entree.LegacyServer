@@ -1,5 +1,4 @@
-'use strict';
-module.exports = function(sequelize, DataTypes) {
+export default function(sequelize, DataTypes) {
   var Restaurant = sequelize.define('Restaurant', {
     name: {
       type: DataTypes.STRING(64),

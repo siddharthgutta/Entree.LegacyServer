@@ -1,4 +1,4 @@
-var mongoose = require('mongoose')
+import mongoose from 'mongoose';
 
 var OrderItemSchema = new mongoose.Schema({
     quantity: Number,
@@ -14,7 +14,4 @@ var OrderSchema = new mongoose.Schema({
     state: String
 });
 
-module.exports = {
-    OrderItem: OrderItemSchema,
-    Order: OrderSchema
-}
+export {OrderItemSchema, OrderSchema};
