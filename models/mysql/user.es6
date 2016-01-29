@@ -8,10 +8,8 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.STRING(10),
       allowNull: false
     },
-    password: {
-      type: DataTypes.STRING(128),
-      allowNull: false
-    },
+    email: DataTypes.STRING(128),
+    pin: DataTypes.STRING(4)
   });
   return User;
 };

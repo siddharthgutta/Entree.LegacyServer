@@ -4,10 +4,7 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.STRING(64),
       allowNull: false
     },
-    secondAddress: {
-      type: DataTypes.STRING(64),
-      allowNull: false
-    },
+    secondAddress: DataTypes.STRING(64),
     city: {
       type: DataTypes.STRING(32),
       allowNull: false
