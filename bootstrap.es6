@@ -14,7 +14,7 @@ export function resolveContext() {
   return ctx;
 }
 
-export function initScribe(override = true, mongo = true, socket = true, ...exposers) {
+export function initScribe(override = true, mongo = true, socket = true, colors=true, pre=true, tags=true, callsite=true, ...exposers) {
 
   console.log(`Scribe assuming you have mongo installed - ${mongo}!!!`);
   console.log(`Scribe assuming you socket port open - ${socket}!!!`);
@@ -22,6 +22,16 @@ export function initScribe(override = true, mongo = true, socket = true, ...expo
   var context = resolveContext();
 
   var scribeConsole = new Scribe(context.id, {
+    inspector: {
+      colors: colors,
+      showHidden: false,
+      depth: 5,
+      pre: pre,
+      callsite: callsite,
+      tags: tags,
+      args: true,
+      metrics: true
+    },
     name: 'Entree',
     mongoUri: 'mongodb://localhost/scribe',
     mongo,
