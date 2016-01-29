@@ -8,7 +8,7 @@ var db = {};
 fs
     .readdirSync(__dirname)
     .filter(function(file) {
-        return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-4) === '.es6');
+        return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
     })
     .forEach(function(file) {
         var schema = require(path.join(__dirname, file));
