@@ -10,8 +10,7 @@ var OrderSchema = new mongoose.Schema({
     phoneNumber: String,
     restaurantId: Number,
     items: [OrderItemSchema],
-    totalPrice: Number,
-    state: String
+    status: String
 });
 
 export {OrderItemSchema, OrderSchema};

@@ -19,7 +19,7 @@ export default function(sequelize, DataTypes) {
           }
         });
 
-        Restaurant.hasOne(models.RestaurantHours, {
+        Restaurant.hasMany(models.RestaurantHours, {
           onDelete: "CASCADE",
           foreignKey: {
             allowNull: false
