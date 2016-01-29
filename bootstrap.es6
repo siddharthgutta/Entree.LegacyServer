@@ -1,17 +1,19 @@
-import Scribe from 'scribe-js'
-import config from 'config'
-import cluster from 'cluster'
-import {exec} from 'shelljs'
+// jscs:disable requireSpacesInsideObjectBrackets
+import Scribe from 'scribe-js';
+import config from 'config';
+import cluster from 'cluster';
+import {exec} from 'shelljs';
 
 export function resolveContext() {
   var port = parseInt(process.env.BRANCHOFF_PORT) || process.env.PORT || 3000;
-  var socketPort = 50000 + (Number(process.env.pm_id) || port);
+  var socketPort = 50000 + (Number(process.env.pm_id) || port);// jscs:ignore requireCamelCaseOrUpperCaseIdentifiers
   var id = process.env.BRANCHOFF_BRANCH || (exec('git rev-parse --abbrev-ref HEAD', {silent: true}).output || '').trim() || 'local';
-  var nodeEnv = process.env.NODE_ENV || "localbuild?";
+  var nodeEnv = process.env.NODE_ENV || 'localbuild?';
   var ctx = {port, socketPort, id, nodeEnv};
 
   return ctx;
 }
+
 export function initScribe(override = true, mongo = true, socket = true, ...exposers) {
 
   console.log(`Scribe assuming you have mongo installed - ${mongo}!!!`);
@@ -56,7 +58,7 @@ export function initScribe(override = true, mongo = true, socket = true, ...expo
     },
     native: {},
     debug: false
-  }, ...["test", ...exposers]);
+  }, ...['test', ...exposers]);
 
   scribeConsole.persistent('tags', [context.port, context.nodeEnv]);
 

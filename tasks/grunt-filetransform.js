@@ -1,6 +1,6 @@
 var fs = require('fs');
 module.exports = function (grunt) {
-  grunt.registerMultiTask('filetransform', 'Convert es6 to es5', function () {
+  grunt.registerMultiTask('filetransform', 'File transform module', function () {
     var transformer = this.options({
       transformer: null
     }).transformer;
@@ -8,12 +8,14 @@ module.exports = function (grunt) {
     if (transformer && typeof transformer.transform === 'function') {
       this.files.forEach(function (file) {
         var input = file.src[0];
-        var gen = transformer.transform(input);
-        grunt.log.writeln('Transforming...' + input);
-        grunt.file.write(file.dest, gen.code);
-        grunt.file.write(file.dest + '.map', gen.sourcemap.toJSON());
-        grunt.log.writeln('Outputing...' + file.dest);
-        grunt.log.writeln('Outputing...' + file.dest + '.map');
+        var output = file.dest; // grunt multi-ext fix
+        if (file.orig.ext) {
+          var dotidx = input.lastIndexOf('.');
+          output = input.substring(0, dotidx < 0 ? input.length : dotidx) + file.orig.ext;
+        }
+
+        grunt.log.writeln('Transforming...' + input + " --> " + output);
+        transformer.transform(input, output);
       });
     }
   });
