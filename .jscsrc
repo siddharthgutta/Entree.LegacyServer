@@ -8,10 +8,5 @@
   ],
   "maxErrors": 9999,
   "requireTrailingComma": false,
-  "requireSpacesInsideObjectBrackets": {
-    "allExcept": [
-      "}",
-      ")"
-    ]
-  }
+  "requireSpacesInsideObjectBrackets": false
 }
