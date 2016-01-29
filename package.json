@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "ansi-to-html": "^0.3.0",
     "async": "^1.5.0",
     "autoprefixer": "^6.2.1",
     "babel-core": "^6.4.5",
@@ -63,7 +64,8 @@
     "test": "mocha --timeout 5000 --no-exit -R nyan",
     "tests": "npm run test ./tests/*-test.compiled.js",
     "start": "node index.compiled.js",
-    "test-no-color": "mocha --timeout 5000 --no-exit --no-colors"
+    "test-no-nyan": "mocha --timeout 5000 --no-exit --colors",
+    "tests-no-nyan": "npm run test-no-nyan ./tests/*-test.compiled.js"
   },
   "repository": {
     "type": "git",
