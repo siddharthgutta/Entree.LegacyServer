@@ -8,6 +8,9 @@ import Twilio from '../libs/sms/twilio.es6'
 import config from 'config'
 const testCreds = config.get('Twilio.test');
 
+// SET THIS VARIABLE FOR VERBOSE LOGS OF ALL REQUESTS/RESPONSES
+const VERBOSE_LOGGING = false;
+
 const to_test_nums = {
 
 
@@ -75,14 +78,18 @@ const from_test_nums = {
 
 const testSMS = new Twilio(from_test_nums.FROM_VALID_NUMBER.num, testCreds.sid, testCreds.authToken);
 
-function sendTestSMS(toNumber, textBody) {
-		console.tag('api', 'sms', 'test').log(toNumber, textBody);
-		return testSMS.send(toNumber, textBody);
+function sendTestSMS(toNumber, textBody, verboseLogging=VERBOSE_LOGGING) {
+		if (verboseLogging)
+				console.tag('api', 'sms', 'test').log(toNumber, textBody);
+		return testSMS.send(toNumber, textBody, VERBOSE_LOGGING);
 }
 
-function checkError(expectedError, resultingError, responseOrErrorObject) {
-		(expectedError != resultingError) ?
-				console.tag(TEST).err(responseOrErrorObject) : console.tag(TEST).log(responseOrErrorObject);
+function checkError(expectedError, resultingError, responseOrErrorObject, verboseLogging=VERBOSE_LOGGING) {
+		if (expectedError != resultingError) {
+				console.tag(TEST).err(responseOrErrorObject)
+		} else if (verboseLogging) {
+				console.tag(TEST).log(responseOrErrorObject)
+		}
 }
 
 describe("TwilioSend", () => {
