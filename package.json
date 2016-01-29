@@ -59,9 +59,9 @@
     "underscore": "^1.8.3"
   },
   "scripts": {
-    "test": "mocha --timeout 5000 --reporter nyan",
+    "test": "mocha --timeout 5000 --no-exit",
     "tests": "npm run test ./tests/*-test.compiled.js",
-    "start": "node index.compiled.js"
+    "start": "node index.compiled.js",
   },
   "repository": {
     "type": "git",
