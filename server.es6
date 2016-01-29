@@ -9,7 +9,7 @@ import sio from './message/sio'             // socket-io (websockets)
 import BasicRouter from './routes/basic'    // imports standard/websocket routers
 import NotifyRouter from './routes/notify'
 import ApiRouter from './routes/api'
-import sequelize from './models/index.es6'            // mysql orm
+import sequelize from './models/mysql/index.es6'            // mysql orm
 
 const app = express();                            // server creation
 const server = http.createServer(app);

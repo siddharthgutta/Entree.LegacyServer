@@ -1,7 +1,10 @@
-import Scribe from 'scribe-js';
-import config from 'config';
-import cluster from 'cluster';
-import {exec} from 'shelljs';
+import Scribe from 'scribe-js'
+import config from 'config'
+import cluster from 'cluster'
+import {exec} from 'shelljs'
+import models from './models/mysql/index.es6'
+import mongoose from 'mongoose'
+
 
 export function resolveContext() {
   var port = parseInt(process.env.BRANCHOFF_PORT) || process.env.PORT || 3000;
@@ -79,9 +82,11 @@ export function initScribe(override = true, mongo = true, socket = true, colors=
 }
 
 export function initDatabase() {
-  var context = resolveContext();
+  models.sequelize.sync({force: true}); // Remove once we finalize model
 
-  // todo
+  var mongoConfig = config['mongo'];
+  mongoose.connect(`mongodb://${mongoConfig.username}:${mongoConfig.password}@` +
+    `${mongoConfig.host}:${mongoConfig.port}/${mongoConfig.database}`);
 }
 
 export function initServer() {
