@@ -1,4 +1,4 @@
-import User from '../models/user.es6'
+import User from '../models/mysql/user.es6';
 
 /**
  * IMPORTANT: Must return promises!

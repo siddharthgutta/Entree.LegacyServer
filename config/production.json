@@ -23,7 +23,7 @@
   ],
   "Twilio": {
     "fromNumbers": "+15125200133",
-    "production":  {
+    "production": {
       "sid": "AC98c288dd56d31217abb621f81b1415e4",
       "authToken": "6325c4f809a60e8c9b390a1355f477d7"
     },
@@ -31,5 +31,19 @@
       "sid": "AC170b40ecf9e378bc5b414c60801d7178",
       "authToken": "3e7ae8aebc9dc023b66ee071065089b0"
     }
+  },
+  "mysql": {
+    "username": "root",
+    "password": "123456",
+    "database": "entree",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "mongo": {
+    "username": "root",
+    "password": "123456",
+    "database": "entree",
+    "host": "127.0.0.1",
+    "port": "27017"
   }
 }
