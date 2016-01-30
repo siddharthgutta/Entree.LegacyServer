@@ -2,13 +2,14 @@
 
 echo "invoked by github push"
 
-npm install
-npm update
+npm set progress=false
+npm --no-color --no-spin --loglevel=error update
 
 grunt build
 grunt filetransform:babel
 
 message=$(git log -1 --pretty=%B)
+branch=$(git symbolic-ref --short HEAD)
 
 # push ios release
 ios_raw=$(curl https://api.tryouts.io/v1/applications/NCKHE4E1/releases/ \
@@ -29,8 +30,8 @@ android_raw=$(curl https://api.tryouts.io/v1/applications/6A6cacUG/releases/ \
 ios_url=$(echo $ios_raw | sed 's/.*"download_url": "\(.*\)", "size".*/\1/p')
 android_url=$(echo $android_raw | sed 's/.*"download_url": "\(.*\)", "size".*/\1/p')
 
-ios_payload=$(echo "{\"text\":\"$message\n$ios_url\"}")
-android_payload=$(echo "{\"text\":\"$message\n$android_url\"}")
+ios_payload=$(echo "{\"text\":\"*$branch*\n\n```$message```\n$ios_url\"}")
+android_payload=$(echo "{\"text\":\"*$branch*\n\n```$message```\n$android_url\"}")
 
 curl -X POST -H 'Content-type: application/json' --data "$ios_payload" https://hooks.slack.com/services/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
 curl -X POST -H 'Content-type: application/json' --data "$android_payload" https://hooks.slack.com/services/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

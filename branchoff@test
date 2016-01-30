@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+echo "invoked when branch is test"
+
+npm run tests

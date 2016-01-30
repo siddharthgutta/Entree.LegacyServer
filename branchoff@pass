@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+echo "invoked when test is ok"
+
+code=$1
+output=$2
+message=$(git log -1 --pretty=%B)
+branch=$(git symbolic-ref --short HEAD)
+
+payload=$(echo "{\"text\":\"*$branch*\n\n```$message```\n```$output```*TEST FAILED*\"}")
+
+curl -X POST -H 'Content-type: application/json' \
+     --data "$payload" https://hooks.slack.com/services/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
