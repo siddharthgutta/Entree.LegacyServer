@@ -2,4 +2,4 @@
 
 echo "invoked when branch is test"
 
-npm run tests
+mocha --timeout 5000 --no-exit --no-colors
