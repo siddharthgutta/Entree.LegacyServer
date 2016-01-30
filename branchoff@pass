@@ -7,6 +7,11 @@ output=$2
 message=$(git log -1 --pretty=%B)
 branch=$(git symbolic-ref --short HEAD)
 
+echo 'Arg1:'$1
+echo 'Arg2'$2
+echo 'Code:'$code
+echo 'Output:'$output
+
 payload=$(echo "{\"channel\":\"#continous3\",\"text\":\"Ran tests on *$branch*\n\`\`\`$message\`\`\`\n\`\`\`$output\`\`\`\n*TEST PASSED*\"}")
 
 echo $payload
