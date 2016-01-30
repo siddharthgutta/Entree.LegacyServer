@@ -5,7 +5,7 @@ echo "invoked by github push"
 npm set progress=false
 npm --no-color --no-spin --loglevel=error update
 
-grunt build
+grunt --no-color build
 grunt filetransform:babel
 
 message=$(git log -1 --pretty=%B)
