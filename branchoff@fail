@@ -3,11 +3,11 @@
 echo "invoked when test fails"
 
 code=$1
-output=$(echo "${2//!#\$@%}")
+output=$2
 message=$(git log -1 --pretty=%B )
 branch=$(git symbolic-ref --short HEAD)
 
-payload=$(echo "{\"channel\":\"#continous2\",\"text\":\"Ran tests on *$branch*\n\`\`\`$message\`\`\`\n\`\`\`$output\`\`\`\n*TEST FAILED* Deployment cancelled. Please fix and push! \"}")
+payload=$(echo "{\"channel\":\"#continous3\",\"text\":\"Ran tests on *$branch*\n\`\`\`$message\`\`\`\n\`\`\`$output\`\`\`\n*TEST FAILED* Deployment cancelled. Please fix and push! \"}")
 
 curl -X POST -H 'Content-type: application/json' \
      --data "$payload" https://hooks.slack.com/services/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

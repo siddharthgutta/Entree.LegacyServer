@@ -32,7 +32,7 @@ android_raw=$(curl https://api.tryouts.io/v1/applications/6A6cacUG/releases/ \
 ios_url=$(echo $ios_raw | sed 's/.*"download_url": "\(.*\)", "size".*/\1/p')
 android_url=$(echo $android_raw | sed 's/.*"download_url": "\(.*\)", "size".*/\1/p')
 
-payload=$(echo "{\"channel\":\"#continous2\",\"text\":\"*$branch*\n\`\`\`$message\`\`\`\n*iOS*\n$ios_url\n*Android*\n$android_url\"}")
+payload=$(echo "{\"channel\":\"#continous3\",\"text\":\"*$branch*\n\`\`\`$message\`\`\`\n*iOS*\n$ios_url\n*Android*\n$android_url\"}")
 
 curl -X POST -H 'Content-type: application/json' --data "$payload" https://hooks.slack.com/services/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
 

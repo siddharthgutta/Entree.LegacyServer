@@ -3,11 +3,11 @@
 echo "invoked when test is ok"
 
 code=$1
-output=$(echo "${2//!#\$@%}")
+output=$2
 message=$(git log -1 --pretty=%B)
 branch=$(git symbolic-ref --short HEAD)
 
-payload=$(echo "{\"channel\":\"#continous2\",\"text\":\"Ran tests on *$branch*\n\`\`\`$message\`\`\`\n\`\`\`$output\`\`\`\n*TEST PASSED*\"}")
+payload=$(echo "{\"channel\":\"#continous3\",\"text\":\"Ran tests on *$branch*\n\`\`\`$message\`\`\`\n\`\`\`$output\`\`\`\n*TEST PASSED*\"}")
 
 echo $payload
 
