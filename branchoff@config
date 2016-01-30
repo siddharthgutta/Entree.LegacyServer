@@ -1,13 +1,17 @@
 {
-    "startPort": 3000,
-    "endPort": 4000,
-    "uri": "https://github.com/siddharthgutta/Entree.Server",
-    "debug": true,
-    "pm2": {
-        "script": "./index.compiled.js",
-	    "max_memory_restart": "1G",
-        "env": {
-            "NODE_ENV": "production"
-        }
+  "startPort": 3000,
+  "endPort": 4000,
+  "uri": "https://github.com/siddharthgutta/Entree.Server",
+  "debug": true,
+  "pm2": {
+    "restart_delay": 10000,
+    "watch": false,
+    "min_uptime": "20s",
+    "max_restarts": 3,
+    "script": "./index.compiled.js",
+    "max_memory_restart": "1G",
+    "env": {
+      "NODE_ENV": "production"
     }
+  }
 }
