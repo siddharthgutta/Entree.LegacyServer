@@ -5,21 +5,33 @@ import * as User from '../api/user.es6';
 
 describe('User', function () {
 
-  var attr = {
-    name: 'TestUser',
-    email: 'TestUser@gmail.com',
-    pin: '1234',
-    phoneNumber: '123-456-7890'
-  };
+  var name = 'TestUser';
+  var email = 'TestUser@gmail.com';
+  var password = '1234';
+  var phoneNumber = '1234567890';
 
   describe('#create()', function () {
     it('should insert to and query from the database correctly', function (done) {
-      User.create(attr).then(function () {
-        User.findOne('123-456-7890').then(function (user) {
-          assert.equal(user.name, attr.name);
-          assert.equal(user.pin, attr.pin);
-          assert.equal(user.email, attr.email);
-          assert.equal(user.phoneNumber, attr.phoneNumber);
+      User.create(phoneNumber, password, {name: name, email: email}).then(function () {
+        User.findOne(phoneNumber).then(function (user) {
+          assert.equal(user.name, name);
+          assert.equal(user.password, password);
+          assert.equal(user.email, email);
+          assert.equal(user.phoneNumber, phoneNumber);
+          user.destroy();
+          done();
+        });
+      });
+    });
+  });
+
+  describe('#create()', function () {
+    it('should insert to and query from the database correctly' +
+      'without optional params', function (done) {
+      User.create(phoneNumber, password).then(function () {
+        User.findOne(phoneNumber).then(function (user) {
+          assert.equal(user.phoneNumber, phoneNumber);
+          assert.equal(user.password, password);
           user.destroy();
           done();
         });
@@ -29,18 +41,18 @@ describe('User', function () {
 
   describe('update()', function () {
     it('should update and query from the database correctly', function (done) {
-      User.create(attr).then(function () {
-        User.update(attr.phoneNumber, {
+      User.create(phoneNumber, password, {name: name, email: email}).then(function () {
+        User.update(phoneNumber, {
           name: 'NewUser',
           email: 'NewUser@gmail.com',
-          pin: '5678',
-          phoneNumber: '123-456-1234'
+          password: '5678',
+          phoneNumber: '1234561234'
         }).then(function () {
-          User.findOne('123-456-1234').then(function (user) {
+          User.findOne('1234561234').then(function (user) {
             assert.equal(user.name, 'NewUser');
-            assert.equal(user.pin, '5678');
+            assert.equal(user.password, '5678');
             assert.equal(user.email, 'NewUser@gmail.com');
-            assert.equal(user.phoneNumber, '123-456-1234');
+            assert.equal(user.phoneNumber, '1234561234');
             user.destroy();
             done();
           });
@@ -51,9 +63,9 @@ describe('User', function () {
 
   describe('#destroy()', function () {
     it('should delete from the database correctly', function (done) {
-      User.create(attr).then(function () {
-        User.destroy('123-456-7890').then(function () {
-          User.findOne('123-456-7890').then(function (user) {
+      User.create(phoneNumber, password, name, email).then(function () {
+        User.destroy('1234567890').then(function () {
+          User.findOne('1234567890').then(function (user) {
             assert.equal(user, null);
             done();
           });
@@ -64,13 +76,8 @@ describe('User', function () {
 
   describe('#create()', function () {
     it('should not create Users that have non-alpha name, invalid email format' +
-      'null pin or null phoneNumber', function (done) {
-      User.create({
-        name: '124-*(@Y',
-        email: 'NotAnEmail',
-        pin: null,
-        phoneNumber: null
-      }).then(function (user) {
+      'null password or null phoneNumber', function (done) {
+      User.create(null, null, {name: '124-*(@Y', email: 'NotAnEmail'}).then(function (user) {
         assert(false);
         done();
       }, function (err) {
@@ -81,31 +88,8 @@ describe('User', function () {
   });
 
   describe('#create()', function () {
-    it('should not create Users that has non-numeric pin or invalid phone ' +
-      'number', function (done) {
-      User.create({
-        name: 'TestUser',
-        email: 'TestUser@gmail.com',
-        pin: 'abcd',
-        phoneNumber: '123'
-      }).then(function (user) {
-        assert(false);
-        done();
-      }, function (err) {
-        assert.equal(err.errors.length, 2);
-        done();
-      });
-    });
-  });
-
-  describe('#create()', function () {
-    it('should not create Users whose pin is not size 4', function (done) {
-      User.create({
-        name: 'TestUser',
-        email: 'TestUser@gmail.com',
-        pin: '123',
-        phoneNumber: '123-456-7890'
-      }).then(function (user) {
+    it('should not create Users that has a invalid phone number', function (done) {
+      User.create('123', password, {name: name, email: email}).then(function (user) {
         assert(false);
         done();
       }, function (err) {

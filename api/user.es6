@@ -4,8 +4,12 @@ import models from '../models/mysql/index.es6';
  * IMPORTANT: Must return promises!
  */
 
-export function create(attributes) {
-  return models.User.create(attributes);
+export function create(phoneNumber, password, optional={name: null, email: null}) {
+  return models.User.create({
+    phoneNumber: phoneNumber,
+    password: password,
+    ...optional
+  });
 }
 
 export function update(phoneNumber, attributes) {
