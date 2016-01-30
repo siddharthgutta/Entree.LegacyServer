@@ -14,7 +14,7 @@ route.use((req, res, next)=> {
 
 // token
 route.post('/token/create', (req, res) => {
-  const {username,password} = req.body;
+  const {username, password} = req.body;
   Token.create(username, password).then(res.ok).catch(res.fail);
 });
 
@@ -30,13 +30,13 @@ route.post('/token/destroy', (req, res) => {
 
 // user
 route.post('/user/create', (req, res) => {
-  const {username,email,password, other} = req.body;
+  const {username, email, password, other} = req.body;
   User.create(username, email, password, other).then(res.ok).catch(res.fail);
 });
 
 route.post('/user/destroy', (req, res) => {
-  const {username,password} = req.body;
+  const {username, password} = req.body;
   User.destroy(username, password).then(res.ok).catch(res.fail);
 });
 
-export default route
+export default route;
