@@ -31,7 +31,7 @@ export function sendSMS(toNumber, textBody) {
  */
 export function broadcast(textBody, to=admins) {
   return Promise.all(_.map(to, ({phone, name}) => {
-    var fullMessage = "Server Notification for " + name + ": " + textBody;
+    var fullMessage = 'Server Notification for ' + name + ': ' + textBody;
     sendSMS(phone, fullMessage)
   }));
 }
