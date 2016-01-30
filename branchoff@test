@@ -2,4 +2,4 @@
 
 echo "invoked when branch is test"
 
-mocha --timeout 5000 --no-exit --no-colors
+mocha --timeout 5000 --no-exit --no-colors ./tests/*-test.compiled.js
