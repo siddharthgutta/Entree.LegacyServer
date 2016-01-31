@@ -1,3 +1,7 @@
+/* eslint strict: 0 */
+
+'use strict';
+
 const babel = require('./tasks/babel-cli');
 
 module.exports = grunt => {
@@ -176,7 +180,7 @@ module.exports = grunt => {
     }
   });
 
-  grunt.registerTask('get-deps', '', () => {
+  grunt.registerTask('grunt-license', 'Build a list of dependencies', function transform() {
     const done = this.async();
     const pkg = require('./package.json');
     const fs = require('fs');
@@ -203,7 +207,7 @@ module.exports = grunt => {
 
   // FIXME dont' uglify if in dev mode
   grunt.registerTask('build', [
-    'get-deps',
+    'grunt-license',
     'sass:dist',
     'postcss:dist',
     'browserify:dist',

@@ -8,3 +8,4 @@
 **/cordova/*
 **/resources/*
 **/branchoff*
+*.log

@@ -1,3 +1,7 @@
+/* eslint strict: 0 */
+
+'use strict';
+
 module.exports = function fileTransform(grunt) {
   grunt.registerMultiTask('filetransform', 'File transform module', function transform() {
     const transformer = this.options({
