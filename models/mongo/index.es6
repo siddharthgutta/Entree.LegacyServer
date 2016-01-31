@@ -1,8 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
+var mongoConfig = config.get('MongoDb');
 var basename  = path.basename(module.filename);
+mongoose.connect(`mongodb://${mongoConfig.host}:${mongoConfig.port}/${mongoConfig.database}`);
 var db = {};
 
 fs

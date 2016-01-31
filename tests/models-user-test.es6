@@ -1,13 +1,14 @@
 import './test-init.es6';
 import {initDatabase, destroyDatabase} from '../bootstrap.es6';
 import assert from 'assert';
-import config from 'config';
 import * as User from '../api/user.es6';
 
 describe('User', () => {
 
-  before(() => {
-    initDatabase();
+  before(done => {
+    initDatabase().then(result => {
+      done();
+    });
   });
 
   after(() => {

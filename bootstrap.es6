@@ -81,11 +81,9 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
 }
 
 export function initDatabase() {
-  return new Promise(resolve => {
     const mongoConfig = config.get('MongoDb');
     mongoose.connect(`mongodb://${mongoConfig.host}:${mongoConfig.port}/${mongoConfig.database}`);
-    models.sequelize.sync({force: true}, () => resolve()); // Remove once we finalize model
-  });
+    return models.sequelize.sync({force: true}); // Remove once we finalize model
 }
 
 export function destroyDatabase() {
