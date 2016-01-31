@@ -1,7 +1,7 @@
-import Twilio from '../libs/sms/twilio.es6'
-import config from 'config'
+import Twilio from '../libs/sms/twilio.es6';
+import config from 'config';
 import _ from 'underscore';
-import Promise from 'bluebird'
+import Promise from 'bluebird';
 
 const admins = config.get('Admins');
 const fromNumber = config.get('Twilio.fromNumbers');
@@ -12,10 +12,11 @@ const productionCreds = config.get('Twilio.production');
  * @type {Twilio}
  */
 const productionSMS = new Twilio(fromNumber, productionCreds.sid, productionCreds.authToken);
+
 /**
  * Send a custom message
- * @param to
- * @param data
+ * @param toNumber
+ * @param textBody
  * @returns {*}
  */
 export function sendSMS(toNumber, textBody) {
@@ -25,13 +26,12 @@ export function sendSMS(toNumber, textBody) {
 
 /**
  * Send a data to multiple users; defaults to admins
- * @param data
+ * @param textBody
  * @param to
  * @returns {Promise}
  */
-export function broadcast(textBody, to=admins) {
+export function broadcast(textBody, to = admins) {
   return Promise.all(_.map(to, ({phone, name}) => {
-    var fullMessage = "Server Notification for " + name + ": " + textBody;
-    sendSMS(phone, fullMessage)
+    sendSMS(phone, `Server Notification for${name}: ${textBody}`);
   }));
 }

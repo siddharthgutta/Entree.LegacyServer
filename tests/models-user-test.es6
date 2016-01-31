@@ -4,26 +4,19 @@ import assert from 'assert';
 import * as User from '../api/user.es6';
 
 describe('User', () => {
+  before(done => initDatabase().then(() => done()));
 
-  before(done => {
-    initDatabase().then(result => {
-      done();
-    });
-  });
+  after(() => destroyDatabase());
 
-  after(() => {
-    destroyDatabase();
-  });
-
-  var name = 'TestUser';
-  var email = 'TestUser@gmail.com';
-  var password = '1234';
-  var phoneNumber = '1234567890';
+  const name = 'TestUser';
+  const email = 'TestUser@gmail.com';
+  const password = '1234';
+  const phoneNumber = '1234567890';
 
   describe('#create()', () => {
     it('should insert to and query from the database correctly', done => {
-      User.create(phoneNumber, password, {name: name, email: email}).then(() => {
-        User.findOne(phoneNumber).then(user=> {
+      User.create(phoneNumber, password, {name, email}).then(() => {
+        User.findOne(phoneNumber).then(user => {
           assert.equal(user.name, name);
           assert.equal(user.password, password);
           assert.equal(user.email, email);
@@ -48,7 +41,7 @@ describe('User', () => {
 
     it('should not create Users that have non-alpha name, invalid email format' +
         'null password or null phoneNumber', done => {
-      User.create(null, null, {name: '124-*(@Y', email: 'NotAnEmail'}).then(user => {
+      User.create(null, null, {name: '124-*(@Y', email: 'NotAnEmail'}).then(() => {
         assert(false);
         done();
       }, err => {
@@ -58,7 +51,7 @@ describe('User', () => {
     });
 
     it('should not create Users that has a invalid phone number', done => {
-      User.create('123', password, {name: name, email: email}).then(user => {
+      User.create('123', password, {name, email}).then(() => {
         assert(false);
         done();
       }, err => {
@@ -70,7 +63,7 @@ describe('User', () => {
 
   describe('update()', () => {
     it('should update and query from the database correctly', done => {
-      User.create(phoneNumber, password, {name: name, email: email}).then(() => {
+      User.create(phoneNumber, password, {name, email}).then(() => {
         User.update(phoneNumber, {
           name: 'NewUser',
           email: 'NewUser@gmail.com',

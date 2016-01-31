@@ -23,7 +23,20 @@
     "object-shorthand": [
       2,
       "always"
-    ]
+    ],
+    "no-console": 0,
+    "no-extra-parens": 2,
+    "arrow-body-style": [
+      2,
+      "as-needed"
+    ],
+    "arrow-parens": [
+      2,
+      "as-needed"
+    ],
+    "valid-jsdoc": 2,
+    "no-unreachable": 2,
+    "prefer-template": 2
   },
   "ecmaFeatures": {
     "objectLiteralShorthandProperties": true,
