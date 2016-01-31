@@ -39,7 +39,7 @@ class App extends React.Component {
   render() {
     var items = [
       this.state.selectedOrder ? <OrderFocus key="OrderFocus" order={this.state.selectedOrder}/> :
-          <OrderHistory key="OrderHistory" onOrderClick={this._selectOrder.bind(this)}/>
+          <OrderHistory key="OrderHistory" onOrderClick={()=> this._selectOrder()}/>
     ];
 
     return (

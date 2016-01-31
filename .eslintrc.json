@@ -36,7 +36,26 @@
     ],
     "valid-jsdoc": 2,
     "no-unreachable": 2,
-    "prefer-template": 2
+    "prefer-template": 2,
+    "prefer-arrow-callback": 2,
+    "jsx-no-bind": [
+      2,
+      {
+        "ignoreRefs": false,
+        "allowArrowFunctions": false,
+        "allowBind": false
+      }
+    ],
+    "arrow-spacing": [
+      2,
+      {
+        "before": true,
+        "after": true
+      }
+    ],
+    "no-useless-call": 2,
+    "no-proto": 2,
+    "no-useless-concat": 2
   },
   "ecmaFeatures": {
     "objectLiteralShorthandProperties": true,

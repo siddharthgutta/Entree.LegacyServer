@@ -13,7 +13,7 @@ class ComponentName extends Influx.Component {
   render() {
     return (
       <div></div>
-    )
+    );
   }
 }
 

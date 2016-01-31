@@ -13,6 +13,10 @@ describe('User', () => {
   const password = '1234';
   const phoneNumber = '1234567890';
 
+  if (console) {
+    console.log('true');
+  }
+
   describe('#create()', () => {
     it('should insert to and query from the database correctly', done => {
       User.create(phoneNumber, password, {name, email}).then(() => {
@@ -85,7 +89,7 @@ describe('User', () => {
 
   describe('#destroy()', () => {
     it('should delete from the database correctly', done => {
-      User.create(phoneNumber, password, name, email).then(() => {
+      User.create(phoneNumber, password, {name, email}).then(()=> {
         User.destroy('1234567890').then(() => {
           User.findOne('1234567890').then(user => {
             assert.equal(user, null);
