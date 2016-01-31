@@ -1,8 +1,10 @@
 {
+  "root": true,
   "extends": "airbnb",
   "plugins": [
     "react",
-    "mocha"
+    "mocha",
+    "markdown"
   ],
   "parser": "babel-eslint",
   "env": {
@@ -38,11 +40,11 @@
     "no-unreachable": 2,
     "prefer-template": 2,
     "prefer-arrow-callback": 2,
-    "jsx-no-bind": [
+    "react/jsx-no-bind": [
       2,
       {
-        "ignoreRefs": false,
-        "allowArrowFunctions": false,
+        "ignoreRefs": true,
+        "allowArrowFunctions": true,
         "allowBind": false
       }
     ],
@@ -55,9 +57,14 @@
     ],
     "no-useless-call": 2,
     "no-proto": 2,
-    "no-useless-concat": 2
+    "no-useless-concat": 2,
+    "max-len": [2, 120, 4],
+    "no-param-reassign": 0,
+    "jsx-quotes": [2, "prefer-single"],
+    "react/jsx-indent-props": 0
   },
   "ecmaFeatures": {
+    "jsx": true,
     "objectLiteralShorthandProperties": true,
     "spread": true
   }

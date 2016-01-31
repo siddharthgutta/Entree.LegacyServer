@@ -1,16 +1,13 @@
-'use strict';
+const babel = require('./tasks/babel-cli');
 
-var babel = require('./tasks/babel-cli');
-
-module.exports = function (grunt) {
-  require('time-grunt')(grunt);
+module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
   require('./tasks/grunt-filetransform')(grunt);
 
   grunt.initConfig({
     uglify: {
       options: {
-        banner: '/*! Grunt Uglify <%= grunt.template.today("yyyy-mm-dd") %> */ ',
+        banner: '/*! Grunt Uglify <%= grunt.template.today(\'yyyy-mm-dd\') %> */ ',
         compress: {
           drop_console: true
         }
@@ -55,7 +52,7 @@ module.exports = function (grunt) {
     browserify: {
       dist: {
         options: {
-          transform: ["babelify", 'config-browserify'],
+          transform: ['babelify', 'config-browserify'],
           browserifyOptions: {
             debug: true, // source mapping
             ignoreMTime: true
@@ -64,7 +61,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: 'asr/',
-          src: ['**/Bootstrap.jsx', 'Bootstrap.jsx', '**/Bootstrap.js', 'Bootstrap.js'],
+          src: ['**/Bootstrap.js', 'Bootstrap.js', '**/Bootstrap.js', 'Bootstrap.js'],
           dest: 'public/scripts',
           ext: '.min.js'
         }]
@@ -73,7 +70,7 @@ module.exports = function (grunt) {
         options: {
           watch: true,
           keepAlive: true,
-          transform: ["babelify", 'config-browserify'],
+          transform: ['babelify', 'config-browserify'],
           browserifyOptions: {
             debug: true, // source mapping
             ignoreMTime: true
@@ -82,7 +79,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: 'asr/',
-          src: ['**/Bootstrap.jsx', 'Bootstrap.jsx', '**/Bootstrap.js', 'Bootstrap.js'],
+          src: ['**/Bootstrap.js', 'Bootstrap.js', '**/Bootstrap.js', 'Bootstrap.js'],
           dest: 'public/scripts',
           ext: '.min.js' // NOTE mimic uglifyjs has been run
         }]
@@ -143,8 +140,8 @@ module.exports = function (grunt) {
       },
       builds: {
         files: {
-          "cordova/build/android-debug.apk": "cordova/platforms/android/build/outputs/apk/android-debug.apk",
-          "cordova/build/Entree.ipa": "cordova/platforms/ios/build/device/Entree.ipa"
+          'cordova/build/android-debug.apk': 'cordova/platforms/android/build/outputs/apk/android-debug.apk',
+          'cordova/build/Entree.ipa': 'cordova/platforms/ios/build/device/Entree.ipa'
         }
       }
     },
@@ -157,7 +154,7 @@ module.exports = function (grunt) {
         }
       }
     },
-    clean: ["public/", "./package.noDevDeps.json"],
+    clean: ['public/', './package.noDevDeps.json'],
     rename: {
       dist: {
         files: [
@@ -179,23 +176,24 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('get-deps', '', function () {
-    var done = this.async();
-    var pkg = require('./package.json');
-    var fs = require('fs');
-    var exec = require('child_process').exec;
+  grunt.registerTask('get-deps', '', () => {
+    const done = this.async();
+    const pkg = require('./package.json');
+    const fs = require('fs');
+    const exec = require('child_process').exec;
 
     delete pkg.devDependencies;
 
-    fs.writeFileSync('package.noDevDeps.json', JSON.stringify(pkg), "utf8");
+    fs.writeFileSync('package.noDevDeps.json', JSON.stringify(pkg), 'utf8');
 
-    exec('node node_modules/license-report/index.js --package=./package.noDevDeps.json --output=json',
-        function (err, stdout, stderr) {
+    exec('node node_modules/license-report/index.js ' +
+        '--package=./package.noDevDeps.json --output=json',
+        (err, stdout, stderr) => {
           if (err || stderr) console.error(err, stderr);
-          else fs.writeFileSync('deps.json', JSON.stringify(JSON.parse(stdout), null, 2), "utf8");
+          else fs.writeFileSync('deps.json', JSON.stringify(JSON.parse(stdout), null, 2), 'utf8');
           fs.unlinkSync('package.noDevDeps.json');
           done();
-        })
+        });
   });
 
   grunt.registerTask('styles', [

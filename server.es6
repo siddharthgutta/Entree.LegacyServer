@@ -1,14 +1,12 @@
-import express from 'express'
-import path from 'path'                     // module for handling/transforming file paths
-import favicon from 'serve-favicon'         // middleware for serving a favicon
-import cookieParser from 'cookie-parser'
-import bodyParser from 'body-parser'
-import _ from 'underscore'                  // functional programming library
-import http from 'http'
-import sio from './message/sio'             // socket-io (websockets)
-import BasicRouter from './routes/basic'    // imports standard/websocket routers
-import NotifyRouter from './routes/notify'
-import ApiRouter from './routes/api'
+import express from 'express';
+import path from 'path';                     // module for handling/transforming file paths
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
+import http from 'http';
+import sio from './message/sio';             // socket-io (websockets)
+import BasicRouter from './routes/basic';    // imports standard/websocket routers
+import NotifyRouter from './routes/notify';
+import ApiRouter from './routes/api';
 
 const app = express();                            // server creation
 const server = http.createServer(app);
@@ -22,7 +20,7 @@ app.set('view engine', 'jade');                   // sets the view engine to jad
 app.use(console.middleware('express'));
 app.use('/scribe', console.viewer());
 
-app.use(bodyParser.urlencoded({extended: false}));       // body object from parsed data can have values of strings/arrays
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());                              // sets app to use middleware that only parses json
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public'))); // points app to public directory for static files

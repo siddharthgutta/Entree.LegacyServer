@@ -1,14 +1,15 @@
-import ReactPrefixr from 'react-prefixr'
+import prefix from 'react-prefixr';
 
 export function ifcat(base, obj) {
   let res = '';
   if (arguments.length > 1) {
-    res = base + '';
+    res = `${base} `;
   } else {
     obj = base;
   }
-  for (let [cls, pred] of Object.entries(obj)) {
-    if (pred) res += ' ' + cls;
+
+  for (const [cls, pred] of Object.entries(obj)) {
+    if (pred) res += ` ${cls}`;
   }
 
   return res;
@@ -19,11 +20,11 @@ export function ifel(predicate, b, c) {
 }
 
 export function pre(o) {
-  return ReactPrefixr(o);
+  return prefix(o);
 }
 
 export function apply(elem, styles) {
-  for (let [prop,val] of Object.entries(styles)) {
+  for (const [prop, val] of Object.entries(styles)) {
     elem.style[prop] = val;
   }
 }

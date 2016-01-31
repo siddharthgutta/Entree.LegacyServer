@@ -1,6 +1,6 @@
-import Influx from 'react-influx'
-import React from 'react'
-import {ifcat} from '../../libs/util'
+import Influx from 'react-influx';
+import React from 'react';
+import {ifcat} from '../../libs/util';
 
 class Body extends Influx.Component {
   constructor(...args) {
@@ -12,8 +12,8 @@ class Body extends Influx.Component {
       <div className={ifcat(this.props.className, {body: true, black: this.props.black})}>
         {this.props.children}
       </div>
-    )
+    );
   }
 }
 
-export default Body
+export default Body;

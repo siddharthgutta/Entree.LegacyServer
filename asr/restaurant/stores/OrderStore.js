@@ -1,9 +1,8 @@
-import Influx from 'react-influx'
-import Dispatcher from '../dispatchers/Dispatcher.js'
-import keyMirror from 'keymirror'
-import moment from 'moment'
-import extend from 'extend'
-import Chance from 'chance'
+import Influx from 'react-influx';
+import Dispatcher from '../dispatchers/Dispatcher.js';
+import keyMirror from 'keymirror';
+import extend from 'extend';
+import Chance from 'chance';
 
 const Events = keyMirror({
   ORDER_RECEIVED: null
@@ -44,14 +43,10 @@ class OrderStore extends Influx.Store {
     window.orders = this.data.orders;
   }
 
-  sendStatus(id, status) {
-
-  }
-
   getDispatcherListeners() {
     return [
       [Dispatcher, Dispatcher.Events.CONNECT_STREAM, this._onDispatcherConnectStream]
-    ]
+    ];
   }
 
   getOrders() {
@@ -59,12 +54,12 @@ class OrderStore extends Influx.Store {
   }
 
   injectTestOrder() {
-    const order = extend({}, sampleData[parseInt(Math.random() * sampleData.length)]);
+    const order = extend({}, sampleData[parseInt(Math.random() * sampleData.length, 10)]);
     order.id = ++counter;
     order.name = chance.name();
     order.date = Date.now();
     order.cost = Number((Math.random() * 50).toFixed(2));
-    order.status = chance.pick(["received", "accepted", "completed"]);
+    order.status = chance.pick(['received', 'accepted', 'completed']);
 
     this.data.orders.unshift(order);
     this.emit(Events.ORDER_RECEIVED, order);
@@ -77,16 +72,16 @@ class OrderStore extends Influx.Store {
   }
 
   _onDispatcherConnectStream() {
-    for (var i = 0; i < 20; i++) {
+    for (let i = 0; i < 20; i++) {
       this.injectTestOrder();
     }
 
-    setInterval(()=> {
-      setTimeout(()=> {
+    setInterval(() => {
+      setTimeout(() => {
         this.injectTestOrder();
-      }, parseInt(Math.random() * 500));
-    }, 5000)
+      }, parseInt(Math.random() * 500, 10));
+    }, 5000);
   }
 }
 
-export default Influx.Store.construct(OrderStore, Events)
+export default Influx.Store.construct(OrderStore, Events);

@@ -1,5 +1,10 @@
-node_modules/**
-*.compiled.js
-public/
-cordova/
-resources/
+**/node_modules/*
+**/*.compiled.js
+**/*.compiled.js.map
+*.json
+**/*.json
+*noDevDeps.json
+**/public/*
+**/cordova/*
+**/resources/*
+**/branchoff*

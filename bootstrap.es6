@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import extend from 'extend';
 
 export function resolveContext() {
-  const port = parseInt(process.env.BRANCHOFF_PORT) || process.env.PORT || 3000;
+  const port = parseInt(process.env.BRANCHOFF_PORT, 10) || process.env.PORT || 3000;
   const socketPort = 50000 + (Number(process.env.pm_id) || port);
   const id = process.env.BRANCHOFF_BRANCH || (exec('git rev-parse --abbrev-ref HEAD',
           {silent: true}).output || '').trim() || 'local';

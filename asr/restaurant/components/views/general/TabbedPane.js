@@ -1,7 +1,7 @@
-import React from 'react'
-import Influx from 'react-influx'
-import ReactDOM from 'react-dom'
-import _ from 'underscore'
+import React from 'react';
+import Influx from 'react-influx';
+import ReactDOM from 'react-dom';
+import _ from 'underscore';
 
 function setVendorSpecificStyles(element, property, propertyCased, value) {
   element.style['webkit' + property] = value;

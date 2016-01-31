@@ -1,5 +1,5 @@
-import Influx from 'react-influx'
-import keyMirror from 'keymirror'
+import Influx from 'react-influx';
+import keyMirror from 'keymirror';
 
 const Events = keyMirror({
 

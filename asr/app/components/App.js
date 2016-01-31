@@ -1,5 +1,5 @@
-import React from 'react'
-import Influx from 'react-influx'
+import React from 'react';
+import Influx from 'react-influx';
 
 class App extends Influx.Component {
   constructor(...args) {
@@ -9,9 +9,8 @@ class App extends Influx.Component {
   render() {
     return (
       <div>Whats up!</div>
-    )
+    );
   }
 }
 
-export default App
-
+export default App;
