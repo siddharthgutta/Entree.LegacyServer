@@ -1,6 +1,6 @@
-import Strategy from './strategy.es6'
-import twilio from 'twilio'
-import Promise from 'bluebird'
+import Strategy from './strategy.es6';
+import twilio from 'twilio';
+import Promise from 'bluebird';
 
 export default class Twilio extends Strategy {
   constructor(from, account, auth) {
