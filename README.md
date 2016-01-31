@@ -43,29 +43,41 @@ npm cache clear # if modules need to be downloaded again
 ```bash
 # general env setup
 sudo apt-get update
-sudo apt-get -y install git
-sudo apt-get -y install build-essential git ruby libpam0g-dev
+sudo apt-get -y install git build-essential git ruby libpam0g-dev debconf-utils
 sudo gem install sass
 echo "sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000" >> ~/.bashrc
-echo "export PORT=3000" >> ~/.bashrc
 
 # node via. nvm
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash
 source ~/.bashrc
-nvm install 5.0.0 # test PM2 API access with > 5.1.0 later
-echo "5.0.0" > ~/.nvmrc
+nvm install 5.5.0
+echo "5.5.0" > ~/.nvmrc
 
 # node global
 npm install pm2 -g
 npm install mocha -g
-pm2 install branch-off
+npm install grunt-cli -g
+npm install sequelize-cli -g
+
+# pm2
 pm2 conf branch-off:port 4000
-pm2 install pm2-webshell
 pm2 conf pm2-webshell:port 5000
 pm2 conf pm2-webshell:username build
 pm2 conf pm2-webshell:password build
-npm install grunt-cli -g
-npm install sequelize-cli -g
+pm2 install branch-off
+pm2 install pm2-webshell
+
+# mongo
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+service mongod status
+
+# mysql
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password 123456'
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password 123456'
+sudo apt-get install -y mysql-server
 
 # clone
 git config --global credential.helper store
@@ -101,7 +113,7 @@ Recommended to use MySQL Workbench
 
 ### Tests
 ```bash
-npm run test ./tests/*.test.js
+npm run tests
 ```
 
 ### Webhooks

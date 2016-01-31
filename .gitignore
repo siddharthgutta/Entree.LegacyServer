@@ -61,3 +61,5 @@ xcuserdata
 
 public/
 cordova/www/
+
+package.noDevDeps.json
