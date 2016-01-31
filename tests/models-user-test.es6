@@ -1,9 +1,18 @@
 import './test-init.es6';
+import {initDatabase, destroyDatabase} from '../bootstrap.es6'
 import assert from 'assert';
 import config from 'config';
 import * as User from '../api/user.es6';
 
 describe('User', function () {
+
+  before(()=> {
+    initDatabase();
+  });
+
+  after(()=> {
+    destroyDatabase();
+  });
 
   var name = 'TestUser';
   var email = 'TestUser@gmail.com';

@@ -85,14 +85,17 @@ export function initDatabase() {
   models.sequelize.sync({force: true}); // Remove once we finalize model
 
   var mongoConfig = config.get('MongoDb');
-  mongoose.connect(`mongodb://${mongoConfig.username}:${mongoConfig.password}@` +
-      `${mongoConfig.host}:${mongoConfig.port}/${mongoConfig.database}`);
+  mongoose.connect(`mongodb://${mongoConfig.host}:${mongoConfig.port}/${mongoConfig.database}`);
+}
+
+export function destroyDatabase() {
+  mongoose.connection.close();
+  models.sequelize.close();
 }
 
 export function initServer() {
   var context = resolveContext();
 
   require('./server.es6').default.listen(context.port, () => console.log(`Listening on ${context.port}`));
-
 }
 
