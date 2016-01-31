@@ -1,29 +1,28 @@
-import Scribe from 'scribe-js'
-import config from 'config'
-import cluster from 'cluster'
-import {exec} from 'shelljs'
-import models from './models/mysql/index.es6'
-import mongoose from 'mongoose'
-
+import Scribe from 'scribe-js';
+import config from 'config';
+import {exec} from 'shelljs';
+import models from './models/mysql/index.es6';
+import mongoose from 'mongoose';
+import extend from 'extend';
 
 export function resolveContext() {
-  var port = parseInt(process.env.BRANCHOFF_PORT) || process.env.PORT || 3000;
-  var socketPort = 50000 + (Number(process.env.pm_id) || port);// jscs:ignore requireCamelCaseOrUpperCaseIdentifiers
-  var id = process.env.BRANCHOFF_BRANCH || (exec('git rev-parse --abbrev-ref HEAD', {silent: true}).output || '').trim() || 'local';
-  var nodeEnv = process.env.NODE_ENV || 'localbuild?';
-  var ctx = {port, socketPort, id, nodeEnv};
+  const port = parseInt(process.env.BRANCHOFF_PORT) || process.env.PORT || 3000;
+  const socketPort = 50000 + (Number(process.env.pm_id) || port);
+  const id = process.env.BRANCHOFF_BRANCH || (exec('git rev-parse --abbrev-ref HEAD',
+          {silent: true}).output || '').trim() || 'local';
+  const nodeEnv = process.env.NODE_ENV || 'localbuild?';
+  const ctx = {port, socketPort, id, nodeEnv};
 
   return ctx;
 }
 
 export function initScribe(override = true, mongo = true, socket = true, opts = {}, ...exposers) {
-
   console.log(`Scribe assuming you have mongo installed - ${mongo}!!!`);
   console.log(`Scribe assuming you socket port open - ${socket}!!!`);
 
-  var context = resolveContext();
+  const context = resolveContext();
 
-  var scribeConsole = new Scribe(context.id, {
+  const scribeConsole = new Scribe(context.id, extend(true, {
     inspector: {
       colors: true,
       showHidden: false,
@@ -32,8 +31,7 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
       callsite: true,
       tags: true,
       args: true,
-      metrics: true,
-      ...opts
+      metrics: true
     },
     name: 'Entree',
     mongoUri: 'mongodb://localhost/scribe',
@@ -71,7 +69,7 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
     },
     native: {},
     debug: false
-  }, ...['test', ...exposers]);
+  }, opts), ...['test', ...exposers]);
 
   scribeConsole.persistent('tags', [context.port, context.nodeEnv]);
 
@@ -83,10 +81,11 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
 }
 
 export function initDatabase() {
-  models.sequelize.sync({force: true}); // Remove once we finalize model
-
-  var mongoConfig = config.get('MongoDb');
-  mongoose.connect(`mongodb://${mongoConfig.host}:${mongoConfig.port}/${mongoConfig.database}`);
+  return new Promise(resolve => {
+    const mongoConfig = config.get('MongoDb');
+    mongoose.connect(`mongodb://${mongoConfig.host}:${mongoConfig.port}/${mongoConfig.database}`);
+    models.sequelize.sync({force: true}, () => resolve()); // Remove once we finalize model
+  });
 }
 
 export function destroyDatabase() {
@@ -95,8 +94,8 @@ export function destroyDatabase() {
 }
 
 export function initServer() {
-  var context = resolveContext();
+  const context = resolveContext();
 
-  require('./server.es6').default.listen(context.port, () => console.log(`Listening on ${context.port}`));
+  require('./server.es6').default.listen(context.port,
+      () => console.log(`Listening on ${context.port}`));
 }
-

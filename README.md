@@ -55,6 +55,7 @@ echo "5.5.0" > ~/.nvmrc
 
 # node global
 npm install pm2 -g
+npm install eslint -g
 npm install mocha -g
 npm install grunt-cli -g
 npm install sequelize-cli -g

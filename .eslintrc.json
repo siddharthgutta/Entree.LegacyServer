@@ -1,0 +1,19 @@
+{
+  "extends": "airbnb",
+  "plugins": [
+    "react",
+    "mocha"
+  ],
+  "rules": {
+    "mocha/no-exclusive-tests": 2,
+    "comma-dangle": [2, "never"],
+    "object-curly-spacing": [2, "never"]
+  },
+  "globals": {
+    "it": true,
+    "describe": true,
+    "before": true,
+    "after": true,
+    "require": true
+  }
+}
