@@ -4,7 +4,6 @@ echo "invoked by github push"
 
 npm set progress=false
 npm --no-color --no-spin install
-npm --no-color --no-spin update
 
 grunt build
 grunt filetransform:babel
