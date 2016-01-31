@@ -27,7 +27,7 @@ describe('User', function () {
 
   describe('#create()', function () {
     it('should insert to and query from the database correctly' +
-      'without optional params', function (done) {
+        'without optional params', function (done) {
       User.create(phoneNumber, password).then(function () {
         User.findOne(phoneNumber).then(function (user) {
           assert.equal(user.phoneNumber, phoneNumber);
@@ -76,7 +76,7 @@ describe('User', function () {
 
   describe('#create()', function () {
     it('should not create Users that have non-alpha name, invalid email format' +
-      'null password or null phoneNumber', function (done) {
+        'null password or null phoneNumber', function (done) {
       User.create(null, null, {name: '124-*(@Y', email: 'NotAnEmail'}).then(function (user) {
         assert(false);
         done();

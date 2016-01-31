@@ -3,7 +3,7 @@ import path from 'path';
 import Sequelize from 'sequelize';
 import config from 'config';
 
-var mysqlConfig = config['mysql'];
+var mysqlConfig = config.get('MySQL');
 var basename  = path.basename(module.filename);
 var db        = {};
 var sequelize = new Sequelize(mysqlConfig.database, mysqlConfig.username, mysqlConfig.password, mysqlConfig);

@@ -1,5 +1,4 @@
 {
-  "publicUri": "http://localhost",
   "Client": {
     "testProperty": "hello!"
   },
@@ -39,7 +38,7 @@
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
-  "mongo": {
+  "MongoDb": {
     "username": "root",
     "password": "123456",
     "database": "entree",

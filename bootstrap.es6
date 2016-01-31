@@ -16,7 +16,7 @@ export function resolveContext() {
   return ctx;
 }
 
-export function initScribe(override = true, mongo = true, socket = true, colors=true, pre=true, tags=true, callsite=true, ...exposers) {
+export function initScribe(override = true, mongo = true, socket = true, {colors=true, pre=true, tags=true, callsite=true}, ...exposers) {
 
   console.log(`Scribe assuming you have mongo installed - ${mongo}!!!`);
   console.log(`Scribe assuming you socket port open - ${socket}!!!`);
@@ -84,9 +84,9 @@ export function initScribe(override = true, mongo = true, socket = true, colors=
 export function initDatabase() {
   models.sequelize.sync({force: true}); // Remove once we finalize model
 
-  var mongoConfig = config['mongo'];
+  var mongoConfig = config.get('MongoDb');
   mongoose.connect(`mongodb://${mongoConfig.username}:${mongoConfig.password}@` +
-    `${mongoConfig.host}:${mongoConfig.port}/${mongoConfig.database}`);
+      `${mongoConfig.host}:${mongoConfig.port}/${mongoConfig.database}`);
 }
 
 export function initServer() {

@@ -1,5 +1,4 @@
 {
-  "publicUri": "http://ec2-52-26-163-35.us-west-2.compute.amazonaws.com",
   "Client": {
     "testProperty": "hello!"
   },
@@ -32,18 +31,11 @@
       "authToken": "3e7ae8aebc9dc023b66ee071065089b0"
     }
   },
-  "mysql": {
+  "MySQL": {
     "username": "root",
     "password": "123456",
     "database": "entree",
     "host": "127.0.0.1",
     "dialect": "mysql"
-  },
-  "mongo": {
-    "username": "root",
-    "password": "123456",
-    "database": "entree",
-    "host": "127.0.0.1",
-    "port": "27017"
   }
 }
