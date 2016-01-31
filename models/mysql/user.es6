@@ -1,15 +1,32 @@
 export default function(sequelize, DataTypes) {
   var User = sequelize.define('User', {
-    name: {
+    phoneNumber: {
+      type: DataTypes.STRING(10),
+      allowNull: false,
+      primaryKey: true,
+      validate: {
+        len: 10,
+        isNumeric: true
+      }
+    },
+    password: {
       type: DataTypes.STRING(64),
       allowNull: false
     },
-    phoneNumber: {
-      type: DataTypes.STRING(10),
-      allowNull: false
+    name: {
+      type: DataTypes.STRING(64),
+      allowNull: true,
+      validate: {
+        is: /^[a-zA-Z ]*$/
+      }
     },
-    email: DataTypes.STRING(128),
-    pin: DataTypes.STRING(4)
+    email: {
+      type: DataTypes.STRING(128),
+      allowNull: true,
+      validate: {
+        isEmail: true
+      }
+    }
   });
   return User;
 };
