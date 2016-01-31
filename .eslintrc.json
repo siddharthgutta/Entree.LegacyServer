@@ -4,16 +4,29 @@
     "react",
     "mocha"
   ],
+  "parser": "babel-eslint",
+  "env": {
+    "node": true,
+    "mocha": true,
+    "es6": true
+  },
   "rules": {
     "mocha/no-exclusive-tests": 2,
-    "comma-dangle": [2, "never"],
-    "object-curly-spacing": [2, "never"]
+    "comma-dangle": [
+      2,
+      "never"
+    ],
+    "object-curly-spacing": [
+      2,
+      "never"
+    ],
+    "object-shorthand": [
+      2,
+      "always"
+    ]
   },
-  "globals": {
-    "it": true,
-    "describe": true,
-    "before": true,
-    "after": true,
-    "require": true
+  "ecmaFeatures": {
+    "objectLiteralShorthandProperties": true,
+    "spread": true
   }
 }

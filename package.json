@@ -87,6 +87,7 @@
   },
   "homepage": "https://github.com/siddharthgutta/Entree.Server#readme",
   "devDependencies": {
+    "babel-eslint": "^4.1.6",
     "eslint": "^1.10.3",
     "eslint-config-airbnb": "^4.0.0",
     "eslint-plugin-mocha": "^1.1.0",
