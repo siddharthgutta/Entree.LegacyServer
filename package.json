@@ -64,10 +64,10 @@
     "underscore": "^1.8.3"
   },
   "scripts": {
-    "test": "mocha --timeout 5000 --no-exit -R nyan",
+    "test": "NODE_ENV=staging mocha --timeout 5000 --no-exit -R nyan",
     "tests": "npm run test ./tests/*-test.compiled.js",
     "start": "node index.compiled.js",
-    "test-no-nyan": "mocha --timeout 5000 --no-exit --colors",
+    "test-no-nyan": "NODE_ENV=staging mocha --timeout 5000 --no-exit --colors",
     "tests-no-nyan": "npm run test-no-nyan ./tests/*-test.compiled.js"
   },
   "repository": {
