@@ -16,7 +16,7 @@ branch=$(git symbolic-ref --short HEAD)
 #    "attachments": [
 #        {
 #            "fallback": "Test Passed",
-#            "text": "*Test Results*",
+#            "text": "",
 #            "fields": [
 #                {
 #                    "title": "Branch",
@@ -52,7 +52,7 @@ branch=$(git symbolic-ref --short HEAD)
 # copy(JSON.stringify(JSON.stringify(x)))
 #
 
-payload=$(echo "{\"channel\":\"#continous3\",\"attachments\":[{\"fallback\":\"Test Passed\",\"text\":\"*Test Results*\",\"fields\":[{\"title\":\"Branch\",\"value\":\"$branch\",\"short\":true},{\"title\":\"Author\",\"value\":\"$author\",\"short\":true},{\"title\":\"Commit\",\"value\":\"$id\",\"short\":true},{\"title\":\"Message\",\"value\":\"$message\",\"short\":true},{\"title\":\"Status\",\"value\":\"PASSED!\",\"short\":true}],\"color\":\"#2ab27b\"}]}")
+payload=$(echo "{\"channel\":\"#continous3\",\"attachments\":[{\"fallback\":\"Test Passed\",\"text\":\"\",\"fields\":[{\"title\":\"Branch\",\"value\":\"$branch\",\"short\":true},{\"title\":\"Author\",\"value\":\"$author\",\"short\":true},{\"title\":\"Commit\",\"value\":\"$id\",\"short\":true},{\"title\":\"Message\",\"value\":\"$message\",\"short\":true},{\"title\":\"Status\",\"value\":\"PASSED!\",\"short\":true}],\"color\":\"#2ab27b\"}]}")
 
 curl -X POST -H 'Content-type: application/json' \
      --data "$payload" https://hooks.slack.com/services/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
