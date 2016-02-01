@@ -1,2 +1,2 @@
 mkdir -p ~/mongodb
-mongod —dbpath ~/mongodb
+mongod --dbpath ~/mongodb
