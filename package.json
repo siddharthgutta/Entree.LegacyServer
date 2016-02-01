@@ -71,11 +71,14 @@
   },
   "scripts": {
     "test": "export NODE_ENV=staging; mocha --timeout 5000 --no-exit -R nyan",
-    "tests": "npm run test ./tests/*-test.compiled.js",
+    "tests": "set -e;for f in ./tests/*-test.compiled.js ; do npm run test \"$f\" ; done",
     "start": "node index.compiled.js",
     "test-no-nyan": "export NODE_ENV=staging; mocha --timeout 5000 --no-exit --colors",
-    "tests-no-nyan": "npm run test-no-nyan ./tests/*-test.compiled.js",
-    "lint": "eslint --ext js,.es6,.jsx ./"
+    "tests-no-nyan": "set -e;for f in ./tests/*-test.compiled.js ; do npm run test-no-nyan \"$f\" ; done",
+    "test-ci": "export NODE_ENV=staging; mocha --timeout 5000 --no-exit --no-colors",
+    "tests-ci": "set -e;for f in ./tests/*-test.compiled.js ; do npm run test-ci \"$f\" ; done",
+    "lint": "eslint --ext js,.es6,.jsx ./",
+    "lint-ci": "eslint --no-color --ext js,.es6,.jsx ./"
   },
   "repository": {
     "type": "git",
