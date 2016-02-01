@@ -1,5 +1,5 @@
-export default function(sequelize, DataTypes) {
-  var RestaurantHours = sequelize.define('RestaurantHours', {
+export default function (sequelize, DataTypes) {
+  const RestaurantHours = sequelize.define('RestaurantHours', {
     dayOfTheWeek: {
       type: DataTypes.STRING(10),
       allowNull: false
@@ -14,4 +14,4 @@ export default function(sequelize, DataTypes) {
     }
   });
   return RestaurantHours;
-};
+}

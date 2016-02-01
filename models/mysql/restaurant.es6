@@ -1,26 +1,33 @@
-export default function(sequelize, DataTypes) {
-  var Restaurant = sequelize.define('Restaurant', {
+export default function (sequelize, DataTypes) {
+  const Restaurant = sequelize.define('Restaurant', {
     name: {
       type: DataTypes.STRING(64),
-      allowNull: false
+      allowNull: false,
+      primaryKey: true
     },
     password: {
       type: DataTypes.STRING(64),
       allowNull: false
     },
-    phoneNumber: DataTypes.STRING(10)
+    phoneNumber: {
+      type: DataTypes.STRING(10),
+      validate: {
+        isNumeric: true,
+        len: 10
+      }
+    }
   }, {
     classMethods: {
       associate: function(models) {
         Restaurant.hasOne(models.Location, {
-          onDelete: "CASCADE",
+          onDelete: 'CASCADE',
           foreignKey: {
             allowNull: false
           }
         });
 
         Restaurant.hasMany(models.RestaurantHours, {
-          onDelete: "CASCADE",
+          onDelete: 'CASCADE',
           foreignKey: {
             allowNull: false
           }
@@ -29,4 +36,4 @@ export default function(sequelize, DataTypes) {
     }
   });
   return Restaurant;
-};
+}

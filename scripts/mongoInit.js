@@ -1,17 +1,17 @@
-var mongo = new Mongo();
+const mongo = new Mongo();
 
-var db = mongo.getDB('entree');
-db.dropUser('root');
-db.createUser({
+const entree = mongo.getDB('entree');
+entree.dropUser('root');
+entree.createUser({
   user: 'root',
   pwd: '123456',
   roles: [{role: 'userAdmin', db: 'entree'}]
 });
 
-var db = mongo.getDB('entree_test');
-db.dropUser('root');
-db.createUser({
+const entreeTest = mongo.getDB('entreeTest');
+entreeTest.dropUser('root');
+entreeTest.createUser({
   user: 'root',
   pwd: '123456',
-  roles: [{role: 'userAdmin', db: 'entree_test'}]
+  roles: [{role: 'userAdmin', db: 'entreeTest'}]
 });
