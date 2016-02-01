@@ -42,8 +42,9 @@ branch=$(git symbolic-ref --short HEAD)
 #                    "title": "Status",
 #                    "value": "FAILED! Push again for staging",
 #                    "short": true
-#                }
+#                },
 #            ],
+#            "mrkdwn_in": ["fields"],
 #            "color": "#F35A00"
 #        }
 #    ]
