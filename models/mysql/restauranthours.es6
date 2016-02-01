@@ -1,7 +1,7 @@
 export default function (sequelize, DataTypes) {
   const RestaurantHours = sequelize.define('RestaurantHours', {
     dayOfTheWeek: {
-      type: DataTypes.STRING(10),
+      type: DataTypes.STRING(10), // eslint-disable-line new-cap
       allowNull: false
     },
     openTime: {
