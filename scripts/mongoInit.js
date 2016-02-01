@@ -1,4 +1,4 @@
-const mongo = new Mongo();
+const mongo = new Mongo(); // eslint-disable-line no-undef
 
 const entree = mongo.getDB('entree');
 entree.dropUser('root');

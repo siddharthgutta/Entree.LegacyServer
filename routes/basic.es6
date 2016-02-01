@@ -1,11 +1,9 @@
 import {Router} from 'express';
-import {exec} from 'shelljs'
-import fs from 'fs'
-import async from 'async'
+import {exec} from 'shelljs';
 import Convert from 'ansi-to-html';
-var convert = new Convert();
 
-const route = Router();
+const convert = new Convert();
+const route = new Router();
 
 route.get('/', (req, res) => res.render('restaurant'));
 route.get('/tools', (req, res) => res.render('tools'));
@@ -17,7 +15,7 @@ route.get('/tests', (req, res) => {
   child.stdout.on('message', data => capture += data);
   child.stdout.on('end', () => {
     res.type('text/html');
-    var resultCapture = capture.replace(/\n/g, '<br/>').replace(/\s/g, '&nbsp;');
+    const resultCapture = capture.replace(/\n/g, '<br/>').replace(/\s/g, '&nbsp;');
     res.send(convert.toHtml(resultCapture));
   });
 });

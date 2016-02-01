@@ -7,11 +7,11 @@ import models from '../models/mysql/index.es6';
 /**
  * Create a user
  *
- * @param phoneNumber {string}: User phone number
- * @param password {string}: User password
- * @param name {string}: User name
- * @param email {string}: User email
- * @returns {Promise}
+ * @param {string} phoneNumber: User phone number
+ * @param {string} password: User password
+ * @param {string} name: User name
+ * @param {string} email: User email
+ * @returns {Promise}: Returns the user object
  */
 export function create(phoneNumber, password, name, email) {
   return models.User.create({phoneNumber, password, name, email});
@@ -20,9 +20,9 @@ export function create(phoneNumber, password, name, email) {
 /**
  * Update a user attributes
  *
- * @param phoneNumber {string}: User phone number
- * @param attributes {Object}: Attributes to update
- * @returns {Promise}
+ * @param {string} phoneNumber: User phone number
+ * @param {Object} attributes: Attributes to update
+ * @returns {Promise}: Returns the user object
  */
 export function update(phoneNumber, attributes) {
   return models.User.update(
@@ -35,8 +35,8 @@ export function update(phoneNumber, attributes) {
 /**
  * Destroy a user
  *
- * @param phoneNumber {string}: User phone number
- * @returns {Promise}
+ * @param {string} phoneNumber: User phone number
+ * @returns {Promise}: Returns the user object
  */
 export function destroy(phoneNumber) {
   return models.User.destroy({
@@ -47,8 +47,8 @@ export function destroy(phoneNumber) {
 /**
  * Find a user by phone
  *
- * @param phoneNumber {string}: User phone number
- * @returns {Promise}
+ * @param {string} phoneNumber: User phone number
+ * @returns {Promise}: Returns the user object
  */
 export function findOne(phoneNumber) {
   return models.User.findOne({

@@ -1,11 +1,10 @@
 import {Router} from 'express';
-import bodyParser from 'body-parser'
-import * as Token from '../api/token.es6'
-import * as User from '../api/user.es6'
+import * as Token from '../api/token.es6';
+import * as User from '../api/user.es6';
 
-const route = Router();
+const route = new Router();
 
-route.use((req, res, next)=> {
+route.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.ok = (data, message) => res.json({status: 0, data: data.toJSON ? data.toJSON() : data, message});
   res.fail = (cause, message, status) => res.json({status: status || 1, cause, message});
