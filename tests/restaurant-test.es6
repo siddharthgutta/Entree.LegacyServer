@@ -1,4 +1,5 @@
 import assert from 'assert';
+import './test-init.es6';
 import * as Restaurant from '../api/restaurant.es6';
 
 describe('Restaurant', () => {
