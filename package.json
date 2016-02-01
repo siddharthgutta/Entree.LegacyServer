@@ -75,7 +75,7 @@
     "start": "node index.compiled.js",
     "test-no-nyan": "export NODE_ENV=staging; mocha --timeout 5000 --no-exit --colors",
     "tests-no-nyan": "set -e;for f in ./tests/*-test.compiled.js ; do npm run test-no-nyan \"$f\" ; done",
-    "test-ci": "export NODE_ENV=staging; mocha --timeout 5000 --no-exit --no-colors",
+    "test-ci": "mocha --timeout 5000 --no-exit --no-colors",
     "tests-ci": "set -e;for f in ./tests/*-test.compiled.js ; do npm run test-ci \"$f\" ; done",
     "lint": "eslint --ext js,.es6,.jsx ./",
     "lint-ci": "eslint --no-color --ext js,.es6,.jsx ./"
