@@ -71,7 +71,7 @@
     "start": "node index.compiled.js",
     "test-no-nyan": "export NODE_ENV=staging; mocha --timeout 5000 --no-exit --colors",
     "tests-no-nyan": "npm run test-no-nyan ./tests/*-test.compiled.js",
-    "lint": "eslint -c .eslintrc.json ./**/*"
+    "lint": "eslint --ext js,.es6,.jsx ./"
   },
   "repository": {
     "type": "git",
