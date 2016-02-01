@@ -1,6 +1,6 @@
-import Strategy from './strategy.es6'
-import twilio from 'twilio'
-import Promise from 'bluebird'
+import Strategy from './strategy.es6';
+import twilio from 'twilio';
+import Promise from 'bluebird';
 
 export default class Twilio extends Strategy {
   constructor(from, account, auth) {
@@ -9,10 +9,12 @@ export default class Twilio extends Strategy {
     console.tag('lib', 'twilio').log('Client Created with From Number: ', from);
   }
 
-  send(toNumber, textBody, verboseLogging=false) {
-    if (verboseLogging)
-      console.tag('lib', 'twilio').log("Sent to", toNumber, ":", textBody);
-    return new Promise((resolve, reject)=> {
+  send(toNumber, textBody, verboseLogging = false) {
+    if (verboseLogging) {
+      console.tag('lib', 'twilio').log('Sent to', toNumber, ':', textBody);
+    }
+
+    return new Promise((resolve, reject) => {
       this.client.messages.create({
         body: textBody,
         to: toNumber,
@@ -31,6 +33,6 @@ export default class Twilio extends Strategy {
 
   // Unnecessary for now
   normalize(toNumber) {
-    return `+1${String(number).replace('+1', '')}`;
+    return `+1${String(toNumber).replace('+1', '')}`;
   }
 }
