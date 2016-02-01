@@ -1,7 +1,12 @@
 {
    "presets": [
      "es2015",
-     "react"
+     "react",
+     "stage-0"
    ],
-   plugins: ["transform-object-rest-spread", "transform-runtime"]
+   plugins: [
+    "transform-object-rest-spread",
+    "transform-runtime",
+    "syntax-class-properties"
+   ]
 }

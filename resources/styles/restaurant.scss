@@ -17,26 +17,13 @@ body {
   }
 }
 
-.example-enter {
-  transform: translateX(100%);
-}
-
-.example-enter.example-enter-active {
-  transition: all 500ms ease-in;
-  transform: translateX(0);
-}
-
-.example-leave {
-  transform: translateX(0);
-}
-
-.example-leave.example-leave-active {
-  transition: all 500ms ease-in;
-  transform: translateX(-100%);
-}
-
 #app {
   overflow: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 .group {
@@ -490,4 +477,50 @@ body {
       }
     }
   }
+}
+
+.board {
+  & > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+.board-enter {
+  opacity: 0.01;
+  transition: opacity .5s ease-in;
+}
+
+.board-enter.board-enter-active {
+  opacity: 1;
+}
+
+.board-leave {
+  opacity: 1;
+  transition: opacity .5s ease-in;
+}
+
+.board-leave.board-leave-active {
+  opacity: 0;
+}
+
+.order-list-enter {
+  opacity: 0.01;
+  transition: opacity .5s ease-in;
+}
+
+.order-list-enter.order-list-enter-active {
+  opacity: 1;
+}
+
+.order-list-leave {
+  opacity: 1;
+  transition: opacity .5s ease-in;
+}
+
+.order-list-leave.order-list-leave-active {
+  opacity: 0;
 }

@@ -76,6 +76,13 @@
     "react/jsx-closing-bracket-location": [
       1,
       "props-aligned"
+    ],
+    "brace-style": [
+      2,
+      "1tbs",
+      {
+        "allowSingleLine": false
+      }
     ]
   },
   "ecmaFeatures": {

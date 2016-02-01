@@ -1,17 +1,23 @@
 import React from 'react';
 import moment from 'moment';
 import {ifcat} from '../../../libs/utils';
+import {Link} from 'react-router';
 
 class Order extends React.Component {
-  constructor(...args) {
-    super(...args);
+
+  static propTypes = {
+    order: React.PropTypes.object
+  };
+
+  constructor(context, props) {
+    super(context, props);
   }
 
   render() {
-    const order = this.props;
+    const {order} = this.props;
 
     return (
-        <div onClick={this.props.onClick} onTouchTap={this.props.onClick} className='order flex' style={{height:80}}>
+        <Link component='div' className='order flex' style={{height: 80}} to={`order/${order.id}`}>
           <div className='id box flex left'>{order.id}</div>
           <div className='box flex left'>
             <div>
@@ -32,7 +38,7 @@ class Order extends React.Component {
               bgBlue: order.status === 'received'})}>{order.status}</div>
           </div>
           <div className='box flex center vertical evil-icon forward'/>
-        </div>
+        </Link>
     );
   }
 }

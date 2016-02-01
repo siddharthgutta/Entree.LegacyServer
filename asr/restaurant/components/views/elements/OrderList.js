@@ -3,10 +3,15 @@ import Influx from 'react-influx';
 import OrderStore from '../../../stores/OrderStore';
 import Order from './Order.js';
 import _ from 'underscore';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 class OrderList extends Influx.Component {
-  constructor(...args) {
-    super(...args);
+  static propTypes = {
+    status: React.PropTypes.string
+  };
+
+  constructor(context, props) {
+    super(context, props);
 
     this.state = {orders: OrderStore.getOrders()};
   }
@@ -28,14 +33,24 @@ class OrderList extends Influx.Component {
   render() {
     const {orders} = this.state;
     const items = orders.map((order, i) =>
-        <Order onClick={() => this.props.onOrderClick(order)} key={order.id} {...order} index={i}/>);
+        <Order key={order.id} order={order} index={i}/>);
 
-    // manually animating for now
+    if (!items.length) {
+      items.push(
+          <div key='status' className='empty'>{`No ${this.props.status} orders`}</div>
+      );
+    }
+
     return (
-        <div className='group full momentum' style={{padding: 15, background: 'rgba(0,0,0,0.7)', overflow: 'scroll'}}>
-          { !items.length ? <div className='empty'>{`No ${this.props.status} orders`}</div> :
-              <div className='items'>{items}</div> }
-        </div>
+        <ReactCSSTransitionGroup
+            component='div'
+            className='group full momentum'
+            style={{padding: 15, background: 'rgba(0,0,0,0.7)', overflowY: 'scroll'}}
+            transitionName='order-list'
+            transitionEnterTimeout={500}
+            transitionLeaveTimeout={500}>
+          {items}
+        </ReactCSSTransitionGroup>
     );
   }
 }
