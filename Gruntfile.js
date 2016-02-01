@@ -215,7 +215,7 @@ module.exports = grunt => {
 
   // FIXME dont' uglify if in dev mode
   grunt.registerTask('build', [
-    'clean:build',
+    'clean:compiled',
     'grunt-license',
     'sass:dist',
     'postcss:dist',
