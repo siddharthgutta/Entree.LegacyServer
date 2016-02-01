@@ -1,5 +1,5 @@
-export default function(sequelize, DataTypes) {
-  var Location = sequelize.define('Location', {
+export default function (sequelize, DataTypes) {
+  const Location = sequelize.define('Location', {
     firstAddress: {
       type: DataTypes.STRING(64),
       allowNull: false
@@ -19,4 +19,4 @@ export default function(sequelize, DataTypes) {
     },
   });
   return Location;
-};
+}

@@ -7,20 +7,21 @@ import models from '../models/mysql/index.es6';
 /**
  * Create a user
  *
- * @param phoneNumber
- * @param password
- * @param optional
+ * @param phoneNumber {string} - User phone number
+ * @param password {string} - User password
+ * @param name {string} - User name
+ * @param email {string} - User email
  * @returns {Promise}
  */
-export function create(phoneNumber, password, optional = {name: null, email: null}) {
-  return models.User.create({phoneNumber, password, ...optional});
+export function create(phoneNumber, password, name, email) {
+  return models.User.create({phoneNumber, password, name, email});
 }
 
 /**
  * Update a user attributes
  *
- * @param phoneNumber
- * @param attributes
+ * @param phoneNumber {string} - User phone number
+ * @param attributes {Object} - Attributes to update
  * @returns {Promise}
  */
 export function update(phoneNumber, attributes) {
@@ -34,7 +35,7 @@ export function update(phoneNumber, attributes) {
 /**
  * Destroy a user
  *
- * @param phoneNumber
+ * @param phoneNumber {string} - User phone number
  * @returns {Promise}
  */
 export function destroy(phoneNumber) {
@@ -46,7 +47,7 @@ export function destroy(phoneNumber) {
 /**
  * Find a user by phone
  *
- * @param phoneNumber
+ * @param phoneNumber {string} - User phone number
  * @returns {Promise}
  */
 export function findOne(phoneNumber) {

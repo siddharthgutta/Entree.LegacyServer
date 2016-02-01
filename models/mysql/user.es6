@@ -1,5 +1,5 @@
-export default function(sequelize, DataTypes) {
-  var User = sequelize.define('User', {
+export default function (sequelize, DataTypes) {
+  const User = sequelize.define('User', {
     phoneNumber: {
       type: DataTypes.STRING(10),
       allowNull: false,
@@ -15,18 +15,18 @@ export default function(sequelize, DataTypes) {
     },
     name: {
       type: DataTypes.STRING(64),
-      allowNull: true,
+      allowNull: false,
       validate: {
         is: /^[a-zA-Z ]*$/
       }
     },
     email: {
       type: DataTypes.STRING(128),
-      allowNull: true,
+      allowNull: false,
       validate: {
         isEmail: true
       }
     }
   });
   return User;
-};
+}
