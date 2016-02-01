@@ -7,12 +7,6 @@ import Header from './views/elements/Header';
 import Dispatcher from '../dispatchers/Dispatcher';
 
 class App extends React.Component {
-  constructor(context, props) {
-    super(context, props);
-
-    this.state = {};
-  }
-
   componentDidMount() {
     Dispatcher.emit(Dispatcher.Events.CONNECT_STREAM);
   }

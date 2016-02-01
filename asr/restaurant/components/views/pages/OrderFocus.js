@@ -40,21 +40,9 @@ class OrderFocus extends Influx.Component {
     const {history} = this.props;
 
     Dispatcher.emit(Dispatcher.Events.REQUEST_HEADER, `#${order.id}`, 'Order', {
-      style: {minHeight: 185},
+      style: {minHeight: 55},
       leftIcon: 'evil-icon back',
-      onLeftClick: () => history.goBack(),
-      children: (
-          <div className='flex' style={{padding: '30px 0'}}>
-            <div className='box flex center vertical'
-                 style={{borderRight: '1px solid rgba(255, 255, 255, 0.1)'}}>
-              <div className='value'>${order.cost}</div>
-              <div className='desc'>TOTAL COST</div>
-            </div>
-            <div className='box small flex center vertical'>
-              <div className='value icon message'></div>
-            </div>
-          </div>
-      )
+      onLeftClick: () => history.goBack()
     });
   }
 
@@ -84,7 +72,7 @@ class OrderFocus extends Influx.Component {
     const {order} = this.state;
 
     const items = (
-        <div className='full  flex vertical'>
+        <div className='full flex vertical'>
           <div className='flex status' style={{minHeight: 53}}>
             <div className={ifcat('box event', {active: order.status === 'received'})}>RECEIVED</div>
             <div className={ifcat('box event', {active: order.status === 'accepted'})}>PROGRESS</div>
@@ -138,6 +126,17 @@ class OrderFocus extends Influx.Component {
 
     return (
         <div className='full flex vertical'>
+          <div className='flex'
+               style={{padding: '30px 0', minHeight: 130, borderBottom: '1px solid rgba(255, 255, 255, 0.1)'}}>
+            <div className='box flex center vertical'
+                 style={{borderRight: '1px solid rgba(255, 255, 255, 0.1)'}}>
+              <div className='value'>${order.cost}</div>
+              <div className='desc'>TOTAL COST</div>
+            </div>
+            <div className='box small flex center vertical'>
+              <div className='value icon message'></div>
+            </div>
+          </div>
           <TabbedPane spread Items={items} Details={details} tabs={['Items', 'Details']}/>
           <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 62}}>
             <div className='floater'>

@@ -17,13 +17,13 @@ body {
   }
 }
 
+#app {
+  overflow: hidden;
+}
+
 a {
   color: inherit;
   text-decoration: none;
-}
-
-#app {
-  overflow: hidden;
 }
 
 .group {
@@ -476,6 +476,16 @@ a {
         margin-bottom: 0;
       }
     }
+  }
+}
+
+.board {
+  & > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 }
 

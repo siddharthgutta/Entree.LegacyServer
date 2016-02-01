@@ -10,18 +10,18 @@ class Board extends React.Component {
 
   render() {
     return (
-        <ReactCSSTransitionGroup
-            component='div'
-            className='full'
-            transitionName='board'
-            transitionEnterTimeout={500}
-            transitionLeaveTimeout={500}>
-          <div className='full-abs'>
+        <div className='full'>
+          <ReactCSSTransitionGroup
+              component='div'
+              className='full-abs board'
+              transitionName='board'
+              transitionEnterTimeout={500}
+              transitionLeaveTimeout={500}>
             {React.cloneElement(this.props.children, {
               key: this.props.location.pathname
             })}
-          </div>
-        </ReactCSSTransitionGroup>
+          </ReactCSSTransitionGroup>
+        </div>
     );
   }
 }
