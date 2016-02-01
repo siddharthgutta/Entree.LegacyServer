@@ -48,7 +48,7 @@ class TabbedPane extends Influx.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (Array.isArray(nextProps.tabs) && nextProps.tabs.length && nextProps.tabs.indexOf(this.activeTab) == -1) {
+    if (Array.isArray(nextProps.tabs) && nextProps.tabs.length && nextProps.tabs.indexOf(this.activeTab) === -1) {
       this.activeTab = nextProps.tabs[0];
     }
   }
@@ -66,8 +66,8 @@ class TabbedPane extends Influx.Component {
     var children = this.props.tabs.map(tab => {
       return (
           <div key={tab} ref={tab}
-               style={{height:'100%',display:'inline-block',verticalAlign:'top',
-             width:(1/count * 100) + '%',overflow:'hidden',position:'relative'}}>
+               style={{height:'100%', display:'inline-block', verticalAlign:'top',
+             width:(1 / count * 100) + '%', overflow:'hidden', position:'relative'}}>
             {this.state[tab] ? this.props[tab] : null}</div>
       );
     });
@@ -85,7 +85,7 @@ class TabbedPane extends Influx.Component {
 
     return (
         <div className='full flex vertical'>
-          <div className={'tabs '  + (this.props.spread ? 'spread flex' : null)}>{tabs}</div>
+          <div className={'tabs ' + (this.props.spread ? 'spread flex' : null)}>{tabs}</div>
           <div className='full' style={style}>
             <div className='full-abs animate' ref='pane'
                  style={{width:count * 100 + '%'}}>{children}</div>
@@ -95,4 +95,4 @@ class TabbedPane extends Influx.Component {
   }
 }
 
-export default TabbedPane
+export default TabbedPane;

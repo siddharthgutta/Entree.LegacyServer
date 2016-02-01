@@ -22,16 +22,14 @@ class Order extends React.Component {
           <div className='cost box flex center'>{order.cost.toFixed(2)}</div>
           <div className='box flex right hide'>
             <div className={ifcat('button blue box icon flex center', {
-                  clock:order.status === 'accepted',
-                  check:order.status === 'completed',
-                  cross:order.status === 'declined',
-                  mail:order.status === 'received',
-                  bgGreen:order.status === 'accepted',
-                  bgGray:order.status === 'completed',
-                  bgRed:order.status === 'declined',
-                  bgBlue:order.status === 'received'
-                  })}>{order.status}
-            </div>
+              clock: order.status === 'accepted',
+              check: order.status === 'completed',
+              cross: order.status === 'declined',
+              mail: order.status === 'received',
+              bgGreen: order.status === 'accepted',
+              bgGray: order.status === 'completed',
+              bgRed: order.status === 'declined',
+              bgBlue: order.status === 'received'})}>{order.status}</div>
           </div>
           <div className='box flex center vertical evil-icon forward'/>
         </div>
@@ -40,5 +38,3 @@ class Order extends React.Component {
 }
 
 export default Order;
-
-
