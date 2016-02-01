@@ -1,94 +1,94 @@
 import React from 'react';
 import Influx from 'react-influx';
 import ReactDOM from 'react-dom';
-import _ from 'underscore';
-
-function setVendorSpecificStyles(element, property, propertyCased, value) {
-  element.style['webkit' + property] = value;
-  element.style['moz' + property] = value;
-  element.style['ms' + property] = value;
-  element.style['o' + property] = value;
-  element.style[propertyCased] = value;
-}
-
+import {apply, ifcat} from '../../../libs/utils';
 
 class TabbedPane extends Influx.Component {
+
+  static defaultProps = {
+    style: {},
+    spread: true
+  };
+
+  static propTypes = {
+    onChange: React.PropTypes.func,
+    spread: React.PropTypes.bool,
+    style: React.PropTypes.object.isRequired
+  };
 
   constructor(...args) {
     super(...args);
 
     this.state = {[this.props.tabs[0]]: true};
-    this.activeTab = this.props.tabs[0];
+    this.active = this.props.tabs[0];
   }
 
   _showTab(tab) {
-    var index = this.props.tabs.indexOf(tab);
+    const index = this.props.tabs.indexOf(tab);
+
     if (index > -1) {
-      if (this.activeTab) {
-        var activeTab = this.refs['button' + this.activeTab];
-        activeTab.classList.remove('selected');
+      if (this.active) {
+        const active = this.refs[`button${this.active}`];
+        active.classList.remove('selected');
       }
 
-      var nextTab = ReactDOM.findDOMNode(this.refs['button' + tab]);
-      nextTab.classList.add('selected');
-      setVendorSpecificStyles(ReactDOM.findDOMNode(this.refs.pane), 'Transform',
-          'transform', 'translate3d(-' + (index / this.props.tabs.length * 100) + '%, 0, 0)');
-      this.activeTab = tab;
+      const next = ReactDOM.findDOMNode(this.refs[`button${tab}`]);
+      next.classList.add('selected');
+
+      apply(ReactDOM.findDOMNode(this.refs.pane),
+          {transform: `translate3d(-${index / this.props.tabs.length * 100}%, 0, 0)`});
+
+      this.active = tab;
 
       if (this.props.onChange) {
         this.props.onChange(tab);
       }
 
       if (!this.state[tab]) {
-        var state = {};
-        state[tab] = true;
-        this.setState(state);
+        this.setState({[tab]: true});
       }
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (Array.isArray(nextProps.tabs) && nextProps.tabs.length && nextProps.tabs.indexOf(this.activeTab) === -1) {
-      this.activeTab = nextProps.tabs[0];
+    if (Array.isArray(nextProps.tabs) && nextProps.tabs.length
+        && nextProps.tabs.indexOf(this.active) === -1) {
+      this.active = nextProps.tabs[0];
     }
   }
 
   componentDidMount() {
-    this._showTab(this.activeTab);
+    this._showTab(this.active);
   }
 
   componentDidUpdate() {
-    this._showTab(this.activeTab);
+    this._showTab(this.active);
   }
 
   render() {
-    var count = this.props.tabs.length;
-    var children = this.props.tabs.map(tab => {
-      return (
-          <div key={tab} ref={tab}
-               style={{height:'100%', display:'inline-block', verticalAlign:'top',
-             width:(1 / count * 100) + '%', overflow:'hidden', position:'relative'}}>
-            {this.state[tab] ? this.props[tab] : null}</div>
-      );
-    });
+    const count = this.props.tabs.length;
+    const children = this.props.tabs.map(tab =>
+        <div key={tab} ref={tab}
+             style={{height: '100%', display: 'inline-block', verticalAlign: 'top',
+             width: `${(1 / count * 100)}%`, overflow: 'hidden', position: 'relative'}}>
+          {this.state[tab] ? this.props[tab] : null}</div>
+    );
 
-    var tabs = this.props.tabs.map(tab => {
-      return (
-          <div key={tab} onTouchTap={this._showTab.bind(this, tab)} onClick={this._showTab.bind(this, tab)}
-               className={'tab ' + (this.props.spread ? 'box' : null)} ref={'button' + tab}>{tab}</div>
-      );
-    });
+    const tabs = this.props.tabs.map(tab =>
+        <div key={tab} onTouchTap={() => this._showTab(tab)}
+             onClick={() => this._showTab(tab)}
+             className={ifcat('tab', {box: this.props.spread})}
+             ref={`button${tab}`}>{tab}</div>
+    );
 
-    var style = this.props.style || {};
-    style.position = 'relative';
-    style.overflow = 'hidden';
+    const style = {...this.props.style, ...{position: 'relative', overflow: 'hidden'}};
 
     return (
         <div className='full flex vertical'>
-          <div className={'tabs ' + (this.props.spread ? 'spread flex' : null)}>{tabs}</div>
+          <div className={ifcat('tabs', {'spread flex': this.props.spread})}>{tabs}</div>
           <div className='full' style={style}>
             <div className='full-abs animate' ref='pane'
-                 style={{width:count * 100 + '%'}}>{children}</div>
+                 style={{width: `${count * 100}%`}}>{children}</div>
           </div>
         </div>
     );

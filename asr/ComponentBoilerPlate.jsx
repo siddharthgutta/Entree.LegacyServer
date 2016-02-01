@@ -1,5 +1,5 @@
-import Influx from 'react-influx'
-import React from 'react'
+import Influx from 'react-influx';
+import React from 'react';
 
 class ComponentName extends Influx.Component {
   constructor(...args) {
@@ -12,9 +12,9 @@ class ComponentName extends Influx.Component {
 
   render() {
     return (
-      <div></div>
+        <div></div>
     );
   }
 }
 
-export default ComponentName
+export default ComponentName;

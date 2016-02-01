@@ -3,9 +3,11 @@ import Dispatcher from '../dispatchers/Dispatcher.js';
 import keyMirror from 'keymirror';
 import extend from 'extend';
 import Chance from 'chance';
+import _ from 'underscore';
 
 const Events = keyMirror({
-  ORDER_RECEIVED: null
+  ORDER_RECEIVED: null,
+  ORDER_UPDATED: null
 });
 
 const chance = new Chance();
@@ -62,9 +64,31 @@ class OrderStore extends Influx.Store {
     order.status = chance.pick(['received', 'accepted', 'completed']);
 
     this.data.orders.unshift(order);
+
     this.emit(Events.ORDER_RECEIVED, order);
+    this.emit(Events.ORDER_UPDATED, order);
 
     return order;
+  }
+
+  fetchOrderById(id) {
+    id = parseInt(id, 10);
+
+    if (id) {
+      const {orders} = this.data;
+      const idx = _.findIndex(orders, {id});
+
+      if (idx > -1) {
+        return orders[idx];
+      }
+    }
+
+    return {
+      id: 'NA',
+      cost: 0,
+      status: 'loading',
+      name: 'loading'
+    };
   }
 
   off(type, listener) {

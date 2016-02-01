@@ -2,8 +2,15 @@ import React from 'react';
 import Influx from 'react-influx';
 
 class Header extends Influx.Component {
-  constructor(...args) {
-    super(...args);
+  static propTypes = {
+    style: React.PropTypes.object,
+    title: React.PropTypes.string,
+    subtitle: React.PropTypes.string,
+    children: React.PropTypes.node
+  };
+
+  constructor(context, props) {
+    super(context, props);
   }
 
   render() {
