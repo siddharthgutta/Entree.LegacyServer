@@ -1,3 +1,3 @@
-import io from 'socket.io'
+import io from 'socket.io';
 
-export default io()
+export default io();
