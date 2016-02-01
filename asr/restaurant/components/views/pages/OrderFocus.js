@@ -1,11 +1,12 @@
 import React from 'react';
+import Influx from 'react-influx';
 import moment from 'moment';
 import TabbedPane from '../general/TabbedPane.js';
-import Header from '../../views/elements/Header.js';
+import Dispatcher from '../../../dispatchers/Dispatcher';
 import {ifcat} from '../../../libs/utils';
 import OrderStore from '../../../stores/OrderStore';
 
-class OrderFocus extends React.Component {
+class OrderFocus extends Influx.Component {
 
   static propTypes = {
     params: React.PropTypes.object
@@ -20,10 +21,41 @@ class OrderFocus extends React.Component {
     this.state = {time: 0, order};
   }
 
+  componentDidMount() {
+    this._createHeader();
+  }
+
+  componentDidUpdate() {
+    this._createHeader();
+  }
+
   getListeners() {
     return [
       [OrderStore, OrderStore.ORDER_UPDATED, this._onOrderUpdated]
     ];
+  }
+
+  _createHeader() {
+    const {order} = this.state;
+    const {history} = this.props;
+
+    Dispatcher.emit(Dispatcher.Events.REQUEST_HEADER, `#${order.id}`, 'Order', {
+      style: {minHeight: 185},
+      leftIcon: 'evil-icon back',
+      onLeftClick: () => history.goBack(),
+      children: (
+          <div className='flex' style={{padding: '30px 0'}}>
+            <div className='box flex center vertical'
+                 style={{borderRight: '1px solid rgba(255, 255, 255, 0.1)'}}>
+              <div className='value'>${order.cost}</div>
+              <div className='desc'>TOTAL COST</div>
+            </div>
+            <div className='box small flex center vertical'>
+              <div className='value icon message'></div>
+            </div>
+          </div>
+      )
+    });
   }
 
   _onOrderUpdated(order) {
@@ -104,63 +136,17 @@ class OrderFocus extends React.Component {
         </div>
     );
 
-    const header = (
-        <Header title={`#${order.id}`} subtitle='ORDER' style={{minHeight: 185}}>
-          <div className='flex' style={{padding: '30px 0'}}>
-            <div className='box flex center vertical'
-                 style={{borderRight: '1px solid rgba(255, 255, 255, 0.1)'}}>
-              <div className='value'>${order.cost}</div>
-              <div className='desc'>TOTAL COST</div>
-            </div>
-            <div className='box small flex center vertical'>
-              <div className='value icon message'></div>
-            </div>
-          </div>
-        </Header>
-    );
-
     return (
-        <div className='full'>
-          <div className='full-abs'>
-            <div className='full flex vertical'>
-              {header}
-              <TabbedPane spread Items={items} Details={details} tabs={['Items', 'Details']}/>
-              <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 62}}>
-                <div className='floater'>
-                  <div className='flex'>
-                    <div className='button box dim'>DECLINE</div>
-                    <div className='button box green' onTouchTap={() => this._handleAccept(true)}
-                         onClick={() => this._handleAccept(true)}>
-                      ACCEPT
-                    </div>
-                  </div>
+        <div className='full flex vertical'>
+          <TabbedPane spread Items={items} Details={details} tabs={['Items', 'Details']}/>
+          <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 62}}>
+            <div className='floater'>
+              <div className='flex'>
+                <div className='button box dim'>DECLINE</div>
+                <div className='button box green' onTouchTap={() => this._handleAccept(true)}
+                     onClick={() => this._handleAccept(true)}>
+                  ACCEPT
                 </div>
-              </div>
-            </div>
-            <div className={ifcat('full-abs vignette', {hide: !this.state.showDialog})}>
-              <div className='dialog center'>
-                <div className='box flex center vertical' style={{padding: 15}}>
-                  <div className='value'>$15.35</div>
-                  <div className='desc'>TOTAL COST</div>
-                </div>
-                <hr />
-                <div className='desc bold normal' style={{marginBottom: 20}}>Select a preparation time</div>
-                <div className='button navy flex center' onTouchTap={() => this._addTime(1)}
-                     onClick={() => this._addTime(1)}><
-                    span className='icon add'/>&nbps;<span>1 Minute</span>
-                </div>
-                <div className='button navy flex center' onTouchTap={() => this._addTime(5)}
-                     onClick={() => this._addTime(5)}>
-                  <span className='icon add'/>&nbps;<span>5 Minutes</span>
-                </div>
-                <div className='button navy flex center' onTouchTap={() => this._addTime(15)}
-                     onClick={() => this._addTime(15)}>
-                  <span className='icon add'/>&nbps;<span>15 Minutes</span>
-                </div>
-                <div className='desc' style={{marginBottom: 10}}>OR</div>
-                <input type='number' placeholder='minutes' value={this.state.time}
-                       onChange={e => this._handleInput(e.target.value)}/>
-                <div className='button'>submit</div>
               </div>
             </div>
           </div>

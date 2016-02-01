@@ -6,6 +6,10 @@ import _ from 'underscore';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 class OrderList extends Influx.Component {
+  static propTypes = {
+    status: React.PropTypes.string
+  };
+
   constructor(context, props) {
     super(context, props);
 
@@ -29,8 +33,7 @@ class OrderList extends Influx.Component {
   render() {
     const {orders} = this.state;
     const items = orders.map((order, i) =>
-        <Order onClick={() => this.props.onOrderClick(order)}
-               key={order.id} order={order} index={i}/>);
+        <Order key={order.id} order={order} index={i}/>);
 
     if (!items.length) {
       items.push(
