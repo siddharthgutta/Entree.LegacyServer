@@ -2,7 +2,6 @@ import React from 'react';
 import Influx from 'react-influx';
 import OrderStore from '../../../stores/OrderStore';
 import Order from './Order.js';
-import TabbedPane from './../general/TabbedPane.js';
 import _ from 'underscore';
 
 class OrderList extends Influx.Component {
@@ -35,12 +34,10 @@ class OrderList extends Influx.Component {
     return (
         <div className='group full momentum' style={{padding: 15, background: 'rgba(0,0,0,0.7)', overflow: 'scroll'}}>
           { !items.length ? <div className='empty'>{`No ${this.props.status} orders`}</div> :
-              <div className='items'>{items}</div>  }
+              <div className='items'>{items}</div> }
         </div>
     );
   }
 }
 
 export default OrderList;
-
-

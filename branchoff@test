@@ -2,7 +2,7 @@
 
 echo "invoked when branch is test"
 
-# eslint --no-color -c .eslintrc.json ./*
+# eslint --quiet --no-color -c .eslintrc.json ./**/*
 
 export NODE_ENV=staging;
 mocha --timeout 5000 --no-exit --no-colors ./tests/*-test.compiled.js

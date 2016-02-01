@@ -1,7 +1,4 @@
 import React from 'react';
-import Influx from 'react-influx';
-import OrderList from '../elements/OrderList.js';
-import Dispatcher from '../../../dispatchers/Dispatcher';
 import TabbedPane from '../general/TabbedPane.js';
 import Header from '../../views/elements/Header.js';
 import {ifcat} from '../../../libs/utils';
@@ -50,14 +47,14 @@ class OrderFocus extends React.Component {
                   </div>
                 </div>
               </Header>
-              <TabbedPane spread={true} Items={
+              <TabbedPane spread Items={
               <div className='full  flex vertical'>
               <div className='flex status' style={{minHeight:53}}>
                 <div className={ifcat('box event', {active: order.status === 'received'})}>RECEIVED</div>
                 <div className={ifcat('box event', {active: order.status === 'accepted'})}>PROGRESS</div>
                 <div className={ifcat('box event', {active: order.status === 'completed'})}>COMPLETE</div>
               </div>
-              <div className='full' style={{padding:'10px 15px 0',overflow:'scroll',background:'rgba(0,0,0,0.7)'}}>
+              <div className='full' style={{padding:'10px 15px 0', overflow:'scroll', background:'rgba(0,0,0,0.7)'}}>
                 <div className='item flex'>
                   <div className='box flex quantity center vertical'>1</div>
                   <div className='box flex name center vertical'>Big Combo Box</div>
@@ -79,7 +76,7 @@ class OrderFocus extends React.Component {
                   <div className='box flex cost center right vertical'>$5.60</div>
                 </div>
               </div>
-              </div>} Details={<div className='full' style={{padding:'30px',overflow:'scroll',background:'rgba(0,0,0,0.7)'}}>
+              </div>} Details={<div className='full' style={{padding: '30px', overflow: 'scroll', background: 'rgba(0,0,0,0.7)'}}>
                   <div className='box flex left vertical small info'>
                     <div className='value'>#{order.id}</div>
                     <div className='desc'>ID</div>
@@ -94,7 +91,7 @@ class OrderFocus extends React.Component {
                     <div className='desc'>DATE</div>
                   </div>
               </div>} tabs={['Items', 'Details']}/>
-              <div style={{padding:'0px 20px',background:'rgba(0,0,0,0.7)',minHeight:62}}>
+              <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 62}}>
                 <div className='floater'>
                   <div className='flex'>
                     <div className='button box dim'>DECLINE</div>
@@ -107,12 +104,12 @@ class OrderFocus extends React.Component {
             </div>
             <div className={ifcat('full-abs vignette', {hide: !this.state.showDialog})}>
               <div className='dialog center'>
-                <div className='box flex center vertical' style={{padding:15}}>
+                <div className='box flex center vertical' style={{padding: 15}}>
                   <div className='value'>$15.35</div>
                   <div className='desc'>TOTAL COST</div>
                 </div>
                 <hr />
-                <div className='desc bold normal' style={{marginBottom:20}}>Select a preparation time</div>
+                <div className='desc bold normal' style={{marginBottom: 20}}>Select a preparation time</div>
                 <div className='button navy flex center' onTouchTap={this._addTime.bind(this, 1)}
                      onClick={this._addTime.bind(this, 1)}><span
                     className='icon add'/> 1
@@ -128,7 +125,7 @@ class OrderFocus extends React.Component {
                     className='icon add'/> 15
                   Minutes
                 </div>
-                <div className='desc' style={{marginBottom:10}}>OR</div>
+                <div className='desc' style={{marginBottom: 10}}>OR</div>
                 <input type='number' placeholder='minutes' value={this.state.time}
                        onChange={this._handleInput.bind(this)}/>
                 <div className='button'>submit</div>
