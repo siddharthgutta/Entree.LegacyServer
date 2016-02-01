@@ -134,6 +134,7 @@ module.exports = grunt => {
       dist: {
         files: [
           {expand: true, cwd: 'resources/fonts', src: ['**/*'], dest: 'public/fonts'},
+          {expand: true, cwd: 'resources/images', src: ['**/*'], dest: 'public/images'},
           {expand: true, cwd: 'resources/scripts', src: ['**/*'], dest: 'public/scripts'}
         ]
       },
@@ -158,7 +159,10 @@ module.exports = grunt => {
         }
       }
     },
-    clean: ['public/', './package.noDevDeps.json'],
+    clean: {
+      build: ['public/', './package.noDevDeps.json'],
+      compiled: ['./**/*.compiled.js', './**/*.compiled.js.map']
+    },
     rename: {
       dist: {
         files: [
@@ -179,6 +183,11 @@ module.exports = grunt => {
       }
     }
   });
+
+  grunt.registerTask('compile', [
+    'clean:compiled',
+    'filetransform:babel'
+  ]);
 
   grunt.registerTask('grunt-license', 'Build a list of dependencies', function transform() {
     const done = this.async();
@@ -207,16 +216,34 @@ module.exports = grunt => {
 
   // FIXME dont' uglify if in dev mode
   grunt.registerTask('build', [
+    'clean:build',
+    'clean:compiled',
+    'filetransform:babel',
+    'grunt-license',
+    'sass:dist',
+    'postcss:dist',
+    'browserify:dist',
+    'jade:dist',
+    'copy:dist',
+    'copy:cordova',
+    'copy:builds',
+    'rename:dist'
+  ]);
+
+  grunt.registerTask('production', [
+    'clean:build',
+    'clean:compiled',
+    'filetransform:babel',
     'grunt-license',
     'sass:dist',
     'postcss:dist',
     'browserify:dist',
     'uglify:dist',
     'jade:dist',
-    'imagemin',
     'copy:dist',
     'copy:cordova',
     'copy:builds',
+    'imagemin',
     'rename:dist'
   ]);
 

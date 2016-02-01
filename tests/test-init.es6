@@ -1,14 +1,7 @@
 import {initScribe} from '../bootstrap';
 import path from 'path';
 import stack from 'callsite';
-import {initDatabase, destroyDatabase} from '../bootstrap.es6';
 
 const console = initScribe(true, false, false, {inspector: {colors: false, callsite: false, pre: false, tags: false}});
 console.persistent('tags', []);
 global.TEST = path.basename(stack()[7].getFileName());
-
-before(done => {
-  initDatabase().then(() => done());
-});
-
-after(() => destroyDatabase());

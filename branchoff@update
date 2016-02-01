@@ -5,8 +5,7 @@ echo "invoked by github push"
 npm set progress=false
 npm --no-color --no-spin --loglevel=error install
 
-grunt build
-grunt filetransform:babel
+grunt production
 
 message=$(git log -1 --pretty=%B)
 branch=$(git symbolic-ref --short HEAD)

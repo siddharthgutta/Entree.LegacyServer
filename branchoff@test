@@ -2,7 +2,12 @@
 
 echo "invoked when branch is test"
 
-# eslint --no-color --ext js,.es6,.jsx ./
+set -e
 
 export NODE_ENV=staging;
-mocha --timeout 5000 --no-exit --no-colors ./tests/*-test.compiled.js
+
+npm uninstall escope
+npm install escope@3.3.0 # hot fix
+
+npm run lint-ci
+npm run tests-ci
