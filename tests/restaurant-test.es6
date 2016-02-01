@@ -3,7 +3,6 @@ import './test-init.es6';
 import * as Restaurant from '../api/restaurant.es6';
 import {initDatabase, destroyDatabase} from '../bootstrap.es6';
 
-
 before(done => {
   initDatabase().then(() => done());
 });

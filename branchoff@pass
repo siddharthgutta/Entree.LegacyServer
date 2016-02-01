@@ -7,7 +7,7 @@ output=$2
 message=$(git log -1 --pretty=%B)
 branch=$(git symbolic-ref --short HEAD)
 
-payload=$(echo "{\"channel\":\"#continous3\",\"text\":\"Ran tests on *$branch*\n\`\`\`$message\`\`\`\n\`\`\`$output\`\`\`\n*TEST PASSED*\"}")
+payload=$(echo "{\"channel\":\"#continous3\",\"text\":\"Ran tests on *$branch*\n\`\`\`$message\`\`\`\n\`\`\`\n$output\`\`\`\n*TEST PASSED*\"}")
 
 echo $payload
 
