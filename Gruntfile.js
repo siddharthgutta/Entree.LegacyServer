@@ -158,7 +158,10 @@ module.exports = grunt => {
         }
       }
     },
-    clean: ['public/', './package.noDevDeps.json'],
+    clean: {
+      build: ['public/', './package.noDevDeps.json'],
+      compiled: ['./**/*.compiled.js', './**/*.compiled.js.map']
+    },
     rename: {
       dist: {
         files: [
@@ -179,6 +182,11 @@ module.exports = grunt => {
       }
     }
   });
+
+  grunt.registerTask('compile', [
+    'clean:compiled',
+    'filetransform:babel'
+  ]);
 
   grunt.registerTask('grunt-license', 'Build a list of dependencies', function transform() {
     const done = this.async();
@@ -207,6 +215,7 @@ module.exports = grunt => {
 
   // FIXME dont' uglify if in dev mode
   grunt.registerTask('build', [
+    'clean:build',
     'grunt-license',
     'sass:dist',
     'postcss:dist',
