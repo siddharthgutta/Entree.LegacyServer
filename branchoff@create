@@ -1,8 +1,5 @@
 #!/usr/bin/env sh
 
-echo "invoked when branch is cloned"
+echo 'triggering ./branchoff@update'
 
-npm set progress=false
-
-echo "script invoking push script"
-. ./branchoff@update
+. ./branchoff@update ${1} # pass in mode

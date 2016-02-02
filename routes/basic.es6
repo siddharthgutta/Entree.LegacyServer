@@ -9,7 +9,7 @@ route.get('/', (req, res) => res.render('restaurant'));
 route.get('/tools', (req, res) => res.render('tools'));
 route.get('/tests', (req, res) => {
   let capture = '';
-  const child = exec(`npm run test-no-nyan ${__dirname}/../tests/*-test.compiled.js`, {async: true, silent: true});
+  const child = exec(`npm run tests-no-nyan && npm run lint`, {async: true, silent: true, cwd: `${__dirname}/../`});
   child.stdout.on('data', data => capture += data);
   child.stderr.on('data', data => capture += data);
   child.stdout.on('message', data => capture += data);

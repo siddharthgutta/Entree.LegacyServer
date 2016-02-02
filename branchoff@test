@@ -1,13 +1,6 @@
 #!/usr/bin/env sh
 
-echo "invoked when branch is test"
-
-set -e
-
 export NODE_ENV=staging;
-
-npm uninstall escope
-npm install escope@3.3.0 # hot fix
 
 npm run lint-ci
 npm run tests-ci

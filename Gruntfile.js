@@ -2,8 +2,6 @@
 
 'use strict';
 
-const babel = require('./tasks/babel-cli');
-
 module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
   require('./tasks/grunt-filetransform')(grunt);
@@ -173,13 +171,18 @@ module.exports = grunt => {
     filetransform: {
       babel: {
         options: {
-          transformer: babel
+          transformer: require('./tasks/babel-cli')
         },
         files: [{
           expand: true,
           src: ['**/*.es6'],
           ext: '.compiled.js'
         }]
+      }
+    },
+    shell: {
+      cordova: {
+        command: 'npm run cordova'
       }
     }
   });
@@ -214,7 +217,6 @@ module.exports = grunt => {
     'postcss:dist'
   ]);
 
-  // FIXME dont' uglify if in dev mode
   grunt.registerTask('build', [
     'clean:build',
     'clean:compiled',
@@ -225,9 +227,7 @@ module.exports = grunt => {
     'browserify:dist',
     'jade:dist',
     'copy:dist',
-    'copy:cordova',
-    'copy:builds',
-    'rename:dist'
+    'cordova'
   ]);
 
   grunt.registerTask('production', [
@@ -236,15 +236,20 @@ module.exports = grunt => {
     'filetransform:babel',
     'grunt-license',
     'sass:dist',
+    'imagemin',
     'postcss:dist',
     'browserify:dist',
     'uglify:dist',
     'jade:dist',
     'copy:dist',
+    'cordova'
+  ]);
+
+  grunt.registerTask('cordova', [
     'copy:cordova',
-    'copy:builds',
-    'imagemin',
-    'rename:dist'
+    'rename:dist',
+    'shell:cordova',
+    'copy:builds'
   ]);
 
   grunt.registerTask('default', 'build');
