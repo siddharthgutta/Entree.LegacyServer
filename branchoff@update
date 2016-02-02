@@ -3,7 +3,7 @@
 npm set progress=false
 
 # for default npm installer
-npm --no-color --no-spin --loglevel=error --cache-min 9999999 install
+npm --no-color --no-spin --loglevel=error --cache-min 9999999 install --production
 
 grunt production --no-color --verbose || true
 

@@ -182,7 +182,7 @@ module.exports = grunt => {
     },
     shell: {
       cordova: {
-        command: 'cd cordova && cordova build ios --device && cordova build android'
+        command: 'npm run cordova'
       }
     }
   });

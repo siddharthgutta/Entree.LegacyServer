@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 
-npm set progress=false
+echo 'triggering ./branchoff@update'
 
 . ./branchoff@update $0 # pass in argument
