@@ -3,10 +3,10 @@
 npm set progress=false
 
 # for default npm installer
-# npm --no-color --no-spin --loglevel=error --cache-min 9999999 install
+npm --no-color --no-spin --loglevel=error --cache-min 9999999 install
 
 # for cached installer
-npm-cache install
+# npm-cache install
 
 grunt production
 
