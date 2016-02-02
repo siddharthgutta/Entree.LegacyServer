@@ -34,8 +34,10 @@ class OrderFocus extends Page {
   }
 
   getModals() {
+    const {order} = this.state;
+
     return {
-      [Modals.OrderTime]: <OrderTime onSubmitTime={(time => this.setState({time}))}/>
+      [Modals.ORDER_TIME]: <OrderTime cost={`$${order.cost}`} onSubmitTime={(time => this.setState({time}))}/>
     };
   }
 
@@ -135,7 +137,7 @@ class OrderFocus extends Page {
               <div className='flex'>
                 <div className='button box dim'>DECLINE</div>
                 <div className='button box green' onTouchTap={() => this._handleAccept(true)}
-                     onClick={() => Dispatcher.emit(Dispatcher.Events.MODAL_VISIBILITY, Modals.OrderTime, true)}>
+                     onClick={() => Dispatcher.emit(Dispatcher.Events.MODAL_VISIBILITY, Modals.ORDER_TIME, true)}>
                   ACCEPT
                 </div>
               </div>

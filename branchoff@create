@@ -1,8 +1,7 @@
 #!/usr/bin/env sh
 
-echo "invoked when branch is cloned"
-
 npm set progress=false
 
 echo "script invoking push script"
-. ./branchoff@update
+
+. ./branchoff@update $0 # pass in argument

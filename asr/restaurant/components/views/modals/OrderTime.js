@@ -6,14 +6,16 @@ class OrderTime extends React.Component {
     onAcceptTime: React.PropTypes.func.isRequired,
     onCancel: React.PropTypes.func.isRequired,
     hide: React.PropTypes.func.isRequired,
-    startTime: React.PropTypes.number.isRequired
+    startTime: React.PropTypes.number.isRequired,
+    cost: React.PropTypes.any
   };
 
   static defaultProps = {
     onAcceptTime: Function,
     onCancel: Function,
     hide: Function,
-    startTime: 0
+    startTime: 0,
+    cost: 0
   };
 
   constructor(context, props) {
@@ -50,7 +52,7 @@ class OrderTime extends React.Component {
     return (
         <div className='dialog center'>
           <div className='box flex center vertical' style={{padding: 15}}>
-            <div className='value'>$15.35</div>
+            <div className='value'>{this.props.cost}</div>
             <div className='desc'>TOTAL COST</div>
           </div>
           <hr />
@@ -67,7 +69,7 @@ class OrderTime extends React.Component {
           </div>
           <div className='desc' style={{marginBottom: 10}}>OR</div>
           <input type='number' placeholder='minutes' value={this.state.time}
-                 onChange={e => this._handleInput(e.target.value)}/>
+                 onChange={e => this._setTime(e.target.value)}/>
           <div className='button' onClick={() => this._handleAccept()}
                onTouchTap={() => this._handleAccept()}>submit
           </div>

@@ -12,6 +12,8 @@ class OrderFocus extends Influx.Component {
   _registerModals() {
     this.modals = this.getModals();
 
+    console.log(this.modals);
+
     _.each(this.modals,
         (component, name) => {
           Dispatcher.emit(Dispatcher.Events.REGISTER_MODAL, name, component);

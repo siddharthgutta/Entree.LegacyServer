@@ -1,14 +1,13 @@
 import React from 'react';
 import Influx from 'react-influx';
-import _ from 'underscore';
-import {ifcat} from '../../../libs/utils';
 import Dispatcher from '../../../dispatchers/Dispatcher';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 class ModalManager extends Influx.Component {
   constructor(context, props) {
     super(context, props);
 
-    this.state = {comps: {}, visible: {}};
+    this.state = {comps: {}, visible: null};
   }
 
   getListeners() {
@@ -23,19 +22,34 @@ class ModalManager extends Influx.Component {
   }
 
   _setModalVisibility(name, visible) {
-    this.setState({visible: {...this.state.visible, [name]: visible}});
+    this.setState({visible: visible ? name : null});
   }
 
   render() {
     const {visible, comps} = this.state;
-    const modals = _.map(comps, (modal, name) =>
-        <div key={name} className={ifcat('full', {hide: !visible[name]})}>
-          {React.cloneElement(modal, {hide: () => this._setModalVisibility(name, false)})}
-        </div>);
-    const active = _.reduce(visible, (show, shown) => show || shown);
+    const modals = [];
+
+    if (visible && comps[visible]) {
+      const component = comps[visible];
+      modals.push(
+          <div key={visible} className='full'>
+            <div className='full-abs' style={{zIndex: 1}} onTouchTap={() => this._setModalVisibility(visible, false)}
+                 onClick={() => this._setModalVisibility(visible, false)}/>
+            <div className='modal-wrapper'>
+              {React.cloneElement(component, {hide: () => this._setModalVisibility(visible, false)})}
+            </div>
+          </div>
+      );
+    }
 
     return (
-        <div className={ifcat('full-abs vignette', {hide: !active})} style={{zIndex: 9999}}>{modals}</div>
+        <ReactCSSTransitionGroup
+            className='vignette modal'
+            transitionName='modal'
+            transitionEnterTimeout={500}
+            transitionLeaveTimeout={500}>
+          {modals}
+        </ReactCSSTransitionGroup>
     );
   }
 }

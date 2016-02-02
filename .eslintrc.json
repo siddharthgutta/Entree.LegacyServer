@@ -74,8 +74,10 @@
       2
     ],
     "react/jsx-closing-bracket-location": [
-      1,
-      "props-aligned"
+      2,
+      {
+        "location": "after-props"
+      }
     ],
     "brace-style": [
       2,

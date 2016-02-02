@@ -397,7 +397,10 @@ a {
   background: rgba(0, 0, 0, 0.8);
   top: 0;
   z-index: 999;
-  position: absolute;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
   .dialog {
     padding: 20px;
     width: 100%;
@@ -505,6 +508,50 @@ a {
 
 .board-leave.board-leave-active {
   opacity: 0;
+}
+
+.modal {
+  opacity: 1;
+  transition: opacity .1s, visibility .1s;
+  &:empty {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  & > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+.modal-wrapper {
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.modal-enter {
+  transform: translateY(-100%);
+  transition: transform .5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.modal-enter.modal-enter-active {
+  transform: translateY(0);
+}
+
+.modal-leave {
+  transform: translateY(0);
+  transition: transform .5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.modal-leave.modal-leave-active {
+  transform: translateY(-100%);
 }
 
 .order-list-enter {

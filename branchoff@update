@@ -1,16 +1,19 @@
 #!/usr/bin/env sh
 
-echo "invoked by github push"
-
 npm set progress=false
-npm --no-color --no-spin --loglevel=error install
+
+# for default npm installer
+# npm --no-color --no-spin --loglevel=error --cache-min 9999999 install
+
+# for cached installer
+npm-cache install
 
 grunt production
 
 message=$(git log -1 --pretty=%B)
 branch=$(git symbolic-ref --short HEAD)
 
-if [[ $message == *"release"* || $message == *"RELEASE"* ]]
+if [[ ${message} == *"release"* || ${message} == *"RELEASE"* ]] && [[ $0 != *"test"* ]]
 then
 # push ios release
 ios_raw=$(curl https://api.tryouts.io/v1/applications/NCKHE4E1/releases/ \
@@ -28,8 +31,8 @@ android_raw=$(curl https://api.tryouts.io/v1/applications/6A6cacUG/releases/ \
     -F "status=2" \
     -H "Authorization: b0fbf0eb2c9fded09aefdcf2eeff759c:73da365b26d0ff39f865f285012538fa69d8405e")
 
-ios_url=$(echo $ios_raw | sed 's/.*"download_url": "\(.*\)", "size".*/\1/p')
-android_url=$(echo $android_raw | sed 's/.*"download_url": "\(.*\)", "size".*/\1/p')
+ios_url=$(echo ${ios_raw} | sed 's/.*"download_url": "\(.*\)", "size".*/\1/p')
+android_url=$(echo ${android_raw} | sed 's/.*"download_url": "\(.*\)", "size".*/\1/p')
 
 payload=$(echo "{\"channel\":\"#continous3\",\"text\":\"*$branch*\n\`\`\`$message\`\`\`\n*iOS*\n$ios_url\n*Android*\n$android_url\"}")
 
