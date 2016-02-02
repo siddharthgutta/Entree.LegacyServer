@@ -59,6 +59,7 @@ npm install eslint -g
 npm install mocha -g
 npm install grunt-cli -g
 npm install sequelize-cli -g
+npm install cordova -g
 
 # pm2
 pm2 conf branch-off:port 4000

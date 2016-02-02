@@ -181,6 +181,11 @@ module.exports = grunt => {
           ext: '.compiled.js'
         }]
       }
+    },
+    shell: {
+      cordova: {
+        command: 'cd cordova && cordova build ios --device && cordova build android'
+      }
     }
   });
 
@@ -226,6 +231,7 @@ module.exports = grunt => {
     'jade:dist',
     'copy:dist',
     'copy:cordova',
+    'shell:cordova',
     'copy:builds',
     'rename:dist'
   ]);
@@ -242,6 +248,7 @@ module.exports = grunt => {
     'jade:dist',
     'copy:dist',
     'copy:cordova',
+    'shell:cordova',
     'copy:builds',
     'imagemin',
     'rename:dist'

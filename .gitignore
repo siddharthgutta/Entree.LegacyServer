@@ -60,6 +60,6 @@ xcuserdata
 *.compiled.js.map
 
 public/
-cordova/www/
+www/
 
 package.noDevDeps.json
