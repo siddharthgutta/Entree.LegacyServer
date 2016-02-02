@@ -23,7 +23,7 @@ export default function (sequelize, DataTypes) {
       type: DataTypes.TIME,
       allowNull: false,
       validate: {
-        validTimes: function (closeTime) {
+        validTimes: function (closeTime) { // eslint-disable-line
           if (closeTime <= this.openTime) {
             throw new Error('Close time must be after openTime');
           }

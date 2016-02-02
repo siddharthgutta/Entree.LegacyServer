@@ -24,7 +24,7 @@ export function create(dayOfTheWeek, openTime, closeTime) {
  * @returns {Promise}: Returns the RestaurantHour object
  */
 export function findOne(restaurantName, dayOfTheWeek) {
-  return models.RestaurantHour.findOne(
-    {where: {restaurantName, dayOfTheWeek}}
-  );
+  return models.RestaurantHour.findOne({
+    where: {restaurantName, dayOfTheWeek}
+  });
 }
