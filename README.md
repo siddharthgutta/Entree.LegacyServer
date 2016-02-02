@@ -61,6 +61,9 @@ npm install grunt-cli -g
 npm install sequelize-cli -g
 npm install cordova -g
 npm install npm-cache -g
+npm install babel-eslint -g
+npm install -g eslint-config-airbnb eslint-plugin-markdown
+npm install -g eslint-plugin-mocha eslint-plugin-react
 
 # pm2
 pm2 conf branch-off:port 4000

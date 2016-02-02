@@ -27,7 +27,7 @@ exports.transform = function transform(input, output) {
   fs.writeFileSync(sourcemapfile, sourcemap.toJSON(), 'utf8');
 };
 
-if (process.argv.length > 3) {
+if (process.argv.length > 3 && require.main === module) {
   const input = process.argv[3];
   const output = process.argv[2];
 
