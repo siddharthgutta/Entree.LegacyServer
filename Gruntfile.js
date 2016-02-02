@@ -230,10 +230,7 @@ module.exports = grunt => {
     'browserify:dist',
     'jade:dist',
     'copy:dist',
-    'copy:cordova',
-    'shell:cordova',
-    'copy:builds',
-    'rename:dist'
+    'cordova'
   ]);
 
   grunt.registerTask('production', [
@@ -242,16 +239,20 @@ module.exports = grunt => {
     'filetransform:babel',
     'grunt-license',
     'sass:dist',
+    'imagemin',
     'postcss:dist',
     'browserify:dist',
     'uglify:dist',
     'jade:dist',
     'copy:dist',
+    'cordova'
+  ]);
+
+  grunt.registerTask('cordova', [
     'copy:cordova',
+    'rename:dist',
     'shell:cordova',
-    'copy:builds',
-    'imagemin',
-    'rename:dist'
+    'copy:builds'
   ]);
 
   grunt.registerTask('default', 'build');
