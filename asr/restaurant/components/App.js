@@ -5,6 +5,7 @@ import OrderFocus from './views/pages/OrderFocus';
 import Board from './views/general/Board';
 import Header from './views/elements/Header';
 import Dispatcher from '../dispatchers/Dispatcher';
+import ModalManager from './views/modals/ModalManager';
 
 class App extends React.Component {
   componentDidMount() {
@@ -15,6 +16,7 @@ class App extends React.Component {
     return (
         <div className='full flex vertical'>
           <Header />
+          <ModalManager />
           <Router history={browserHistory}>
             <Route path='/' component={Board}>
               <IndexRoute component={OrderHistory}/>

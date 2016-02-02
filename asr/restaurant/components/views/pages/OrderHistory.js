@@ -1,22 +1,14 @@
 import React from 'react';
-import Influx from 'react-influx';
+import Page from './Page';
 import TabbedPane from '../general/TabbedPane.js';
 import OrderList from '../../views/elements/OrderList';
 import Dispatcher from '../../../dispatchers/Dispatcher';
 
-class OrderHistory extends Influx.Component {
+class OrderHistory extends Page {
   constructor(context, props) {
     super(context, props);
 
     this.state = {};
-  }
-
-  componentDidMount() {
-    this._createHeader();
-  }
-
-  componentDidUpdate() {
-    this._createHeader();
   }
 
   _handleTabChange(tab) {
@@ -24,7 +16,11 @@ class OrderHistory extends Influx.Component {
     document.body.classList.add({Received: 'red', Progress: 'green', Completed: 'blue'}[tab]);
   }
 
-  _createHeader() {
+  getModals() {
+    return {};
+  }
+
+  renderHeader() {
     Dispatcher.emit(Dispatcher.Events.REQUEST_HEADER, 'Order', 'History', {
       style: {minHeight: 55, borderBottom: 'none'},
       leftIcon: 'evil-icon menu'

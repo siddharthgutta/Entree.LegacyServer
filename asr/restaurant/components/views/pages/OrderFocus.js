@@ -1,12 +1,18 @@
 import React from 'react';
-import Influx from 'react-influx';
+import Page from './Page';
 import moment from 'moment';
 import TabbedPane from '../general/TabbedPane.js';
 import Dispatcher from '../../../dispatchers/Dispatcher';
 import {ifcat} from '../../../libs/utils';
 import OrderStore from '../../../stores/OrderStore';
+import OrderTime from '../modals/OrderTime';
+import keyMirror from 'keymirror';
 
-class OrderFocus extends Influx.Component {
+const Modals = keyMirror({
+  ORDER_TIME: null
+});
+
+class OrderFocus extends Page {
 
   static propTypes = {
     params: React.PropTypes.object
@@ -21,21 +27,19 @@ class OrderFocus extends Influx.Component {
     this.state = {time: 0, order};
   }
 
-  componentDidMount() {
-    this._createHeader();
-  }
-
-  componentDidUpdate() {
-    this._createHeader();
-  }
-
   getListeners() {
     return [
       [OrderStore, OrderStore.ORDER_UPDATED, this._onOrderUpdated]
     ];
   }
 
-  _createHeader() {
+  getModals() {
+    return {
+      [Modals.OrderTime]: <OrderTime onSubmitTime={(time => this.setState({time}))}/>
+    };
+  }
+
+  renderHeader() {
     const {order} = this.state;
     const {history} = this.props;
 
@@ -54,18 +58,6 @@ class OrderFocus extends Influx.Component {
     }
 
     this.setState({order});
-  }
-
-  _addTime(time) {
-    this.setState({time: this.state.time + time});
-  }
-
-  _handleAccept(a) {
-    this.setState({showDialog: a});
-  }
-
-  _handleInput(input) {
-    this.setState({time: Math.abs(isNaN(input) ? 0 : Number(input))});
   }
 
   render() {
@@ -143,7 +135,7 @@ class OrderFocus extends Influx.Component {
               <div className='flex'>
                 <div className='button box dim'>DECLINE</div>
                 <div className='button box green' onTouchTap={() => this._handleAccept(true)}
-                     onClick={() => this._handleAccept(true)}>
+                     onClick={() => Dispatcher.emit(Dispatcher.Events.MODAL_VISIBILITY, Modals.OrderTime, true)}>
                   ACCEPT
                 </div>
               </div>
