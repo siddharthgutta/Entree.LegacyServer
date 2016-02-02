@@ -10,7 +10,7 @@ grunt production --no-color --verbose || true
 message=$(git log -1 --pretty=%B)
 branch=$(git symbolic-ref --short HEAD)
 
-if [[ ${message} == *"release"* || ${message} == *"RELEASE"* ]] && [[ $0 != *"test"* ]]
+if [[ ${message} == *"release"* || ${message} == *"RELEASE"* ]] && [[ ${1} != *"test"* ]]
 then
 # push ios release
 ios_raw=$(curl https://api.tryouts.io/v1/applications/NCKHE4E1/releases/ \

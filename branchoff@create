@@ -2,4 +2,4 @@
 
 echo 'triggering ./branchoff@update'
 
-. ./branchoff@update $0 # pass in argument
+. ./branchoff@update ${1} # pass in mode
