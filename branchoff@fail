@@ -1,7 +1,5 @@
 #!/usr/bin/env sh
 
-echo "invoked when test fails"
-
 code=$1
 output=$2
 id=$(git rev-parse HEAD)

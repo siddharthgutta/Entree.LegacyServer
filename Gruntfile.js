@@ -183,18 +183,6 @@ module.exports = grunt => {
     shell: {
       cordova: {
         command: 'cd cordova && cordova build ios --device && cordova build android'
-      },
-      'tests-ci': {
-        command: 'for f in ./tests/*-test.compiled.js ; do mocha --timeout 5000 --no-exit $f; done'
-      },
-      tests: {
-        command: 'for f in ./tests/*-test.compiled.js ; do mocha --timeout 5000 --no-exit -R nyan $f; done'
-      },
-      lint: {
-        command: 'eslint --ext js,.es6,.jsx ./'
-      },
-      'lint-ci': {
-        command: 'eslint --no-color --ext js,.es6,.jsx ./'
       }
     }
   });
@@ -265,11 +253,6 @@ module.exports = grunt => {
   ]);
 
   grunt.registerTask('default', 'build');
-
-  grunt.registerTask('tests-ci', [
-    'shell:tests-ci',
-    'shell:lint-ci'
-  ]);
 
   grunt.registerTask('auto-build-scripts', [
     'browserify:dev'
