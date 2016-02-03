@@ -34,7 +34,7 @@ describe('RestaurantHour', () => {
 
     it('should not create RestaurantHours that have a invalid close and open time' +
         'formats', done => {
-      RestaurantHour.create(dayOfTheWeek, '00:00:0', '11:22:2').then(restaurantHour => {
+      RestaurantHour.create(dayOfTheWeek, '00:00', '11:22').then(restaurantHour => {
         restaurantHour.destroy().then(() => {
           assert(false);
           done();
