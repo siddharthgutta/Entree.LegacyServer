@@ -37,8 +37,7 @@ describe('Restaurant', () => {
           assert.equal(restaurant.name, name);
           assert.equal(restaurant.password, password);
           assert.equal(restaurant.phoneNumber, phoneNumber);
-          restaurant.destroy();
-          done();
+          restaurant.destroy().then(() => done());
         });
       });
     });
@@ -49,8 +48,7 @@ describe('Restaurant', () => {
         Restaurant.findOne(result.id).then(restaurant => {
           assert.equal(restaurant.name, name);
           assert.equal(restaurant.password, password);
-          restaurant.destroy();
-          done();
+          restaurant.destroy().then(() => done());
         });
       });
     });
@@ -93,8 +91,7 @@ describe('Restaurant', () => {
             assert.equal(restaurant.name, 'NewRestaurant');
             assert.equal(restaurant.password, '5678');
             assert.equal(restaurant.phoneNumber, '1234561234');
-            restaurant.destroy();
-            done();
+            restaurant.destroy().then(() => done());
           });
         });
       });
@@ -154,8 +151,7 @@ describe('Restaurant', () => {
               assert.equal(hours[0].dayOfTheWeek, dayOfTheWeek);
               assert.equal(hours[0].openTime, openTime);
               assert.equal(hours[0].closeTime, closeTime);
-              restaurant.destroy();
-              done();
+              restaurant.destroy().then(() => done());
             });
           });
         });
@@ -173,8 +169,7 @@ describe('Restaurant', () => {
                   assert.equal(hours[0].dayOfTheWeek, dayOfTheWeek);
                   assert.equal(hours[0].openTime, '22:22:22');
                   assert.equal(hours[0].closeTime, '33:33:33');
-                  restaurant.destroy();
-                  done();
+                  restaurant.destroy().then(() => done());
                 });
               });
             });
@@ -191,8 +186,7 @@ describe('Restaurant', () => {
               Restaurant.addOrUpdateHour(restaurant.id, restaurantHourNew).then(() => {
                 Restaurant.getHours(restaurant.id).then(hours => {
                   assert.equal(hours.length, 2);
-                  restaurant.destroy();
-                  done();
+                  restaurant.destroy().then(() => done());
                 });
               });
             });
@@ -207,14 +201,13 @@ describe('Restaurant', () => {
       Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
         Location.create(firstAddress, city, state, zipcode, {secondAddress}).then(location => {
           Restaurant.setOrUpdateLocation(name, location).then(() => {
-            restaurant.getLocation().then(result => {
+            Restaurant.getLocation(name).then(result => {
               assert.equal(result.firstAddress, firstAddress);
               assert.equal(result.secondAddress, secondAddress);
               assert.equal(result.city, city);
               assert.equal(result.state, state);
               assert.equal(result.zipcode, zipcode);
-              restaurant.destroy();
-              done();
+              restaurant.destroy().then(() => done());
             });
           });
         });
@@ -227,14 +220,13 @@ describe('Restaurant', () => {
           Restaurant.setOrUpdateLocation(name, location).then(() => {
             Location.create('Main St', 'NewCity', 'AB', '09876', {secondAddress: 'NewSecond'}).then(locationNew => {
               Restaurant.setOrUpdateLocation(name, locationNew).then(() => {
-                restaurant.getLocation().then(result => {
+                Restaurant.getLocation(name).then(result => {
                   assert.equal(result.firstAddress, 'Main St');
                   assert.equal(result.secondAddress, 'NewSecond');
                   assert.equal(result.city, 'NewCity');
                   assert.equal(result.state, 'AB');
                   assert.equal(result.zipcode, '09876');
-                  restaurant.destroy();
-                  done();
+                  restaurant.destroy().then(() => done());
                 });
               });
             });
@@ -251,9 +243,25 @@ describe('Restaurant', () => {
               Restaurant.setOrUpdateLocation(name, locationNew).then(() => {
                 Location.findAll().then(result => {
                   assert.equal(result.length, 1);
-                  restaurant.destroy();
-                  done();
+                  restaurant.destroy().then(() => done());
                 });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+
+  describe('#removeLocation', () => {
+    it('should remove the location for a specific restaurant', done => {
+      Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
+        Location.create(firstAddress, city, state, zipcode, {secondAddress}).then(location => {
+          Restaurant.setOrUpdateLocation(name, location).then(() => {
+            Restaurant.removeLocation(name).then(() => {
+              Restaurant.getLocation(name).then(result => {
+                assert.equal(result, null);
+                restaurant.destroy().then(() => done());
               });
             });
           });

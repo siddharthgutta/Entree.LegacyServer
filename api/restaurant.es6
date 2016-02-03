@@ -132,3 +132,17 @@ export function removeLocation(name) {
     });
   });
 }
+
+/**
+ * Gets the location for the restaurant
+ *
+ * @param {string} name: name of restaurant to modify
+ * @returns {Promise}: Returns a promise with the Location object
+ */
+export function getLocation(name) {
+  return new Promise(resolve => {
+    findOne(name).then(restaurant => {
+      resolve(restaurant.getLocation());
+    });
+  });
+}

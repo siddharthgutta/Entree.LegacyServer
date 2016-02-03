@@ -27,8 +27,7 @@ describe('User', () => {
           assert.equal(user.password, password);
           assert.equal(user.email, email);
           assert.equal(user.phoneNumber, phoneNumber);
-          user.destroy();
-          done();
+          user.destroy().then(() => done());
         });
       });
     });
@@ -88,8 +87,7 @@ describe('User', () => {
             assert.equal(user.password, '5678');
             assert.equal(user.email, 'NewUser@gmail.com');
             assert.equal(user.phoneNumber, '1234561234');
-            user.destroy();
-            done();
+            user.destroy().then(() => done());
           });
         });
       });

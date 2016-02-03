@@ -26,8 +26,7 @@ describe('RestaurantHour', () => {
           assert.equal(restaurantHour.dayOfTheWeek, dayOfTheWeek);
           assert.equal(restaurantHour.openTime, openTime);
           assert.equal(restaurantHour.closeTime, closeTime);
-          restaurantHour.destroy();
-          done();
+          restaurantHour.destroy().then(() => done());
         });
       });
     });

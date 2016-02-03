@@ -28,8 +28,7 @@ describe('Location', () => {
         assert.equal(location.city, city);
         assert.equal(location.state, state);
         assert.equal(location.zipcode, zipcode);
-        location.destroy();
-        done();
+        location.destroy().then(() => done());
       });
     });
 
