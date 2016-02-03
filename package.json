@@ -66,11 +66,12 @@
     "supertest": "^1.1.0",
     "twilio": "^2.8.0",
     "underscore": "^1.8.3",
-    "xml2js": "^0.4.16"
+    "xml2js": "^0.4.16",
+    "superagent": "^1.6.1"
   },
   "scripts": {
     "test": "export NODE_ENV=staging; mocha --timeout 5000 --no-exit -R nyan",
-    "tests": "for f in ./tests/*-test.compiled.js ; do npm run test $f; done",
+    "tests": "set -e; for f in ./tests/*-test.compiled.js ; do npm run test $f; done",
     "start": "node index.compiled.js",
     "test-no-nyan": "export NODE_ENV=staging; mocha --timeout 5000 --no-exit --colors",
     "tests-no-nyan": "for f in ./tests/*-test.compiled.js ; do npm run test-no-nyan $f; done",
