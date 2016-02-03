@@ -17,12 +17,16 @@ export default function (sequelize, DataTypes) {
     },
     openTime: {
       type: DataTypes.TIME,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        is: /^[0-9]{2}\:[0-9]{2}\:[0-9]{2}$/
+      }
     },
     closeTime: {
       type: DataTypes.TIME,
       allowNull: false,
       validate: {
+        is: /^[0-9]{2}\:[0-9]{2}\:[0-9]{2}$/,
         validTimes: function (closeTime) { // eslint-disable-line
           if (closeTime <= this.openTime) {
             throw new Error('Close time must be after openTime');
