@@ -7,6 +7,8 @@ import Twilio from '../libs/sms/twilio.es6';
 import config from 'config';
 const testCreds = config.get('Twilio.test');
 const admins = config.get('Admins');
+import Promise from 'bluebird';
+
 
 // SET THIS VARIABLE FOR VERBOSE LOGS OF ALL REQUESTS/RESPONSES
 const VERBOSE_LOGGING = false;
@@ -97,27 +99,30 @@ describe('Twilio Send', () => {
     Immediately set it to false when done testing
     Disclaimer: Twilio will charge us for these!
     */
-    const runProductionTests = false;
+    const runProductionTests = true;
 
     if (runProductionTests) {
-      it('using real SMS should work successfully', done => {
-        sendSMS('+12149664948', `TEST SMS ${moment().format('h:mm A')}`)
-          .then(response => {
-            console.tag(global.TEST).log(response);
-            done();
-          })
-          .catch(err => {
-            console.tag(global.TEST).error(err);
-            expect().fail('Text message was not sent successfully even though it should have!');
-            done();
-          });
-      });
+      //it('using real SMS should work successfully', done => {
+      //  sendSMS('+12149664948', `TEST SMS ${moment().format('h:mm A')}`)
+      //    .then(response => {
+      //      console.tag(global.TEST).log(response);
+      //      done();
+      //    })
+      //    .catch(err => {
+      //      console.tag(global.TEST).error(err);
+      //      expect().fail('Text message was not sent successfully even though it should have!');
+      //      done();
+      //    });
+      //});
 
       it('broadcasting real SMS to admins should work successfully', done => {
         broadcast(`BROADCAST TEST SMS ${moment().format('h:mm A')}`, admins)
           .then(responses => {
+            console.log(typeof(responses));
+            console.log(responses.length);
+            console.log(responses);
             responses.forEach(response => {
-              console.tag(global.TEST).log(response);
+              console.tag(global.TEST).log(`Broadcast response: ${response}`);
             });
             done();
           })
@@ -127,7 +132,7 @@ describe('Twilio Send', () => {
             done();
           });
       });
-    }
+    };
 
     _.map(TO_TEST_NUMS, test => {
       it(test.message, done => {

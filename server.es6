@@ -7,6 +7,7 @@ import sio from './message/sio';             // socket-io (websockets)
 import BasicRouter from './routes/basic';    // imports standard/websocket routers
 import NotifyRouter from './routes/notify';
 import ApiRouter from './routes/api';
+import TwilioRouter from './routes/twilio';
 
 const app = express();                            // server creation
 const server = http.createServer(app);
@@ -29,6 +30,7 @@ app.use(express.static(path.join(__dirname, 'public'))); // points app to public
 app.use('/', BasicRouter);
 app.use('/notify', NotifyRouter);
 app.use('/api', ApiRouter);
+app.use('/twilio', TwilioRouter);
 
 export const expressApp = app;
 export default server;
