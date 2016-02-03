@@ -54,3 +54,41 @@ export function findOne(name) {
     where: {name}
   });
 }
+
+/**
+ * Insert restaurantHour to restaurant if the day is not already defined
+ * Otherwise, updates existing entry for the day
+ *
+ * @param {string} name: Restaurant name to be added to
+ * @param {Object} restaurantHour: RestaurantHour information to add to restaurant
+ * @returns {Promise}: Returns the Restaurant object
+ */
+export function addOrUpdateHour(name, restaurantHour) {
+  return new Promise(resolve => {
+    findOne(name).then(restaurant => {
+      restaurant.getRestaurantHours({where: {dayOfTheWeek: restaurantHour.dayOfTheWeek}}).then(results => {
+        if (results.length === 1) {
+          restaurant.removeRestaurantHour(results[0]).then(() => {
+            resolve(restaurant.addRestaurantHour(restaurantHour));
+          });
+        } else {
+          resolve(restaurant.addRestaurantHour(restaurantHour));
+        }
+      });
+    });
+  });
+}
+
+/**
+ * Get RestaurantHours associated with restaurant
+ *
+ * @param {string} name: Restaurant name to be queried
+ * @returns {Promise}: Returns the Restaurant object
+ */
+export function getHours(name) {
+  return new Promise(resolve => {
+    findOne(name).then(restaurant => {
+      resolve(restaurant.getRestaurantHours());
+    });
+  });
+}
