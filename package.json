@@ -66,7 +66,8 @@
     "superagent": "^1.6.1",
     "supertest": "^1.1.0",
     "twilio": "^2.8.0",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "xml2js": "^0.4.16"
   },
   "scripts": {
     "test": "export NODE_ENV=staging; mocha --timeout 5000 --no-exit -R nyan",
