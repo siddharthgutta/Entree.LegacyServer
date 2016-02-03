@@ -125,13 +125,13 @@ describe('Restaurant', () => {
       });
     });
 
-    it('should cascade delete restaurant hours', done => {
+    it('should cascade delete restaurant hours when deleting restaurant', done => {
       Restaurant.create(name, password, {phoneNumber}).then(() => {
         RestaurantHour.create(dayOfTheWeek, openTime, closeTime).then(restaurantHour => {
           Restaurant.addOrUpdateHour(name, restaurantHour).then(() => {
             Restaurant.destroy(name).then(() => {
-              RestaurantHour.findOne(name, dayOfTheWeek).then(result => {
-                assert.equal(result, null);
+              RestaurantHour.findAll().then(result => {
+                assert.equal(result.length, 0);
                 done();
               });
             });
