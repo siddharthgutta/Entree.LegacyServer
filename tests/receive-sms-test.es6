@@ -75,7 +75,7 @@ describe('Twilio SMS Receive', () => {
         .post(`/twilio/fallback`)
         .send({})
         .expect('Content-type', 'text/xml; charset=utf-8')
-        .expect(200)
+        .expect(403)
         .end((err, res) => {
           if (err) {
             // If expected error occurs, test is good
