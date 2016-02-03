@@ -1,0 +1,71 @@
+@import "shared/reset";
+@import "shared/fonts";
+@import "shared/base";
+@import "shared/scroll";
+@import "shared/layouts";
+@import "shared/tabs";
+
+body {
+  font-family: 'Proxima Nova', "Helvetica", "Helvetic Neue", "Open Sans", sans-serif;
+  overflow: hidden;
+}
+
+input, textarea {
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: none;
+  -webkit-appearance: none;
+}
+
+#app {
+  overflow: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.button {
+  background: #228AE6;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+  border-radius: 40px;
+  font-size: 18px;
+  color: #FFF;
+  letter-spacing: 1.25px;
+  line-height: 19px;
+  padding: 16px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.input {
+  border: 2px solid rgba(255, 255, 255, 0.34);
+  border-radius: 40px;
+  color: #FFFFFF;
+  letter-spacing: 1.5px;
+  line-height: 19px;
+  padding: 16px;
+  font-size: 15px;
+  width: 100%;
+  background: transparent;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.blur {
+  filter: blur(50px);
+  -webkit-filter: blur(50px);
+}
+
+.animate-transform {
+  transition: transform .3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+video {
+  width: 100%;
+  position: absolute;
+  top: 0;
+}

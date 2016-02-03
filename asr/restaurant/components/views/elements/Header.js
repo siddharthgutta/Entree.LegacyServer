@@ -1,6 +1,7 @@
 import React from 'react';
 import Influx from 'react-influx';
 import Dispatcher from '../../../dispatchers/Dispatcher';
+import {onClick} from '../../../../libs/utils';
 
 class Header extends Influx.Component {
   constructor(context, props) {
@@ -43,16 +44,14 @@ class Header extends Influx.Component {
     return (
         <div className='header' style={this.state.style}>
           <div className='nav flex'>
-            <div onTouchTap={() => this.state.onLeftClick()}
-                 onClick={() => this.state.onLeftClick()}
-                 className={`box flex center vertical nav-left ${this.state.leftIcon}`}/>
+            <div {...onClick(() => this.state.onLeftClick())}
+                className={`box flex center vertical nav-left ${this.state.leftIcon}`}/>
             <div className='text' style={{flex: 1}}>
               <div className='title'>{this.state.title}</div>
               <div className='subtitle'>{this.state.subtitle}</div>
             </div>
-            <div onTouchTap={() => this.state.onRightClick()}
-                 onClick={() => this.state.onLeftClick()}
-                 className={`nav-right center vertical ${this.state.rightIcon}`}/>
+            <div {...onClick(() => this.state.onLeftClick())}
+                className={`nav-right center vertical ${this.state.rightIcon}`}/>
           </div>
           {this.state.children}
         </div>

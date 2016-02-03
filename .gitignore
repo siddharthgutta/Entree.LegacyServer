@@ -58,6 +58,7 @@ xcuserdata
 
 *.compiled.js
 *.compiled.js.map
+*.roadrunner.json
 
 public/
 www/

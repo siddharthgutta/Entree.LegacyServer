@@ -1,7 +1,7 @@
 import React from 'react';
 import Influx from 'react-influx';
 import ReactDOM from 'react-dom';
-import {apply, ifcat} from '../../../libs/utils';
+import {apply, ifcat, onClick} from '../../../../libs/utils';
 
 class TabbedPane extends Influx.Component {
 
@@ -75,9 +75,7 @@ class TabbedPane extends Influx.Component {
     );
 
     const tabs = this.props.tabs.map(tab =>
-        <div key={tab} onTouchTap={() => this._showTab(tab)}
-             onClick={() => this._showTab(tab)}
-             className={ifcat('tab', {box: this.props.spread})}
+        <div key={tab} {...onClick(() => this._showTab(tab))} className={ifcat('tab', {box: this.props.spread})}
              ref={`button${tab}`}>{tab}</div>
     );
 

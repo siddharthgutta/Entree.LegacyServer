@@ -1,7 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import {ifcat} from '../../../libs/utils';
-import {Link} from 'react-router';
+import {ifcat, onClick} from '../../../../libs/utils';
 
 class Order extends React.Component {
 
@@ -9,15 +8,17 @@ class Order extends React.Component {
     order: React.PropTypes.object
   };
 
-  constructor(context, props) {
-    super(context, props);
-  }
+  static contextTypes = {
+    history: React.PropTypes.object
+  };
 
   render() {
     const {order} = this.props;
+    const {history} = this.context;
 
     return (
-        <Link component='div' className='order flex' style={{height: 80}} to={`order/${order.id}`}>
+        <div className='order flex' style={{height: 80}}
+            {...onClick(() => history.push(`order/${order.id}`))}>
           <div className='id box flex left'>{order.id}</div>
           <div className='box flex left'>
             <div>
@@ -38,7 +39,7 @@ class Order extends React.Component {
               bgBlue: order.status === 'received'})}>{order.status}</div>
           </div>
           <div className='box flex center vertical evil-icon forward'/>
-        </Link>
+        </div>
     );
   }
 }

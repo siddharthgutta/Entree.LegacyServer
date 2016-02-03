@@ -1,4 +1,5 @@
 import React from 'react';
+import {onClick} from '../../../../libs/utils';
 
 class OrderTime extends React.Component {
 
@@ -50,28 +51,31 @@ class OrderTime extends React.Component {
 
   render() {
     return (
-        <div className='dialog center'>
-          <div className='box flex center vertical' style={{padding: 15}}>
-            <div className='value'>{this.props.cost}</div>
-            <div className='desc'>TOTAL COST</div>
+        <div className='modal-box center'>
+          <div className='flex modal-header'>
+            <div className='box flex center vertical' style={{padding: 15}}>
+              <div className='value'>
+                <div className='bubble icon dollar'/>
+                {this.props.cost}</div>
+              <div className='desc'>TOTAL COST</div>
+            </div>
           </div>
-          <hr />
-          <div className='desc bold normal' style={{marginBottom: 20}}>Select a preparation time</div>
-          <div className='button navy flex center' onTouchTap={() => this._addTime(1)} onClick={() => this._addTime(1)}>
-            <span className='icon add'/><span>&nbsp;1 Minutes</span>
-          </div>
-          <div className='button navy flex center' onTouchTap={() => this._addTime(5)} onClick={() => this._addTime(5)}>
-            <span className='icon add'/><span>&nbsp;5 Minutes</span>
-          </div>
-          <div className='button navy flex center' onTouchTap={() => this._addTime(15)}
-               onClick={() => this._addTime(15)}>
-            <span className='icon add'/><span>&nbsp;15 Minutes</span>
-          </div>
-          <div className='desc' style={{marginBottom: 10}}>OR</div>
-          <input type='number' placeholder='minutes' value={this.state.time}
-                 onChange={e => this._setTime(e.target.value)}/>
-          <div className='button' onClick={() => this._handleAccept()}
-               onTouchTap={() => this._handleAccept()}>submit
+          <div className='body'>
+            <div className='desc bold normal' style={{marginBottom: 20}}>Select a preparation time</div>
+            <div className='button navy flex center' {...onClick(() => this._addTime(1))}>
+              <span className='icon add'/><span>&nbsp;1 Minutes</span>
+            </div>
+            <div className='button navy flex center' {...onClick(() => this._addTime(5))}>
+              <span className='icon add'/><span>&nbsp;5 Minutes</span>
+            </div>
+            <div className='button navy flex center' {...onClick(() => this._addTime(15))}>
+              <span className='icon add'/><span>&nbsp;15 Minutes</span>
+            </div>
+            <div className='desc' style={{marginBottom: 10}}>OR</div>
+            <input type='number' placeholder='minutes' value={this.state.time} style={{paddingRight: 0}}
+                   onChange={e => this._setTime(e.target.value)}/>
+            <div className='button' {...onClick(() => this._handleAccept())}>submit
+            </div>
           </div>
         </div>
     );

@@ -2,6 +2,7 @@ import React from 'react';
 import Influx from 'react-influx';
 import Dispatcher from '../../../dispatchers/Dispatcher';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import {onClick} from '../../../../libs/utils';
 
 class ModalManager extends Influx.Component {
   constructor(context, props) {
@@ -33,8 +34,8 @@ class ModalManager extends Influx.Component {
       const component = comps[visible];
       modals.push(
           <div key={visible} className='full'>
-            <div className='full-abs' style={{zIndex: 1}} onTouchTap={() => this._setModalVisibility(visible, false)}
-                 onClick={() => this._setModalVisibility(visible, false)}/>
+            <div className='full-abs' style={{zIndex: 1}}
+                {...onClick(() => this._setModalVisibility(visible, false))}/>
             <div className='modal-wrapper'>
               {React.cloneElement(component, {hide: () => this._setModalVisibility(visible, false)})}
             </div>
