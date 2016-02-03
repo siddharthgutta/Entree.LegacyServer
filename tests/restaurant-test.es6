@@ -2,6 +2,7 @@ import assert from 'assert';
 import './test-init.es6';
 import * as Restaurant from '../api/restaurant.es6';
 import * as RestaurantHour from '../api/restaurantHour.es6';
+import * as Location from '../api/location.es6';
 import {initDatabase, destroyDatabase} from '../bootstrap.es6';
 
 before(done => {
@@ -18,6 +19,12 @@ describe('Restaurant', () => {
   const dayOfTheWeek = 'Monday';
   const openTime = '11:11:11';
   const closeTime = '12:34:56';
+
+  const firstAddress = '1234 Main Street';
+  const secondAddress = '5678 Burbon Street';
+  const city = 'Houston';
+  const state = 'TX';
+  const zipcode = '48921';
 
   if (console) {
     console.log('true');
@@ -105,6 +112,36 @@ describe('Restaurant', () => {
         });
       });
     });
+
+    it('should cascade delete location when deleting restaurant', done => {
+      Restaurant.create(name, password, {phoneNumber}).then(() => {
+        Location.create(firstAddress, city, state, zipcode, {secondAddress}).then(location => {
+          Restaurant.setOrUpdateLocation(name, location).then(() => {
+            Restaurant.destroy(name).then(() => {
+              Location.findAll().then(result => {
+                assert.equal(result.length, 0);
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
+
+    it('should cascade delete restaurant hours', done => {
+      Restaurant.create(name, password, {phoneNumber}).then(() => {
+        RestaurantHour.create(dayOfTheWeek, openTime, closeTime).then(restaurantHour => {
+          Restaurant.addOrUpdateHour(name, restaurantHour).then(() => {
+            Restaurant.destroy(name).then(() => {
+              RestaurantHour.findOne(name, dayOfTheWeek).then(result => {
+                assert.equal(result, null);
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
   });
 
   describe('#addOrUpdateRestaurantHours', () => {
@@ -163,15 +200,60 @@ describe('Restaurant', () => {
         });
       });
     });
+  });
 
-    it('should cascade delete restaurant hours', done => {
+  describe('#setOrUpdateLocation', () => {
+    it('should set the location of a restaurant if one does not exist', done => {
       Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
-        RestaurantHour.create(dayOfTheWeek, openTime, closeTime).then(restaurantHour => {
-          Restaurant.addOrUpdateHour(restaurant.id, restaurantHour).then(() => {
-            Restaurant.destroy(restaurant.id).then(() => {
-              RestaurantHour.findOne(restaurant.id, dayOfTheWeek).then(result => {
-                assert.equal(result, null);
-                done();
+        Location.create(firstAddress, city, state, zipcode, {secondAddress}).then(location => {
+          Restaurant.setOrUpdateLocation(name, location).then(() => {
+            restaurant.getLocation().then(result => {
+              assert.equal(result.firstAddress, firstAddress);
+              assert.equal(result.secondAddress, secondAddress);
+              assert.equal(result.city, city);
+              assert.equal(result.state, state);
+              assert.equal(result.zipcode, zipcode);
+              restaurant.destroy();
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    it('should replace an existing location correctly', done => {
+      Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
+        Location.create(firstAddress, city, state, zipcode, {secondAddress}).then(location => {
+          Restaurant.setOrUpdateLocation(name, location).then(() => {
+            Location.create('Main St', 'NewCity', 'AB', '09876', {secondAddress: 'NewSecond'}).then(locationNew => {
+              Restaurant.setOrUpdateLocation(name, locationNew).then(() => {
+                restaurant.getLocation().then(result => {
+                  assert.equal(result.firstAddress, 'Main St');
+                  assert.equal(result.secondAddress, 'NewSecond');
+                  assert.equal(result.city, 'NewCity');
+                  assert.equal(result.state, 'AB');
+                  assert.equal(result.zipcode, '09876');
+                  restaurant.destroy();
+                  done();
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+
+    it('should delete the old location when replacing', done => {
+      Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
+        Location.create(firstAddress, city, state, zipcode, {secondAddress}).then(location => {
+          Restaurant.setOrUpdateLocation(name, location).then(() => {
+            Location.create('Main St', 'NewCity', 'AB', '09876', {secondAddress: 'NewSecond'}).then(locationNew => {
+              Restaurant.setOrUpdateLocation(name, locationNew).then(() => {
+                Location.findAll().then(result => {
+                  assert.equal(result.length, 1);
+                  restaurant.destroy();
+                  done();
+                });
               });
             });
           });

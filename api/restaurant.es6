@@ -92,3 +92,43 @@ export function getHours(id) {
     });
   });
 }
+
+/**
+ * Sets the location for a restaurant if no location is set
+ * Otherwise, remove the existing location and update it
+ *
+ * @param {string} name: Name of restaurant to modify
+ * @param {Object} location: Location object to be set
+ * @returns {Promise}: Returns promise with no data(?)
+ */
+export function setOrUpdateLocation(name, location) {
+  return new Promise(resolve => {
+    findOne(name).then(restaurant => {
+      restaurant.getLocation().then(result => {
+        if (result) {
+          result.destroy().then(() => {
+            resolve(restaurant.setLocation(location));
+          });
+        } else {
+          resolve(restaurant.setLocation(location));
+        }
+      });
+    });
+  });
+}
+
+/**
+ * Removes the location for the restaurant with name
+ *
+ * @param {string} name: name of restaurant to modify
+ * @returns {Promise}: Returns a promise with no data(?)
+ */
+export function removeLocation(name) {
+  return new Promise(resolve => {
+    findOne(name).then(restaurant => {
+      restaurant.getLocation().then(location => {
+        resolve(location.destroy());
+      });
+    });
+  });
+}
