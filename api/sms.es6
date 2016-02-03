@@ -31,7 +31,5 @@ export function sendSMS(toNumber, textBody) {
  * @returns {Promise[]} list of errors and responses for each sent message
  */
 export function broadcast(textBody, to = admins) {
-  return Promise.all(_.map(to, ({phone, name}) => {
-    sendSMS(phone, `Server Notification for ${name}: ${textBody}`);
-  }));
+  return Promise.all(_.map(to, ({phone, name}) => sendSMS(phone, `Server Notification for ${name}: ${textBody}`)));
 }

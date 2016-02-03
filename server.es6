@@ -7,6 +7,7 @@ import sio from './message/sio';             // socket-io (websockets)
 import BasicRouter from './routes/basic';    // imports standard/websocket routers
 import NotifyRouter from './routes/notify';
 import ApiRouter from './routes/api';
+import TwilioRouter from './routes/twilio';
 
 const app = express();                            // server creation
 const server = http.createServer(app);
@@ -20,7 +21,7 @@ app.set('view engine', 'jade');                   // sets the view engine to jad
 app.use(console.middleware('express'));
 app.use('/scribe', console.viewer());
 
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());                              // sets app to use middleware that only parses json
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public'))); // points app to public directory for static files
@@ -29,6 +30,7 @@ app.use(express.static(path.join(__dirname, 'public'))); // points app to public
 app.use('/', BasicRouter);
 app.use('/notify', NotifyRouter);
 app.use('/api', ApiRouter);
+app.use('/twilio', TwilioRouter);
 
 export const expressApp = app;
 export default server;

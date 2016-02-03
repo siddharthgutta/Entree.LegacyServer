@@ -20,18 +20,10 @@ export default function (sequelize, DataTypes) {
     classMethods: {
       associate: models => {
         Restaurant.hasOne(models.Location, {
-          onDelete: 'CASCADE',
-          foreignKey: {
-            allowNull: false
-          }
+          onDelete: 'CASCADE'
         });
 
-        Restaurant.hasMany(models.RestaurantHours, {
-          onDelete: 'CASCADE',
-          foreignKey: {
-            allowNull: false
-          }
-        });
+        Restaurant.hasMany(models.RestaurantHour);
       }
     }
   });

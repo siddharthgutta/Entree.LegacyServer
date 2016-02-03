@@ -2,39 +2,46 @@ import {Router} from 'express';
 import config from 'config';
 const twilio = require('twilio');
 const productionCreds = config.get('Twilio.production');
-const testCreds = config.get('Twilio.test');
-
 const route = new Router();
 
+process.env.TWILIO_AUTH_TOKEN = productionCreds.authToken;
+
+function respond(res, message) {
+  const resp = new twilio.TwimlResponse();
+  resp.message(message);
+  res.type('text/xml');
+  res.send(resp.toString());
+}
+
 // Receiving a text message from a user transferred by Twilio
-route.post('/receive', (req, res) => {
-  // Twilio received a real text message
-  let resp;
-  if (twilio.validateExpressRequest(req, productionCreds.authToken)) {
-    console.tag('routes', 'twilio', 'production').log('Text message received: ${JSON.stringify(req)}');
+route.post('/receive', twilio.webhook(), (req, res) => {
 
-    resp = new twilio.TwimlResponse();
-    /*
-    Insert code to respond with appropriate response message using a similaar format
-    */
-    resp.message('We have received your message!');
-    res.type('text/plain');
-    res.send(resp.toString());
-  } else if (twilio.validateExpressRequest(req, testCreds.authToken)) {
-    // if we receive a test message
+  // The commented out functions are useful for writing unit tests if this route changes
+  /*
+  console.log(`Accepts application/json: ${req.accepts('application/json')}`);
+  console.log(`Request Headers: ${JSON.stringify(req.headers)}`);
+  */
+  console.tag('routes', 'twilio', 'receive').log(`Request: ${JSON.stringify(req.body)}`);
 
-    console.tag('routes', 'twilio', 'test').log('Text message received: ${JSON.stringify(req)}');
-    resp = new twilio.TwimlResponse();
-    /*
-    Insert code to respond with appropriate response message using a similaar format
-    */
-    resp.message('We have received your test message!');
-    res.type('text/plain');
-    res.send(resp.toString());
-  } else {
-    // Someone besides Twilio is attempting to use this endpoint
-    res.status(401).send('Sorry, you are not authorized to make requests here.');
-  }
+  /*
+   !!!!! Set message to the corresponding function calls for handling appropriate responses
+   */
+  const message = 'Receive: We have received your message!';
+  respond(res, message);
+});
+
+// Receiving a fallback text message from a user transferred by Twilio when /receive fails
+route.post('/fallback', twilio.webhook({
+  // Turning off standard validation
+  validate: false
+}), (req, res) => {
+  console.tag('routes', 'twilio', 'fallback').log(`Request: ${JSON.stringify(req.body)}`);
+  /*
+   !!!!! Set message to the corresponding function calls for handling appropriate responses
+   NOTE: we might implement something different for this case because this may occur when validation fails
+   */
+  const message = 'Fallback: We have received your message!';
+  respond(res, message);
 });
 
 export default route;
