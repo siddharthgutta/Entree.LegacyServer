@@ -70,14 +70,14 @@
   },
   "scripts": {
     "test": "export NODE_ENV=staging; mocha --timeout 5000 --no-exit -R nyan",
-    "tests": "set -e; for f in ./tests/*-test.compiled.js ; do npm run test $f; done",
+    "tests": "for f in ./tests/*-test.compiled.js ; do npm run test $f; done",
     "start": "node index.compiled.js",
     "test-no-nyan": "export NODE_ENV=staging; mocha --timeout 5000 --no-exit --colors",
-    "tests-no-nyan": "set -e; for f in ./tests/*-test.compiled.js ; do npm run test-no-nyan $f; done",
-    "test-ci": "set-e; mocha --timeout 5000 --no-exit --no-colors",
-    "tests-ci": "set-e; for f in ./tests/*-test.compiled.js ; do npm run test-ci $f; done",
+    "tests-no-nyan": "for f in ./tests/*-test.compiled.js ; do npm run test-no-nyan $f; done",
+    "test-ci": "mocha --timeout 5000 --no-exit --no-colors",
+    "tests-ci": "for f in ./tests/*-test.compiled.js ; do npm run test-ci $f; done",
     "lint": "eslint --ext js,.es6,.jsx ./",
-    "lint-ci": "set-e; eslint --no-color --ext js,.es6,.jsx ./",
+    "lint-ci": "eslint --no-color --ext js,.es6,.jsx ./",
     "cordova": "cd cordova && cordova build ios --device && cordova build android"
   },
   "repository": {
