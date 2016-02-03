@@ -15,7 +15,6 @@ function respond(res, message) {
 
 // Receiving a text message from a user transferred by Twilio
 route.post('/receive', twilio.webhook(), (req, res) => {
-
   // The commented out functions are useful for writing unit tests if this route changes
   /*
   console.log(`Accepts application/json: ${req.accepts('application/json')}`);
