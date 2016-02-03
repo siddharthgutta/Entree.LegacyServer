@@ -119,9 +119,6 @@ describe('Twilio Send', () => {
       it('broadcasting real SMS to admins should work successfully', done => {
         broadcast(`BROADCAST TEST SMS ${moment().format('h:mm A')}`, admins)
           .then(responses => {
-            console.log(typeof(responses));
-            console.log(responses.length);
-            console.log(responses);
             responses.forEach(response => {
               console.tag(global.TEST).log(`Broadcast response: ${JSON.stringify(response)}`);
             });
