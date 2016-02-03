@@ -7,8 +7,6 @@ import Twilio from '../libs/sms/twilio.es6';
 import config from 'config';
 const testCreds = config.get('Twilio.test');
 const admins = config.get('Admins');
-import Promise from 'bluebird';
-
 
 // SET THIS VARIABLE FOR VERBOSE LOGS OF ALL REQUESTS/RESPONSES
 const VERBOSE_LOGGING = false;
@@ -95,34 +93,34 @@ function checkError(expectedError, resultingError, responseOrErrorObject, verbos
 describe('Twilio Send', () => {
   describe('To', () => {
     /*
-    Only set runProductionTests to true when wanting to test real text messages
+    Only set REAL_SMS_TEST or BROADCAST_REAL_SMS_TEST or to true when wanting to test real text messages
     Immediately set it to false when done testing
     Disclaimer: Twilio will charge us for these!
     */
-    const runProductionTests = true;
+    const REAL_SMS_TEST = false;
+    const BROADCAST_REAL_SMS_TEST = false;
 
-    if (runProductionTests) {
-      //it('using real SMS should work successfully', done => {
-      //  sendSMS('+12149664948', `TEST SMS ${moment().format('h:mm A')}`)
-      //    .then(response => {
-      //      console.tag(global.TEST).log(response);
-      //      done();
-      //    })
-      //    .catch(err => {
-      //      console.tag(global.TEST).error(err);
-      //      expect().fail('Text message was not sent successfully even though it should have!');
-      //      done();
-      //    });
-      //});
+    if (REAL_SMS_TEST) {
+      it('using real SMS should work successfully', done => {
+        sendSMS('+12149664948', `TEST SMS ${moment().format('h:mm A')}`)
+          .then(response => {
+            console.tag(global.TEST).log(`Real SMS response: ${JSON.stringify(response)}`);
+            done();
+          })
+          .catch(err => {
+            console.tag(global.TEST).error(err);
+            expect().fail('Text message was not sent successfully even though it should have!');
+            done();
+          });
+      });
+    }
 
+    if (BROADCAST_REAL_SMS_TEST) {
       it('broadcasting real SMS to admins should work successfully', done => {
         broadcast(`BROADCAST TEST SMS ${moment().format('h:mm A')}`, admins)
           .then(responses => {
-            console.log(typeof(responses));
-            console.log(responses.length);
-            console.log(responses);
             responses.forEach(response => {
-              console.tag(global.TEST).log(`Broadcast response: ${response}`);
+              console.tag(global.TEST).log(`Broadcast response: ${JSON.stringify(response)}`);
             });
             done();
           })
@@ -132,7 +130,7 @@ describe('Twilio Send', () => {
             done();
           });
       });
-    };
+    }
 
     _.map(TO_TEST_NUMS, test => {
       it(test.message, done => {

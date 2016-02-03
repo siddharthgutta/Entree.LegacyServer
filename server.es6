@@ -21,7 +21,7 @@ app.set('view engine', 'jade');                   // sets the view engine to jad
 app.use(console.middleware('express'));
 app.use('/scribe', console.viewer());
 
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());                              // sets app to use middleware that only parses json
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public'))); // points app to public directory for static files
