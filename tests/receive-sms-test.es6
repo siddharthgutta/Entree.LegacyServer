@@ -37,7 +37,7 @@ describe('Twilio SMS Receive', () => {
         .post(`/twilio/receive`)
         .send({})
         .expect('Content-type', 'text/plain; charset=utf-8')
-        .expect(403, done);
+        .expect(200, done);
     });
   });
 
