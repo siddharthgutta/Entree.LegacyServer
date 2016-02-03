@@ -93,17 +93,18 @@ function checkError(expectedError, resultingError, responseOrErrorObject, verbos
 describe('Twilio Send', () => {
   describe('To', () => {
     /*
-    Only set runProductionTests to true when wanting to test real text messages
+    Only set REAL_SMS_TEST or BROADCAST_REAL_SMS_TEST or to true when wanting to test real text messages
     Immediately set it to false when done testing
     Disclaimer: Twilio will charge us for these!
     */
-    const runProductionTests = false;
+    const REAL_SMS_TEST = false;
+    const BROADCAST_REAL_SMS_TEST = false;
 
-    if (runProductionTests) {
+    if (REAL_SMS_TEST) {
       it('using real SMS should work successfully', done => {
         sendSMS('+12149664948', `TEST SMS ${moment().format('h:mm A')}`)
           .then(response => {
-            console.tag(global.TEST).log(response);
+            console.tag(global.TEST).log(`Real SMS response: ${JSON.stringify(response)}`);
             done();
           })
           .catch(err => {
@@ -112,12 +113,14 @@ describe('Twilio Send', () => {
             done();
           });
       });
+    }
 
+    if (BROADCAST_REAL_SMS_TEST) {
       it('broadcasting real SMS to admins should work successfully', done => {
         broadcast(`BROADCAST TEST SMS ${moment().format('h:mm A')}`, admins)
           .then(responses => {
             responses.forEach(response => {
-              console.tag(global.TEST).log(response);
+              console.tag(global.TEST).log(`Broadcast response: ${JSON.stringify(response)}`);
             });
             done();
           })
