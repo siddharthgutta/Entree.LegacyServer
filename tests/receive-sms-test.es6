@@ -72,10 +72,11 @@ describe('Twilio SMS Receive', () => {
 
     it('should pass validation for simple post request', done => {
       server
+        
         .post(`/twilio/fallback`)
         .send({})
         .expect('Content-type', 'text/xml; charset=utf-8')
-        .expect(403)
+        .expect(200)
         .end((err, res) => {
           if (err) {
             // If expected error occurs, test is good
