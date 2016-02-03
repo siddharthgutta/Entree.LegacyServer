@@ -61,7 +61,7 @@ export function findOne(name) {
  *
  * @param {string} name: Restaurant name to be added to
  * @param {Object} restaurantHour: RestaurantHour information to add to restaurant
- * @returns {Promise}: Returns the Restaurant object
+ * @returns {Promise}: Returns nothing(?)
  */
 export function addOrUpdateHour(name, restaurantHour) {
   return new Promise(resolve => {
@@ -83,7 +83,7 @@ export function addOrUpdateHour(name, restaurantHour) {
  * Get RestaurantHours associated with restaurant
  *
  * @param {string} name: Restaurant name to be queried
- * @returns {Promise}: Returns the Restaurant object
+ * @returns {Promise}: Returns a list of restaurant hours associated with the restaurant
  */
 export function getHours(name) {
   return new Promise(resolve => {
