@@ -72,7 +72,6 @@ describe('Twilio SMS Receive', () => {
 
     it('should pass validation for simple post request', done => {
       server
-        
         .post(`/twilio/fallback`)
         .send({})
         .expect('Content-type', 'text/xml; charset=utf-8')
