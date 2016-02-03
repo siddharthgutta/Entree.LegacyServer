@@ -32,6 +32,32 @@ describe('RestaurantHour', () => {
       });
     });
 
+    it('should not create RestaurantHours that have a invalid close and open time' +
+        'formats', done => {
+      RestaurantHour.create(dayOfTheWeek, '00:00', '11:22').then(restaurantHour => {
+        restaurantHour.destroy().then(() => {
+          assert(false);
+          done();
+        });
+      }, err => {
+        assert.equal(err.errors.length, 2);
+        done();
+      });
+    });
+
+    it('should not create RestaurantHours that have a invalid close and open time' +
+      'formats', done => {
+      RestaurantHour.create(dayOfTheWeek, '0:0:0', '1:2:3').then(restaurantHour => {
+        restaurantHour.destroy().then(() => {
+          assert(false);
+          done();
+        });
+      }, err => {
+        assert.equal(err.errors.length, 2);
+        done();
+      });
+    });
+
     it('should not create RestaurantHours that have a close time earlier than' +
         'open time', done => {
       RestaurantHour.create(dayOfTheWeek, openTime, '00:00:00').then(restaurantHour => {
