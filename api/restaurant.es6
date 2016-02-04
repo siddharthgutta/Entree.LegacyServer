@@ -97,13 +97,13 @@ export function getHours(id) {
  * Sets the location for a restaurant if no location is set
  * Otherwise, remove the existing location and update it
  *
- * @param {string} name: Name of restaurant to modify
+ * @param {Number} id: primary key of restaurant to be updated
  * @param {Object} location: Location object to be set
  * @returns {Promise}: Returns promise with no data(?)
  */
-export function setOrUpdateLocation(name, location) {
+export function setOrUpdateLocation(id, location) {
   return new Promise(resolve => {
-    findOne(name).then(restaurant => {
+    findOne(id).then(restaurant => {
       restaurant.getLocation().then(result => {
         if (result) {
           result.destroy().then(() => {
@@ -120,12 +120,12 @@ export function setOrUpdateLocation(name, location) {
 /**
  * Removes the location for the restaurant with name
  *
- * @param {string} name: name of restaurant to modify
+ * @param {Number} id: primary key of restaurant to remove location from
  * @returns {Promise}: Returns a promise with no data(?)
  */
-export function removeLocation(name) {
+export function removeLocation(id) {
   return new Promise(resolve => {
-    findOne(name).then(restaurant => {
+    findOne(id).then(restaurant => {
       restaurant.getLocation().then(location => {
         resolve(location.destroy());
       });
@@ -136,12 +136,12 @@ export function removeLocation(name) {
 /**
  * Gets the location for the restaurant
  *
- * @param {string} name: name of restaurant to modify
+ * @param {Number} id: primary key of restaurant to get location of
  * @returns {Promise}: Returns a promise with the Location object
  */
-export function getLocation(name) {
+export function getLocation(id) {
   return new Promise(resolve => {
-    findOne(name).then(restaurant => {
+    findOne(id).then(restaurant => {
       resolve(restaurant.getLocation());
     });
   });

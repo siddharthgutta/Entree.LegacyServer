@@ -111,10 +111,10 @@ describe('Restaurant', () => {
     });
 
     it('should cascade delete location when deleting restaurant', done => {
-      Restaurant.create(name, password, {phoneNumber}).then(() => {
+      Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
         Location.create(firstAddress, city, state, zipcode, {secondAddress}).then(location => {
-          Restaurant.setOrUpdateLocation(name, location).then(() => {
-            Restaurant.destroy(name).then(() => {
+          Restaurant.setOrUpdateLocation(restaurant.id, location).then(() => {
+            Restaurant.destroy(restaurant.id).then(() => {
               Location.findAll().then(result => {
                 assert.equal(result.length, 0);
                 done();
@@ -126,10 +126,10 @@ describe('Restaurant', () => {
     });
 
     it('should cascade delete restaurant hours when deleting restaurant', done => {
-      Restaurant.create(name, password, {phoneNumber}).then(() => {
+      Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
         RestaurantHour.create(dayOfTheWeek, openTime, closeTime).then(restaurantHour => {
-          Restaurant.addOrUpdateHour(name, restaurantHour).then(() => {
-            Restaurant.destroy(name).then(() => {
+          Restaurant.addOrUpdateHour(restaurant.id, restaurantHour).then(() => {
+            Restaurant.destroy(restaurant.id).then(() => {
               RestaurantHour.findAll().then(result => {
                 assert.equal(result.length, 0);
                 done();
@@ -200,8 +200,8 @@ describe('Restaurant', () => {
     it('should set the location of a restaurant if one does not exist', done => {
       Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
         Location.create(firstAddress, city, state, zipcode, {secondAddress}).then(location => {
-          Restaurant.setOrUpdateLocation(name, location).then(() => {
-            Restaurant.getLocation(name).then(result => {
+          Restaurant.setOrUpdateLocation(restaurant.id, location).then(() => {
+            Restaurant.getLocation(restaurant.id).then(result => {
               assert.equal(result.firstAddress, firstAddress);
               assert.equal(result.secondAddress, secondAddress);
               assert.equal(result.city, city);
@@ -217,10 +217,10 @@ describe('Restaurant', () => {
     it('should replace an existing location correctly', done => {
       Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
         Location.create(firstAddress, city, state, zipcode, {secondAddress}).then(location => {
-          Restaurant.setOrUpdateLocation(name, location).then(() => {
+          Restaurant.setOrUpdateLocation(restaurant.id, location).then(() => {
             Location.create('Main St', 'NewCity', 'AB', '09876', {secondAddress: 'NewSecond'}).then(locationNew => {
-              Restaurant.setOrUpdateLocation(name, locationNew).then(() => {
-                Restaurant.getLocation(name).then(result => {
+              Restaurant.setOrUpdateLocation(restaurant.id, locationNew).then(() => {
+                Restaurant.getLocation(restaurant.id).then(result => {
                   assert.equal(result.firstAddress, 'Main St');
                   assert.equal(result.secondAddress, 'NewSecond');
                   assert.equal(result.city, 'NewCity');
@@ -238,9 +238,9 @@ describe('Restaurant', () => {
     it('should delete the old location when replacing', done => {
       Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
         Location.create(firstAddress, city, state, zipcode, {secondAddress}).then(location => {
-          Restaurant.setOrUpdateLocation(name, location).then(() => {
+          Restaurant.setOrUpdateLocation(restaurant.id, location).then(() => {
             Location.create('Main St', 'NewCity', 'AB', '09876', {secondAddress: 'NewSecond'}).then(locationNew => {
-              Restaurant.setOrUpdateLocation(name, locationNew).then(() => {
+              Restaurant.setOrUpdateLocation(restaurant.id, locationNew).then(() => {
                 Location.findAll().then(result => {
                   assert.equal(result.length, 1);
                   restaurant.destroy().then(() => done());
@@ -257,9 +257,9 @@ describe('Restaurant', () => {
     it('should remove the location for a specific restaurant', done => {
       Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
         Location.create(firstAddress, city, state, zipcode, {secondAddress}).then(location => {
-          Restaurant.setOrUpdateLocation(name, location).then(() => {
-            Restaurant.removeLocation(name).then(() => {
-              Restaurant.getLocation(name).then(result => {
+          Restaurant.setOrUpdateLocation(restaurant.id, location).then(() => {
+            Restaurant.removeLocation(restaurant.id).then(() => {
+              Restaurant.getLocation(restaurant.id).then(result => {
                 assert.equal(result, null);
                 restaurant.destroy().then(() => done());
               });
