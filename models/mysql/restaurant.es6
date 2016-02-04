@@ -2,8 +2,7 @@ export default function (sequelize, DataTypes) {
   const Restaurant = sequelize.define('Restaurant', {
     name: {
       type: DataTypes.STRING(64), // eslint-disable-line new-cap
-      allowNull: false,
-      primaryKey: true
+      allowNull: false
     },
     password: {
       type: DataTypes.STRING(64), // eslint-disable-line new-cap

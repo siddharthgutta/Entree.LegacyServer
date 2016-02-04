@@ -25,8 +25,8 @@ describe('Restaurant', () => {
 
   describe('#create()', () => {
     it('should insert to and query from the database correctly', done => {
-      Restaurant.create(name, password, {phoneNumber}).then(() => {
-        Restaurant.findOne(name).then(restaurant => {
+      Restaurant.create(name, password, {phoneNumber}).then(result => {
+        Restaurant.findOne(result.id).then(restaurant => {
           assert.equal(restaurant.name, name);
           assert.equal(restaurant.password, password);
           assert.equal(restaurant.phoneNumber, phoneNumber);
@@ -38,8 +38,8 @@ describe('Restaurant', () => {
 
     it('should insert to and query from the database correctly' +
         'without optional params', done => {
-      Restaurant.create(name, password).then(() => {
-        Restaurant.findOne(name).then(restaurant => {
+      Restaurant.create(name, password).then(result => {
+        Restaurant.findOne(result.id).then(restaurant => {
           assert.equal(restaurant.name, name);
           assert.equal(restaurant.password, password);
           restaurant.destroy();
@@ -76,13 +76,13 @@ describe('Restaurant', () => {
 
   describe('update()', () => {
     it('should update and query from the database correctly', done => {
-      Restaurant.create(name, password, {phoneNumber}).then(() => {
-        Restaurant.update(name, {
+      Restaurant.create(name, password, {phoneNumber}).then(result => {
+        Restaurant.update(result.id, {
           name: 'NewRestaurant',
           password: '5678',
           phoneNumber: '1234561234'
         }).then(() => {
-          Restaurant.findOne('NewRestaurant').then(restaurant => {
+          Restaurant.findOne(result.id).then(restaurant => {
             assert.equal(restaurant.name, 'NewRestaurant');
             assert.equal(restaurant.password, '5678');
             assert.equal(restaurant.phoneNumber, '1234561234');
@@ -96,9 +96,9 @@ describe('Restaurant', () => {
 
   describe('#destroy()', () => {
     it('should delete from the database correctly', done => {
-      Restaurant.create(name, password, {phoneNumber}).then(() => {
-        Restaurant.destroy(name).then(() => {
-          Restaurant.findOne(name).then(restaurant => {
+      Restaurant.create(name, password, {phoneNumber}).then(result => {
+        Restaurant.destroy(result.id).then(() => {
+          Restaurant.findOne(result.id).then(restaurant => {
             assert.equal(restaurant, null);
             done();
           });
@@ -111,8 +111,8 @@ describe('Restaurant', () => {
     it('should add and query restaurant hours for a restaurant correctly', done => {
       Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
         RestaurantHour.create(dayOfTheWeek, openTime, closeTime).then(restaurantHour => {
-          Restaurant.addOrUpdateHour(name, restaurantHour).then(() => {
-            Restaurant.getHours(name).then(hours => {
+          Restaurant.addOrUpdateHour(restaurant.id, restaurantHour).then(() => {
+            Restaurant.getHours(restaurant.id).then(hours => {
               assert.equal(hours.length, 1);
               assert.equal(hours[0].dayOfTheWeek, dayOfTheWeek);
               assert.equal(hours[0].openTime, openTime);
@@ -128,10 +128,10 @@ describe('Restaurant', () => {
     it('should update and query restaurant hours for a restaurant correctly', done => {
       Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
         RestaurantHour.create(dayOfTheWeek, openTime, closeTime).then(restaurantHour => {
-          Restaurant.addOrUpdateHour(name, restaurantHour).then(() => {
+          Restaurant.addOrUpdateHour(restaurant.id, restaurantHour).then(() => {
             RestaurantHour.create(dayOfTheWeek, '22:22:22', '33:33:33').then(restaurantHourNew => {
-              Restaurant.addOrUpdateHour(name, restaurantHourNew).then(() => {
-                Restaurant.getHours(name).then(hours => {
+              Restaurant.addOrUpdateHour(restaurant.id, restaurantHourNew).then(() => {
+                Restaurant.getHours(restaurant.id).then(hours => {
                   assert.equal(hours.length, 1);
                   assert.equal(hours[0].dayOfTheWeek, dayOfTheWeek);
                   assert.equal(hours[0].openTime, '22:22:22');
@@ -149,10 +149,10 @@ describe('Restaurant', () => {
     it('should support multiple days of the week', done => {
       Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
         RestaurantHour.create(dayOfTheWeek, openTime, closeTime).then(restaurantHour => {
-          Restaurant.addOrUpdateHour(name, restaurantHour).then(() => {
+          Restaurant.addOrUpdateHour(restaurant.id, restaurantHour).then(() => {
             RestaurantHour.create('Tuesday', openTime, closeTime).then(restaurantHourNew => {
-              Restaurant.addOrUpdateHour(name, restaurantHourNew).then(() => {
-                Restaurant.getHours(name).then(hours => {
+              Restaurant.addOrUpdateHour(restaurant.id, restaurantHourNew).then(() => {
+                Restaurant.getHours(restaurant.id).then(hours => {
                   assert.equal(hours.length, 2);
                   restaurant.destroy();
                   done();
@@ -165,11 +165,11 @@ describe('Restaurant', () => {
     });
 
     it('should cascade delete restaurant hours', done => {
-      Restaurant.create(name, password, {phoneNumber}).then(() => {
+      Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
         RestaurantHour.create(dayOfTheWeek, openTime, closeTime).then(restaurantHour => {
-          Restaurant.addOrUpdateHour(name, restaurantHour).then(() => {
-            Restaurant.destroy(name).then(() => {
-              RestaurantHour.findOne(name, dayOfTheWeek).then(result => {
+          Restaurant.addOrUpdateHour(restaurant.id, restaurantHour).then(() => {
+            Restaurant.destroy(restaurant.id).then(() => {
+              RestaurantHour.findOne(restaurant.id, dayOfTheWeek).then(result => {
                 assert.equal(result, null);
                 done();
               });
