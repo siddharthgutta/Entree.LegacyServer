@@ -19,7 +19,7 @@ export function create(name, password, optional = {phoneNumber: null}) {
 /**
  * Update a restaurant attributes
  *
- * @param {Number} id: Name of restaurant
+ * @param {Number} id: primary key of restaurant
  * @param {Object} attributes : Attributes to update
  * @returns {Promise}: Returns the Restaurant object
  */
@@ -34,7 +34,7 @@ export function update(id, attributes) {
 /**
  * Destroy a restaurant
  *
- * @param {Number} id: Name of restaurant
+ * @param {Number} id: primary key of restaurant
  * @returns {Promise}: Returns the Restaurant object
  */
 export function destroy(id) {
@@ -46,7 +46,7 @@ export function destroy(id) {
 /**
  * Find a restaurant by id
  *
- * @param {Number} id: Name of restaurant
+ * @param {Number} id: primary key of restaurant
  * @returns {Promise}: Returns the Restaurant object
  */
 export function findOne(id) {
@@ -59,7 +59,7 @@ export function findOne(id) {
  * Insert restaurantHour to restaurant if the day is not already defined
  * Otherwise, updates existing entry for the day
  *
- * @param {Number} id: Restaurant id to be added to
+ * @param {Number} id: primary key of restaurant to be added to
  * @param {Object} restaurantHour: RestaurantHour information to add to restaurant
  * @returns {Promise}: Returns nothing(?)
  */
@@ -82,7 +82,7 @@ export function addOrUpdateHour(id, restaurantHour) {
 /**
  * Get RestaurantHours associated with restaurant
  *
- * @param {Number} id: Restaurant id to be queried
+ * @param {Number} id: primary key of restaurant to be queried
  * @returns {Promise}: Returns a list of restaurant hours associated with the restaurant
  */
 export function getHours(id) {
