@@ -19,14 +19,14 @@ export function create(name, password, optional = {phoneNumber: null}) {
 /**
  * Update a restaurant attributes
  *
- * @param {string} name: Name of restaurant
+ * @param {Number} id: Name of restaurant
  * @param {Object} attributes : Attributes to update
  * @returns {Promise}: Returns the Restaurant object
  */
-export function update(name, attributes) {
+export function update(id, attributes) {
   return models.Restaurant.update(
       attributes, {
-        where: {name}
+        where: {id}
       }
   );
 }
@@ -34,24 +34,24 @@ export function update(name, attributes) {
 /**
  * Destroy a restaurant
  *
- * @param {string} name: Name of restaurant
+ * @param {Number} id: Name of restaurant
  * @returns {Promise}: Returns the Restaurant object
  */
-export function destroy(name) {
+export function destroy(id) {
   return models.Restaurant.destroy({
-    where: {name}
+    where: {id}
   });
 }
 
 /**
- * Find a restaurant by name
+ * Find a restaurant by id
  *
- * @param {string} name: Name of restaurant
+ * @param {Number} id: Name of restaurant
  * @returns {Promise}: Returns the Restaurant object
  */
-export function findOne(name) {
+export function findOne(id) {
   return models.Restaurant.findOne({
-    where: {name}
+    where: {id}
   });
 }
 
@@ -59,13 +59,13 @@ export function findOne(name) {
  * Insert restaurantHour to restaurant if the day is not already defined
  * Otherwise, updates existing entry for the day
  *
- * @param {string} name: Restaurant name to be added to
+ * @param {Number} id: Restaurant id to be added to
  * @param {Object} restaurantHour: RestaurantHour information to add to restaurant
  * @returns {Promise}: Returns nothing(?)
  */
-export function addOrUpdateHour(name, restaurantHour) {
+export function addOrUpdateHour(id, restaurantHour) {
   return new Promise(resolve => {
-    findOne(name).then(restaurant => {
+    findOne(id).then(restaurant => {
       restaurant.getRestaurantHours({where: {dayOfTheWeek: restaurantHour.dayOfTheWeek}}).then(results => {
         if (results.length === 1) {
           restaurant.removeRestaurantHour(results[0]).then(() => {
@@ -82,12 +82,12 @@ export function addOrUpdateHour(name, restaurantHour) {
 /**
  * Get RestaurantHours associated with restaurant
  *
- * @param {string} name: Restaurant name to be queried
+ * @param {Number} id: Restaurant id to be queried
  * @returns {Promise}: Returns a list of restaurant hours associated with the restaurant
  */
-export function getHours(name) {
+export function getHours(id) {
   return new Promise(resolve => {
-    findOne(name).then(restaurant => {
+    findOne(id).then(restaurant => {
       resolve(restaurant.getRestaurantHours());
     });
   });
