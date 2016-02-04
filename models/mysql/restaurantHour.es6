@@ -37,9 +37,7 @@ export default function (sequelize, DataTypes) {
   }, {
     classMethods: {
       associate: models => {
-        RestaurantHour.belongsTo(models.Restaurant, {
-          onDelete: 'CASCADE'
-        });
+        RestaurantHour.belongsTo(models.Restaurant);
       }
     }
   });

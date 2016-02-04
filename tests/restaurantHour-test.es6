@@ -21,13 +21,12 @@ describe('RestaurantHour', () => {
   describe('#create()', () => {
     it('should insert and query to the database with valid arguments', done => {
       RestaurantHour.create(dayOfTheWeek, openTime, closeTime).then(() => {
-        /* Name param for find is null since we did not associate with a restaurant */
-        RestaurantHour.findOne(null, dayOfTheWeek).then(restaurantHour => {
-          assert.equal(restaurantHour.dayOfTheWeek, dayOfTheWeek);
-          assert.equal(restaurantHour.openTime, openTime);
-          assert.equal(restaurantHour.closeTime, closeTime);
-          restaurantHour.destroy();
-          done();
+        RestaurantHour.findAll().then(result => {
+          assert.equal(result.length, 1);
+          assert.equal(result[0].dayOfTheWeek, dayOfTheWeek);
+          assert.equal(result[0].openTime, openTime);
+          assert.equal(result[0].closeTime, closeTime);
+          result[0].destroy().then(() => done());
         });
       });
     });
