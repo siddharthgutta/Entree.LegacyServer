@@ -19,7 +19,7 @@ export function create(dayOfTheWeek, openTime, closeTime) {
 /**
  * Finds restaurant hour given a restaurantName and dayOfTheWeek
  *
- * @param {string} restaurantName : name of the restaurant
+ * @param {string} restaurantId: name of the restaurant
  * @param {string} dayOfTheWeek : day of the week
  * @returns {Promise}: Returns the RestaurantHour object
  */
