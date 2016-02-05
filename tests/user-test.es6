@@ -37,7 +37,7 @@ describe('User', () => {
         assert(false);
         done();
       }, err => {
-        assert.equal(err.errors.length, 4);
+        assert.equal(err.errors.length, 1);
         done();
       });
     });
