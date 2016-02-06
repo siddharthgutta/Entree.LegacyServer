@@ -20,6 +20,7 @@ route.post('/receive', twilio.webhook(), (req, res) => {
   console.log(`Accepts application/json: ${req.accepts('application/json')}`);
   console.log(`Request Headers: ${JSON.stringify(req.headers)}`);
   */
+  // Make sure to use Twilio.normalize to convert number to 10 digit
   console.tag('routes', 'twilio', 'receive').log(`Request: ${JSON.stringify(req.body)}`);
 
   /*
@@ -34,6 +35,7 @@ route.post('/fallback', twilio.webhook({
   // Turning off standard validation
   validate: false
 }), (req, res) => {
+  // Make sure to use Twilio.normalize to convert number to 10 digit
   console.tag('routes', 'twilio', 'fallback').log(`Request: ${JSON.stringify(req.body)}`);
   /*
    !!!!! Set message to the corresponding function calls for handling appropriate responses
