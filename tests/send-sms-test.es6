@@ -113,6 +113,19 @@ describe('Twilio Send', () => {
             done();
           });
       });
+
+      it('should fail to send real SMS with invalid number', done => {
+        sendSMS('+123', `TEST SMS ${moment().format('h:mm A')}`)
+          .then(response => {
+            console.tag(global.TEST).log(`Real SMS response: ${JSON.stringify(response)}`);
+            expect().fail('Text message should not be sent successfully with invalid number!');
+            done();
+          })
+          .catch(err => {
+            console.tag(global.TEST).error(err);
+            done();
+          });
+      });
     }
 
     if (BROADCAST_REAL_SMS_TEST) {
