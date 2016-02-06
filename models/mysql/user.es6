@@ -5,8 +5,7 @@ export default function (sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true,
       validate: {
-        len: 10,
-        isNumeric: true
+        is: /^\d{10}$/
       }
     },
     password: {
