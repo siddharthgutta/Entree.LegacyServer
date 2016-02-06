@@ -20,8 +20,27 @@ export function create(phoneNumber, password, name, email) {
   return models.User.create({phoneNumber, password, name, email});
 }
 
-const signupGreeting = 'Hi, Entrée here. I can help you order ahead at your favorite restaurants. ' +
-  'Type in /r to see where I work. Type in /help at any point if you need help.';
+/**
+ * Gets the greeting message to be sent on signup, can return signup or greeting message
+ *
+ * @param {string} name: User's name
+ * @param {boolean} firstTime: whether or not this is the first time signing up
+ * @returns {string}: Returns greeting message
+ */
+function getGreeting(name, firstTime) {
+  if (firstTime && name) {
+    return `Hi ${name}, Entrée here. I can help you order ahead at your favorite restaurants. ' +
+      'Type in /r to see where I work. Type in /help at any point if you need help.`;
+  } else if (firstTime && !name) {
+    return 'Hi, Entrée here. I can help you order ahead at your favorite restaurants. ' +
+      'Type in /r to see where I work. Type in /help at any point if you need help.';
+  } else if (!firstTime && name) {
+    return `Welcome back ${name}! I'm here to help you order ahead at your favorite restaurants. ` +
+      'Type in /r to see where I work. Type in /help at any point if you need help.';
+  }
+  return "Welcome back! I'm here to help you order ahead at your favorite restaurants. " +
+    'Type in /r to see where I work. Type in /help at any point if you need help.';
+}
 
 /**
  * Initial User Signup
@@ -31,21 +50,31 @@ const signupGreeting = 'Hi, Entrée here. I can help you order ahead at your fav
  * @returns {Promise}: Returns the user object.
  */
 export function signup(phoneNumber) {
-  return db.sequelize.transaction(t =>
-    models.User.create({phoneNumber}, {transaction: t})
-      .then(() => {
-        sendSMS(phoneNumber, signupGreeting)
-          .catch(error => {
-            console.tag('api', 'user', 'signup', 'sendSMS', 'ERROR')
-              .log(`Text Message was not sent successfully, but user account was created. SMS Error: ${error}`);
-            throw new Error(`SMS failed to send correctly.`);
-          });
-      }).catch(() => {
-        console.tag('api', 'user', 'signup', 'sendSMS', 'ERROR')
-          .log('User account could not be created in the User table. No text message sent to user.');
-        throw new Error(`User account failed to be created.`);
-      })
-  );
+  return new Promise((resolve, reject) => {
+    db.sequelize.transaction(t =>
+      models.User.findOrCreate({where: {phoneNumber}, transaction: t})
+        .spread((user, created) => {
+          sendSMS(user.phoneNumber, getGreeting(user.name, created))
+            .then(response => {
+              // sendSMS will pass the response from twilio with text sent details
+              // this response is not currently being dealt with but needs to be stored in the Messages table
+              console.tag('routes', 'api', '/user/signup', 'User.signup', 'SUCCESS')
+                .log(`New user was ${created ? 'created' : 'found'} & ` +
+                  `${created ? 'full' : 'partial'} welcome message.`);
+              return resolve(response);
+            }).catch(error => {
+              console.tag('api', 'user', 'signup', 'sendSMS', 'ERROR')
+                .log('Text Message was not sent successfully, but user account was created.' +
+                  `If user account was created, rolling it back now. SMS Error: ${error}`);
+              throw new Error(`SMS Error: ${error}`);
+            });
+        }).catch(error => {
+          console.tag('api', 'user', 'signup', 'sendSMS', 'ERROR')
+            .log(`User could not be created/found in the User table. No text message sent to user. Error: ${error}`);
+          return reject(error);
+        })
+    );
+  });
 }
 
 /**
