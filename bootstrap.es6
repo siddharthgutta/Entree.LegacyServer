@@ -1,7 +1,7 @@
 import Scribe from 'scribe-js';
 import {exec} from 'shelljs';
-import mysql from './models/mysql/index.es6';
-import mongo from './models/mongo/index.es6';
+import models from './models/mysql/index.es6';
+import mongoose from 'mongoose';
 import extend from 'extend';
 
 export function resolveContext() {
@@ -81,13 +81,13 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
 
 export function initDatabase() {
   return new Promise(resolve => {
-    resolve(mysql.sequelize.sync({force: true})); // Remove once we finalize model
+    resolve(models.sequelize.sync({force: true})); // Remove once we finalize model
   });
 }
 
 export function destroyDatabase() {
-  mongo.mongoose.connection.close();
-  mysql.sequelize.close();
+  mongoose.connection.close();
+  models.sequelize.close();
 }
 
 export function initServer() {

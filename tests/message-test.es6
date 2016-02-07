@@ -78,6 +78,23 @@ describe('Message', () => {
       });
     });
 
+    it('only returns results between from and to', done => {
+      Message.create(from, to, content, date, twilioSid, success).then(() => {
+        Message.create('2222222222', '3333333333', content, date, twilioSid, success).then(() => {
+          Message.find(to, from).then(result => {
+            assert.equal(result.length, 1);
+            assert.equal(result[0].from, from);
+            assert.equal(result[0].to, to);
+            assert.equal(result[0].content, content);
+            assert.equal(result[0].date.getTime(), date);
+            assert.equal(result[0].twilioSid, twilioSid);
+            assert.equal(result[0].success, success);
+            result[0].remove().then(() => done());
+          });
+        });
+      });
+    });
+
     it('orders messages descending by date', done => {
       Message.create(from, to, content, date, twilioSid, success).then(() => {
         Message.create(from, to, content, date + 100, twilioSid, success).then(() => {
