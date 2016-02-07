@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-export default new mongoose.Schema({
+const orderSchema = new mongoose.Schema({
   phoneNumber: String,
   restaurantId: Number,
   items: [
@@ -12,3 +12,5 @@ export default new mongoose.Schema({
   ],
   status: String
 });
+
+export default mongoose.model('Order', orderSchema);

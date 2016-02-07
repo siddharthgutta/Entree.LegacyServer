@@ -1,5 +1,4 @@
 import Scribe from 'scribe-js';
-import config from 'config';
 import {exec} from 'shelljs';
 import models from './models/mysql/index.es6';
 import mongoose from 'mongoose';
@@ -82,8 +81,6 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
 
 export function initDatabase() {
   return new Promise(resolve => {
-    const mongoConfig = config.get('MongoDb');
-    mongoose.connect(`mongodb://${mongoConfig.host}:${mongoConfig.port}/${mongoConfig.database}`);
     resolve(models.sequelize.sync({force: true})); // Remove once we finalize model
   });
 }
