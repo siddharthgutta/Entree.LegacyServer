@@ -2,9 +2,13 @@ import './test-init.es6';
 import assert from 'assert';
 import * as User from '../api/user.es6';
 import {initDatabase, destroyDatabase} from '../bootstrap.es6';
+import {resolveContext} from '../bootstrap.es6';
 import config from 'config';
 const TWILIO_FROM_NUMBER = config.get('Twilio.fromNumbers');
 import expect from 'expect.js';
+import supertest from 'supertest';
+const port = resolveContext().port;
+const server = supertest.agent(`http://localhost:${port}`);
 
 before(done => {
   initDatabase().then(() => done());
@@ -34,6 +38,16 @@ describe('User', () => {
   describe('#signup()', () => {
     if (REAL_SIGNUP) {
       let fullWelcomeMessage;
+
+      describe('/api/user/signup endpoint', () => {
+        it('should fail validation for complex request', done => {
+          server
+            .post(`/api/user/signup`)
+            .send({productionPhoneNumber})
+            .expect('Content-type', 'application/json; charset=utf-8')
+            .expect(200, done);
+        });
+      });
 
       it('should create a new user and send a real SMS message', done => {
         User.signup(productionPhoneNumber).then(response => {
