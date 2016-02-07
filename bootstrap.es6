@@ -28,7 +28,7 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
       showHidden: false,
       depth: 5,
       pre: true,
-      callsite: true,
+      callsite: false,
       tags: true,
       args: true,
       metrics: true

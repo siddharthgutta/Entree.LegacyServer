@@ -1,8 +1,5 @@
 {
-  "startPort": 3000,
-  "endPort": 4000,
-  "uri": "https://github.com/siddharthgutta/Entree.Server",
-  "debug": true,
+  "igniter": "node index.compiled.js",
   "pm2": {
     "restart_delay": 10000,
     "watch": false,

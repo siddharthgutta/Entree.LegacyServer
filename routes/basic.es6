@@ -1,12 +1,17 @@
 import {Router} from 'express';
 import {exec} from 'shelljs';
 import Convert from 'ansi-to-html';
+import config from 'config';
 
 const convert = new Convert();
 const route = new Router();
+const clientConfig = JSON.stringify(config.get('Client'));
 
-route.get('/', (req, res) => res.render('restaurant'));
-route.get('/tools', (req, res) => res.render('tools'));
+route.get('/', (req, res) => res.render('index', {config: clientConfig}));
+route.get('/restaurant', (req, res) => res.render('restaurant', {config: clientConfig}));
+route.get('/registration', (req, res) => res.render('registration', {config: clientConfig}));
+route.get('/messenger', (req, res) => res.render('messenger', {config: clientConfig}));
+
 route.get('/tests', (req, res) => {
   let capture = '';
   const child = exec(`npm run tests-no-nyan && npm run lint`, {async: true, silent: true, cwd: `${__dirname}/../`});

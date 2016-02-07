@@ -3,19 +3,25 @@ import Page from './Page';
 import moment from 'moment';
 import TabbedPane from '../general/TabbedPane.js';
 import Dispatcher from '../../../dispatchers/Dispatcher';
-import {ifcat} from '../../../libs/utils';
+import {ifcat} from '../../../../libs/utils';
 import OrderStore from '../../../stores/OrderStore';
 import OrderTime from '../modals/OrderTime';
+import OrderDecline from '../modals/OrderDecline';
+import Chat from '../modals/Chat';
 import keyMirror from 'keymirror';
+import {onClick} from '../../../../libs/utils';
 
 const Modals = keyMirror({
-  ORDER_TIME: null
+  ORDER_TIME: null,
+  ORDER_CANCEL: null,
+  CHAT: null
 });
 
 class OrderFocus extends Page {
 
   static propTypes = {
-    params: React.PropTypes.object
+    params: React.PropTypes.object,
+    history: React.PropTypes.object
   };
 
   constructor(context, props) {
@@ -37,7 +43,9 @@ class OrderFocus extends Page {
     const {order} = this.state;
 
     return {
-      [Modals.ORDER_TIME]: <OrderTime cost={`$${order.cost}`} onSubmitTime={(time => this.setState({time}))}/>
+      [Modals.CHAT]: <Chat />,
+      [Modals.ORDER_TIME]: <OrderTime cost={`${order.cost}`} onSubmitTime={(time => this.setState({time}))}/>,
+      [Modals.ORDER_CANCEL]: <OrderDecline cost={`${order.cost}`} onConfirm={(decline => this.setState({decline}))}/>
     };
   }
 
@@ -124,20 +132,26 @@ class OrderFocus extends Page {
                style={{padding: '30px 0', minHeight: 130, borderBottom: '1px solid rgba(255, 255, 255, 0.1)'}}>
             <div className='box flex center vertical'
                  style={{borderRight: '1px solid rgba(255, 255, 255, 0.1)'}}>
-              <div className='value'>${order.cost}</div>
+              <div className='value'>
+                <div className='bubble light icon dollar'/>
+                {order.cost}</div>
               <div className='desc'>TOTAL COST</div>
             </div>
-            <div className='box small flex center vertical'>
-              <div className='value icon message'></div>
+            <div className='box small flex center vertical' {...onClick(() =>
+                Dispatcher.emit(Dispatcher.Events.MODAL_VISIBILITY, Modals.CHAT, true))}>
+              <div className='value icon message'/>
             </div>
           </div>
           <TabbedPane spread Items={items} Details={details} tabs={['Items', 'Details']}/>
           <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 62}}>
             <div className='floater'>
               <div className='flex'>
-                <div className='button box dim'>DECLINE</div>
-                <div className='button box green' onTouchTap={() => this._handleAccept(true)}
-                     onClick={() => Dispatcher.emit(Dispatcher.Events.MODAL_VISIBILITY, Modals.ORDER_TIME, true)}>
+                <div className='button box dim' {...onClick(() =>
+                    Dispatcher.emit(Dispatcher.Events.MODAL_VISIBILITY, Modals.ORDER_CANCEL, true))}>
+                  DECLINE
+                </div>
+                <div className='button box green' {...onClick(() =>
+                    Dispatcher.emit(Dispatcher.Events.MODAL_VISIBILITY, Modals.ORDER_TIME, true))}>
                   ACCEPT
                 </div>
               </div>

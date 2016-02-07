@@ -1,10 +1,8 @@
 import App from './components/App.js';
 import React from 'react';
 import {render} from 'react-dom';
-import tapInject from 'react-tap-event-plugin';
+import {useTouchEventsForClick} from '../libs/utils';
 
-if (/iPad|iPhone|iPod/.test(navigator.platform)) {
-  tapInject({shouldRejectClick: () => true});
-}
+useTouchEventsForClick();
 
 render(<App />, document.getElementById('app'));

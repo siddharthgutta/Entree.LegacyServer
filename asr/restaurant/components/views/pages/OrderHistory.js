@@ -3,6 +3,14 @@ import Page from './Page';
 import TabbedPane from '../general/TabbedPane.js';
 import OrderList from '../../views/elements/OrderList';
 import Dispatcher from '../../../dispatchers/Dispatcher';
+import Feedback from '../modals/Feedback';
+import {onClick} from '../../../../libs/utils';
+import keyMirror from 'keymirror';
+
+const Modals = keyMirror({
+  FEEDBACK: null
+});
+
 
 class OrderHistory extends Page {
   constructor(context, props) {
@@ -17,13 +25,16 @@ class OrderHistory extends Page {
   }
 
   getModals() {
-    return {};
+    return {
+      [Modals.FEEDBACK]: <Feedback />
+    };
   }
 
   renderHeader() {
     Dispatcher.emit(Dispatcher.Events.REQUEST_HEADER, 'Order', 'History', {
       style: {minHeight: 55, borderBottom: 'none'},
-      leftIcon: 'evil-icon menu'
+      leftIcon: 'evil-icon menu',
+      onLeftClick: () => Dispatcher.emit(Dispatcher.Events.MENU_VISIBILITY, true)
     });
   }
 
@@ -39,7 +50,9 @@ class OrderHistory extends Page {
           <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 45}}>
             <div className='floater'>
               <div className='flex'>
-                <div className='button box dim'>HAVING ISSUES?</div>
+                <div className='button box dim' {...onClick(() =>
+                    Dispatcher.emit(Dispatcher.Events.MODAL_VISIBILITY, Modals.FEEDBACK, true))}>HAVING ISSUES?
+                </div>
               </div>
             </div>
           </div>

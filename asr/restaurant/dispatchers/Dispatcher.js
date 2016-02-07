@@ -6,7 +6,8 @@ const Events = keyMirror({
   REQUEST_HEADER: null,
   REGISTER_MODAL: null,
   UNREGISTER_MODAL: null,
-  MODAL_VISIBILITY: null
+  MODAL_VISIBILITY: null,
+  MENU_VISIBILITY: null
 });
 
 export default Influx.Dispatcher.construct(Influx.Dispatcher, Events);

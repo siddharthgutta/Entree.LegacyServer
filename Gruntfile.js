@@ -133,6 +133,7 @@ module.exports = grunt => {
         files: [
           {expand: true, cwd: 'resources/fonts', src: ['**/*'], dest: 'public/fonts'},
           {expand: true, cwd: 'resources/images', src: ['**/*'], dest: 'public/images'},
+          {expand: true, cwd: 'resources/videos', src: ['**/*'], dest: 'public/videos'},
           {expand: true, cwd: 'resources/scripts', src: ['**/*'], dest: 'public/scripts'}
         ]
       },
@@ -181,8 +182,8 @@ module.exports = grunt => {
       }
     },
     shell: {
-      cordova: {
-        command: 'npm run cordova'
+      'cordova-build': {
+        command: 'npm run cordova-build'
       }
     }
   });
@@ -248,7 +249,7 @@ module.exports = grunt => {
   grunt.registerTask('cordova', [
     'copy:cordova',
     'rename:dist',
-    'shell:cordova',
+    'shell:cordova-build',
     'copy:builds'
   ]);
 
