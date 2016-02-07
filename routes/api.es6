@@ -45,13 +45,13 @@ route.post('/user/destroy', (req, res) => {
 });
 
 // Users sends in the phone number for initial first layer signup
-route.post('/user/signup/:number', (req, res) => {
-  User.signup(req.params.number)
+route.post('/user/signup', (req, res) => {
+  User.signup(req.body.phoneNumber)
     .then(response => {
       console.tag('routes', 'api', '/user/signup', 'User.signup', 'SMS').log(JSON.stringify(response));
       res.ok(['routes', 'api', '/user/signup', 'User.signup', 'SUCCESS'],
         'New user created. Sending full welcome message.',
-        {}, `We have sent a text message to your number: ${req.params.number}`);
+        {}, `We have sent a text message to your number: ${req.body.phoneNumber}`);
     }).catch(error => {
       res.fail(['routes', 'api', '/user/signup', 'User.signup', 'ERROR'],
         `Error: ${error}`,
