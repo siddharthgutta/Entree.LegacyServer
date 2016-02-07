@@ -69,7 +69,7 @@ class UserList extends Influx.Component {
     );
 
     return (
-        <div className='full user-list scy momentum'>
+        <div className='full user-list scroll scroll-y momentum'>
           {users}
         </div>
     );

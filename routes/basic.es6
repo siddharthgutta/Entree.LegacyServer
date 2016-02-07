@@ -7,10 +7,24 @@ const convert = new Convert();
 const route = new Router();
 const clientConfig = JSON.stringify(config.get('Client'));
 
-route.get('/', (req, res) => res.render('index', {config: clientConfig}));
-route.get('/restaurant', (req, res) => res.render('restaurant', {config: clientConfig}));
-route.get('/registration', (req, res) => res.render('registration', {config: clientConfig}));
-route.get('/messenger', (req, res) => res.render('messenger', {config: clientConfig}));
+route.get('/', (req, res) => res.render('index', {
+  config: clientConfig
+}));
+
+route.get('/restaurant', (req, res) => res.render('restaurant', {
+  config: clientConfig,
+  title: 'Entree · Restaurant'
+}));
+
+route.get('/registration', (req, res) => res.render('registration', {
+  config: clientConfig,
+  title: 'Entree · Registration'
+}));
+
+route.get('/messenger', (req, res) => res.render('messenger', {
+  config: clientConfig,
+  title: 'Entree · Messenger'
+}));
 
 route.get('/tests', (req, res) => {
   let capture = '';

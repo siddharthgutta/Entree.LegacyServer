@@ -2,7 +2,7 @@ import Influx from 'react-influx';
 import React from 'react';
 import MessageStore from '../../stores/MessageStore';
 import Dispatcher from '../../dispatchers/Dispatcher';
-import Messages from './Messages';
+import Messenger from './../../../components/Messenger';
 
 class Chat extends Influx.Component {
   constructor(context, props) {
@@ -42,7 +42,7 @@ class Chat extends Influx.Component {
     }
 
     return (
-        <Messages messages={messages} me={MessageStore.getMe()} them={user}
+        <Messenger messages={messages} me={MessageStore.getMe()} them={user}
                   insertMessage={msg => this._insertMessage(msg)}/>
     );
   }

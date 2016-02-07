@@ -1,14 +1,11 @@
 .scroll {
-  overflow: hidden;
-  &:hover {
-    overflow: auto;
-  }
-  &.scroll-y:hover {
+  overflow: auto;
+
+  &.scroll-y {
     overflow-x: hidden;
     overflow-y: auto;
   }
-
-  &.scroll-x:hover {
+  &.scroll-x {
     overflow-x: auto;
     overflow-y: hidden;
   }
