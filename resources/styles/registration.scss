@@ -4,6 +4,7 @@
 @import "shared/scroll";
 @import "shared/layouts";
 @import "shared/tabs";
+@import "shared/messenger";
 
 body {
   font-family: 'Proxima Nova', "Helvetica", "Helvetic Neue", "Open Sans", sans-serif;
@@ -30,29 +31,32 @@ a {
 .button {
   background: #228AE6;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
-  border-radius: 40px;
-  font-size: 18px;
+  border-radius: 0px;
+  font-size: 15px;
   color: #FFF;
   letter-spacing: 1.25px;
   line-height: 19px;
-  padding: 16px;
+  padding: 20px;
   text-align: center;
   font-weight: bold;
+  //margin: 10px;
+  //border-radius: 5px;
 }
 
 .input {
-  border: 2px solid rgba(255, 255, 255, 0.34);
-  border-radius: 40px;
-  color: #FFFFFF;
+  border-radius: 0px;
+  color: #000;
+  background: #FFF;
   letter-spacing: 1.5px;
   line-height: 19px;
   padding: 16px;
   font-size: 15px;
   width: 100%;
-  background: transparent;
   text-transform: uppercase;
-  margin-bottom: 10px;
   text-align: center;
+  margin: 0;
+  font-weight: bold;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .blur {
@@ -68,4 +72,11 @@ video {
   width: 100%;
   position: absolute;
   top: 0;
+}
+
+.from-me {
+  background: #3BCE29 !important;
+  &:before {
+    border-color: #3BCE29 !important;
+  }
 }
