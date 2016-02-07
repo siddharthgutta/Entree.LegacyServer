@@ -1,11 +1,18 @@
 import mongoose from 'mongoose';
 
 const messageSchema = new mongoose.Schema({
-  from: String,
-  to: String,
+  from: {
+    type: String,
+    match: /^\d{10}$/
+  },
+  to: {
+    type: String,
+    match: /^\d{10}$/
+  },
   content: String,
   date: Date,
-  twilioSid: String
+  twilioSid: String,
+  success: Boolean
 });
 
 export default mongoose.model('Message', messageSchema);

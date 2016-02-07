@@ -17,4 +17,6 @@ mongoose.connection.once('open', () => {
     });
 });
 
+db.mongoose = mongoose;
+
 export default db;
