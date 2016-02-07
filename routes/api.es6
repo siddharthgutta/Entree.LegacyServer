@@ -6,8 +6,14 @@ const route = new Router();
 
 route.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.ok = (data, message) => res.json({status: 0, data: data.toJSON ? data.toJSON() : data, message});
-  res.fail = (cause, message, status) => res.json({status: status || 1, cause, message});
+  res.ok = (tags, logMessage, data, resMessage) => {
+    console.tag(...tags).log(logMessage);
+    res.json({status: 0, data: data.toJSON ? data.toJSON() : data, resMessage});
+  };
+  res.fail = (tags, logMessage, resMessage, status) => {
+    console.tag(...tags).log(logMessage);
+    res.json({status: status || 1, resMessage});
+  };
   next();
 });
 
@@ -36,6 +42,22 @@ route.post('/user/create', (req, res) => {
 route.post('/user/destroy', (req, res) => {
   const {username, password} = req.body;
   User.destroy(username, password).then(res.ok).catch(res.fail);
+});
+
+// Users sends in the phone number for initial first layer signup
+route.post('/user/signup/:number', (req, res) => {
+  User.signup(req.params.number)
+    .then(response => {
+      console.tag('routes', 'api', '/user/signup', 'User.signup', 'SMS').log(JSON.stringify(response));
+      res.ok(['routes', 'api', '/user/signup', 'User.signup', 'SUCCESS'],
+        'New user created. Sending full welcome message.',
+        {}, `We have sent a text message to your number: ${req.params.number}`);
+    }).catch(error => {
+      res.fail(['routes', 'api', '/user/signup', 'User.signup', 'ERROR'],
+        `Error: ${error}`,
+        'Sorry, a text message to your phone could not be sent! Please try again.',
+        500);
+    });
 });
 
 export default route;

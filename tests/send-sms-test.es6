@@ -6,6 +6,7 @@ import _ from 'underscore';
 import Twilio from '../libs/sms/twilio.es6';
 import config from 'config';
 const testCreds = config.get('Twilio.test');
+const TWILIO_FROM_NUMBER = config.get('Twilio.fromNumbers');
 const admins = config.get('Admins');
 
 // SET THIS VARIABLE FOR VERBOSE LOGS OF ALL REQUESTS/RESPONSES
@@ -98,18 +99,42 @@ describe('Twilio Send', () => {
     Disclaimer: Twilio will charge us for these!
     */
     const REAL_SMS_TEST = false;
+    // Modify this number, to test with your own phone
+    const REAL_PHONE_NUMBER_WITHOUT_COUNTRY_CODE = '2149664948';
+    const REAL_PHONE_NUMBER = `+1${REAL_PHONE_NUMBER_WITHOUT_COUNTRY_CODE}`;
     const BROADCAST_REAL_SMS_TEST = false;
+    const REAL_NUMBERS = [REAL_PHONE_NUMBER_WITHOUT_COUNTRY_CODE, REAL_PHONE_NUMBER];
+
 
     if (REAL_SMS_TEST) {
-      it('using real SMS should work successfully', done => {
-        sendSMS('+12149664948', `TEST SMS ${moment().format('h:mm A')}`)
+      _.map(REAL_NUMBERS, number => {
+        it('sending real SMS to number with country code should send successfully', done => {
+          const testMessage = `TEST SMS ${moment().format('h:mm A')}`;
+          sendSMS(number, testMessage)
+            .then(response => {
+              console.tag(global.TEST).log(`Real SMS response: ${JSON.stringify(response)}`);
+              expect(response.to).to.be(REAL_PHONE_NUMBER);
+              expect(response.from).to.be(TWILIO_FROM_NUMBER);
+              expect(response.body).to.contain(`${testMessage}`);
+              done();
+            })
+            .catch(err => {
+              console.tag(global.TEST).error(err);
+              expect().fail('Text message was not sent successfully even though it should have!');
+              done();
+            });
+        });
+      });
+
+      it('should fail to send real SMS with invalid number', done => {
+        sendSMS('+123', `TEST SMS ${moment().format('h:mm A')}`)
           .then(response => {
             console.tag(global.TEST).log(`Real SMS response: ${JSON.stringify(response)}`);
+            expect().fail('Text message should not be sent successfully with invalid number!');
             done();
           })
           .catch(err => {
             console.tag(global.TEST).error(err);
-            expect().fail('Text message was not sent successfully even though it should have!');
             done();
           });
       });
