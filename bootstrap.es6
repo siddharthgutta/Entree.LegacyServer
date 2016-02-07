@@ -1,16 +1,14 @@
 import Scribe from 'scribe-js';
-import {exec} from 'shelljs';
+import config from 'config';
 import models from './models/mysql/index.es6';
 import mongoose from 'mongoose';
 import extend from 'extend';
 
 export function resolveContext() {
-  const port = parseInt(process.env.BRANCHOFF_PORT, 10) || process.env.PORT || 3000;
-  const socketPort = 50000 + (Number(process.env.pm_id) || port);
-  const id = process.env.BRANCHOFF_BRANCH || (exec('git rev-parse --abbrev-ref HEAD',
-          {silent: true}).output || '').trim() || 'local';
-  const nodeEnv = process.env.NODE_ENV || 'localbuild?';
-  const ctx = {port, socketPort, id, nodeEnv};
+  const port = config.get('Port');
+  const id = config.get('AppId');
+  const nodeEnv = config.get('NodeEnv');
+  const ctx = {port, id, nodeEnv};
 
   return ctx;
 }
@@ -36,7 +34,7 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
     mongoUri: 'mongodb://localhost/scribe',
     mongo,
     basePath: 'scribe/',
-    socketPort: context.socketPort,
+    socketPort: 50000 + (Number(process.env.pm_id) || context.port),
     socket,
     nwjs: {
       buildDir: `${__dirname}/../public/native`
@@ -94,5 +92,5 @@ export function initServer() {
   const context = resolveContext();
 
   require('./server.es6').default.listen(context.port,
-      () => console.log(`Listening on ${context.port}`));
+      () => console.tag('server').log(`Listening on ${context.port}`));
 }

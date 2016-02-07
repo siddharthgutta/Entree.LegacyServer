@@ -43,9 +43,14 @@ npm cache clear # if modules need to be downloaded again
 ```bash
 # general env setup
 sudo apt-get update
-sudo apt-get -y install git build-essential git ruby libpam0g-dev debconf-utils
+sudo apt-get -y install git build-essential git ruby libpam0g-dev debconf-utils automake libtool libpng-dev
 sudo gem install sass
 echo "sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000" >> ~/.bashrc
+
+# MAC OSX!
+brew install automake
+brew install libtool
+brew install libpng
 
 # node via. nvm
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash

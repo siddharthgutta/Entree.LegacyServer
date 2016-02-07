@@ -1,6 +1,7 @@
 {
   "Client": {
-    "testProperty": "hello!"
+    "testProperty": "hello!",
+    "socketPort": 3000
   },
   "Admins": [
     {
@@ -20,6 +21,17 @@
       "name": "Sid Gutta"
     }
   ],
+  "AppId": "local",
+  "NodeEnv": "development",
+  "Port": 3000,
+  "UseInternalSocket": true,
+  "ExternalSocketServer": {
+    "protocol": "http",
+    "host": "ec2-52-89-1-140.us-west-2.compute.amazonaws.com",
+    "port": 2997,
+    "search": "?",
+    "path": ""
+  },
   "Twilio": {
     "fromNumbers": "+15125200133",
     "production": {

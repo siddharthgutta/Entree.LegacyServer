@@ -2,6 +2,8 @@
 
 'use strict';
 
+const mozjpeg = require('imagemin-mozjpeg');
+
 module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
   require('./tasks/grunt-filetransform')(grunt);
@@ -56,7 +58,7 @@ module.exports = grunt => {
         options: {
           transform: ['babelify', 'config-browserify'],
           browserifyOptions: {
-            debug: true, // source mapping
+            debug: false, // source mapping
             ignoreMTime: true
           }
         },
@@ -92,7 +94,7 @@ module.exports = grunt => {
         map: false,
         processors: [
           require('autoprefixer')({
-            browsers: ['Chrome > 20']
+            browsers: ['> 1%', 'last 10 versions']
           })
         ]
       },
@@ -103,8 +105,9 @@ module.exports = grunt => {
     imagemin: {
       dist: {
         options: {
-          optimizationLevel: 3,
-          svgoPlugins: [{removeViewBox: false}]
+          optimizationLevel: 4,
+          svgoPlugins: [{removeViewBox: false}],
+          use: [mozjpeg()]
         },
         files: [{
           expand: true,
@@ -223,11 +226,11 @@ module.exports = grunt => {
     'clean:compiled',
     'filetransform:babel',
     'grunt-license',
+    'copy:dist',
     'sass:dist',
     'postcss:dist',
     'browserify:dist',
     'jade:dist',
-    'copy:dist',
     'cordova'
   ]);
 
@@ -235,6 +238,7 @@ module.exports = grunt => {
     'clean:build',
     'clean:compiled',
     'filetransform:babel',
+    'copy:dist',
     'grunt-license',
     'sass:dist',
     'imagemin',
@@ -242,7 +246,6 @@ module.exports = grunt => {
     'browserify:dist',
     'uglify:dist',
     'jade:dist',
-    'copy:dist',
     'cordova'
   ]);
 
