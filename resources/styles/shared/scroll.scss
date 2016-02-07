@@ -17,30 +17,3 @@
 .no-scroll {
   overflow: hidden;
 }
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-  transition: all 250ms ease-in;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-  transition: all 250ms ease-in;
-}
-
-::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  transition: all 250ms ease-in;
-  background: rgba(0, 0, 0, 0.3) !important;
-}
-
-::-webkit-scrollbar-corner {
-  background: transparent;
-  transition: all 250ms ease-in;
-}
-
-::-webkit-scrollbar-thumb:window-inactive {
-  transition: all 250ms ease-in;
-  background: rgba(0, 0, 0, 0.1) !important;
-}
