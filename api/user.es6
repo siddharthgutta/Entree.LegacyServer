@@ -65,8 +65,8 @@ export function signup(phoneNumber) {
             }).catch(error => {
               console.tag('api', 'user', 'signup', 'sendSMS', 'ERROR')
                 .log('Text Message was not sent successfully, but user account was created.' +
-                  `If user account was created, rolling it back now. SMS Error: ${error}`);
-              throw new Error(`SMS Error: ${error}`);
+                  `If user account was created, rolling it back now. SMS Error:`, error);
+              throw new Error(`SMS Error: ${JSON.stringify(error)}`);
             });
         }).catch(error => {
           console.tag('api', 'user', 'signup', 'sendSMS', 'ERROR')
