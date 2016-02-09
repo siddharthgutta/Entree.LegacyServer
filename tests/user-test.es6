@@ -20,7 +20,6 @@ after(() => destroyDatabase());
 describe('User', () => {
   const name = 'TestUser';
   const email = 'TestUser@gmail.com';
-  const password = '1234';
   const phoneNumber = '1234567890';
   // Modify this number to test your own phone
   const productionPhoneNumber = '2149664948';
@@ -59,7 +58,6 @@ describe('User', () => {
 
           User.findOne(productionPhoneNumber).then(user => {
             assert.equal(user.name, null);
-            assert.equal(user.password, null);
             assert.equal(user.email, null);
             assert.equal(user.phoneNumber, productionPhoneNumber);
             user.destroy().then(() => done());
@@ -74,7 +72,7 @@ describe('User', () => {
       it('existing phone number should not be overridden', done => {
         let createdAt;
         let updatedAt;
-        User.create(productionPhoneNumber, password, name, email).then(() => {
+        User.create(productionPhoneNumber, name, email).then(() => {
           User.findOne(productionPhoneNumber).then(user => {
             createdAt = user.createdAt;
             updatedAt = user.updatedAt;
@@ -118,42 +116,45 @@ describe('User', () => {
 
 
   describe('#create()', () => {
-    it('should insert to and query from the database correctly', done => {
-      User.create(phoneNumber, password, name, email).then(() => {
-        User.findOne(phoneNumber).then(user => {
-          assert.equal(user.name, name);
-          assert.equal(user.password, password);
-          assert.equal(user.email, email);
-          assert.equal(user.phoneNumber, phoneNumber);
-          user.destroy().then(() => done());
-        });
+    it('should insert into the database correctly', done => {
+      User.create(phoneNumber, name, email).then(user => {
+        assert.equal(user.name, name);
+        assert.equal(user.email, email);
+        assert.equal(user.phoneNumber, phoneNumber);
+        user.destroy().then(() => done());
       });
     });
 
-    it('should not create Users that have any null attributes', done => {
-      User.create(null, null, null, null).then(() => {
-        assert(false);
-        done();
+    it('should not create Users that have null phoneNumber', done => {
+      User.create(null, name, email).then(user => {
+        user.destroy().then(() => {
+          assert(false);
+          done();
+        });
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
       });
     });
 
-    it('should not create Users with non alpha-numeric names or invalid emails', done => {
-      User.create(phoneNumber, password, '13(*#', 'NotValidEmail').then(() => {
-        assert(false);
-        done();
+    it('should not create Users with invalid email  format', done => {
+      User.create(phoneNumber, name, 'NotValidEmail').then(user => {
+        user.destroy().then(() => {
+          assert(false);
+          done();
+        });
       }, err => {
-        assert.equal(err.errors.length, 2);
+        assert.equal(err.errors.length, 1);
         done();
       });
     });
 
     it('should not create Users with phone number not length 10', done => {
-      User.create('123', password, name, email).then(() => {
-        assert(false);
-        done();
+      User.create('123', name, email).then(user => {
+        user.destroy().then(() => {
+          assert(false);
+          done();
+        });
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -161,9 +162,11 @@ describe('User', () => {
     });
 
     it('should not create Users with non numeric phone numbers', done => {
-      User.create('abcdefghij', password, name, email).then(() => {
-        assert(false);
-        done();
+      User.create('abcdefghij', name, email).then(user => {
+        user.destroy().then(() => {
+          assert(false);
+          done();
+        });
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -173,16 +176,14 @@ describe('User', () => {
 
   describe('update()', () => {
     it('should update and query from the database correctly', done => {
-      User.create(phoneNumber, password, name, email).then(() => {
+      User.create(phoneNumber, name, email).then(() => {
         User.update(phoneNumber, {
           name: 'NewUser',
           email: 'NewUser@gmail.com',
-          password: '5678',
           phoneNumber: '1234561234'
         }).then(() => {
           User.findOne('1234561234').then(user => {
             assert.equal(user.name, 'NewUser');
-            assert.equal(user.password, '5678');
             assert.equal(user.email, 'NewUser@gmail.com');
             assert.equal(user.phoneNumber, '1234561234');
             user.destroy().then(() => done());
@@ -194,12 +195,25 @@ describe('User', () => {
 
   describe('#destroy()', () => {
     it('should delete from the database correctly', done => {
-      User.create(phoneNumber, password, name, email).then(() => {
+      User.create(phoneNumber, name, email).then(() => {
         User.destroy('1234567890').then(() => {
           User.findOne('1234567890').then(user => {
             assert.equal(user, null);
             done();
           });
+        });
+      });
+    });
+  });
+
+  describe('#findOne()', () => {
+    it('should query from the database correctly', done => {
+      User.create(phoneNumber, name, email).then(() => {
+        User.findOne(phoneNumber).then(user => {
+          assert.equal(user.name, name);
+          assert.equal(user.email, email);
+          assert.equal(user.phoneNumber, phoneNumber);
+          user.destroy().then(() => done());
         });
       });
     });

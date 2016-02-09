@@ -11,13 +11,12 @@ import {sendSMS} from './sms.es6';
  * Create a user
  *
  * @param {string} phoneNumber: User phone number
- * @param {string} password: User password
  * @param {string} name: User name
  * @param {string} email: User email
  * @returns {Promise}: Returns the user object
  */
-export function create(phoneNumber, password, name, email) {
-  return models.User.create({phoneNumber, password, name, email});
+export function create(phoneNumber, name, email) {
+  return models.User.create({phoneNumber, name, email});
 }
 
 /**
