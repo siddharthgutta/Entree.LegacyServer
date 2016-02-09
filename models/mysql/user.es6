@@ -8,16 +8,9 @@ export default function (sequelize, DataTypes) {
         is: /^\d{10}$/
       }
     },
-    password: {
-      type: DataTypes.STRING(64), // eslint-disable-line new-cap
-      allowNull: true
-    },
     name: {
       type: DataTypes.STRING(64), // eslint-disable-line new-cap
-      allowNull: true,
-      validate: {
-        is: /^[a-zA-Z ]*$/
-      }
+      allowNull: true
     },
     email: {
       type: DataTypes.STRING(128), // eslint-disable-line new-cap
