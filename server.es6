@@ -25,5 +25,8 @@ app.use(bodyParser.json());                              // sets app to use midd
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public'))); // points app to public directory for static files
 
+// sets up specific routes
+app.use('/message', MessageRouter);
+
 export const expressApp = app;
 export default server;
