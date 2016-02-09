@@ -8,7 +8,7 @@ const TWILIO_FROM_NUMBER = config.get('Twilio.fromNumbers');
 import expect from 'expect.js';
 import supertest from 'supertest';
 const port = resolveContext().port;
-const server = supertest.agent(`http://localhost:${port}`);
+const server = supertest.agent(`https://localhost:${port}`); // FIXME use config; read Server.protocol, Server.port
 
 before(done => {
   initDatabase().then(() => done());

@@ -3,14 +3,17 @@ import config from 'config';
 import models from './models/mysql/index.es6';
 import mongoose from 'mongoose';
 import extend from 'extend';
+import {deprecate} from './libs/utils.es6';
 
 export function resolveContext() {
-  const port = config.get('Port');
-  const id = config.get('AppId');
-  const nodeEnv = config.get('NodeEnv');
-  const ctx = {port, id, nodeEnv};
+  return deprecate(() => {
+    const port = config.get('Server.port');
+    const id = config.get('AppId');
+    const nodeEnv = config.get('NodeEnv');
+    const ctx = {port, id, nodeEnv};
 
-  return ctx;
+    return ctx;
+  }, 'bootstrap.es6#resolveContext: Use config.get(...) instead!');
 }
 
 export function initScribe(override = true, mongo = true, socket = true, opts = {}, ...exposers) {

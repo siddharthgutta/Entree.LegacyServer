@@ -1,7 +1,7 @@
 import React from 'react';
 import Influx from 'react-influx';
 import {findDOMNode} from 'react-dom';
-import {onClick, type} from '../../libs/utils';
+import {onClick, type, log} from '../../libs/utils';
 import Messenger from './../../components/Messenger';
 import request from 'superagent';
 
@@ -75,14 +75,33 @@ class App extends Influx.Component {
   }
 
   _createUser() {
+    if (this.block === 'DONE') {
+      return alert('You should receive a text shortly');
+    } else if (this.block) {
+      return alert('Hang tight');
+    }
+
+    this.block = true;
+
     const node = findDOMNode(this.refs.phone);
     const phoneNumber = node.value;
+
     request.post(`/api/user/signup`)
+        .withCredentials()
         .send({phoneNumber})
         .end((err, res) => {
-          if (err) alert(JSON.stringify(err)); // FIXME improve error handling
-          else if (res.body.status) alert(res.body.message);
-          alert(res.body.message); // FIXME for testing!
+          if (err) {
+            log(['api', 'call'], err);
+            alert(JSON.stringify(err));
+            this.block = false;
+          } else if (res.body.status) {
+            log(['api', 'call'], res.body);
+            alert(res.body.message);
+            this.block = false;
+          } else {
+            alert(res.body.message); // FIXME for testing!
+            this.block = 'DONE';
+          }
         });
   }
 
@@ -100,41 +119,28 @@ class App extends Influx.Component {
 
   render() {
     return (
-        <div className='full' style={{background: 'url(images/top.jpg)',
-              backgroundPosition: '10% center', backgroundSize: 'cover'}}>
+        <div className='full background'>
           <div className='flex center vertical animate-opacity' ref='brand' style={{width: '100%', height: '50%'}}>
-            <div style={{background: 'url(images/logo2.png)', backgroundSize: 'cover',
-            width: 195, height: 90}}/>
-            <div style={{fontSize: 17, color: '#FFF', letterSpacing: '0'}}>Order Ahead with SMS</div>
+            <div className='main-logo'/>
+            <div className='catchphrase'>Order Ahead with SMS</div>
           </div>
-          <div ref='mobile' className='animate-transform'
-               style={{padding: '15px 0', width: '100%', position: 'fixed', bottom: -400, left: 0, right: 0}}>
-            <div className='animate-opacity' ref='icon'
-                 style={{position: 'absolute', top: -60, height: 50, width: '100%', opacity: 0}}>
-              <div style={{backgroundImage: 'url(images/logo2.png)', backgroundSize: 'cover',
-              backgroundPosition: 'left center', height: 60, width: 45, margin: '0 auto'}}/>
+          <div ref='mobile' className='animate-transform phone-wrapper'>
+            <div className='animate-opacity secondary-logo-wrapper' ref='icon'>
+              <div className='secondary-logo'/>
             </div>
-            <div ref='screen' style={{width: 325, margin: '0 auto', background: 'url(images/iphone-black.png)',
-             maxWidth: 325, height: 665, maxHeight: 665, backgroundRepeat: 'no-repeat', backgroundSize: '100% auto',
-             padding: '85px 22px'}}>
-              <div className='flex vertical' style={{background: '#EEE', width: '100%', height: '68%',
-              position: 'relative', borderRadius: 2, overflow: 'hidden'}}>
-                <div style={{backgroundImage: 'url(images/header.jpg)', backgroundSize: '100% auto',
-                backgroundPosition: 'center center', height: '20px', minHeight: '20px', maxHeight: '20px',
-                backgroundRepeat: 'no-repeat'}}/>
+            <div ref='screen' className='phone'>
+              <div className='flex vertical viewport'>
+                <div className='status-bar'/>
                 <Messenger messages={this.state.messages} me={me} them={them}/>
               </div>
             </div>
           </div>
-          <div style={{background: '#000', boxShadow: '0 -10px 50px rgba(0,0,0,0.3)', zIndex: 10,
-              padding: 0, position: 'fixed', left: 0, bottom: 0, overflow: 'hidden', right: 0}}>
-            <div className='' style={{position: 'absolute', left: 0, top: -50, bottom: 0, right: 0,
-            background: '#DDD', backgroundSize: 'cover', zIndex: 0}}/>
-            <div className='full'>
+          <div className='modal'>
+            <div className='input-wrapper'>
               <input type='tel' ref='phone' className='input' placeholder='Your Phone Number'/>
-              <div className='button' {...onClick(() => this._createUser())}><span style={{opacity: 0.7}}>TEXT</span>
-                &nbsp;YOUR ORDER!
-              </div>
+            </div>
+            <div className='button' {...onClick(() => this._createUser())}><span style={{opacity: 0.7}}>TEXT</span>
+              &nbsp;YOUR ORDER!
             </div>
           </div>
         </div>

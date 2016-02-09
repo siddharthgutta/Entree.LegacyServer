@@ -8,7 +8,7 @@ let socketStrategy;
 if (config.get('UseInternalSocket')) {
   socketStrategy = io();
 
-  console.tag('sio').log(`Using internal socket server running on ${config.get('Port')}`);
+  console.tag('sio').log(`Using internal socket server running on ${config.get('Server.port')}`);
 } else {
   const extSocket = config.get('ExternalSocketServer');
   socketStrategy = new SocketServer(extSocket);

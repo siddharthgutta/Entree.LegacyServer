@@ -1,16 +1,34 @@
 {
   "start": "node index.compiled.js",
   "preferPort": {
+    "mode": {
+      "manual": 3000
+    },
     "branch": {
-      "master": 2998,
+      "master": 443,
       "socket-master": 2999,
       "socket-test": 2997
     }
   },
   "env": {
+    "mode": {
+      "manual": {
+        "NODE_ENV": "staging",
+        "HTTPS_REJECT_UNAUTHORIZED": false,
+        "NODE_TLS_REJECT_UNAUTHORIZED": 0
+      },
+      "stage": {
+        "NODE_ENV": "staging",
+        "HTTPS_REJECT_UNAUTHORIZED": false,
+        "NODE_TLS_REJECT_UNAUTHORIZED": 0
+      },
+      "release": {
+        "NODE_ENV": "production",
+        "HTTPS_REJECT_UNAUTHORIZED": true
+      }
+    },
     "branch": {
       "default": {
-        "NODE_ENV": "staging",
         "SOCKET_SERVER_PORT": 2998,
         "SOCKET_SERVER_USE_INTERNAL_ONLY": false,
         "SOCKET_SERVER_HOSTNAME": "localhost",
@@ -19,13 +37,6 @@
         "SOCKET_SERVER_SEARCH": "?"
       },
       "master#release": {
-        "NODE_ENV": "production",
-        "SOCKET_SERVER_PORT": 2997
-      },
-      "registration#release": {
-        "NODE_ENV": "production"
-      },
-      "registration#stage": {
         "NODE_ENV": "production",
         "SOCKET_SERVER_PORT": 2997
       }
