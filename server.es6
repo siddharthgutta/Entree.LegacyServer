@@ -14,9 +14,6 @@ sio.attach(server);                                 // attaches server to socket
 app.set('views', path.join(__dirname, 'views'));  // points app to location of the views
 app.set('view engine', 'jade');                   // sets the view engine to jade
 
-// console access
-app.use(console.middleware('express'));
-
 // compress gzip
 app.use(compression());
 app.use(bodyParser.urlencoded({extended: true}));
