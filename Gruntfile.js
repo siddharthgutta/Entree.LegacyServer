@@ -52,6 +52,7 @@ module.exports = grunt => {
 
 
   grunt.registerTask('build', [
+    'clean',
     'compile',
     'grunt-license'
   ]);
