@@ -15,6 +15,7 @@
     "babel-preset-stage-0": "6.3.13",
     "babelify": "7.2.0",
     "bluebird": "3.2.1",
+    "compression": "1.6.1",
     "body-parser": "1.14.2",
     "brace": "0.7.0",
     "callsite": "1.0.0",
