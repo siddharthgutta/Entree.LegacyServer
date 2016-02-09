@@ -2,13 +2,19 @@
   "Client": {
     "socketPort": "SOCKET_SERVER_PORT"
   },
-  "UseInternalSocket": "SOCKET_SERVER_USE_INTERNAL_ONLY",
+  "UseInternalSocket": {
+    "__name": "SOCKET_SERVER_USE_INTERNAL_ONLY",
+    "__format": "json"
+  },
   "ExternalSocketServer": {
-    "port": "SOCKET_SERVER_PORT",
+    "port": {
+      "__name": "SOCKET_SERVER_PORT",
+      "__format": "json"
+    },
     "protocol": "SOCKET_SERVER_PROTOCOL",
     "search": "SOCKET_SERVER_SEARCH",
     "path": "SOCKET_SERVER_PATH",
-    "host": "SOCKET_SERVER_HOST"
+    "hostname": "SOCKET_SERVER_HOSTNAME"
   },
   "NodeEnv": "NODE_ENV",
   "AppId": "BRANCHOFF_BRANCH",

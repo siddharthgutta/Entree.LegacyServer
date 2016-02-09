@@ -27,7 +27,7 @@
   "UseInternalSocket": true,
   "ExternalSocketServer": {
     "protocol": "http",
-    "host": "ec2-52-89-1-140.us-west-2.compute.amazonaws.com",
+    "hostname": "ec2-52-89-1-140.us-west-2.compute.amazonaws.com",
     "port": 2997,
     "search": "?",
     "path": ""
