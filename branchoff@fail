@@ -1,0 +1,60 @@
+#!/usr/bin/env sh
+
+code=$1
+output=$2
+id=$(git rev-parse HEAD)
+message=$(git log -1 --pretty=%B )
+author=$(git --no-pager show -s --format='%an <%ae>' "$id")
+branch=$(git symbolic-ref --short HEAD)
+
+# Paste into Chrome
+#
+# var x = {
+#    "channel": "#continous3",
+#    "attachments": [
+#        {
+#            "fallback": "Test Failure",
+#            "text": "",
+#            "fields": [
+#                {
+#                    "title": "Branch",
+#                    "value": "$branch",
+#                    "short": true
+#                },
+#                {
+#                    "title": "Author",
+#                    "value": "$author",
+#                    "short": true
+#                },
+#                {
+#                    "title": "Commit",
+#                    "value": "$id",
+#                    "short": true
+#                },
+#                {
+#                    "title": "Message",
+#                    "value": "$message",
+#                    "short": true
+#                },
+#                {
+#                    "title": "Status",
+#                    "value": "FAILED! Push again for staging",
+#                    "short": true
+#                },
+#            ],
+#            "mrkdwn_in": ["fields"],
+#            "color": "#F35A00"
+#        }
+#    ]
+# }
+#
+# copy(JSON.stringify(JSON.stringify(x)))
+#
+
+payload=$(echo "{\"channel\":\"#continous3\",\"attachments\":[{\"fallback\":\"Test Failure\",\"text\":\"\",\"fields\":[{\"title\":\"Branch\",\"value\":\"$branch\",\"short\":true},{\"title\":\"Author\",\"value\":\"$author\",\"short\":true},{\"title\":\"Commit\",\"value\":\"$id\",\"short\":true},{\"title\":\"Message\",\"value\":\"$message\",\"short\":true},{\"title\":\"Status\",\"value\":\"FAILED! Push again for staging\",\"short\":true}],\"color\":\"#F35A00\"}]}")
+
+curl -X POST -H 'Content-type: application/json' \
+     --data "$payload" https://hooks.slack.com/services/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
+
+clean=$(printf "$output")
+curl -F content="$clean" -F channels=\#continous3 -F token=xoxp-16957148439-17257626929-19966448691-9135b559f4 https://slack.com/api/files.upload
