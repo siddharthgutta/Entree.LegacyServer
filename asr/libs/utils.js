@@ -1,5 +1,7 @@
 import prefix from 'react-prefixr';
 import tapInject from 'react-tap-event-plugin';
+import './rAF';
+import request from 'superagent';
 
 export function ifcat(base, obj) {
   let res = '';
@@ -55,4 +57,32 @@ export function scrollTo(element, to, duration) {
   }
 
   setTimeout(() => window.requestAnimationFrame(step), 10);
+}
+
+export function type(node, text, time, then) {
+  const letters = text.split('');
+  let id;
+
+  node.value = '';
+
+  id = setInterval(() => {
+    if (!letters.length) {
+      clearInterval(id);
+      return then();
+    }
+
+    const letter = letters.shift();
+    node.value = node.value + letter;
+  }, time / letters.length);
+}
+
+// FIXME use scribe instead
+export function log(tags, ...message) {
+  request
+      .post('/api/telemetry/log')
+      .send({tags, message})
+      .end((err, res) => {
+        if (err) return console.error(err);
+        console.log(res.body.message);
+      });
 }

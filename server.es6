@@ -3,6 +3,7 @@ import path from 'path';                     // module for handling/transforming
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import http from 'http';
+import compression from 'compression';
 import sio from './message/sio';             // socket-io (websockets)
 import BasicRouter from './routes/basic';    // imports standard/websocket routers
 import NotifyRouter from './routes/notify';
@@ -21,6 +22,8 @@ app.set('view engine', 'jade');                   // sets the view engine to jad
 app.use(console.middleware('express'));
 app.use('/scribe', console.viewer());
 
+// compress gzip
+app.use(compression());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());                              // sets app to use middleware that only parses json
 app.use(cookieParser());

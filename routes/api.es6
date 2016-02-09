@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import * as Token from '../api/token.es6';
 import * as User from '../api/user.es6';
+import {ip} from '../libs/utils.es6';
 
 const route = new Router();
 
@@ -8,11 +9,11 @@ route.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.ok = (tags, logMessage, data, resMessage) => {
     console.tag(...tags).log(logMessage);
-    res.json({status: 0, data: data.toJSON ? data.toJSON() : data, message: resMessage});
+    res.json({data: data.toJSON ? data.toJSON() : data, message: resMessage});
   };
-  res.fail = (tags, logMessage, resMessage, status) => {
+  res.fail = (tags, logMessage, resMessage, status = 1) => {
     console.tag(...tags).log(logMessage);
-    res.json({status: status || 1, message: resMessage});
+    res.json({status, message: resMessage});
   };
   next();
 });
@@ -48,7 +49,7 @@ route.post('/user/destroy', (req, res) => {
 route.post('/user/signup', (req, res) => {
   User.signup(req.body.phoneNumber)
       .then(response => {
-        console.tag('routes', 'api', '/user/signup', 'User.signup', 'SMS').log(JSON.stringify(response));
+        console.tag('routes', 'api', '/user/signup', 'User.signup', 'SMS').log(response);
         res.ok(['routes', 'api', '/user/signup', 'User.signup', 'SUCCESS'],
             'New user created. Sending full welcome message.',
             {}, `We have sent a text message to your number: ${req.body.phoneNumber}`);
@@ -59,6 +60,28 @@ route.post('/user/signup', (req, res) => {
             'Sorry, a text message to your phone could not be sent! Please try again.',
             500);
       });
+});
+
+route.post('/telemetry/:expose', (req, res) => {
+  let tags = req.body.tags;
+  let message = req.body.message;
+
+  if (!tags) {
+    tags = [];
+  } else if (!Array.isArray(tags)) {
+    tags = [tags];
+  }
+
+  if (!message) {
+    message = [];
+  } else if (!Array.isArray(tags)) {
+    message = [message];
+  }
+
+  console
+      .tag('telemetry', ip(req), ...tags)
+      .log(...message)
+      .then(() => res.ok(['telemetry'], 'Logging telemetry', null, 'Success'));
 });
 
 export default route;

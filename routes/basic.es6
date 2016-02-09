@@ -13,17 +13,20 @@ route.get('/', (req, res) => res.render('index', {
 
 route.get('/restaurant', (req, res) => res.render('restaurant', {
   config: clientConfig,
-  title: 'Entree · Restaurant'
+  title: 'Entree · Restaurant',
+  socket: true
 }));
 
-route.get('/registration', (req, res) => res.render('registration', {
+route.get('/welcome', (req, res) => res.render('registration', {
   config: clientConfig,
-  title: 'Entree · Registration'
+  title: 'Entree · Welcome',
+  socket: false
 }));
 
 route.get('/messenger', (req, res) => res.render('messenger', {
   config: clientConfig,
-  title: 'Entree · Messenger'
+  title: 'Entree · Messenger',
+  socket: true
 }));
 
 route.get('/tests', (req, res) => {

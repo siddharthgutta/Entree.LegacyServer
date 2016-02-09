@@ -1,0 +1,16 @@
+{
+  "Client": {
+    "socketPort": "SOCKET_SERVER_PORT"
+  },
+  "UseInternalSocket": "SOCKET_SERVER_USE_INTERNAL_ONLY",
+  "ExternalSocketServer": {
+    "port": "SOCKET_SERVER_PORT",
+    "protocol": "SOCKET_SERVER_PROTOCOL",
+    "search": "SOCKET_SERVER_SEARCH",
+    "path": "SOCKET_SERVER_PATH",
+    "host": "SOCKET_SERVER_HOST"
+  },
+  "NodeEnv": "NODE_ENV",
+  "AppId": "BRANCHOFF_BRANCH",
+  "Port": "BRANCHOFF_PORT"
+}
