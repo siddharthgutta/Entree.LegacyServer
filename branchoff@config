@@ -36,7 +36,7 @@
     "script": "./index.compiled.js",
     "next_gen_js": false,
     "max_memory_restart": "1G",
-    "exec_mode": 'fork',
+    "exec_mode": "fork",
     "instances": 1
   }
 }
