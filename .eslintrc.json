@@ -1,0 +1,95 @@
+{
+  "root": true,
+  "extends": "airbnb",
+  "plugins": [
+    "react",
+    "mocha",
+    "markdown"
+  ],
+  "parser": "babel-eslint",
+  "env": {
+    "node": true,
+    "mocha": true,
+    "es6": true
+  },
+  "rules": {
+    "mocha/no-exclusive-tests": 2,
+    "comma-dangle": [
+      2,
+      "never"
+    ],
+    "object-curly-spacing": [
+      2,
+      "never"
+    ],
+    "object-shorthand": [
+      2,
+      "always"
+    ],
+    "no-console": 0,
+    "no-extra-parens": 2,
+    "arrow-body-style": [
+      2,
+      "as-needed"
+    ],
+    "arrow-parens": [
+      2,
+      "as-needed"
+    ],
+    "valid-jsdoc": 2,
+    "no-unreachable": 2,
+    "prefer-template": 2,
+    "prefer-arrow-callback": 2,
+    "react/jsx-no-bind": [
+      2,
+      {
+        "ignoreRefs": true,
+        "allowArrowFunctions": true,
+        "allowBind": false
+      }
+    ],
+    "arrow-spacing": [
+      2,
+      {
+        "before": true,
+        "after": true
+      }
+    ],
+    "no-useless-call": 2,
+    "no-proto": 2,
+    "no-useless-concat": 2,
+    "max-len": [
+      2,
+      120,
+      4
+    ],
+    "no-param-reassign": 0,
+    "jsx-quotes": [
+      2,
+      "prefer-single"
+    ],
+    "react/jsx-indent-props": 0,
+    "indent": [
+      2,
+      2
+    ],
+    "react/jsx-closing-bracket-location": [
+      2,
+      {
+        "location": "after-props"
+      }
+    ],
+    "brace-style": [
+      2,
+      "1tbs",
+      {
+        "allowSingleLine": false
+      }
+    ]
+  },
+  "ecmaFeatures": {
+    "jsx": true,
+    "objectLiteralShorthandProperties": true,
+    "spread": true
+  }
+}
