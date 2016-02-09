@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import http from 'http';
 import compression from 'compression';
 import sio from './message/sio';
+import MessageRouter from './routes/twilio';
 
 const app = express();                            // server creation
 const server = http.createServer(app);
@@ -20,6 +21,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());                              // sets app to use middleware that only parses json
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public'))); // points app to public directory for static files
+
+// sets up specific routes
+app.use('/message', MessageRouter);
 
 export const expressApp = app;
 export default server;
