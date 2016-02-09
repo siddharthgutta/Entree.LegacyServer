@@ -13,7 +13,7 @@
         "NODE_ENV": "staging",
         "SOCKET_SERVER_PORT": 2998,
         "SOCKET_SERVER_USE_INTERNAL_ONLY": false,
-        "SOCKET_SERVER_HOST": "localhost",
+        "SOCKET_SERVER_HOSTNAME": "localhost",
         "SOCKET_SERVER_PROTOCOL": "http",
         "SOCKET_SERVER_PATH": "",
         "SOCKET_SERVER_SEARCH": "?"
