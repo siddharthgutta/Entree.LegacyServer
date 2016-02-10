@@ -3,7 +3,7 @@ import './test-init.es6';
 import * as Message from '../api/message.es6';
 import {initDatabase, destroyDatabase} from '../bootstrap.es6';
 
-before(done => {
+beforeEach(done => {
   initDatabase().then(() => done());
 });
 
@@ -30,16 +30,14 @@ describe('Message', () => {
         assert.equal(message.date.getTime(), date);
         assert.equal(message.twilioSid, twilioSid);
         assert.equal(message.success, success);
-        message.remove().then(() => done());
+        done();
       });
     });
 
     it('should not create message with invalid non 10-digit phone number', done => {
-      Message.create('123', 'acbdefghij', content, date, twilioSid, success).then(message => {
-        message.remove().then(() => {
-          assert(false);
-          done();
-        });
+      Message.create('123', 'acbdefghij', content, date, twilioSid, success).then(() => {
+        assert(false);
+        done();
       }, err => {
         assert.equal(Object.keys(err.errors).length, 2);
         done();
@@ -58,7 +56,7 @@ describe('Message', () => {
           assert.equal(result[0].date.getTime(), date);
           assert.equal(result[0].twilioSid, twilioSid);
           assert.equal(result[0].success, success);
-          result[0].remove().then(() => done());
+          done();
         });
       });
     });
@@ -73,7 +71,7 @@ describe('Message', () => {
           assert.equal(result[0].date.getTime(), date);
           assert.equal(result[0].twilioSid, twilioSid);
           assert.equal(result[0].success, success);
-          result[0].remove().then(() => done());
+          done();
         });
       });
     });
@@ -89,7 +87,7 @@ describe('Message', () => {
             assert.equal(result[0].date.getTime(), date);
             assert.equal(result[0].twilioSid, twilioSid);
             assert.equal(result[0].success, success);
-            result[0].remove().then(() => done());
+            done();
           });
         });
       });
@@ -102,7 +100,7 @@ describe('Message', () => {
             assert.equal(result.length, 2);
             assert.equal(result[0].date.getTime(), date + 100);
             assert.equal(result[1].date.getTime(), date);
-            result[0].remove().then(result[1].remove().then(() => done()));
+            done();
           });
         });
       });

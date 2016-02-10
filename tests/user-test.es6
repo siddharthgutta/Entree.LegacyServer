@@ -10,7 +10,7 @@ import supertest from 'supertest';
 const port = resolveContext().port;
 const server = supertest.agent(`http://localhost:${port}`);
 
-before(done => {
+beforeEach(done => {
   initDatabase().then(() => done());
 });
 
@@ -60,7 +60,7 @@ describe('User', () => {
             assert.equal(user.name, null);
             assert.equal(user.email, null);
             assert.equal(user.phoneNumber, productionPhoneNumber);
-            user.destroy().then(() => done());
+            done();
           }).catch(error => {
             expect().fail(`Finding User Failed: ${error}`);
           });
@@ -86,7 +86,7 @@ describe('User', () => {
           User.findOne(productionPhoneNumber).then(user => {
             assert.deepEqual(user.createdAt, createdAt);
             assert.deepEqual(user.updatedAt, updatedAt);
-            user.destroy().then(() => done());
+            done();
           });
         });
       });
@@ -121,16 +121,14 @@ describe('User', () => {
         assert.equal(user.name, name);
         assert.equal(user.email, email);
         assert.equal(user.phoneNumber, phoneNumber);
-        user.destroy().then(() => done());
+        done();
       });
     });
 
     it('should not create Users that have null phoneNumber', done => {
-      User.create(null, name, email).then(user => {
-        user.destroy().then(() => {
-          assert(false);
-          done();
-        });
+      User.create(null, name, email).then(() => {
+        assert(false);
+        done();
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -138,11 +136,9 @@ describe('User', () => {
     });
 
     it('should not create Users with invalid email  format', done => {
-      User.create(phoneNumber, name, 'NotValidEmail').then(user => {
-        user.destroy().then(() => {
-          assert(false);
-          done();
-        });
+      User.create(phoneNumber, name, 'NotValidEmail').then(() => {
+        assert(false);
+        done();
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -150,11 +146,9 @@ describe('User', () => {
     });
 
     it('should not create Users with phone number not length 10', done => {
-      User.create('123', name, email).then(user => {
-        user.destroy().then(() => {
-          assert(false);
-          done();
-        });
+      User.create('123', name, email).then(() => {
+        assert(false);
+        done();
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -162,11 +156,9 @@ describe('User', () => {
     });
 
     it('should not create Users with non numeric phone numbers', done => {
-      User.create('abcdefghij', name, email).then(user => {
-        user.destroy().then(() => {
-          assert(false);
-          done();
-        });
+      User.create('abcdefghij', name, email).then(() => {
+        assert(false);
+        done();
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -174,7 +166,7 @@ describe('User', () => {
     });
   });
 
-  describe('update()', () => {
+  describe('#update()', () => {
     it('should update and query from the database correctly', done => {
       User.create(phoneNumber, name, email).then(() => {
         User.update(phoneNumber, {
@@ -186,7 +178,7 @@ describe('User', () => {
             assert.equal(user.name, 'NewUser');
             assert.equal(user.email, 'NewUser@gmail.com');
             assert.equal(user.phoneNumber, '1234561234');
-            user.destroy().then(() => done());
+            done();
           });
         });
       });
@@ -213,7 +205,7 @@ describe('User', () => {
           assert.equal(user.name, name);
           assert.equal(user.email, email);
           assert.equal(user.phoneNumber, phoneNumber);
-          user.destroy().then(() => done());
+          done();
         });
       });
     });
