@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import * as Token from '../api/token.es6';
 import * as User from '../api/user.es6';
-import {ip} from '../libs/utils.es6';
+import {ip, isEmpty} from '../libs/utils.es6';
 
 const route = new Router();
 
@@ -17,7 +17,7 @@ route.use((req, res, next) => {
     res.json({data: data.toJSON ? data.toJSON() : data, message: resMessage});
   };
   res.fail = (tags, logMessage, resMessage, status = 1) => {
-    console.tag(...tags).log(logMessage);
+    console.tag(...tags).error(logMessage);
     res.json({status, message: resMessage});
   };
   next();
@@ -52,19 +52,55 @@ route.post('/user/destroy', (req, res) => {
 
 // Users sends in the phone number for initial first layer signup
 route.post('/user/signup', (req, res) => {
-  User.signup(req.body.phoneNumber)
+  if (isEmpty(req.body.phoneNumber)) {
+    res.status(400);
+    res.fail(['routes', 'api', '/user/signup', 'User.signup'],
+      'Client tried to send null phone number.',
+      "Sorry, you didn't send us a phone number.",
+      'Fail');
+  } else {
+    User.signup(req.body.phoneNumber)
       .then(response => {
         console.tag('routes', 'api', '/user/signup', 'User.signup', 'SMS').log(response);
-        res.ok(['routes', 'api', '/user/signup', 'User.signup', 'SUCCESS'],
-            'New user created. Sending full welcome message.',
-            {}, `We have sent a text message to your number: ${req.body.phoneNumber}`);
+        res.ok(['routes', 'api', '/user/signup', 'User.signup'],
+          'New user created. Sending full welcome message.',
+          {}, `We have sent a text message to your number: ${req.body.phoneNumber}`);
       })
       .catch(error => {
-        res.fail(['routes', 'api', '/user/signup', 'User.signup', 'ERROR'],
-            `Error: ${error}`,
-            `Sorry, a text message to your phone could not be sent: ${error.message}`,
-            500);
+        if (error.name === 'SequelizeValidationError') {
+          res.status(400);
+          res.fail(['routes', 'api', '/user/signup', 'User.signup'],
+            error,
+            'Sorry, that is not a valid number.',
+            'Fail');
+        } else {
+          switch (error.code) {
+          // Invalid To Number
+          case 21211:
+            res.status(400);
+            res.fail(['routes', 'api', '/user/signup', 'User.signup'],
+              error,
+              'Sorry, that is not a real phone number.',
+              'Fail');
+            break;
+          // Twilio Trial: Not a Verified number
+          case 21608:
+            res.status(404);
+            res.fail(['routes', 'api', '/user/signup', 'User.signup'],
+              error,
+              'Sorry, we are currently in private beta. Our service is not available to you yet.',
+              'Fail');
+            break;
+          default:
+            res.status(500);
+            res.fail(['routes', 'api', '/user/signup', 'User.signup'],
+              error,
+              'Sorry, a text message to your phone could not be sent! Please try again.',
+              'Fail');
+          }
+        }
       });
+  }
 });
 
 route.post('/telemetry/:expose', (req, res) => {
