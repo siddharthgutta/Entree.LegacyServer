@@ -23,6 +23,10 @@ describe('User', () => {
   const phoneNumber = '1234567890';
   // Modify this number to test your own phone
   const productionPhoneNumber = '2149664948';
+  const fakeNumber = '1234567890';
+  // REMOVE THIS NUMBER AND ITS CORRESPONDING TEST WHEN NO LONGER TWILIO TRIAL
+  const unverifiedNumber = '8324932791';
+
   /*
    Only set REAL_SIGNUP to true when wanting to test real text message signup
    Immediately set it to false when done testing
@@ -39,12 +43,37 @@ describe('User', () => {
       let fullWelcomeMessage;
 
       describe('/api/user/signup endpoint', () => {
-        it('should fail validation for complex request', done => {
+        it('should send 400 response on null number', done => {
           server
             .post(`/api/user/signup`)
-            .send({productionPhoneNumber})
+            .send({})
+            .expect('Content-type', 'application/json; charset=utf-8')
+            .expect(400, done);
+        });
+
+        it('should signup correctly with valid verified number', done => {
+          server
+            .post(`/api/user/signup`)
+            .send({phoneNumber: productionPhoneNumber})
             .expect('Content-type', 'application/json; charset=utf-8')
             .expect(200, done);
+        });
+
+        it('should respond with status 400 on a non-real number', done => {
+          server
+            .post(`/api/user/signup`)
+            .send({phoneNumber: fakeNumber})
+            .expect('Content-type', 'application/json; charset=utf-8')
+            .expect(400, done);
+        });
+
+        // TEMPORARY TEST FOR TWILIO TRIAL
+        it('should respond 404 for unverified number', done => {
+          server
+            .post(`/api/user/signup`)
+            .send({phoneNumber: unverifiedNumber})
+            .expect('Content-type', 'application/json; charset=utf-8')
+            .expect(404, done);
         });
       });
 
