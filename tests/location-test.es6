@@ -3,7 +3,7 @@ import './test-init.es6';
 import * as Location from '../api/location.es6';
 import {initDatabase, destroyDatabase} from '../bootstrap.es6';
 
-before(done => {
+beforeEach(done => {
   initDatabase().then(() => done());
 });
 
@@ -28,17 +28,15 @@ describe('Location', () => {
         assert.equal(location.city, city);
         assert.equal(location.state, state);
         assert.equal(location.zipcode, zipcode);
-        location.destroy().then(() => done());
+        done();
       });
     });
 
     it('should not create Locations with null firstAddress, null city' +
         'null state, or null zipcode', done => {
-      Location.create(null, null, null, null).then(location => {
-        location.destroy().then(() => {
-          assert(false);
-          done();
-        });
+      Location.create(null, null, null, null).then(() => {
+        assert(false);
+        done();
       }, err => {
         assert.equal(err.errors.length, 4);
         done();
@@ -46,11 +44,9 @@ describe('Location', () => {
     });
 
     it('should not create Locations with invalid state or zipcode lengths', done => {
-      Location.create(firstAddress, city, 'X', '1').then(location => {
-        location.destroy().then(() => {
-          assert(false);
-          done();
-        });
+      Location.create(firstAddress, city, 'X', '1').then(() => {
+        assert(false);
+        done();
       }, err => {
         assert.equal(err.errors.length, 2);
         done();

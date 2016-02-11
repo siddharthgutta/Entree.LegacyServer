@@ -5,7 +5,7 @@ import * as RestaurantHour from '../api/restaurantHour.es6';
 import * as Location from '../api/location.es6';
 import {initDatabase, destroyDatabase} from '../bootstrap.es6';
 
-before(done => {
+beforeEach(done => {
   initDatabase().then(() => done());
 });
 
@@ -32,34 +32,28 @@ describe('Restaurant', () => {
 
   describe('#create()', () => {
     it('should insert to and query from the database correctly', done => {
-      Restaurant.create(name, password, {phoneNumber}).then(result => {
-        Restaurant.findOne(result.id).then(restaurant => {
-          assert.equal(restaurant.name, name);
-          assert.equal(restaurant.password, password);
-          assert.equal(restaurant.phoneNumber, phoneNumber);
-          restaurant.destroy().then(() => done());
-        });
+      Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
+        assert.equal(restaurant.name, name);
+        assert.equal(restaurant.password, password);
+        assert.equal(restaurant.phoneNumber, phoneNumber);
+        done();
       });
     });
 
     it('should insert to and query from the database correctly' +
         'without optional params', done => {
-      Restaurant.create(name, password).then(result => {
-        Restaurant.findOne(result.id).then(restaurant => {
-          assert.equal(restaurant.name, name);
-          assert.equal(restaurant.password, password);
-          restaurant.destroy().then(() => done());
-        });
+      Restaurant.create(name, password).then(restaurant => {
+        assert.equal(restaurant.name, name);
+        assert.equal(restaurant.password, password);
+        done();
       });
     });
 
     it('should not create Restaurants that have null name, null password' +
         'or phone number of length not 10', done => {
-      Restaurant.create(null, null, {phoneNumber: '123'}).then(restaurant => {
-        restaurant.destroy().then(() => {
-          assert(false);
-          done();
-        });
+      Restaurant.create(null, null, {phoneNumber: '123'}).then(() => {
+        assert(false);
+        done();
       }, err => {
         assert.equal(err.errors.length, 3);
         done();
@@ -67,11 +61,9 @@ describe('Restaurant', () => {
     });
 
     it('should not create Restaurant with non numeric phone number', done => {
-      Restaurant.create(name, password, {phoneNumber: 'abcdefghij'}).then(restaurant => {
-        restaurant.destroy().then(() => {
-          assert(false);
-          done();
-        });
+      Restaurant.create(name, password, {phoneNumber: 'abcdefghij'}).then(() => {
+        assert(false);
+        done();
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -79,7 +71,7 @@ describe('Restaurant', () => {
     });
   });
 
-  describe('update()', () => {
+  describe('#update()', () => {
     it('should update and query from the database correctly', done => {
       Restaurant.create(name, password, {phoneNumber}).then(result => {
         Restaurant.update(result.id, {
@@ -91,7 +83,7 @@ describe('Restaurant', () => {
             assert.equal(restaurant.name, 'NewRestaurant');
             assert.equal(restaurant.password, '5678');
             assert.equal(restaurant.phoneNumber, '1234561234');
-            restaurant.destroy().then(() => done());
+            done();
           });
         });
       });
@@ -141,7 +133,7 @@ describe('Restaurant', () => {
     });
   });
 
-  describe('#addOrUpdateRestaurantHours', () => {
+  describe('#addOrUpdateRestaurantHours()', () => {
     it('should add and query restaurant hours for a restaurant correctly', done => {
       Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
         RestaurantHour.create(dayOfTheWeek, openTime, closeTime).then(restaurantHour => {
@@ -151,7 +143,7 @@ describe('Restaurant', () => {
               assert.equal(hours[0].dayOfTheWeek, dayOfTheWeek);
               assert.equal(hours[0].openTime, openTime);
               assert.equal(hours[0].closeTime, closeTime);
-              restaurant.destroy().then(() => done());
+              done();
             });
           });
         });
@@ -169,7 +161,7 @@ describe('Restaurant', () => {
                   assert.equal(hours[0].dayOfTheWeek, dayOfTheWeek);
                   assert.equal(hours[0].openTime, '22:22:22');
                   assert.equal(hours[0].closeTime, '33:33:33');
-                  restaurant.destroy().then(() => done());
+                  done();
                 });
               });
             });
@@ -186,7 +178,7 @@ describe('Restaurant', () => {
               Restaurant.addOrUpdateHour(restaurant.id, restaurantHourNew).then(() => {
                 Restaurant.getHours(restaurant.id).then(hours => {
                   assert.equal(hours.length, 2);
-                  restaurant.destroy().then(() => done());
+                  done();
                 });
               });
             });
@@ -196,7 +188,7 @@ describe('Restaurant', () => {
     });
   });
 
-  describe('#setOrUpdateLocation', () => {
+  describe('#setOrUpdateLocation()', () => {
     it('should set the location of a restaurant if one does not exist', done => {
       Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
         Location.create(firstAddress, city, state, zipcode, {secondAddress}).then(location => {
@@ -207,7 +199,7 @@ describe('Restaurant', () => {
               assert.equal(result.city, city);
               assert.equal(result.state, state);
               assert.equal(result.zipcode, zipcode);
-              restaurant.destroy().then(() => done());
+              done();
             });
           });
         });
@@ -226,7 +218,7 @@ describe('Restaurant', () => {
                   assert.equal(result.city, 'NewCity');
                   assert.equal(result.state, 'AB');
                   assert.equal(result.zipcode, '09876');
-                  restaurant.destroy().then(() => done());
+                  done();
                 });
               });
             });
@@ -243,7 +235,7 @@ describe('Restaurant', () => {
               Restaurant.setOrUpdateLocation(restaurant.id, locationNew).then(() => {
                 Location.findAll().then(result => {
                   assert.equal(result.length, 1);
-                  restaurant.destroy().then(() => done());
+                  done();
                 });
               });
             });
@@ -253,7 +245,7 @@ describe('Restaurant', () => {
     });
   });
 
-  describe('#removeLocation', () => {
+  describe('#removeLocation()', () => {
     it('should remove the location for a specific restaurant', done => {
       Restaurant.create(name, password, {phoneNumber}).then(restaurant => {
         Location.create(firstAddress, city, state, zipcode, {secondAddress}).then(location => {

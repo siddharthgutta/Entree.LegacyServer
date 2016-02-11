@@ -1,17 +1,15 @@
 import mongoose from 'mongoose';
 
 const messageSchema = new mongoose.Schema({
-  from: {
+  phoneNumber: {
     type: String,
     match: /^\d{10}$/
   },
-  to: {
-    type: String,
-    match: /^\d{10}$/
-  },
+  restaurantId: Number,
   content: String,
   date: Date,
   twilioSid: String,
+  sentByUser: Boolean,
   success: Boolean
 });
 
