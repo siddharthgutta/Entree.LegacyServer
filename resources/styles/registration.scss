@@ -130,10 +130,10 @@ video {
 }
 
 .main-logo {
-  background: url(../images/logo2.png);
+  background: url(../images/logo3.png);
   background-size: cover;
-  width: 195px;
-  height: 90px;
+  width: 225px;
+  height: 100px;
 }
 
 .background {
@@ -167,13 +167,13 @@ video {
   top: -60px;
   height: 50px;
   width: 100%;
-  opacity: 1;
+  opacity: 0;
 }
 
 .secondary-logo {
-  background: url(../images/logo2.png) left center;
+  background: url(../images/logo4.png) left center;
   background-size: cover;
   height: 60px;
-  width: 45px;
+  width: 60px;
   margin: 0 auto;
 }

@@ -10,37 +10,37 @@ const me = {
 };
 
 const them = {
-  number: 'Entree'
+  number: 'Entrée'
 };
 
 const conversation = [{
   from: 'A',
-  to: 'Entree',
-  content: 'Hey Entree!'
+  to: 'Entrée',
+  content: 'Hey Entrée!'
 }, {
-  from: 'Entree',
+  from: 'Entrée',
   to: 'A',
-  content: 'Hi. What would you like to order?'
+  content: 'Hi. What are you in the mood for?'
 }, {
   from: 'A',
-  to: 'Entree',
-  content: '@starbucks 1 vanilla latte ice'
+  to: 'Entrée',
+  content: '@starbucks 1 tall iced vanilla latte'
 }, {
-  from: 'Entree',
+  from: 'Entrée',
   to: 'A',
   content: 'Great! Come pick it up in 5 minutes.'
 }, {
-  from: 'Entree',
+  from: 'Entrée',
   to: 'A',
   content: 'Can I help you with anything else?'
 }, {
   from: 'A',
-  to: 'Entree',
-  content: 'Hmmm. My usual from Torchies?'
+  to: 'Entrée',
+  content: 'Can I get my usual from Torchies?'
 }, {
-  from: 'Entree',
+  from: 'Entrée',
   to: 'A',
-  content: 'Ok. 2 Democrats coming right up! It\'ll be ready in 15 mins'
+  content: '2 Democrats coming right up! It\'ll be ready in 15 mins'
 }];
 
 class App extends Influx.Component {
@@ -66,7 +66,7 @@ class App extends Influx.Component {
         this._injectMessages();
       };
 
-      if (message.to === 'Entree') {
+      if (message.to === 'Entrée') {
         return setTimeout(() => type(textarea, message.content, 1000, () => next()), messages.length ? 1500 : 0);
       }
 
@@ -111,7 +111,11 @@ class App extends Influx.Component {
       const brand = findDOMNode(this.refs.brand);
       const icon = findDOMNode(this.refs.icon);
       brand.style.opacity = 0;
-      icon.style.opacity = 1;
+
+      if (icon.getBoundingClientRect().top - 250 > 0) {
+        icon.style.opacity = 1;
+      }
+
       iphone.className += ' translate-up';
       setTimeout(() => this._injectMessages(), 1000);
     }, 2000);
@@ -122,7 +126,7 @@ class App extends Influx.Component {
         <div className='full background'>
           <div className='flex center vertical animate-opacity' ref='brand' style={{width: '100%', height: '50%'}}>
             <div className='main-logo'/>
-            <div className='catchphrase'>Order Ahead with SMS</div>
+            <div className='catchphrase'>Your Foodie Friend</div>
           </div>
           <div ref='mobile' className='animate-transform phone-wrapper'>
             <div className='animate-opacity secondary-logo-wrapper' ref='icon'>
