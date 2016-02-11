@@ -79,6 +79,10 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
 
 export function initDatabase() {
   return new Promise(resolve => {
+    for (const col in mongoose.connection.collections) { //eslint-disable-line
+      mongoose.connection.collections[col].remove();
+    }
+
     resolve(models.sequelize.sync({force: true})); // Remove once we finalize model
   });
 }
