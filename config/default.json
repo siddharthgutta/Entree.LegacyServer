@@ -21,9 +21,13 @@
       "name": "Sid Gutta"
     }
   ],
+  "Server": {
+    "protocol": "https",
+    "port": 3000,
+    "httpsRejectUnauthorized": false
+  },
   "AppId": "local",
   "NodeEnv": "development",
-  "Port": 3000,
   "UseInternalSocket": true,
   "ExternalSocketServer": {
     "protocol": "http",

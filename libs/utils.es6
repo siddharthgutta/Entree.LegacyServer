@@ -1,3 +1,5 @@
+import chalk from 'chalk';
+
 // falsey check; null | undefined
 export function isNullOrUndefined(a) {
   return typeof a === 'undefined' || a === null;
@@ -14,4 +16,10 @@ export function ip(req) {
   } catch (e) {
     console.error(e);
   }
+}
+
+export function deprecate(func, message = 'No deprecation warning!') {
+  process.stdout.write(`${chalk.red('deprecated:')} ${chalk.yellow.bold(message)}\n`); // bypass scribe
+
+  return func();
 }

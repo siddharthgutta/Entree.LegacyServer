@@ -20,6 +20,7 @@ route.get('/restaurant', (req, res) => res.render('restaurant', {
 route.get('/welcome', (req, res) => res.render('registration', {
   config: clientConfig,
   title: 'Entree · Welcome',
+  description: 'Order Ahead With SMS',
   socket: false
 }));
 

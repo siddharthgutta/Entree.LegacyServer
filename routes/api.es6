@@ -7,6 +7,11 @@ const route = new Router();
 
 route.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
+route.use((req, res, next) => {
   res.ok = (tags, logMessage, data, resMessage) => {
     console.tag(...tags).log(logMessage);
     res.json({data: data.toJSON ? data.toJSON() : data, message: resMessage});
@@ -57,7 +62,7 @@ route.post('/user/signup', (req, res) => {
       .catch(error => {
         res.fail(['routes', 'api', '/user/signup', 'User.signup', 'ERROR'],
             `Error: ${error}`,
-            'Sorry, a text message to your phone could not be sent! Please try again.',
+            `Sorry, a text message to your phone could not be sent: ${error.message}`,
             500);
       });
 });

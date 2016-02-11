@@ -1,17 +1,23 @@
 import express from 'express';
-import path from 'path';                     // module for handling/transforming file paths
+import path from 'path';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import http from 'http';
+import https from 'https';
+import config from 'config';
 import compression from 'compression';
 import sio from './message/sio';             // socket-io (websockets)
-import BasicRouter from './routes/basic';    // imports standard/websocket routers
+import BasicRouter from './routes/basic';
 import NotifyRouter from './routes/notify';
 import ApiRouter from './routes/api';
 import TwilioRouter from './routes/twilio';
+import * as fs from 'fs';
 
-const app = express();                            // server creation
-const server = http.createServer(app);
+const app = express();
+const server = https.createServer({
+  key: fs.readFileSync('./keys/www.textentree.com.key'),
+  cert: fs.readFileSync('./keys/www.textentree.com.crt'),
+  rejectUnauthorized: config.get('Server.httpsRejectUnauthorized')
+}, app);
 
 sio.attach(server);                                 // attaches server to socket.io instance
 
@@ -35,5 +41,4 @@ app.use('/notify', NotifyRouter);
 app.use('/api', ApiRouter);
 app.use('/twilio', TwilioRouter);
 
-export const expressApp = app;
 export default server;

@@ -16,7 +16,16 @@
     "path": "SOCKET_SERVER_PATH",
     "hostname": "SOCKET_SERVER_HOSTNAME"
   },
+  "Server": {
+    "httpsRejectUnauthorized": {
+      "__name": "HTTPS_REJECT_UNAUTHORIZED",
+      "__format": "json"
+    },
+    "port": {
+      "__name": "BRANCHOFF_PORT",
+      "__format": "json"
+    }
+  },
   "NodeEnv": "NODE_ENV",
-  "AppId": "BRANCHOFF_BRANCH",
-  "Port": "BRANCHOFF_PORT"
+  "AppId": "BRANCHOFF_BRANCH"
 }

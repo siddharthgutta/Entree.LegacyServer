@@ -1,5 +1,5 @@
-import 'es6-symbol/implement';
 import '../libs/onerror';
+import 'babel-polyfill';
 import App from './components/App.js';
 import React from 'react';
 import {render} from 'react-dom';

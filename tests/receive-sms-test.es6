@@ -11,7 +11,7 @@ import {parseString} from 'xml2js';
 import selectn from 'selectn';
 
 const port = resolveContext().port;
-const server = supertest.agent(`http://localhost:${port}`);
+const server = supertest.agent(`https://localhost:${port}`); // FIXME use config
 
 const REAL_RECEIVE_BODY = {ToCountry: 'US', ToState: 'TX', SmsMessageSid: 'SMa7934e2ae401ac3af943b9135ac2b970',
   NumMedia: '0', ToCity: 'MILANO', FromZip: '75052', SmsSid: 'SMa7934e2ae401ac3af943b9135ac2b970', FromState: 'TX',

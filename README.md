@@ -90,6 +90,9 @@ sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password passwor
 sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password 123456'
 sudo apt-get install -y mysql-server
 
+# open ports < 1024 for non-sudo
+sudo setcap cap_net_bind_service=+ep `readlink -f \`which node\``
+
 # clone
 git config --global credential.helper store
 mkdir Github && cd Github

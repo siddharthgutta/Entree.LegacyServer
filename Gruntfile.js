@@ -58,7 +58,7 @@ module.exports = grunt => {
         options: {
           transform: ['babelify', 'config-browserify'],
           browserifyOptions: {
-            debug: false, // source mapping
+            debug: true, // source mapping
             ignoreMTime: true
           }
         },
