@@ -5,11 +5,13 @@ import bodyParser from 'body-parser';
 import http from 'http';
 import compression from 'compression';
 import sio from './message/sio.es6';
+import {initSocket} from './message/socket-server.es6';
 
 const app = express();                            // server creation
 const server = http.createServer(app);
 
 sio.attach(server);                                 // attaches server to socket.io instance
+initSocket();
 
 app.set('views', path.join(__dirname, 'views'));  // points app to location of the views
 app.set('view engine', 'jade');                   // sets the view engine to jade
