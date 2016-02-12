@@ -3,9 +3,8 @@
  */
 
 export default class SocketTable {
-  constructor(maxSocket, logging = false) {
-    this.socketCount = maxSocket;
-    this.tokenDict = {};
+  constructor(logging = false) {
+    this.tokenDict = new Map();
     this.logging = logging;
   }
 
@@ -16,13 +15,13 @@ export default class SocketTable {
   }
 
   tokenExists(token) {
-    return token in this.tokenDict ? true : false;
+    return this.tokenDict.has(token);
   }
 
   addToken(token) {
-    if (!(token in this.tokenDict)) {
+    if (!(this.tokenDict.has(token))) {
       this.log(`Added ${token} to SocketTable`);
-      this.tokenDict[token] = [];
+      this.tokenDict.set(token, []);
       return true;
     }
     this.log(`Token ${token} already exists in the table`);
@@ -30,27 +29,25 @@ export default class SocketTable {
   }
 
   addSocket(token, socket) {
-    if (!(token in this.tokenDict)) {
+    if (!(this.tokenDict.has(token))) {
       this.log(`Trying to add socket, but ${token} token does not exist in SocketTable.`);
       return false;
-    } else if (this.tokenDict[token].length >= this.socketCount) {
-      this.log(`Trying to add socket, but token can only have 4 sockets at a time`);
-      return false;
     }
+
     this.log(`Successfully added socket to ${token} in table`);
-    this.tokenDict[token].push(socket);
+    this.tokenDict.get(token).push(socket);
     return true;
   }
 
   removeSocket(token, socket) {
-    if (!(token in this.tokenDict)) {
+    if (!(this.tokenDict.has(token))) {
       this.log(`Trying to remove socket, but ${token} token does not exist in SocketTable.`);
       return false;
     }
-    const index = this.tokenDict[token].indexOf(socket);
+    const index = this.tokenDict.get(token).indexOf(socket);
     if (index > -1) {
       this.log(`Successfully removed socket from ${token} in SocketTable`);
-      this.tokenDict[token].splice(index, 1);
+      this.tokenDict.get(token).splice(index, 1);
       return true;
     }
     this.log(`Trying to remove socket from ${token}, but socket does not exist there`);
