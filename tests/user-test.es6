@@ -2,13 +2,12 @@ import './test-init.es6';
 import assert from 'assert';
 import * as User from '../api/user.es6';
 import {initDatabase, destroyDatabase} from '../bootstrap.es6';
-import {resolveContext} from '../bootstrap.es6';
 import config from 'config';
 const TWILIO_FROM_NUMBER = config.get('Twilio.fromNumbers');
 import expect from 'expect.js';
 import supertest from 'supertest';
-const port = resolveContext().port;
-const server = supertest.agent(`https://localhost:${port}`); // FIXME use config; read Server.protocol, Server.port
+const port = config.get('Server.port');
+const server = supertest.agent(`https://localhost:${port}`);
 
 beforeEach(done => {
   initDatabase().then(() => done());
@@ -150,14 +149,16 @@ describe('User', () => {
         assert.equal(user.name, name);
         assert.equal(user.email, email);
         assert.equal(user.phoneNumber, phoneNumber);
-        done();
+        user.destroy().then(() => done());
       });
     });
 
     it('should not create Users that have null phoneNumber', done => {
-      User.create(null, name, email).then(() => {
-        assert(false);
-        done();
+      User.create(null, name, email).then(user => {
+        user.destroy().then(() => {
+          assert(false);
+          done();
+        });
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -165,9 +166,11 @@ describe('User', () => {
     });
 
     it('should not create Users with invalid email  format', done => {
-      User.create(phoneNumber, name, 'NotValidEmail').then(() => {
-        assert(false);
-        done();
+      User.create(phoneNumber, name, 'NotValidEmail').then(user => {
+        user.destroy().then(() => {
+          assert(false);
+          done();
+        });
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -175,9 +178,11 @@ describe('User', () => {
     });
 
     it('should not create Users with phone number not length 10', done => {
-      User.create('123', name, email).then(() => {
-        assert(false);
-        done();
+      User.create('123', name, email).then(user => {
+        user.destroy().then(() => {
+          assert(false);
+          done();
+        });
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -185,9 +190,11 @@ describe('User', () => {
     });
 
     it('should not create Users with non numeric phone numbers', done => {
-      User.create('abcdefghij', name, email).then(() => {
-        assert(false);
-        done();
+      User.create('abcdefghij', name, email).then(user => {
+        user.destroy().then(() => {
+          assert(false);
+          done();
+        });
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -234,7 +241,7 @@ describe('User', () => {
           assert.equal(user.name, name);
           assert.equal(user.email, email);
           assert.equal(user.phoneNumber, phoneNumber);
-          done();
+          user.destroy().then(() => done());
         });
       });
     });
