@@ -20,9 +20,11 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
   console.log(`Scribe assuming you have mongo installed - ${mongo}!!!`);
   console.log(`Scribe assuming you socket port open - ${socket}!!!`);
 
-  const context = resolveContext();
+  const id = config.get('AppId');
+  const port = config.get('Server.port');
+  const env = config.get('NodeEnv');
 
-  const scribeConsole = new Scribe(context.id, extend(true, {
+  const scribeConsole = new Scribe(id, extend(true, {
     inspector: {
       colors: true,
       showHidden: false,
@@ -37,7 +39,7 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
     mongoUri: 'mongodb://localhost/scribe',
     mongo,
     basePath: 'scribe/',
-    socketPort: 50000 + (Number(process.env.pm_id) || context.port),
+    socketPort: 50000 + (Number(process.env.pm_id) || port),
     socket,
     nwjs: {
       buildDir: `${__dirname}/../public/native`
@@ -52,7 +54,7 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
         useSession: true
       },
       client: {
-        socketPorts: [context.socketPort],
+        socketPorts: [50000 + (Number(process.env.pm_id) || port)],
         exposed: {
           all: {label: 'all', query: {expose: {$exists: true}}},
           error: {label: 'error', query: {expose: 'error'}},
@@ -71,7 +73,7 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
     debug: false
   }, opts), ...['test', ...exposers]);
 
-  scribeConsole.persistent('tags', [context.port, context.nodeEnv]);
+  scribeConsole.persistent('tags', [port, env]);
 
   if (override) {
     scribeConsole.override();

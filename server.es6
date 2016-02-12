@@ -14,8 +14,8 @@ import * as fs from 'fs';
 
 const app = express();
 const server = https.createServer({
-  key: fs.readFileSync('./keys/www.textentree.com.key'),
-  cert: fs.readFileSync('./keys/www.textentree.com.crt'),
+  key: fs.readFileSync(config.get('Server.sslKey')),
+  cert: fs.readFileSync(config.get('Server.sslCert')),
   rejectUnauthorized: config.get('Server.httpsRejectUnauthorized')
 }, app);
 
