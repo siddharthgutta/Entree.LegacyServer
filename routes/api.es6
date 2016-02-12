@@ -12,9 +12,9 @@ route.use((req, res, next) => {
 });
 
 route.use((req, res, next) => {
-  res.ok = (tags, logMessage, data, resMessage) => {
+  res.ok = (tags, logMessage, data, resMessage, status = 0) => {
     console.tag(...tags).log(logMessage);
-    res.json({data: data.toJSON ? data.toJSON() : data, message: resMessage});
+    res.json({status, message: resMessage, data: data.toJSON ? data.toJSON() : data});
   };
   res.fail = (tags, logMessage, resMessage, status = 1) => {
     console.tag(...tags).error(logMessage);
@@ -56,8 +56,7 @@ route.post('/user/signup', (req, res) => {
     res.status(400);
     res.fail(['routes', 'api', '/user/signup', 'User.signup'],
       'Client tried to send null phone number.',
-      "Sorry, you didn't send us a phone number.",
-      'Fail');
+      "Sorry, you didn't send us a phone number.");
   } else {
     User.signup(req.body.phoneNumber)
       .then(response => {
@@ -71,8 +70,7 @@ route.post('/user/signup', (req, res) => {
           res.status(400);
           res.fail(['routes', 'api', '/user/signup', 'User.signup'],
             error,
-            'Sorry, that is not a valid number.',
-            'Fail');
+            'Sorry, that is not a valid number.');
         } else {
           switch (error.code) {
           // Invalid To Number
@@ -80,23 +78,20 @@ route.post('/user/signup', (req, res) => {
             res.status(400);
             res.fail(['routes', 'api', '/user/signup', 'User.signup'],
               error,
-              'Sorry, that is not a real phone number.',
-              'Fail');
+              'Sorry, that is not a real phone number.');
             break;
           // Twilio Trial: Not a Verified number
           case 21608:
             res.status(404);
             res.fail(['routes', 'api', '/user/signup', 'User.signup'],
               error,
-              'Sorry, we are currently in private beta. Our service is not available to you yet.',
-              'Fail');
+              'Sorry, we are currently in private beta. Our service is not available to you yet.');
             break;
           default:
             res.status(500);
             res.fail(['routes', 'api', '/user/signup', 'User.signup'],
               error,
-              'Sorry, a text message to your phone could not be sent! Please try again.',
-              'Fail');
+              'Sorry, a text message to your phone could not be sent! Please try again.');
           }
         }
       });
