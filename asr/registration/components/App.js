@@ -122,7 +122,7 @@ class App extends Influx.Component {
         <div className='full background'>
           <div className='flex center vertical animate-opacity' ref='brand' style={{width: '100%', height: '50%'}}>
             <div className='main-logo'/>
-            <div className='catchphrase'>Your Foodie Friend</div>
+            <div className='catchphrase'>Order Ahead with SMS</div>
           </div>
           <div ref='mobile' className='animate-transform phone-wrapper'>
             <div className='animate-opacity secondary-logo-wrapper' ref='icon'>
