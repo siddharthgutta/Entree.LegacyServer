@@ -52,14 +52,18 @@ export default function (id, opts = {
         new ErrorExtractor(),
         new JSON2Converter(), {
           through(data, callback) {
-            fetch('/api/telemetry/log', {
-              method: 'post', body: {
-                tags: data.transient.tags,
+            const ptags = data.persistent.tags || [];
+            const ttags = data.transient.tags || [];
+
+            fetch(`/api/telemetry/${data.expose}`, {
+              method: 'post',
+              body: {
+                tags: ptags.concat(ttags),
                 message: data.args
               }
             }).then(res => _console.log(res.body.data))
                 .catch(err => _console.error(err))
-                .then(callback);
+                .then(() => callback());
           }
         });
   });

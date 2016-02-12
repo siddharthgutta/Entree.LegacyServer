@@ -30,8 +30,9 @@ app.use('/scribe', console.viewer());
 
 // compress gzip
 app.use(compression());
+
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());                              // sets app to use middleware that only parses json
+app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public'))); // points app to public directory for static files
 

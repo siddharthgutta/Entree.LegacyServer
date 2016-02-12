@@ -92,7 +92,7 @@ class App extends Influx.Component {
         .then(res => {
           this.block = DONE;
           console.tag('create-user').log(res.body);
-          alert(res.body);
+          alert(res.body.message);
         })
         .catch(err => {
           this.block = false;
