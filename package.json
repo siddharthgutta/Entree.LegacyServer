@@ -49,7 +49,7 @@
     "tests-no-nyan": "set -e; for f in ./tests/*-test.compiled.js ; do npm run test-no-nyan $f; done",
     "test-ci": "set -e; mocha --timeout 5000 --no-exit --no-colors",
     "tests-ci": "set -e;for f in ./tests/*-test.compiled.js ; do npm run test-ci $f; done",
-    "lint": "set -e; which eslint; eslint --ext js,.es6,.jsx ./",
+    "lint": "set -e; which eslint; eslint --ext js,.es6,.jsx ./ && echo 5",
     "lint-ci": "set -e; node_modules/eslint/bin/eslint --no-color --ext js,.es6,.jsx ./",
     "production": "grunt production",
     "cordova-build": "cd cordova && cordova build ios --device && cordova build android",
