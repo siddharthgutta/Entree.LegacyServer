@@ -62,5 +62,6 @@ xcuserdata
 
 public/
 www/
+cordova/
 
 package.noDevDeps.json
