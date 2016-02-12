@@ -5,6 +5,7 @@
       "manual": 3000
     },
     "branch": {
+      "master#manual": 3000,
       "master": 443,
       "socket-master": 2999,
       "socket-test": 2997
