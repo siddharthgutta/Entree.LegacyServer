@@ -6,12 +6,12 @@ import './test-init.es6';
 import expect from 'expect.js';
 import supertest from 'supertest';
 import {isEmpty} from '../libs/utils.es6';
-import {resolveContext} from '../bootstrap.es6';
 import {parseString} from 'xml2js';
 import selectn from 'selectn';
+import config from 'config';
 
-const port = resolveContext().port;
-const server = supertest.agent(`https://localhost:${port}`); // FIXME use config
+const port = config.get('Server.port');
+const server = supertest.agent(`https://localhost:${port}`);
 
 const REAL_RECEIVE_BODY = {ToCountry: 'US', ToState: 'TX', SmsMessageSid: 'SMa7934e2ae401ac3af943b9135ac2b970',
   NumMedia: '0', ToCity: 'MILANO', FromZip: '75052', SmsSid: 'SMa7934e2ae401ac3af943b9135ac2b970', FromState: 'TX',

@@ -2,13 +2,12 @@ import './test-init.es6';
 import assert from 'assert';
 import * as User from '../api/user.es6';
 import {initDatabase, destroyDatabase} from '../bootstrap.es6';
-import {resolveContext} from '../bootstrap.es6';
 import config from 'config';
 const TWILIO_FROM_NUMBER = config.get('Twilio.fromNumbers');
 import expect from 'expect.js';
 import supertest from 'supertest';
-const port = resolveContext().port;
-const server = supertest.agent(`https://localhost:${port}`); // FIXME use config; read Server.protocol, Server.port
+const port = config.get('Server.port');
+const server = supertest.agent(`https://localhost:${port}`);
 
 beforeEach(done => {
   initDatabase().then(() => done());
@@ -23,6 +22,10 @@ describe('User', () => {
   const phoneNumber = '1234567890';
   // Modify this number to test your own phone
   const productionPhoneNumber = '2149664948';
+  const fakeNumber = '1234567890';
+  // REMOVE THIS NUMBER AND ITS CORRESPONDING TEST WHEN NO LONGER TWILIO TRIAL
+  const unverifiedNumber = '8324932791';
+
   /*
    Only set REAL_SIGNUP to true when wanting to test real text message signup
    Immediately set it to false when done testing
@@ -39,12 +42,37 @@ describe('User', () => {
       let fullWelcomeMessage;
 
       describe('/api/user/signup endpoint', () => {
-        it('should fail validation for complex request', done => {
+        it('should send 400 response on null number', done => {
           server
             .post(`/api/user/signup`)
-            .send({productionPhoneNumber})
+            .send({})
+            .expect('Content-type', 'application/json; charset=utf-8')
+            .expect(400, done);
+        });
+
+        it('should signup correctly with valid verified number', done => {
+          server
+            .post(`/api/user/signup`)
+            .send({phoneNumber: productionPhoneNumber})
             .expect('Content-type', 'application/json; charset=utf-8')
             .expect(200, done);
+        });
+
+        it('should respond with status 400 on a non-real number', done => {
+          server
+            .post(`/api/user/signup`)
+            .send({phoneNumber: fakeNumber})
+            .expect('Content-type', 'application/json; charset=utf-8')
+            .expect(400, done);
+        });
+
+        // TEMPORARY TEST FOR TWILIO TRIAL
+        it('should respond 404 for unverified number', done => {
+          server
+            .post(`/api/user/signup`)
+            .send({phoneNumber: unverifiedNumber})
+            .expect('Content-type', 'application/json; charset=utf-8')
+            .expect(404, done);
         });
       });
 
@@ -121,14 +149,16 @@ describe('User', () => {
         assert.equal(user.name, name);
         assert.equal(user.email, email);
         assert.equal(user.phoneNumber, phoneNumber);
-        done();
+        user.destroy().then(() => done());
       });
     });
 
     it('should not create Users that have null phoneNumber', done => {
-      User.create(null, name, email).then(() => {
-        assert(false);
-        done();
+      User.create(null, name, email).then(user => {
+        user.destroy().then(() => {
+          assert(false);
+          done();
+        });
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -136,9 +166,11 @@ describe('User', () => {
     });
 
     it('should not create Users with invalid email  format', done => {
-      User.create(phoneNumber, name, 'NotValidEmail').then(() => {
-        assert(false);
-        done();
+      User.create(phoneNumber, name, 'NotValidEmail').then(user => {
+        user.destroy().then(() => {
+          assert(false);
+          done();
+        });
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -146,9 +178,11 @@ describe('User', () => {
     });
 
     it('should not create Users with phone number not length 10', done => {
-      User.create('123', name, email).then(() => {
-        assert(false);
-        done();
+      User.create('123', name, email).then(user => {
+        user.destroy().then(() => {
+          assert(false);
+          done();
+        });
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -156,9 +190,11 @@ describe('User', () => {
     });
 
     it('should not create Users with non numeric phone numbers', done => {
-      User.create('abcdefghij', name, email).then(() => {
-        assert(false);
-        done();
+      User.create('abcdefghij', name, email).then(user => {
+        user.destroy().then(() => {
+          assert(false);
+          done();
+        });
       }, err => {
         assert.equal(err.errors.length, 1);
         done();
@@ -205,7 +241,7 @@ describe('User', () => {
           assert.equal(user.name, name);
           assert.equal(user.email, email);
           assert.equal(user.phoneNumber, phoneNumber);
-          done();
+          user.destroy().then(() => done());
         });
       });
     });
