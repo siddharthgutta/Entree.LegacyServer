@@ -1,8 +1,5 @@
 import io from 'socket.io';
-const EventEmitter = require('events');
 import Strategy from './strategy.es6';
-
-export const sioEmitter = new EventEmitter();
 
 export default class SocketIO extends Strategy {
   constructor() {
@@ -26,7 +23,7 @@ export default class SocketIO extends Strategy {
         socket.on('disconnect', () => {
           this.st.removeSocket(token, socket);
           // Insert IPC call here to tell main server to remove
-          sioEmitter.emit('disconnect', token);
+          this.emitter.emit('disconnect', token);
         });
       } else {
         console.log(`Disconnected client because of incorrect token: ${token}`);

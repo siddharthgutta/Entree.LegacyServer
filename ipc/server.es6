@@ -2,7 +2,6 @@
  * Created by kfu on 2/12/16.
  */
 
-const EventEmitter = require('events');
 import ipc from 'node-ipc';
 
 // NEED TO IMPLEMENT BRANCHOFF & CONFIG ENVIRONMENT VARIABLES
@@ -10,8 +9,6 @@ const port = 3000;
 // import config from 'config';
 // const port = config.get('Server.port');
 import Strategy from './strategy.es6';
-
-export const ipcEmitter = new EventEmitter();
 
 export class IPC extends Strategy {
   constructor(mainPort) {
@@ -33,15 +30,15 @@ export class IPC extends Strategy {
     ipc.serve(() => {
       ipc.server.on('token', data => {
         ipc.log('got a message from'.debug, (data.id).variable, (data.token).data);
-        ipcEmitter.emit('token', data.token);
+        this.emitter.emit('token', data.token);
       });
 
       ipc.server.on('received', data => {
-        ipcEmitter.emit('received', (data.token).data, (data.message).data);
+        this.emitter.emit('received', (data.token).data, (data.message).data);
       });
 
       ipc.server.on('sent', data => {
-        ipcEmitter.emit('sent', (data.token).data, (data.message).data);
+        this.emitter.emit('sent', (data.token).data, (data.message).data);
       });
     });
 
