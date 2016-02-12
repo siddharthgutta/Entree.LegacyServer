@@ -71,8 +71,8 @@
   },
   "pre-commit": [
     "compile",
-    "tests",
-    "lint"
+    "lint",
+    "tests"
   ],
   "homepage": "https://github.com/siddharthgutta/Entree.Server#readme",
   "devDependencies": {
