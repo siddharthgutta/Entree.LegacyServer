@@ -4,6 +4,7 @@
 
 // TEST FILE that can be run after npm start
 // WILL BE MOVED TO A REAL TEST SOON
+// RUN using: node ipc/client.compiled.js
 
 import ipc from 'node-ipc';
 import io from 'socket.io-client';

@@ -4,7 +4,6 @@
 
 export default class SocketTable {
   constructor(maxSocket, logging = false) {
-    this.socketCount = maxSocket;
     this.tokenDict = {};
     this.logging = logging;
   }
@@ -33,10 +32,8 @@ export default class SocketTable {
     if (!(token in this.tokenDict)) {
       this.log(`Trying to add socket, but ${token} token does not exist in SocketTable.`);
       return false;
-    } else if (this.tokenDict[token].length >= this.socketCount) {
-      this.log(`Trying to add socket, but token can only have 4 sockets at a time`);
-      return false;
     }
+
     this.log(`Successfully added socket to ${token} in table`);
     this.tokenDict[token].push(socket);
     return true;
