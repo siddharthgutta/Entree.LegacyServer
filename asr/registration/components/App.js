@@ -1,9 +1,9 @@
 import React from 'react';
 import Influx from 'react-influx';
 import {findDOMNode} from 'react-dom';
-import {onClick, type, log} from '../../libs/utils';
+import {onClick, type} from '../../libs/utils';
+import fetch from '../../libs/fetch';
 import Messenger from './../../components/Messenger';
-import request from 'superagent';
 
 const me = {
   number: 'A'
@@ -75,7 +75,9 @@ class App extends Influx.Component {
   }
 
   _createUser() {
-    if (this.block === 'DONE') {
+    const DONE = 'done';
+
+    if (this.block === DONE) {
       return alert('You should receive a text shortly');
     } else if (this.block) {
       return alert('Hang tight');
@@ -86,22 +88,16 @@ class App extends Influx.Component {
     const node = findDOMNode(this.refs.phone);
     const phoneNumber = node.value;
 
-    request.post(`/api/user/signup`)
-        .withCredentials()
-        .send({phoneNumber})
-        .end((err, res) => {
-          if (err) {
-            log(['api', 'call'], err);
-            alert(JSON.stringify(err));
-            this.block = false;
-          } else if (res.body.status) {
-            log(['api', 'call'], res.body);
-            alert(res.body.message);
-            this.block = false;
-          } else {
-            alert(res.body.message); // FIXME for testing!
-            this.block = 'DONE';
-          }
+    fetch(`/api/user/signup`, {method: 'post', body: {phoneNumber}})
+        .then(res => {
+          this.block = DONE;
+          console.tag('create-user').log(res.body);
+          alert(res.body);
+        })
+        .catch(err => {
+          this.block = false;
+          console.tag('create-user').error(err);
+          alert(err.message);
         });
   }
 

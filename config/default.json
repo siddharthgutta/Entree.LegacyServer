@@ -24,11 +24,12 @@
   "Server": {
     "protocol": "https",
     "port": 3000,
-    "httpsRejectUnauthorized": false
+    "httpsRejectUnauthorized": false,
+    "sslKey": "./keys/www.textentree.com.key",
+    "sslCert": "./keys/www.textentree.com.crt"
   },
   "AppId": "local",
   "NodeEnv": "development",
-  "UseInternalSocket": true,
   "ExternalSocketServer": {
     "protocol": "http",
     "hostname": "ec2-52-89-1-140.us-west-2.compute.amazonaws.com",

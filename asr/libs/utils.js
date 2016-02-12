@@ -1,7 +1,6 @@
 import prefix from 'react-prefixr';
 import tapInject from 'react-tap-event-plugin';
 import './rAF';
-import request from 'superagent';
 
 export function ifcat(base, obj) {
   let res = '';
@@ -74,15 +73,4 @@ export function type(node, text, time, then) {
     const letter = letters.shift();
     node.value = node.value + letter;
   }, time / letters.length);
-}
-
-// FIXME use scribe instead
-export function log(tags, ...message) {
-  request
-      .post('/api/telemetry/log')
-      .send({tags, message})
-      .end((err, res) => {
-        if (err) return console.error(err);
-        console.log(res.body.message);
-      });
 }

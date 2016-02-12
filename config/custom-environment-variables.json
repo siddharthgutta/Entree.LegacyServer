@@ -24,7 +24,9 @@
     "port": {
       "__name": "BRANCHOFF_PORT",
       "__format": "json"
-    }
+    },
+    "sslKey": "HTTPS_SSL_KEY",
+    "sslCert": "HTTPS_SSL_CERTIFICATE"
   },
   "NodeEnv": "NODE_ENV",
   "AppId": "BRANCHOFF_BRANCH"
