@@ -70,9 +70,7 @@
     "transform": "config-browserify"
   },
   "pre-commit": [
-    "compile",
-    "lint",
-    "tests"
+    "lint"
   ],
   "homepage": "https://github.com/siddharthgutta/Entree.Server#readme",
   "devDependencies": {
