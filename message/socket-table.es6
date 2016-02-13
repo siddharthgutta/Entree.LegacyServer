@@ -14,6 +14,18 @@ export default class SocketTable {
     }
   }
 
+  clear() {
+    this.tokenDict.clear();
+  }
+
+  numTokens() {
+    return this.tokenDict.size;
+  }
+
+  numSockets(token) {
+    return this.tokenDict.get(token).length;
+  }
+
   tokenExists(token) {
     return this.tokenDict.has(token);
   }
@@ -26,6 +38,10 @@ export default class SocketTable {
     }
     this.log(`Token ${token} already exists in the table`);
     return false;
+  }
+
+  removeToken(token) {
+    return this.tokenDict.delete(token);
   }
 
   addSocket(token, socket) {
