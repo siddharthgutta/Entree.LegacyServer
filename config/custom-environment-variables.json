@@ -26,7 +26,8 @@
       "__format": "json"
     },
     "sslKey": "HTTPS_SSL_KEY",
-    "sslCert": "HTTPS_SSL_CERTIFICATE"
+    "sslCert": "HTTPS_SSL_CERTIFICATE",
+    "sslCa": "HTTPS_SSL_CA"
   },
   "NodeEnv": "NODE_ENV",
   "AppId": "BRANCHOFF_BRANCH"

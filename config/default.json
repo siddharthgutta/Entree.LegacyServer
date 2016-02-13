@@ -26,7 +26,8 @@
     "port": 3000,
     "httpsRejectUnauthorized": false,
     "sslKey": "./keys/www.textentree.com.key",
-    "sslCert": "./keys/www.textentree.com.crt"
+    "sslCert": "./keys/www.textentree.com.crt",
+    "sslCa": "./keys/www.textentree.com.chain.crt"
   },
   "AppId": "local",
   "NodeEnv": "development",

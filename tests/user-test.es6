@@ -1,7 +1,6 @@
-import './test-init.es6';
+import {initDatabase, disconnectDatabase} from './test-init.es6';
 import assert from 'assert';
 import * as User from '../api/user.es6';
-import {initDatabase, destroyDatabase} from '../bootstrap.es6';
 import config from 'config';
 const TWILIO_FROM_NUMBER = config.get('Twilio.fromNumbers');
 import expect from 'expect.js';
@@ -13,7 +12,7 @@ beforeEach(done => {
   initDatabase().then(() => done());
 });
 
-after(() => destroyDatabase());
+after(() => disconnectDatabase());
 
 
 describe('User', () => {

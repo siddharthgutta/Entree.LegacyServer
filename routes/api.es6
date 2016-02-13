@@ -14,7 +14,7 @@ route.use((req, res, next) => {
 route.use((req, res, next) => {
   res.ok = (tags, logMessage, data, resMessage, status = 0) => {
     console.tag(...tags).log(logMessage);
-    res.json({status, message: resMessage, data: data.toJSON ? data.toJSON() : data});
+    res.json({status, message: resMessage, data: data && data.toJSON ? data.toJSON() : data});
   };
   res.fail = (tags, logMessage, resMessage, status = 1) => {
     console.tag(...tags).error(logMessage);
@@ -114,13 +114,10 @@ route.post('/telemetry/:expose', (req, res) => {
     message = [message];
   }
 
-  console
-      .tag('telemetry', ip(req), ...tags)
-      .log(...message)
-      .then(() => {
-        res.status(200);
-        res.ok(['telemetry'], 'Logging telemetry', null, 'Success');
-      });
+  console.tag('telemetry', ip(req), ...tags).log(...message);
+
+  res.status(200);
+  res.ok(['telemetry'], 'Logging telemetry', null, 'Success');
 });
 
 export default route;

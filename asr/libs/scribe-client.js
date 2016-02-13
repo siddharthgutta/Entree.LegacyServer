@@ -3,9 +3,6 @@ import JSON2Converter from 'scribe-js/dist/transforms/JSON2Converter';
 import ErrorExtractor from 'scribe-js/dist/transforms/ErrorExtractor';
 import fetch from './fetch';
 
-const _console = window.console;
-window._console = _console;
-
 class ChromeInspector {
   constructor(opts = {styles: {}}) {
     this.opts = opts;
@@ -14,12 +11,12 @@ class ChromeInspector {
   through(data, callback) {
     const ptags = data.persistent.tags || [];
     const ttags = data.transient.tags || [];
-    const tags = (ptags).concat(ttags);
+    const tags = ptags.concat(ttags);
     const app = data.persistent.app;
     const id = data.persistent.id;
     const opts = this.opts;
 
-    _console.log(
+    window.console.log(
         `%c${app}-${id} %c${data.expose.toUpperCase()} ${tags.map(a => `%c${a.toUpperCase()}`).join(' ')}`,
         opts.styles.pre,
         opts.styles.expose,
@@ -58,11 +55,11 @@ export default function (id, opts = {
             fetch(`/api/telemetry/${data.expose}`, {
               method: 'post',
               body: {
-                tags: ptags.concat(ttags),
+                tags: ptags.concat(ttags).concat(['']),
                 message: data.args
               }
-            }).then(res => _console.log(res.body.data))
-                .catch(err => _console.error(err))
+            }).then(res => window.console.log(res.body.data))
+                .catch(err => window.console.error(err))
                 .then(() => callback());
           }
         });

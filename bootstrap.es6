@@ -1,20 +1,6 @@
 import Scribe from 'scribe-js';
 import config from 'config';
-import models from './models/mysql/index.es6';
-import mongoose from 'mongoose';
 import extend from 'extend';
-import {deprecate} from './libs/utils.es6';
-
-export function resolveContext() {
-  return deprecate(() => {
-    const port = config.get('Server.port');
-    const id = config.get('AppId');
-    const nodeEnv = config.get('NodeEnv');
-    const ctx = {port, id, nodeEnv};
-
-    return ctx;
-  }, 'bootstrap.es6#resolveContext: Use config.get(...) instead!');
-}
 
 export function initScribe(override = true, mongo = true, socket = true, opts = {}, ...exposers) {
   console.log(`Scribe assuming you have mongo installed - ${mongo}!!!`);
@@ -82,24 +68,9 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
   return scribeConsole;
 }
 
-export function initDatabase() {
-  return new Promise(resolve => {
-    for (const col in mongoose.connection.collections) { //eslint-disable-line
-      mongoose.connection.collections[col].remove();
-    }
-
-    resolve(models.sequelize.sync({force: true})); // Remove once we finalize model
-  });
-}
-
-export function destroyDatabase() {
-  mongoose.connection.close();
-  models.sequelize.close();
-}
-
 export function initServer() {
-  const context = resolveContext();
+  const port = config.get('Server.port');
 
-  require('./server.es6').default.listen(context.port,
-      () => console.tag('server').log(`Listening on ${context.port}`));
+  require('./server.es6').default.listen(port,
+      () => console.tag('server').log(`Listening on ${port}`));
 }

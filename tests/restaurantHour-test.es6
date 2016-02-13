@@ -1,13 +1,12 @@
 import assert from 'assert';
-import './test-init.es6';
+import {initDatabase, disconnectDatabase} from './test-init.es6';
 import * as RestaurantHour from '../api/restaurantHour.es6';
-import {initDatabase, destroyDatabase} from '../bootstrap.es6';
 
 beforeEach(done => {
   initDatabase().then(() => done());
 });
 
-after(() => destroyDatabase());
+after(() => disconnectDatabase());
 
 describe('RestaurantHour', () => {
   const dayOfTheWeek = 'Monday';

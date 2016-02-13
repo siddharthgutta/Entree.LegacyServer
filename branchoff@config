@@ -18,7 +18,8 @@
         "HTTPS_REJECT_UNAUTHORIZED": false,
         "NODE_TLS_REJECT_UNAUTHORIZED": 0,
         "HTTPS_SSL_KEY": "./keys/localhost.key",
-        "HTTPS_SSL_CERTIFICATE": "./keys/localhost.crt"
+        "HTTPS_SSL_CERTIFICATE": "./keys/localhost.crt",
+        "HTTPS_SSL_CA": "./keys/localhost.crt"
       },
       "stage": {
         "NODE_ENV": "staging",

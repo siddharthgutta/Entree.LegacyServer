@@ -16,6 +16,7 @@ const app = express();
 const server = https.createServer({
   key: fs.readFileSync(config.get('Server.sslKey')),
   cert: fs.readFileSync(config.get('Server.sslCert')),
+  ca: fs.readFileSync(config.get('Server.sslCa')),
   rejectUnauthorized: config.get('Server.httpsRejectUnauthorized')
 }, app);
 

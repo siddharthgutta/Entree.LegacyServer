@@ -1,15 +1,14 @@
 import assert from 'assert';
 import _ from 'underscore';
-import './test-init.es6';
+import {initDatabase, disconnectDatabase} from './test-init.es6';
 import * as MenuItem from '../api/menuItem.es6';
 import Categories from '../models/mongo/menuItemCategories.es6';
-import {initDatabase, destroyDatabase} from '../bootstrap.es6';
 
 beforeEach(done => {
   initDatabase().then(() => done());
 });
 
-after(() => destroyDatabase());
+after(() => disconnectDatabase());
 
 describe('MenuItem', () => {
   if (console) {

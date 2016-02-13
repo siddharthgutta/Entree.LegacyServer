@@ -91,12 +91,12 @@ class App extends Influx.Component {
     fetch(`/api/user/signup`, {method: 'post', body: {phoneNumber}})
         .then(res => {
           this.block = DONE;
-          console.tag('create-user').log(res.body);
+          console2.tag('create-user').log(res.body);
           alert(res.body.message);
         })
         .catch(err => {
           this.block = false;
-          console.tag('create-user').error(err);
+          console2.tag('create-user').error(err);
           alert(err.message);
         });
   }
