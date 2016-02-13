@@ -1,0 +1,7 @@
+{
+  "Server": {
+    "port": 3000
+  },
+  "AppId": "local",
+  "NodeEnv": "development"
+}

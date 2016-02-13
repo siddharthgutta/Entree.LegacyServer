@@ -1,0 +1,6 @@
+**/*.compiled.js
+node_modules/
+public/
+cordova/
+resources/
+other/

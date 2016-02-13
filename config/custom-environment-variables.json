@@ -1,0 +1,10 @@
+{
+  "Server": {
+    "port": {
+      "__name": "BRANCHOFF_PORT",
+      "__format": "json"
+    }
+  },
+  "NodeEnv": "NODE_ENV",
+  "AppId": "BRANCHOFF_BRANCH"
+}

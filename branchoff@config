@@ -1,0 +1,58 @@
+{
+  "start": "node index.compiled.js",
+  "preferPort": {
+    "mode": {
+      "manual": 3000
+    },
+    "branch": {
+      "master#manual": 3000,
+      "master": 443,
+      "socket-master": 2999,
+      "socket-test": 2997,
+      "upgrade#manual": 3001,
+      "upgrade": 80
+    }
+  },
+  "env": {
+    "mode": {
+      "manual": {
+        "NODE_ENV": "staging",
+        "HTTPS_REJECT_UNAUTHORIZED": false,
+        "NODE_TLS_REJECT_UNAUTHORIZED": 0,
+        "HTTPS_SSL_KEY": "./keys/localhost.key",
+        "HTTPS_SSL_CERTIFICATE": "./keys/localhost.crt"
+      },
+      "stage": {
+        "NODE_ENV": "staging",
+        "HTTPS_REJECT_UNAUTHORIZED": false,
+        "NODE_TLS_REJECT_UNAUTHORIZED": 0
+      },
+      "release": {
+        "NODE_ENV": "production",
+        "HTTPS_REJECT_UNAUTHORIZED": true
+      }
+    },
+    "branch": {
+      "default": {
+        "SOCKET_SERVER_PORT": 2998,
+        "SOCKET_SERVER_HOSTNAME": "localhost",
+        "SOCKET_SERVER_PROTOCOL": "http",
+        "SOCKET_SERVER_PATH": "",
+        "SOCKET_SERVER_SEARCH": "?"
+      },
+      "master#release": {
+        "NODE_ENV": "production",
+        "SOCKET_SERVER_PORT": 2997
+      }
+    }
+  },
+  "pm2": {
+    "restart_delay": 10000,
+    "watch": false,
+    "min_uptime": "20s",
+    "max_restarts": 3,
+    "script": "./index.compiled.js",
+    "next_gen_js": false,
+    "max_memory_restart": "1G"
+  }
+}
