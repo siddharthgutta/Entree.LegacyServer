@@ -59,7 +59,7 @@ xcuserdata
 *.compiled.js
 *.compiled.js.map
 *.roadrunner.json
-
+*.cache.json
 public/
 www/
 

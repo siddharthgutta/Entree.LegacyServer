@@ -1,8 +1,8 @@
-import Strategy from './strategy.es6';
+import SMSStrategy from './index.es6';
 import twilio from 'twilio';
 import Promise from 'bluebird';
 
-export default class Twilio extends Strategy {
+export default class Twilio extends SMSStrategy {
   constructor(from, account, auth) {
     super(from);
     this.client = twilio(account, auth);
