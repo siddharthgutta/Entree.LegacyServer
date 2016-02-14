@@ -1,12 +1,19 @@
 {
-   "presets": [
-     "es2015",
-     "react",
-     "stage-0"
-   ],
-   plugins: [
-    "transform-object-rest-spread",
-    "transform-runtime",
-    "syntax-class-properties"
-   ]
+    "env": {
+        "server": {
+           "presets": [
+             "node5",
+             "react",
+             "stage-0"
+           ],
+           plugins: [
+           "array-includes",
+            "transform-object-rest-spread",
+            "syntax-class-properties",
+            ["syntax-async-functions", {
+              "module": "bluebird"
+            }]
+           ]
+        }
+    }
 }

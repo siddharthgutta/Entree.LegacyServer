@@ -5,6 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const convert = require('convert-source-map');
 
+process.env.BABEL_ENV = 'server';
+
 exports.transform = function transform(input, output) {
   const source = fs.readFileSync(input, 'utf8');
   const generated = babel.transform(source, {
@@ -16,7 +18,7 @@ exports.transform = function transform(input, output) {
   });
 
   const code = generated.code.replace(/require\(['"]\.(.*?)['"]\)/mg,
-      (matched, group) => `require('.${group.replace(/\.es6$/g, '')}.compiled.js\')`);
+    (matched, group) => `require('.${group.replace(/\.es6$/g, '')}.compiled.js\')`);
 
   const sourcemap = convert.fromSource(code);
   const sourcemapfile = `${output}.map`;

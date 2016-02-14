@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+
+sleep 10
+
+export NODE_ENV=staging;
+
+set -e
+npm run tests-ci
+npm run lint-ci

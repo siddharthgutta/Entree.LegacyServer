@@ -1,0 +1,34 @@
+{
+  "Server": {
+    "httpsRejectUnauthorized": {
+      "__name": "HTTPS_REJECT_UNAUTHORIZED",
+      "__format": "json"
+    },
+    "port": {
+      "__name": "BRANCHOFF_PORT",
+      "__format": "json"
+    },
+    "sslKey": "HTTPS_SSL_KEY",
+    "sslCert": "HTTPS_SSL_CERTIFICATE",
+    "sslCa": "HTTPS_SSL_CA"
+  },
+  "ExternalSocketServer": {
+    "port": {
+      "__name": "SOCKET_SERVER_PORT",
+      "__format": "json"
+    },
+    "protocol": "SOCKET_SERVER_PROTOCOL",
+    "search": "SOCKET_SERVER_SEARCH",
+    "path": "SOCKET_SERVER_PATH",
+    "hostname": "SOCKET_SERVER_HOSTNAME"
+  },
+  "NodeEnv": "NODE_ENV",
+  "AppId": "BRANCHOFF_BRANCH",
+  "Mode": "BRANCHOFF_MODE",
+  "IPC": {
+    "allowRemote": {
+      "__name": "IPC_ALLOW_REMOTE",
+      "__format": "json"
+    }
+  }
+}
