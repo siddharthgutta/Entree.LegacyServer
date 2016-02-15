@@ -7,22 +7,18 @@ const convert = new Convert();
 const route = new Router();
 const clientConfig = JSON.stringify(config.get('Client'));
 
-route.get('/', (req, res) => res.render('index', {
-  config: clientConfig
+route.get('/', (req, res) => res.render('registration', {
+  config: clientConfig,
+  title: 'Entrée · Order Ahead With SMS',
+  description: `Text Entrée to order ahead at your favorite restaurants,
+  get recommendations on where to eat, and find delicious deals`,
+  socket: false
 }));
 
 route.get('/restaurant', (req, res) => res.render('restaurant', {
   config: clientConfig,
   title: 'Entrée · Restaurant',
   socket: true
-}));
-
-route.get('/welcome', (req, res) => res.render('registration', {
-  config: clientConfig,
-  title: 'Entrée · Welcome',
-  description: `Text Entrée to order ahead at your favorite restaurants,
-  get recommendations on where to eat, and find delicious deals`,
-  socket: false
 }));
 
 route.get('/messenger', (req, res) => res.render('messenger', {

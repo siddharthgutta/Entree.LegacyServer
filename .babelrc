@@ -6,7 +6,6 @@
    ],
    plugins: [
     "transform-object-rest-spread",
-    "transform-runtime",
     "syntax-class-properties"
    ]
 }

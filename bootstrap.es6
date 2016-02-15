@@ -35,9 +35,7 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
         username: 'build',
         password: 'build',
         authentication: true,
-        sessionSecret: 'scribe-session',
-        useBodyParser: true,
-        useSession: true
+        useBodyParser: true
       },
       client: {
         socketPorts: [50000 + (Number(process.env.pm_id) || port)],
