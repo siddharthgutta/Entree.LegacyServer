@@ -1,11 +1,11 @@
 import assert from 'assert';
 import _ from 'underscore';
-import {initDatabase, disconnectDatabase} from './test-init.es6';
+import {clearDatabase, disconnectDatabase} from './test-init.es6';
 import * as MenuItem from '../api/menuItem.es6';
 import Categories from '../models/mongo/menuItemCategories.es6';
 
 beforeEach(done => {
-  initDatabase().then(() => done());
+  clearDatabase().then(() => done());
 });
 
 after(() => disconnectDatabase());

@@ -1,4 +1,4 @@
-import {initDatabase, disconnectDatabase} from './test-init.es6';
+import {clearDatabase, disconnectDatabase} from './test-init.es6';
 import assert from 'assert';
 import * as User from '../api/user.es6';
 import config from 'config';
@@ -9,7 +9,7 @@ const port = config.get('Server.port');
 const server = supertest.agent(`https://localhost:${port}`);
 
 beforeEach(done => {
-  initDatabase().then(() => done());
+  clearDatabase().then(() => done());
 });
 
 after(() => disconnectDatabase());

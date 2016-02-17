@@ -1,9 +1,9 @@
 import assert from 'assert';
-import {initDatabase, disconnectDatabase} from './test-init.es6';
+import {clearDatabase, disconnectDatabase} from './test-init.es6';
 import * as RestaurantHour from '../api/restaurantHour.es6';
 
 beforeEach(done => {
-  initDatabase().then(() => done());
+  clearDatabase().then(() => done());
 });
 
 after(() => disconnectDatabase());
