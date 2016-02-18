@@ -50,11 +50,6 @@ branch=$(git symbolic-ref --short HEAD)
 # copy(JSON.stringify(JSON.stringify(x)))
 #
 
-#curl "https://api.github.com/repos/siddharthgutta/Entree.Server/statuses/$id?access_token=f7a2fe34369a6b76f0cc3dfd02d1f982d424f281" \
-#  -H "Content-Type: application/json" \
-#  -X POST \
-#  -d "{\"state\": \"success\", \"description\": \"BranchOff\", \"target_url\": \"http://textentree.com:4000\"}"
-
 payload=$(echo "{\"channel\":\"#continous3\",\"attachments\":[{\"fallback\":\"Test Passed\",\"text\":\"\",\"fields\":[{\"title\":\"Branch\",\"value\":\"$branch\",\"short\":true},{\"title\":\"Author\",\"value\":\"$author\",\"short\":true},{\"title\":\"Commit\",\"value\":\"$id\",\"short\":true},{\"title\":\"Message\",\"value\":\"$message\",\"short\":true},{\"title\":\"Status\",\"value\":\"PASSED!\",\"short\":true}],\"color\":\"#2ab27b\"}]}")
 
 curl -X POST -H 'Content-type: application/json' \

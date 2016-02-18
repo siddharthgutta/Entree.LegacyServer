@@ -4,14 +4,13 @@ import assert from 'assert';
 import {format} from 'url';
 import now from 'performance-now';
 import Promise from 'bluebird';
-import config from 'config';
 import crypto from 'crypto';
-import socketServer from '../message/socket-server.es6';
+import ss from '../message/socket-server.es6';
 
 const message = global.TEST;
 const token = crypto.randomBytes(15).toString('hex');
 const msgCount = 10;
-const channel = 'send';
+const channel = 'channel-0';
 
 let socket;
 
@@ -36,39 +35,6 @@ let socket;
  *
  **/
 
-
-/**
- *
- * ss.connect() :: Promise
- * -----------------------
- * Use this function to connect the socket server. All the information is pulled from the
- * branchoff@config depending on the running environment
- *
- *
- * ss.accept(token) :: Promise
- * -----------------------
- * Accepts any incoming websockets with the token you provide
- *
- *
- * ss.reject(token) :: Promise
- * -----------------------
- * Reject any tokens; all connected websockets will be disconnected
- *
- *
- * ss.emit(token, channel, data) :: Promise
- * -----------------------
- * Send to a token, on a specified channel, some data
- *
- *
- * ss.disconnect()
- * -----------------------
- * Disconnect ipc to ensure Node quits
- *
- */
-
-// construct a new socketServer which does not interfere with the main socket-server
-const ss = new socketServer.constructor(global.TEST + config.get('AppId'));
-
 describe(global.TEST, () => {
   it('should create socket-server', done => {
     ss.connect().then(() => done());
@@ -92,33 +58,21 @@ describe(global.TEST, () => {
   it(`should send ${msgCount} messages to client`, done => {
     const start = now();
     const messages = new Array(msgCount);
-    let received = 0;
 
     socket.on(channel, (data, respond) => {
       assert(data, message);
-
-      if (ss.isRemote()) {
-        respond({status: 'ok'});
-      }
-
-      if (ss.isLocal() && ++received === msgCount) {
-        const duration = ((now() - start) / 1000);
-        console.log(`throughput ${(msgCount / duration).toFixed(3)} messages/second`);
-        done();
-      }
+      respond({status: 'ok'});
     });
 
     for (let i = 0; i < messages.length; i++) {
       messages[i] = ss.emit(token, channel, message + i);
     }
 
-    if (ss.isRemote()) {
-      Promise.all(messages).then(() => {
-        const duration = ((now() - start) / 1000);
-        console.log(`throughput ${(msgCount / duration).toFixed(3)} messages/second`);
-        done();
-      });
-    }
+    Promise.all(messages).then(() => {
+      const duration = ((now() - start) / 1000);
+      console.log(`throughput ${(msgCount / duration).toFixed(3)} messages/second`);
+      done();
+    });
   });
 
   it('should disconnect client (from server)', done => {

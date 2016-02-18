@@ -32,7 +32,7 @@ const defaultEventMap = {
 class SocketServer extends EventEmitter {
   constructor(id, address, channel = 'socket', remote, debug = false,
               eventMap = defaultEventMap,
-              resTimeout = 60000, concurrency = 50) {
+              resDefaultTimeout = 60000, concurrency = 50) {
     super();
 
     this.id = id.replace(/[^a-zA-Z0-9]/g, '');
@@ -40,7 +40,7 @@ class SocketServer extends EventEmitter {
     this.eventMap = Object.assign(defaultEventMap, eventMap);
     this.remoteAddress = address;
     this.remote = remote;
-    this.resTimeout = resTimeout;
+    this.resDefaultTimeout = resDefaultTimeout;
     this.debug = debug;
 
     this.setMaxListeners(Number.MAX_SAFE_INTEGER);
@@ -195,14 +195,16 @@ class SocketServer extends EventEmitter {
 
     const timeout = () => {
       this.removeListener(event, accepted);
-      reject(new Error('No awk received'));
+      reject({token, channel, data, awk});
     };
 
     if (awk) {
       event = this.for(eventMap.responseClientAwk, eventId);
 
+      const wait = typeof awk === 'number' && awk > 0 ? awk : this.resDefaultTimeout;
+
       this.once(event, accepted);
-      tid = setTimeout(timeout, this.resTimeout);
+      tid = setTimeout(timeout, wait);
     }
 
     this._emitIPC(action, this.wrap({

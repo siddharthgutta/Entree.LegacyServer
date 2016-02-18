@@ -1,4 +1,5 @@
 import models from '../models/mongo/index.es6';
+import Promise from 'bluebird';
 
 /**
  * IMPORTANT: Must return promises!

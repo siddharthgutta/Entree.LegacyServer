@@ -43,7 +43,7 @@ npm cache clear # if modules need to be downloaded again
 ```bash
 # general env setup
 sudo apt-get update
-sudo apt-get -y install git build-essential git ruby libpam0g-dev debconf-utils automake libtool libpng-dev
+sudo apt-get -y install git build-essential git ruby libpam0g-dev debconf-utils automake libtool libpng-dev libkrb5-dev
 sudo gem install sass
 echo "sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000" >> ~/.bashrc
 
@@ -60,12 +60,12 @@ echo "5.5.0" > ~/.nvmrc
 
 # node global
 npm install pm2 -g
-npm install eslint -g
-npm install eslint-config-airbnb npm install -g
-npm install eslint-plugin-markdown -g 
-npm install eslint-plugin-mocha -g
-npm install eslint-plugin-react -g
-npm install babel-eslint -g 
+npm install eslint@1.10.3 -g
+npm install babel-eslint@4.1.8 -g
+npm install eslint-config-airbnb@4.0.0 -g
+npm install eslint-plugin-markdown@1.0.0-beta.1 -g
+npm install eslint-plugin-mocha@1.1.0 -g
+npm install eslint-plugin-react@3.16.1 -g
 npm install mocha -g
 npm install grunt-cli -g
 npm install sequelize-cli -g

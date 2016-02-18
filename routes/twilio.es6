@@ -68,21 +68,21 @@ export function createAndEmit(from, restaurantID, textBody, date, msgSid, twilio
 route.post('/receive', twilio.webhook(), (req, res) => {
   // The commented out functions are useful for writing unit tests if this route changes
   /*
-  console.log(`Accepts application/json: ${req.accepts('application/json')}`);
-  console.log(`Request Headers: ${JSON.stringify(req.headers)}`);
-  */
+   console.log(`Accepts application/json: ${req.accepts('application/json')}`);
+   console.log(`Request Headers: ${JSON.stringify(req.headers)}`);
+   */
   // Make sure to use Twilio.normalize to convert number to 10 digit
   console.tag('routes', 'twilio', 'receive').log(`Request: ${JSON.stringify(req.body)}`);
   // NEEDS TO BE REPLACED WITH USER AUTHENTICATION
   // 0 for now for Sid's Messenger
   createAndEmit(normalize(req.body.From), 0, req.body.Body,
       Date.now(), req.body.SmsMessageSid, normalize(req.body.To), true, true).then(() => {
-        console.tag('routes', 'twilio', 'receive').log('Successfully created/emitted message');
-        respond(res, '');
-      }).catch(err => {
-        res.status(500).fail(['routes', 'twilio', 'receive'], err,
-          'There was an error receiving this message.');
-      });
+    console.tag('routes', 'twilio', 'receive').log('Successfully created/emitted message');
+    respond(res, '');
+  }).catch(err => {
+    res.status(500).fail(['routes', 'twilio', 'receive'], err,
+        'There was an error receiving this message.');
+  });
 });
 
 // Receiving a fallback text message from a user transferred by Twilio when /receive fails
@@ -96,11 +96,12 @@ route.post('/fallback', twilio.webhook({
   // 0 for now for Sid's Messenger
   createAndEmit(normalize(req.body.From), 0, req.body.Body,
       Date.now(), req.body.SmsMessageSid, normalize(req.body.To), true, true).then(() => {
-        console.tag('routes', 'twilio', 'fallback').log('Successfully created/emitted message');
-        respond(res, '');
-      }).catch(err => {
-        res.status(500).fail(['routes', 'twilio', 'fallback'], err,
-          'There was an error receiving this message.');
-      });
+    console.tag('routes', 'twilio', 'fallback').log('Successfully created/emitted message');
+    respond(res, '');
+  }).catch(err => {
+    res.status(500).fail(['routes', 'twilio', 'fallback'], err,
+        'There was an error receiving this message.');
+  });
 });
+
 export default route;
