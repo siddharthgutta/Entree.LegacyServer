@@ -9,6 +9,7 @@ const messageSchema = new mongoose.Schema({
   content: String,
   date: Date,
   twilioSid: String,
+  twilioNumber: String,
   sentByUser: Boolean,
   success: Boolean
 });

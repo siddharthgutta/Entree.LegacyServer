@@ -9,7 +9,8 @@ const socketTokenSchema = new mongoose.Schema({
   },
   numTokens: {
     type: Number,
-    required: true
+    required: true,
+    default: 0
   },
   tokens: [String]
 });
