@@ -10,7 +10,7 @@ import ss from '../message/socket-server.es6';
 const message = global.TEST;
 const token = crypto.randomBytes(15).toString('hex');
 const msgCount = 10;
-const channel = 'channel-0';
+const channel = 'send';
 
 let socket;
 
@@ -88,21 +88,32 @@ describe(global.TEST, () => {
   it(`should send ${msgCount} messages to client`, done => {
     const start = now();
     const messages = new Array(msgCount);
+    let received = 0;
 
     socket.on(channel, (data, respond) => {
+      console.log(data); // FIXME not receiving data; use standard emit from socket-test
+
       assert(data, message);
       respond({status: 'ok'});
+
+      if (false && ss.isLocal() && ++received === msgCount) {
+        const duration = ((now() - start) / 1000);
+        console.log(`throughput ${(msgCount / duration).toFixed(3)} messages/second`);
+        done();
+      }
     });
 
     for (let i = 0; i < messages.length; i++) {
       messages[i] = ss.emit(token, channel, message + i);
     }
 
-    Promise.all(messages).then(() => {
-      const duration = ((now() - start) / 1000);
-      console.log(`throughput ${(msgCount / duration).toFixed(3)} messages/second`);
-      done();
-    });
+    if (true || ss.isRemote()) {
+      Promise.all(messages).then(() => {
+        const duration = ((now() - start) / 1000);
+        console.log(`throughput ${(msgCount / duration).toFixed(3)} messages/second`);
+        done();
+      });
+    }
   });
 
   it('should disconnect client (from server)', done => {
