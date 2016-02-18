@@ -1,24 +1,17 @@
-import request from 'superagent';
-import {format} from 'url';
+import config from 'config';
+import LocalSocketServer from './local-socket-server.es6';
 
-class SocketServer {
-  constructor({protocol, host, port, path = '', search = '?'}) {
-    this.uri = format({protocol, host, path, search, port});
-  }
+let socketServer;
+let mode = 'local';
 
-  attach() {
-    // ignore
-  }
-
-  emit(channel, data) {
-    // TODO
-    request
-        .post(this.uri)
-        .send({channel, data})
-        .end((err, req) => {
-          console.log(err, req);
-        });
-  }
+if (config.get('UseRemoteSocketServer')) {
+  const RemoteSocketServer = require('./remote-socket-server.es6'); // private :) for throughput testing
+  socketServer = new RemoteSocketServer();
+  mode = 'remote';
+} else {
+  socketServer = new LocalSocketServer();
 }
 
-export default SocketServer;
+console.tag('sio').log(`Using ${mode} socket server`);
+
+export default socketServer;

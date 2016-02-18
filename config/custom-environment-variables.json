@@ -2,11 +2,11 @@
   "Client": {
     "socketPort": "SOCKET_SERVER_PORT"
   },
-  "UseInternalSocket": {
-    "__name": "SOCKET_SERVER_USE_INTERNAL_ONLY",
+  "UseRemoteSocketServer": {
+    "__name": "SOCKET_SERVER_USE_REMOTE",
     "__format": "json"
   },
-  "ExternalSocketServer": {
+  "SocketServer": {
     "port": {
       "__name": "SOCKET_SERVER_PORT",
       "__format": "json"
@@ -30,5 +30,6 @@
     "sslCa": "HTTPS_SSL_CA"
   },
   "NodeEnv": "NODE_ENV",
+  "Mode": "BRANCHOFF_MODE",
   "AppId": "BRANCHOFF_BRANCH"
 }
