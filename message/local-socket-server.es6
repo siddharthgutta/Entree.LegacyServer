@@ -1,8 +1,8 @@
 import SocketServer from '../libs/socket-server.es6';
 import config from 'config';
 import ipc from 'node-ipc';
-import selectn from 'selectn';
 import address from '../libs/address.es6';
+import selectn from 'selectn';
 
 const id = config.get('AppId');
 const socketServer = config.get('SocketServer');
@@ -88,10 +88,6 @@ class LocalSocketServer extends SocketServer {
 
   volatile(token, channel, data) {
     return super.emit(token, channel, data, false); // emit has no awk yet; so just invoke that
-  }
-
-  emit(token, data) {
-    super.emit(token, null, data, false);
   }
 
   volatile() {

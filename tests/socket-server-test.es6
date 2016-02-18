@@ -35,6 +35,36 @@ let socket;
  *
  **/
 
+
+/**
+ *
+ * ss.connect() :: Promise
+ * -----------------------
+ * Use this function to connect the socket server. All the information is pulled from the
+ * branchoff@config depending on the running environment
+ *
+ *
+ * ss.accept(token) :: Promise
+ * -----------------------
+ * Accepts any incoming websockets with the token you provide
+ *
+ *
+ * ss.reject(token) :: Promise
+ * -----------------------
+ * Reject any tokens; all connected websockets will be disconnected
+ *
+ *
+ * ss.emit(token, channel, data) :: Promise
+ * -----------------------
+ * Send to a token, on a specified channel, some data
+ *
+ *
+ * ss.disconnect()
+ * -----------------------
+ * Disconnect ipc to ensure Node quits
+ *
+ */
+
 describe(global.TEST, () => {
   it('should create socket-server', done => {
     ss.connect().then(() => done());

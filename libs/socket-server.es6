@@ -166,6 +166,7 @@ class SocketServer extends EventEmitter {
     return data;
   }
 
+
   _handleTransmit({token, channel, data, resolve, action, reject, awk}, callback) {
     const eventMap = this.eventMap;
     const eventId = this.generateUUID();
@@ -226,7 +227,11 @@ class SocketServer extends EventEmitter {
   }
 
   _emitIPC(event, data) {
+<<<<<<< 1d27543bfe9cc7f4855ce3ce66cd37bc6975d1f7
     ipc.of[this.channel].emit(event, data);
+=======
+    ipc.of.socket.emit(event, data);
+>>>>>>> Temp fix for channels
   }
 
   accept(token) {
