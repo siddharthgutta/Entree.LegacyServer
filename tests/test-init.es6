@@ -9,7 +9,7 @@ const console = initScribe(true, false, false,
 console.persistent('tags', []);
 global.TEST = path.basename(stack()[7].getFileName());
 
-export function initDatabase() {
+export function clearDatabase() {
   return new Promise(resolve => {
     for (const col in mongoose.connection.collections) { //eslint-disable-line
       mongoose.connection.collections[col].remove();
