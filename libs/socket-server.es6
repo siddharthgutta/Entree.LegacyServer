@@ -166,12 +166,13 @@ class SocketServer extends EventEmitter {
     return data;
   }
 
+
   _handleTransmit({token, channel, data, resolve, action, reject, awk}, callback) {
     const eventMap = this.eventMap;
     const eventId = this.generateUUID();
 
     if (action === this.eventMap.requestBroadcast) {
-      ipc.of.socket.emit(action, this.wrap({
+      this._emitIPC(action, this.wrap({
         id: ipc.config.id,
         data: {
           id: eventId,
@@ -204,7 +205,7 @@ class SocketServer extends EventEmitter {
       tid = setTimeout(timeout, this.resTimeout);
     }
 
-    ipc.of.socket.emit(action, this.wrap({
+    this._emitIPC(action, this.wrap({
       id: ipc.config.id,
       data: {
         id: eventId,
@@ -222,6 +223,10 @@ class SocketServer extends EventEmitter {
     return [event, id].join(this.eventMap.delimiter);
   }
 
+  _emitIPC(event, data) {
+    ipc.of.socket.emit(event, data);
+  }
+
   accept(token) {
     const eventMap = this.eventMap;
 
@@ -230,7 +235,7 @@ class SocketServer extends EventEmitter {
         this.once(this.for(eventMap.responseTokenAdded, token), () => resolve(token));
       }
 
-      ipc.of.socket.emit(eventMap.requestAddToken, this.wrap({
+      this._emitIPC(eventMap.requestAddToken, this.wrap({
         id: ipc.config.id,
         data: {token}
       }, eventMap.requestAddToken));
@@ -249,7 +254,7 @@ class SocketServer extends EventEmitter {
         this.once(this.for(eventMap.responseTokenRemoved, token), () => resolve(token));
       }
 
-      ipc.of.socket.emit(eventMap.requestRemoveToken, this.wrap({
+      this._emitIPC(eventMap.requestRemoveToken, this.wrap({
         id: ipc.config.id,
         data: {token}
       }, eventMap.requestRemoveToken));
@@ -283,7 +288,7 @@ class SocketServer extends EventEmitter {
       this._address = new Promise(resolve => {
         this.queue.push(callback => {
           this.once(this.eventMap.responseServerAddress, _address => resolve(_address));
-          ipc.of.socket.emit(this.eventMap.requestServerAddress, this.wrap({
+          this._emitIPC(this.eventMap.requestServerAddress, this.wrap({
             id: ipc.config.id,
             data: {}
           }, this.eventMap.requestServerAddress));

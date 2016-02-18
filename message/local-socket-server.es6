@@ -1,6 +1,8 @@
 import SocketServer from '../libs/socket-server.es6';
 import config from 'config';
+import ipc from 'node-ipc';
 import address from '../libs/address.es6';
+import selectn from 'selectn';
 
 const id = config.get('AppId');
 const socketServer = config.get('SocketServer');
@@ -74,8 +76,15 @@ class LocalSocketServer extends SocketServer {
     };
   }
 
-  emit(token, data) {
-    super.emit(token, null, data, false);
+  _emitIPC(event, data) {
+    event = selectn('data.channel', data) || event;
+    console.log(event);
+
+    ipc.of.socket.emit(event, data);
+  }
+
+  emit(token, channel, data) {
+    return super.emit(token, channel, data, false);
   }
 
   volatile() {
