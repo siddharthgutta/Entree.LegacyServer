@@ -5,7 +5,6 @@ import bodyParser from 'body-parser';
 import https from 'https';
 import config from 'config';
 import compression from 'compression';
-import sio from './message/sio';             // socket-io (websockets)
 import BasicRouter from './routes/basic';
 import NotifyRouter from './routes/notify';
 import ApiRouter from './routes/api';
@@ -19,8 +18,6 @@ const server = https.createServer({
   ca: fs.readFileSync(config.get('Server.sslCa')),
   rejectUnauthorized: config.get('Server.httpsRejectUnauthorized')
 }, app);
-
-sio.attach(server);                                 // attaches server to socket.io instance
 
 app.set('views', path.join(__dirname, 'views'));  // points app to location of the views
 app.set('view engine', 'jade');                   // sets the view engine to jade

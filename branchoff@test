@@ -12,5 +12,5 @@ sleep 10
 export NODE_ENV=staging;
 
 set -e
-npm run lint-ci
 npm run tests-ci
+npm run lint-ci

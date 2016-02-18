@@ -21,6 +21,7 @@
       "name": "Sid Gutta"
     }
   ],
+  "Mode": "manual",
   "Server": {
     "protocol": "https",
     "port": 3000,
@@ -31,10 +32,18 @@
   },
   "AppId": "local",
   "NodeEnv": "development",
-  "ExternalSocketServer": {
+  "SocketServer": {
     "protocol": "http",
     "hostname": "ec2-52-89-1-140.us-west-2.compute.amazonaws.com",
     "port": 2997,
+    "search": "?",
+    "path": ""
+  },
+  "UseRemoteSocketServer": false,
+  "RemoteSocketServer": {
+    "protocol": "http",
+    "hostname": "notifications.textentree.com",
+    "port": 2996,
     "search": "?",
     "path": ""
   },
