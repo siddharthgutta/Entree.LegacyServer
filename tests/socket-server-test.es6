@@ -91,8 +91,6 @@ describe(global.TEST, () => {
     let received = 0;
 
     socket.on(channel, (data, respond) => {
-      console.log(data); // FIXME not receiving data; use standard emit from socket-test
-
       assert(data, message);
 
       if (ss.isRemote()) {
