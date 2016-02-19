@@ -166,7 +166,6 @@ class SocketServer extends EventEmitter {
     return data;
   }
 
-
   _handleTransmit({token, channel, data, resolve, action, reject, awk}, callback) {
     const eventMap = this.eventMap;
     const eventId = this.generateUUID();

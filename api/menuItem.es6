@@ -28,15 +28,14 @@ export function find(restaurantId, optional = {}) {
  * @param {Object} mods: extra modifications for the menu item
  * @returns {Promise}: Returns the menu object
  */
-export function create(
-    restaurantId,
-    category,
-    name,
-    description,
-    price,
-    hasSize,
-    sizes,
-    mods) {
+export function create(restaurantId,
+                       category,
+                       name,
+                       description,
+                       price,
+                       hasSize,
+                       sizes,
+                       mods) {
   return (new models.MenuItem({
     restaurantId,
     category,
@@ -45,7 +44,8 @@ export function create(
     price,
     hasSize,
     sizes,
-    mods})).save();
+    mods
+  })).save();
 }
 
 /* eslint-disable */

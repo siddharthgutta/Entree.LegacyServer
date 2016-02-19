@@ -72,10 +72,7 @@
       "prefer-single"
     ],
     "react/jsx-indent-props": 0,
-    "indent": [
-      2,
-      2
-    ],
+    "indent": 0,
     "react/jsx-closing-bracket-location": [
       2,
       {

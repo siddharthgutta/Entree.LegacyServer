@@ -3,6 +3,7 @@ import config from 'config';
 import ipc from 'node-ipc';
 import address from '../libs/address.es6';
 import selectn from 'selectn';
+import cid from '../libs/cluster-id.es6';
 
 const id = config.get('AppId');
 const socketServer = config.get('SocketServer');
@@ -31,7 +32,7 @@ const eventMap = {
 
 class LocalSocketServer extends SocketServer {
   constructor(_id = id, channel = 'socket') {
-    super(_id, socketServer, channel, false, debug, eventMap);
+    super(_id + cid, socketServer, channel, false, debug, eventMap);
 
     this._address = address(socketServer, 'https');
   }
@@ -88,10 +89,6 @@ class LocalSocketServer extends SocketServer {
 
   volatile(token, channel, data) {
     return super.emit(token, channel, data, false); // emit has no awk yet; so just invoke that
-  }
-
-  volatile() {
-    throw new Error('Not implemented by socket-server');
   }
 
   emitCB() {

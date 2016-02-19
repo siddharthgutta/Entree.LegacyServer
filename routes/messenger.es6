@@ -26,6 +26,34 @@ route.use((req, res, next) => {
   next();
 });
 
+// ensure all stored tokens are still alive; otherwise kick them out
+function validateSockets(restaurantID) {
+  return new Promise(resolve => {
+    findOne(restaurantID)
+        .then(results => {
+          // run in parallel this should be fast
+          // 2 seconds for now; this can be reduced to 1 - 1.5 seconds
+          async.each(results.tokens, (token, callback) => {
+            console.log('Checking', token);
+            socketServer.emit(token, 'alive?', {}, 2000)
+                .then(data => {
+                  console.log('Received', data);
+                  callback();
+                })
+                .catch(() => {
+                  console.log('Removing', token);
+                  removeToken(restaurantID, token);
+                  socketServer.reject(token);
+                  callback();
+                });
+          }, () => resolve());
+        })
+        .catch(e => {
+          console.error(e);
+          resolve();
+        });
+  });
+}
 
 route.post('/token', (req, res) => {
   // TODO NEEDS TO BE REPLACED WITH USER AUTHENTICATION
@@ -35,46 +63,27 @@ route.post('/token', (req, res) => {
 
   console.log(reqToken);
 
-  // ensure all stored tokens are still alive; otherwise kick them out
-  findOne(restaurantID)
-      .then(results => {
-        // run in parallel this should be fast
-        // 2 seconds for now; this can be reduced to 1 - 1.5 seconds
-        async.each(results.tokens, (token, callback) => {
-          console.log('Checking', token);
-          socketServer.emit(token, 'alive?', {}, 2000)
-              .then(data => {
-                console.log('Received', data);
-                callback();
-              })
-              .catch(() => {
-                console.log('Removing', token);
-                removeToken(restaurantID, token);
-                socketServer.reject(token);
-                callback();
-              });
-        }, () => {
-          addTokenOrCreate(restaurantID, reqToken)
-              .then(() => Promise.all([socketServer.address(), socketServer.accept(reqToken)]))
-              .spread((address, token) => {
-                // add any listeners to remove disconnected ones; speeds up the general awk check
-                // this could have some implications like those who are trying to reconnect via socket.io poll
-                // TODO please review @jesse @jadesym
-                const removeEvent = socketServer.for(socketServer.eventMap.responseClientDisconnected, token);
-                socketServer.once(removeEvent, () => {
-                  console.log('Removing token', token);
-                  removeToken(restaurantID, token);
-                  socketServer.reject(token);
-                });
+  validateSockets(restaurantID)
+      .then(() => addTokenOrCreate(restaurantID, reqToken)
+          .then(() => Promise.all([socketServer.address(), socketServer.accept(reqToken)]))
+          .spread((address, token) => {
+            // add any listeners to remove disconnected ones; speeds up the general awk check
+            // this could have some implications like those who are trying to reconnect via socket.io poll
+            // TODO please review @jesse @jadesym
+            const removeEvent = socketServer.for(socketServer.eventMap.responseClientDisconnected, token);
+            socketServer.once(removeEvent, () => {
+              console.log('Removing token', token);
+              removeToken(restaurantID, token);
+              socketServer.reject(token);
+            });
 
-                const successMsg = `Successfully created token: ${token}`;
-                res.ok(['routes', 'messenger', 'token'], {token, address},
-                    {token, address}, successMsg); // renaming for minimization
-              })
-              .catch(err => res.status(500).fail(['routes', 'messenger', 'token'],
-                  err, `Unsuccessfully created token: ${reqToken}`));
-        });
-      });
+            const successMsg = `Successfully created token: ${token}`;
+            res.ok(['routes', 'messenger', 'token'], {token, address},
+                {token, address}, successMsg); // renaming for minimization
+          })
+      )
+      .catch(err => res.status(500).fail(['routes', 'messenger', 'token'],
+          err, `Unsuccessfully created token: ${reqToken}`));
 });
 
 // Used to get all messages

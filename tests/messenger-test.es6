@@ -1,3 +1,7 @@
+/**
+ * Created by kfu on 2/19/16.
+ */
+
 import './test-init.es6';
 import expect from 'expect.js';
 import supertest from 'supertest';
@@ -9,6 +13,8 @@ import assert from 'assert';
 import * as SocketToken from '../api/socketToken.es6';
 import _ from 'underscore';
 import * as Message from '../api/message.es6';
+
+console.log(port);
 
 beforeEach(done => {
   clearDatabase().then(() => done());
@@ -24,7 +30,7 @@ describe('Messenger Tests', () => {
     const restaurantId = 0;
     const token = 'abc';
 
-    it('should succeed adding a token to an existing SocketToken', done => {
+    it('should succeed adding a token to an existing SocketToken; but deletes any non-responsive sockets', done => {
       SocketToken.addTokenOrCreate(restaurantId, token).then(() => {
         server
             .post(`/messenger/token`)
@@ -37,11 +43,11 @@ describe('Messenger Tests', () => {
                 console.tag(global.TEST).log(err);
                 expect().fail('Error response returned');
               }
-              const newToken = res.body.data;
+              const newToken = res.body.data.token;
               SocketToken.findOne(restaurantId).then(socketToken => {
                 assert.equal(socketToken.restaurantId, restaurantId);
-                assert.equal(socketToken.numTokens, 2);
-                assert(_.isEqual(socketToken.tokens, [token, newToken]));
+                assert.equal(socketToken.numTokens, 1);
+                assert(_.isEqual(socketToken.tokens, [newToken]));
                 done();
               }).catch(findOneError => {
                 console.tag(global.TEST).log(findOneError);
@@ -65,7 +71,7 @@ describe('Messenger Tests', () => {
               console.tag(global.TEST).log(err);
               expect().fail('Error response returned');
             }
-            const newToken = res.body.data;
+            const newToken = res.body.data.token;
             SocketToken.findOne(restaurantId).then(socketToken => {
               assert.equal(socketToken.restaurantId, restaurantId);
               assert.equal(socketToken.numTokens, 1);
@@ -87,7 +93,7 @@ describe('Messenger Tests', () => {
                   .post(`/messenger/token`)
                   .send({})
                   .expect('Content-type', 'application/json; charset=utf-8')
-                  .expect(500, done);
+                  .expect(200, done);
             });
           });
         });
@@ -113,8 +119,8 @@ describe('Messenger Tests', () => {
           .expect('Content-type', 'application/json; charset=utf-8')
           .expect(200)
           .end((err, res) => {
-            assert(_.isEqual(res.body.count, 0));
-            assert(_.isEqual(res.body.messages, []));
+            assert(_.isEqual(res.body.data.count, 0));
+            assert(_.isEqual(res.body.data.messages, []));
             done();
           });
     });
@@ -146,8 +152,8 @@ describe('Messenger Tests', () => {
                       .expect('Content-type', 'application/json; charset=utf-8')
                       .expect(200)
                       .end((err, res) => {
-                        assert(_.isEqual(res.body.count, 1));
-                        assert.equal(new Date(res.body.messages[0].date).getTime(), date);
+                        assert(_.isEqual(res.body.data.count, 1));
+                        assert.equal(new Date(res.body.data.messages[0].date).getTime(), date);
                         done();
                       });
                 })
@@ -175,7 +181,7 @@ describe('Messenger Tests', () => {
                 phoneNumber,
                 restaurantId,
                 content,
-                date + 100,
+                    date + 100,
                 twilioSid,
                 twilioNumber,
                 sentByUser,
@@ -187,9 +193,9 @@ describe('Messenger Tests', () => {
                       .expect('Content-type', 'application/json; charset=utf-8')
                       .expect(200)
                       .end((err, res) => {
-                        assert(_.isEqual(res.body.count, 2));
-                        assert.equal(new Date(res.body.messages[0].date).getTime(), date + 100);
-                        assert.equal(new Date(res.body.messages[1].date).getTime(), date);
+                        assert(_.isEqual(res.body.data.count, 2));
+                        assert.equal(new Date(res.body.data.messages[0].date).getTime(), date + 100);
+                        assert.equal(new Date(res.body.data.messages[1].date).getTime(), date);
                         done();
                       });
                 })
@@ -225,15 +231,17 @@ describe('Messenger Tests', () => {
       });
 
       it('should fail without a SocketToken', done => {
-        SocketToken.addTokenOrCreate(restaurantId, token).then(() => {
-          server
-              .post(`/messenger/send`)
-              .send({phoneNumber: productionPhoneNumber, content: 'Valid Message'})
-              .expect('Content-type', 'application/json; charset=utf-8')
-              .expect(200, done);
-        }).catch(createError => {
-          expect().fail(`Token could not be created: ${createError}`);
-        });
+        SocketToken.addTokenOrCreate(restaurantId, token)
+            .then(() => {
+              server
+                  .post(`/messenger/send`)
+                  .send({phoneNumber: productionPhoneNumber, content: 'Valid Message'})
+                  .expect('Content-type', 'application/json; charset=utf-8')
+                  .expect(200, done);
+            })
+            .catch(createError => {
+              expect().fail(`Token could not be created: ${createError}`);
+            });
       });
     }
   });

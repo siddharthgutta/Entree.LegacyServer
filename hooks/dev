@@ -7,4 +7,4 @@ sleep 10
 export NODE_ENV=staging;
 
 set -e
-npm run test-ci ./tests/socket-server-disable.compiled.js
+npm run test-ci ./tests/messenger-test.compiled.js

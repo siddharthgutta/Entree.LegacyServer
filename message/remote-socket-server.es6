@@ -1,9 +1,10 @@
 import SocketServer from '../libs/socket-server.es6';
 import config from 'config';
+import cid from '../libs/cluster-id.es6';
 
 const id = config.get('AppId');
 const remoteSocketServer = config.get('RemoteSocketServer');
-const debug = false; // config.get('NodeEnv') === 'production'
+const debug = true; // config.get('NodeEnv') === 'production'
 
 /**
  *
@@ -16,7 +17,14 @@ const debug = false; // config.get('NodeEnv') === 'production'
 
 class RemoteSocketServer extends SocketServer {
   constructor(_id = id, channel = 'socket') {
-    super(_id, remoteSocketServer, channel, true, debug);
+    super(_id + cid, remoteSocketServer, channel, true, debug);
+  }
+
+  address() {
+    return super.address().then(address => {
+      address.hostname = remoteSocketServer.hostname; // override with SSL name
+      return address;
+    });
   }
 }
 
