@@ -4,8 +4,9 @@ import assert from 'assert';
 import {format} from 'url';
 import now from 'performance-now';
 import Promise from 'bluebird';
+import config from 'config';
 import crypto from 'crypto';
-import ss from '../message/socket-server.es6';
+import socketServer from '../message/socket-server.es6';
 
 const message = global.TEST;
 const token = crypto.randomBytes(15).toString('hex');
@@ -64,6 +65,9 @@ let socket;
  * Disconnect ipc to ensure Node quits
  *
  */
+
+// construct a new socketServer which does not interfere with the main socket-server
+const ss = new socketServer.constructor(global.TEST + config.get('AppId'));
 
 describe(global.TEST, () => {
   it('should create socket-server', done => {

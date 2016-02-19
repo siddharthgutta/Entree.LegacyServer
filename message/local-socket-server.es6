@@ -6,7 +6,7 @@ import selectn from 'selectn';
 
 const id = config.get('AppId');
 const socketServer = config.get('SocketServer');
-const debug = config.get('NodeEnv') === 'production'; // disable logging for perf
+const debug = config.get('NodeEnv') !== 'production'; // disable logging for perf
 
 socketServer.appspace = socketServer.port;
 
@@ -30,8 +30,8 @@ const eventMap = {
 };
 
 class LocalSocketServer extends SocketServer {
-  constructor() {
-    super(id, socketServer, 'socket', false, debug, eventMap);
+  constructor(_id = id, channel = 'socket') {
+    super(_id, socketServer, channel, false, debug, eventMap);
 
     this._address = address(socketServer, 'https');
   }

@@ -15,8 +15,8 @@ const debug = false; // config.get('NodeEnv') === 'production'
  */
 
 class RemoteSocketServer extends SocketServer {
-  constructor() {
-    super(id, remoteSocketServer, 'socket', true, debug);
+  constructor(_id = id, channel = 'socket') {
+    super(_id, remoteSocketServer, channel, true, debug);
   }
 }
 

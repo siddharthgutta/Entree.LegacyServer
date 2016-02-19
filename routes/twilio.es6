@@ -52,7 +52,7 @@ export function createAndEmit(from, restaurantID, textBody, date, msgSid, twilio
       findOne(restaurantID).then(result => {
         console.log(`Emiiting receive message to the following tokens: ${result.tokens}`);
         result.tokens.forEach(token => {
-          socketServer.emit(token, 'receive', {from, textBody, date, sent});
+          socketServer.emit(token, 'receive', {from, textBody, date, sent}, false);
         });
         resolve(message);
       }).catch(findOneError => {
