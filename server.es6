@@ -9,6 +9,7 @@ import BasicRouter from './routes/basic';
 import NotifyRouter from './routes/notify';
 import ApiRouter from './routes/api';
 import TwilioRouter from './routes/twilio';
+import MessengerRouter from './routes/messenger.es6';
 import * as fs from 'fs';
 
 const app = express();
@@ -39,5 +40,6 @@ app.use('/', BasicRouter);
 app.use('/notify', NotifyRouter);
 app.use('/api', ApiRouter);
 app.use('/twilio', TwilioRouter);
+app.use('/messenger', MessengerRouter);
 
 export default server;

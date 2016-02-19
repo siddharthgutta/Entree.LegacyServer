@@ -13,5 +13,4 @@ if (config.get('UseRemoteSocketServer')) {
 }
 
 console.tag('sio').log(`Using ${mode} socket server`);
-
 export default socketServer;

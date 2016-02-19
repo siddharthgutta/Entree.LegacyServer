@@ -2,7 +2,7 @@ import {clearDatabase, disconnectDatabase} from './test-init.es6';
 import assert from 'assert';
 import * as User from '../api/user.es6';
 import config from 'config';
-const TWILIO_FROM_NUMBER = config.get('Twilio.fromNumbers');
+const TWILIO_FROM_NUMBER = config.get('Twilio.numbers')[0];
 import expect from 'expect.js';
 import supertest from 'supertest';
 const port = config.get('Server.port');
