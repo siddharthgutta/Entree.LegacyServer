@@ -4,7 +4,9 @@ import config from 'config';
 import mongoose from 'mongoose';
 
 const mongoConfig = config.get('MongoDb');
+mongoose.Promise = require('bluebird');
 mongoose.connect(`mongodb://${mongoConfig.host}:${mongoConfig.port}/${mongoConfig.database}`);
+
 const basename = path.basename(module.filename);
 const db = {};
 

@@ -57,7 +57,7 @@ describe('Message', () => {
         success).then(() => {
           assert(false);
           done();
-        }, err => {
+        }).catch(err => {
           assert.equal(Object.keys(err.errors).length, 1);
           done();
         });
