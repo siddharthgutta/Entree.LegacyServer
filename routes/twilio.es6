@@ -46,7 +46,7 @@ route.use((req, res, next) => {
  * @param {Boolean} success: whether or not the message was sent successfully via Twilio
  * @returns {Promise}: Returns an object that contains the row of that restaurantID
  */
-function createAndEmit(from, restaurantID, textBody, date, msgSid, twilioNumber, sent, success) {
+export function createAndEmit(from, restaurantID, textBody, date, msgSid, twilioNumber, sent, success) {
   return new Promise((resolve, reject) => {
     create(from, restaurantID, textBody, date, msgSid, twilioNumber, sent, success).then(message => {
       findOne(restaurantID).then(result => {

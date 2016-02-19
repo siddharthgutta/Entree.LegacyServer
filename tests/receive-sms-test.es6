@@ -11,6 +11,8 @@ import selectn from 'selectn';
 import config from 'config';
 import {clearDatabase, disconnectDatabase} from './test-init.es6';
 import * as SocketToken from '../api/socketToken.es6';
+import assert from 'assert';
+import {createAndEmit} from '../routes/twilio.es6';
 
 const port = config.get('Server.port');
 const server = supertest.agent(`https://localhost:${port}`);
@@ -89,6 +91,65 @@ describe('Twilio SMS Receive', () => {
           });
       }).catch(err => {
         expect().fail(`Could not create SocketToken: ${err}`);
+      });
+    });
+  });
+
+  describe('createAndEmit tests', () => {
+    const phoneNumber = '1234567890';
+    const content = 'This is the message content';
+    const restaurantId = 1;
+    const date = Date.now();
+    const twilioSid = 'abc123';
+    const twilioNumber = '0987654321';
+    const sentByUser = true;
+    const success = true;
+
+    beforeEach(done => {
+      clearDatabase().then(() => done());
+    });
+
+    it('should fail without SocketToken', done => {
+      createAndEmit(
+        phoneNumber,
+        restaurantId,
+        content,
+        date,
+        twilioSid,
+        twilioNumber,
+        sentByUser,
+        success).then(() => {
+          expect().fail(`Should fail since no SocketToken exists.`);
+        }).catch(() => {
+          done();
+        });
+    });
+
+    it('should succeed if SocketToken exists', done => {
+      SocketToken.addTokenOrCreate(restaurantId, '123456').then(() => {
+        createAndEmit(
+          phoneNumber,
+          restaurantId,
+          content,
+          date,
+          twilioSid,
+          twilioNumber,
+          sentByUser,
+          success).then(message => {
+            assert.equal(message.phoneNumber, phoneNumber);
+            assert.equal(message.restaurantId, restaurantId);
+            assert.equal(message.content, content);
+            assert.equal(message.date.getTime(), date);
+            assert.equal(message.twilioSid, twilioSid);
+            assert.equal(message.twilioNumber, twilioNumber);
+            assert.equal(message.sentByUser, sentByUser);
+            assert.equal(message.success, success);
+            done();
+          }).catch(() => {
+            expect().fail(`Should succeed since SocketToken exists.`);
+          });
+      }).catch(() => {
+        expect().fail(`Should succeed since SocketToken exists.`);
       });
     });
   });
