@@ -25,7 +25,8 @@
         "HTTPS_SSL_KEY": "./keys/localhost.key",
         "HTTPS_SSL_CERTIFICATE": "./keys/localhost.crt",
         "HTTPS_SSL_CA": "./keys/localhost.crt",
-        "SOCKET_SERVER_HOSTNAME": "127.0.0.1"
+        "SOCKET_SERVER_HOSTNAME": "127.0.0.1",
+        "SOCKET_SERVER_USE_REMOTE": false
       },
       "stage": {
         "NODE_ENV": "staging",
