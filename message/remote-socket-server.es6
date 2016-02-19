@@ -3,7 +3,7 @@ import config from 'config';
 
 const id = config.get('AppId');
 const remoteSocketServer = config.get('RemoteSocketServer');
-const debug = config.get('NodeEnv') !== 'production';
+const debug = false; // config.get('NodeEnv') === 'production'
 
 /**
  *
