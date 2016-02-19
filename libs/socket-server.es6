@@ -99,7 +99,7 @@ class SocketServer extends EventEmitter {
 
     return new Promise(resolve => {
       ipc[this.remote ? 'connectToNet' : 'connectTo'](this.channel, () => {
-        ipc.of.socket.on('connect', () => {
+        ipc.of[this.channel].on('connect', () => {
           ipc.config.stopRetrying = true;
           resolve();
 
@@ -107,45 +107,45 @@ class SocketServer extends EventEmitter {
         });
       });
 
-      ipc.of.socket.on('disconnect', () => {
+      ipc.of[this.channel].on('disconnect', () => {
         this.queue.pause();
       });
 
-      ipc.of.socket.on(eventMap.responseTokenAdded, data => {
+      ipc.of[this.channel].on(eventMap.responseTokenAdded, data => {
         data = this.unwrap(data, eventMap.responseTokenAdded).data;
 
         this._emit(eventMap.responseTokenAdded, data);
         this._emit(this.for(eventMap.responseTokenAdded, data.token), data);
       });
 
-      ipc.of.socket.on(eventMap.responseServerAddress, data => {
+      ipc.of[this.channel].on(eventMap.responseServerAddress, data => {
         data = this.unwrap(data, eventMap.responseServerAddress).data;
 
         this._emit(eventMap.responseServerAddress, data);
       });
 
-      ipc.of.socket.on(eventMap.responseTokenRemoved, data => {
+      ipc.of[this.channel].on(eventMap.responseTokenRemoved, data => {
         data = this.unwrap(data, eventMap.responseTokenRemoved).data;
 
         this._emit(eventMap.responseTokenRemoved, data);
         this._emit(this.for(eventMap.responseTokenRemoved, data.token), data);
       });
 
-      ipc.of.socket.on(eventMap.responseClientAwk, data => {
+      ipc.of[this.channel].on(eventMap.responseClientAwk, data => {
         data = this.unwrap(data, eventMap.responseClientAwk).data;
 
         this._emit(eventMap.responseClientAwk, data);
         this._emit(this.for(eventMap.responseClientAwk, data.id), data);
       });
 
-      ipc.of.socket.on(eventMap.responseClientConnected, data => {
+      ipc.of[this.channel].on(eventMap.responseClientConnected, data => {
         data = this.unwrap(data, eventMap.responseClientConnected).data;
 
         this._emit(eventMap.responseClientConnected, data);
         this._emit(this.for(eventMap.responseClientConnected, data.token), data);
       });
 
-      ipc.of.socket.on(eventMap.responseClientDisconnected, data => {
+      ipc.of[this.channel].on(eventMap.responseClientDisconnected, data => {
         data = this.unwrap(data, eventMap.responseClientDisconnected).data;
 
         this._emit(eventMap.responseClientDisconnected, data);
@@ -224,7 +224,7 @@ class SocketServer extends EventEmitter {
   }
 
   _emitIPC(event, data) {
-    ipc.of.socket.emit(event, data);
+    ipc.of[this.channel].emit(event, data);
   }
 
   accept(token) {
