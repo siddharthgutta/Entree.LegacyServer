@@ -58,7 +58,7 @@ describe('Message', () => {
       });
     });
 
-    it('should not remove a token that does not exist from existing tokens', done => {
+    it('should error when removing a token that does not exist', done => {
       SocketToken.addTokenOrCreate(restaurantId, token).then(() => {
         SocketToken.removeToken(restaurantId, 'Invalid').then(() => {
           assert(false);
@@ -70,7 +70,7 @@ describe('Message', () => {
       });
     });
 
-    it('should not remove a token that does not exist from an empty token list', done => {
+    it('should error when removing a token that does not exist', done => {
       SocketToken.addTokenOrCreate(restaurantId, token).then(() => {
         SocketToken.removeToken(restaurantId, token).then(() => {
           SocketToken.removeToken(restaurantId, token).then(() => {
@@ -117,6 +117,16 @@ describe('Message', () => {
             done();
           });
         });
+      });
+    });
+
+    it('should throw an error if query does not find anything', done => {
+      SocketToken.findOne(restaurantId).then(() => {
+        assert(false);
+        done();
+      }).catch(() => {
+        assert(true);
+        done();
       });
     });
   });

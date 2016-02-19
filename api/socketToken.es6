@@ -72,8 +72,16 @@ export function isValidToken(restaurantId, token) {
  * Finds a SocketToken object by restaurantId
  *
  * @param {number} restaurantId: id of restaurant the socket token corresponds to
- * @returns {Promise}: Returns the socket token object
+ * @returns {Promise}: Returns the socket token object or rejects with error if nothing is found
  */
 export function findOne(restaurantId) {
-  return models.SocketToken.findOne({restaurantId});
+  return new Promise((resolve, reject) => {
+    models.SocketToken.findOne({restaurantId}).then(result => {
+      if (result) {
+        resolve(result);
+      } else {
+        reject(Error(`SocketToken with ${restaurantId} could not be found`));
+      }
+    });
+  });
 }
