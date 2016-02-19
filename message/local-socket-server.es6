@@ -78,7 +78,6 @@ class LocalSocketServer extends SocketServer {
 
   _emitIPC(event, data) {
     event = selectn('data.channel', data) || event;
-    console.log(event);
 
     ipc.of.socket.emit(event, data);
   }

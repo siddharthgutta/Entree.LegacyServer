@@ -91,12 +91,13 @@ describe(global.TEST, () => {
     let received = 0;
 
     socket.on(channel, (data, respond) => {
-      console.log(data); // FIXME not receiving data; use standard emit from socket-test
-
       assert(data, message);
-      respond({status: 'ok'});
 
-      if (false && ss.isLocal() && ++received === msgCount) {
+      if (ss.isRemote()) {
+        respond({status: 'ok'});
+      }
+
+      if (ss.isLocal() && ++received === msgCount) {
         const duration = ((now() - start) / 1000);
         console.log(`throughput ${(msgCount / duration).toFixed(3)} messages/second`);
         done();
@@ -107,7 +108,7 @@ describe(global.TEST, () => {
       messages[i] = ss.emit(token, channel, message + i);
     }
 
-    if (true || ss.isRemote()) {
+    if (ss.isRemote()) {
       Promise.all(messages).then(() => {
         const duration = ((now() - start) / 1000);
         console.log(`throughput ${(msgCount / duration).toFixed(3)} messages/second`);
