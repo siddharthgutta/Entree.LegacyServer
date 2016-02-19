@@ -7,49 +7,21 @@ import models from '../models/mongo/index.es6';
 const MAX_TOKENS = 4;
 
 /**
- * Create a socket token
- *
- * @param {number} restaurantId: id of restaurant the socket token corresponds to
- * @param {Object} optional: optional list of starting tokens
- * @returns {Promise}: Returns the socket token object created
- */
-export function create(restaurantId, optional = {tokens: []}) {
-  return new Promise((resolve, reject) => {
-    const numTokens = optional.tokens.length;
-    if (numTokens > MAX_TOKENS) {
-      reject(Error(`Tried to create socketToken with ${optional.tokens.length} tokens.` +
-        `Maximum is ${MAX_TOKENS} tokens`));
-    } else {
-      models.SocketToken.create({restaurantId, numTokens, ...optional}, (err, result) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(result);
-      });
-    }
-  });
-}
-
-/**
- * Adds a token to a specific socket token object and increments numTokens count
+ * Adds a token to a specific SocketToken object and increments numTokens count
+ * NOTE - If the SocketToken object does not exist, create one and add the input token
  *
  * @param {number} restaurantId: id of restaurant the socket token corresponds to
  * @param {string} token: the token that we want to add
  * @returns {Promise}: Returns the socket token object the token was added to
  */
-export function addToken(restaurantId, token) {
+export function addTokenOrCreate(restaurantId, token) {
   return new Promise((resolve, reject) => {
     models.SocketToken.findOneAndUpdate(
       {restaurantId, numTokens: {$lt: MAX_TOKENS}},
-      {$push: {tokens: token}, $inc: {numTokens: 1}},
-      {new: true})
+      {restaurantId, $push: {tokens: token}, $inc: {numTokens: 1}},
+      {new: true, upsert: true})
       .exec().then(result => {
-        if (result) {
-          resolve(result);
-        } else {
-          reject(Error(`Could not find valid SocketToken. Either restaurantId ${restaurantId} is ` +
-            `invalid or the SocketToken already has max number of tokens`));
-        }
+        resolve(result);
       }, err => reject(err));
   });
 }
@@ -94,4 +66,14 @@ export function isValidToken(restaurantId, token) {
         reject(err);
       });
   });
+}
+
+/**
+ * Finds a SocketToken object by restaurantId
+ *
+ * @param {number} restaurantId: id of restaurant the socket token corresponds to
+ * @returns {Promise}: Returns the socket token object
+ */
+export function findOne(restaurantId) {
+  return models.SocketToken.findOne({restaurantId});
 }
