@@ -6,7 +6,7 @@ import selectn from 'selectn';
 
 const id = config.get('AppId');
 const socketServer = config.get('SocketServer');
-const debug = config.get('NodeEnv') !== 'production';
+const debug = config.get('NodeEnv') === 'production'; // disable logging for perf
 
 socketServer.appspace = socketServer.port;
 
@@ -86,8 +86,8 @@ class LocalSocketServer extends SocketServer {
     return super.emit(token, channel, data, false);
   }
 
-  volatile() {
-    throw new Error('Not implemented by socket-server');
+  volatile(token, channel, data) {
+    return super.emit(token, channel, data, false); // emit has no awk yet; so just invoke that
   }
 
   emitCB() {
