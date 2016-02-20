@@ -85,7 +85,6 @@ describe('Message', () => {
     });
   });
 
-
   describe('#isValidToken', () => {
     it('should determine if a token is valid', done => {
       SocketToken.addTokenOrCreate(restaurantId, token).then(() => {

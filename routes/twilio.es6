@@ -50,7 +50,7 @@ export function createAndEmit(from, restaurantID, textBody, date, msgSid, twilio
   return new Promise((resolve, reject) => {
     create(from, restaurantID, textBody, date, msgSid, twilioNumber, sent, success).then(message => {
       findOne(restaurantID).then(result => {
-        console.log(`Emiiting receive message to the following tokens: ${result.tokens}`);
+        console.log(`Emitting receive message to the following tokens: ${result.tokens}`);
         result.tokens.forEach(token => {
           socketServer.emit(token, 'receive', {from, textBody, date, sent}, false);
         });

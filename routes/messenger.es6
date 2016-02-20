@@ -12,6 +12,10 @@ import {findOne, addTokenOrCreate} from '../api/socketToken.es6';
 
 const route = new Router();
 
+function normalize(toNumber) {
+  return `${String(toNumber).replace('+1', '')}`;
+}
+
 route.use((req, res, next) => {
   res.ok = (tags, logMessage, data, resMessage, status = 0) => {
     console.tag(...tags).log(logMessage);
@@ -30,9 +34,12 @@ route.post('/token', (req, res) => {
   const restaurantID = 0;
   const token = shortid.generate();
   addTokenOrCreate(restaurantID, token).then(result => {
-    socketServer.accept(token);
-    const successMsg = `Successfully created token: ${token}`;
-    res.ok(['routes', 'messenger', 'token'], result, successMsg);
+    socketServer.accept(token).then(acceptedToken => {
+      const successMsg = `Successfully created token: ${acceptedToken}`;
+      res.ok(['routes', 'messenger', 'token'], result, acceptedToken, successMsg);
+    }).catch(acceptError => {
+      res.status(500).fail(['routes', 'messenger', 'token'], acceptError, `Unsuccessfully Created Token: ${token}`);
+    });
   }).catch(err => {
     res.status(500).fail(['routes', 'messenger', 'token'], err, `Unsuccessfully Created Token: ${token}`);
   });
@@ -44,11 +51,15 @@ route.post('/messages', (req, res) => {
   // 0 for now for Sid's Messenger
   const restaurantID = 0;
 
-  const dbMessages = findByRestaurant(restaurantID);
-  const resMessages = _.map(dbMessages, msg =>
-    msg.success ? _.pick(msg, 'phoneNumber', 'content', 'date', 'sentByUser') : null
-  );
-  res.send(_.without(resMessages, null));
+  findByRestaurant(restaurantID).then(messages => {
+    const resMessages = _.map(messages, msg =>
+      msg.success ? _.pick(msg, 'phoneNumber', 'content', 'date', 'sentByUser') : null
+    );
+    const filteredMessages = _.without(resMessages, null);
+    res.send({count: filteredMessages.length, messages: filteredMessages});
+  }).catch(findMessagesError => {
+    res.status(500).fail(['routes', 'messenger', 'messages'], findMessagesError, 'Could not retreive your messages');
+  });
 });
 
 const sendFailTags = ['routes', 'messenger', '/send'];
@@ -60,27 +71,31 @@ route.post('/send', (req, res) => {
   const restaurantID = 0;
 
   const content = req.body.content;
-  const number = req.body.phoneNumber;
-  sendSMS(number, content)
-    .then(response => {
-      const date = new Date(response.dateCreated);
-      create(response.phoneNumber, restaurantID, response.body, date, response.sid, response.from, false, true);
-      // Get all tokens relevant to said id
-      const resBody = {phoneNumber: response.to, content: response.body, date, sentByUser: false};
+  const phoneNumber = req.body.phoneNumber;
 
-      findOne(restaurantID).then(result => {
-        result.tokens.forEach(token => {
-          socketServer.emit(token, 'send', resBody);
+  sendSMS(phoneNumber, content)
+    .then(response => {
+      const date = new Date(response.dateCreated).getTime();
+      create(normalize(response.to), restaurantID, response.body,
+        date, response.sid, normalize(response.from), false, true).then(() => {
+          // Get all tokens relevant to said id
+          const resBody = {phoneNumber: normalize(response.to), content: response.body, date, sentByUser: false};
+
+          findOne(restaurantID).then(result => {
+            result.tokens.forEach(token => {
+              socketServer.emit(token, 'send', resBody);
+            });
+            res.ok(['routes', 'messenger', '/send', 'User.signup'],
+              'New send message created.',
+              {phoneNumber, content}, `We have sent your text message to the number: ${req.body.phoneNumber}`);
+          }).catch(findOneError => {
+            res.status(500).fail(sendFailTags, findOneError, failResMsg);
+          });
+        }).catch(createError => {
+          res.status(500).fail(sendFailTags, createError, failResMsg);
         });
-        res.ok(['routes', 'messenger', '/send', 'User.signup'],
-          'New send message created.',
-          {}, `We have sent your text message to the number: ${req.body.phoneNumber}`);
-      }).catch(err => {
-        res.status(500).fail(sendFailTags, err, failResMsg);
-      });
-    }).catch(error => {
-      res.status(500);
-      res.fail(sendFailTags, error, failResMsg);
+    }).catch(sendSMSError => {
+      res.status(500).fail(sendFailTags, sendSMSError, failResMsg);
     });
 });
 
