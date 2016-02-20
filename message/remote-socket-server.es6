@@ -4,11 +4,7 @@ import cid from '../libs/cluster-id.es6';
 
 const id = config.get('AppId');
 const remoteSocketServer = config.get('RemoteSocketServer');
-<<<<<<< 1016d44cfe6d63499d84c18fb80b17927b19bcde
 const debug = true; // config.get('NodeEnv') === 'production'
-=======
-const debug = false; // config.get('NodeEnv') === 'production'
->>>>>>> Adding some throughput tests
 
 /**
  *

@@ -1,3 +1,10 @@
+<<<<<<< 2547db356a7e365dfa999cc889e989087437b928
+=======
+/**
+ * Created by kfu on 2/15/16.
+ */
+
+>>>>>>> Integrating messenger ui with backend
 import {Router} from 'express';
 import shortid from 'shortid';
 import _ from 'underscore';
@@ -26,6 +33,7 @@ route.use((req, res, next) => {
   next();
 });
 
+<<<<<<< 2547db356a7e365dfa999cc889e989087437b928
 // ensure all stored tokens are still alive; otherwise kick them out
 function validateSockets(restaurantID) {
   return new Promise(resolve => {
@@ -54,6 +62,8 @@ function validateSockets(restaurantID) {
         });
   });
 }
+=======
+>>>>>>> Integrating messenger ui with backend
 
 route.post('/token', (req, res) => {
   // TODO NEEDS TO BE REPLACED WITH USER AUTHENTICATION
@@ -63,6 +73,7 @@ route.post('/token', (req, res) => {
 
   console.log(reqToken);
 
+<<<<<<< 2547db356a7e365dfa999cc889e989087437b928
   validateSockets(restaurantID)
       .then(() => addTokenOrCreate(restaurantID, reqToken)
           .then(() => Promise.all([socketServer.address(), socketServer.accept(reqToken)]))
@@ -84,6 +95,49 @@ route.post('/token', (req, res) => {
       )
       .catch(err => res.status(500).fail(['routes', 'messenger', 'token'],
           err, `Unsuccessfully created token: ${reqToken}`));
+=======
+  // ensure all stored tokens are still alive; otherwise kick them out
+  findOne(restaurantID)
+      .then(results => {
+        // run in parallel this should be fast
+        // 2 seconds for now; this can be reduced to 1 - 1.5 seconds
+        async.each(results.tokens, (token, callback) => {
+          console.log('Checking', token);
+          socketServer.emit(token, 'alive?', {}, 2000)
+              .then(data => {
+                console.log('Received', data);
+                callback();
+              })
+              .catch(() => {
+                console.log('Removing', token);
+                removeToken(restaurantID, token);
+                socketServer.reject(token);
+                callback();
+              });
+        }, () => {
+          addTokenOrCreate(restaurantID, reqToken)
+              .then(() => Promise.all([socketServer.address(), socketServer.accept(reqToken)]))
+              .spread((address, token) => {
+
+                // add any listeners to remove disconnected ones; speeds up the general awk check
+                // this could have some implications like those who are trying to reconnect via socket.io poll
+                // TODO please review @jesse @jadesym
+                const removeEvent = socketServer.for(socketServer.eventMap.responseClientDisconnected, token);
+                socketServer.once(removeEvent, () => {
+                  console.log('Removing token', token);
+                  removeToken(restaurantID, token);
+                  socketServer.reject(token);
+                });
+
+                const successMsg = `Successfully created token: ${token}`;
+                res.ok(['routes', 'messenger', 'token'], {token, address},
+                    {token, address}, successMsg); // renaming for minimization
+              })
+              .catch(err => res.status(500).fail(['routes', 'messenger', 'token'],
+                  err, `Unsuccessfully created token: ${reqToken}`));
+        });
+      });
+>>>>>>> Integrating messenger ui with backend
 });
 
 // Used to get all messages
@@ -119,6 +173,7 @@ route.post('/send', (req, res) => {
         const date = new Date(response.dateCreated).getTime();
         create(normalize(response.to), restaurantID, response.body,
             date, response.sid, normalize(response.from), false, true).then(() => {
+<<<<<<< 2547db356a7e365dfa999cc889e989087437b928
               // Get all tokens relevant to said id
               // TODO Give me the actual response from the db
               const resBody = {
@@ -149,6 +204,33 @@ route.post('/send', (req, res) => {
       .catch(sendSMSError => {
         res.status(500).fail(sendFailTags, sendSMSError, failResMsg);
       });
+=======
+          // Get all tokens relevant to said id
+          // TODO Give me the actual response from the db
+          const resBody = {
+            phoneNumber: normalize(response.to),
+            content: response.body, date,
+            twilioNumber: '5125200133',
+            sentByUser: false
+          };
+
+          findOne(restaurantID).then(result => {
+            result.tokens.forEach(token => {
+              socketServer.emit(token, 'send', resBody, false);
+            });
+            res.ok(['routes', 'messenger', '/send', 'User.signup'],
+                'New send message created.',
+                {phoneNumber, content}, `We have sent your text message to the number: ${req.body.phoneNumber}`);
+          }).catch(findOneError => {
+            res.status(500).fail(sendFailTags, findOneError, failResMsg);
+          });
+        }).catch(createError => {
+          res.status(500).fail(sendFailTags, createError, failResMsg);
+        });
+      }).catch(sendSMSError => {
+    res.status(500).fail(sendFailTags, sendSMSError, failResMsg);
+  });
+>>>>>>> Integrating messenger ui with backend
 });
 
 export default route;

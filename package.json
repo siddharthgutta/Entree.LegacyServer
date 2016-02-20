@@ -72,8 +72,9 @@
     "sequelize": "3.19.1",
     "serve-favicon": "2.3.0",
     "shelljs": "0.5.3",
-    "socket.io": "1.4.5",
     "shortid": "2.2.4",
+    "socket.io": "1.4.5",
+    "socket.io-client": "1.4.5",
     "superagent": "1.7.2",
     "supertest": "1.1.0",
     "twilio": "3.3.0-edge",
@@ -119,9 +120,6 @@
     "transform": "config-browserify"
   },
   "pre-commit": [
-    "compile",
-    "branch-off-test",
-    "lint"
   ],
   "homepage": "https://github.com/siddharthgutta/Entree.Server#readme",
   "devDependencies": {

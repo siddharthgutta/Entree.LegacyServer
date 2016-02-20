@@ -11,20 +11,17 @@ route.get('/', (req, res) => res.render('registration', {
   config: clientConfig,
   title: 'Entrée · Order Ahead With SMS',
   description: `Text Entrée to order ahead at your favorite restaurants,
-  get recommendations on where to eat, and find delicious deals`,
-  socket: false
+  get recommendations on where to eat, and find delicious deals`
 }));
 
 route.get('/restaurant', (req, res) => res.render('restaurant', {
   config: clientConfig,
-  title: 'Entrée · Restaurant',
-  socket: true
+  title: 'Entrée · Restaurant'
 }));
 
 route.get('/messenger', (req, res) => res.render('messenger', {
   config: clientConfig,
-  title: 'Entrée · Messenger',
-  socket: true
+  title: 'Entrée · Messenger'
 }));
 
 route.get('/tests', (req, res) => {

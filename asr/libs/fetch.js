@@ -14,8 +14,10 @@ export default function fetch(url, opts = {}) {
       req = req.send(opts.body);
     }
 
-    for (const [k, v] of Object.entries(opts.headers)) {
-      req = req.set(k, v);
+    if (opts.headers) {
+      for (const [k, v] of Object.entries(opts.headers)) {
+        req = req.set(k, v);
+      }
     }
 
     req.end((err, res) => {

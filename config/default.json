@@ -42,7 +42,7 @@
   "UseRemoteSocketServer": false,
   "RemoteSocketServer": {
     "protocol": "http",
-    "hostname": "notifications.textentree.com",
+    "hostname": "www.textentree.com",
     "port": 2996,
     "search": "?",
     "path": ""

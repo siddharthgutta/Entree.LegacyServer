@@ -12,5 +12,10 @@ sleep 10
 export NODE_ENV=staging;
 
 set -e
+<<<<<<< 2547db356a7e365dfa999cc889e989087437b928:branchoff@benchmark
 npm run benchmarks-ci
 npm run lint-ci
+=======
+#npm run tests-ci
+#npm run lint-ci
+>>>>>>> Integrating messenger ui with backend:branchoff@test
