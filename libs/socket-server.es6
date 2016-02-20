@@ -35,7 +35,7 @@ class SocketServer extends EventEmitter {
               resTimeout = 60000, concurrency = 50) {
     super();
 
-    this.id = id;
+    this.id = id.replace(/[^a-zA-Z0-9]/g, '');
     this.channel = channel;
     this.eventMap = Object.assign(defaultEventMap, eventMap);
     this.remoteAddress = address;

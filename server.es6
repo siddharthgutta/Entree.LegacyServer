@@ -10,6 +10,7 @@ import NotifyRouter from './routes/notify';
 import ApiRouter from './routes/api';
 import TwilioRouter from './routes/twilio';
 import MessengerRouter from './routes/messenger.es6';
+import socketServer from './message/socket-server.es6';
 import * as fs from 'fs';
 
 const app = express();
@@ -19,6 +20,8 @@ const server = https.createServer({
   ca: fs.readFileSync(config.get('Server.sslCa')),
   rejectUnauthorized: config.get('Server.httpsRejectUnauthorized')
 }, app);
+
+socketServer.connect();
 
 app.set('views', path.join(__dirname, 'views'));  // points app to location of the views
 app.set('view engine', 'jade');                   // sets the view engine to jade
