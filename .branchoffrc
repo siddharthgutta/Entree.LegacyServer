@@ -1,5 +1,6 @@
 {
   "start": "node index.compiled.js",
+  "hooksDir": "hooks/",
   "preferPort": {
     "mode": {
       "manual": 3000

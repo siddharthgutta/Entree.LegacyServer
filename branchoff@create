@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-
-echo 'triggering ./branchoff@update'
-
-. ./branchoff@update ${1} # pass in mode

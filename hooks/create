@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+echo 'triggering ./update'
+
+. ./update ${1} # pass in mode
