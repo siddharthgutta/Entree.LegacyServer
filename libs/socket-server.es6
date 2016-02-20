@@ -35,7 +35,7 @@ class SocketServer extends EventEmitter {
               resTimeout = 60000, concurrency = 50) {
     super();
 
-    this.id = id;
+    this.id = id.replace(/[^a-zA-Z0-9]/g, '');
     this.channel = channel;
     this.eventMap = Object.assign(defaultEventMap, eventMap);
     this.remoteAddress = address;
@@ -166,7 +166,6 @@ class SocketServer extends EventEmitter {
     return data;
   }
 
-
   _handleTransmit({token, channel, data, resolve, action, reject, awk}, callback) {
     const eventMap = this.eventMap;
     const eventId = this.generateUUID();
@@ -187,19 +186,20 @@ class SocketServer extends EventEmitter {
     }
 
     let tid;
+    let event;
 
-    function accepted(res) {
+    const accepted = res => {
       clearTimeout(tid);
       resolve(res.data);
-    }
+    };
 
-    function timeout() {
+    const timeout = () => {
       this.removeListener(event, accepted);
       reject(new Error('No awk received'));
-    }
+    };
 
     if (awk) {
-      const event = this.for(eventMap.responseClientAwk, eventId);
+      event = this.for(eventMap.responseClientAwk, eventId);
 
       this.once(event, accepted);
       tid = setTimeout(timeout, this.resTimeout);

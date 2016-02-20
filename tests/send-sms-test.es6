@@ -6,7 +6,7 @@ import _ from 'underscore';
 import Twilio from '../libs/sms/twilio.es6';
 import config from 'config';
 const testCreds = config.get('Twilio.test');
-const TWILIO_FROM_NUMBER = config.get('Twilio.fromNumbers');
+const TWILIO_FROM_NUMBER = config.get('Twilio.numbers')[0];
 const admins = config.get('Admins');
 
 // SET THIS VARIABLE FOR VERBOSE LOGS OF ALL REQUESTS/RESPONSES

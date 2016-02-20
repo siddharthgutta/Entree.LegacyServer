@@ -4,7 +4,7 @@ import _ from 'underscore';
 import Promise from 'bluebird';
 
 const admins = config.get('Admins');
-const fromNumber = config.get('Twilio.fromNumbers');
+const fromNumber = config.get('Twilio.numbers')[0];
 const productionCreds = config.get('Twilio.production');
 
 /**
