@@ -2,8 +2,15 @@ import {Router} from 'express';
 import * as Token from '../api/token.es6';
 import * as User from '../api/user.es6';
 import {ip, isEmpty} from '../libs/utils.es6';
+import {create} from '../api/message.es6';
+import {findOne} from '../api/socketToken.es6';
+import socketServer from '../message/socket-server.es6';
 
 const route = new Router();
+
+function normalize(toNumber) {
+  return `${String(toNumber).replace('+1', '')}`;
+}
 
 route.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -50,47 +57,63 @@ route.post('/user/destroy', (req, res) => {
   User.destroy(username, password).then(res.ok).catch(res.fail);
 });
 
+const signupTags = ['routes', 'api', '/user/signup'];
+const failResMsg = 'Sorry, a text message to your phone could not be sent! Please try again.';
+
 // Users sends in the phone number for initial first layer signup
 route.post('/user/signup', (req, res) => {
   if (isEmpty(req.body.phoneNumber)) {
-    res.status(400);
-    res.fail(['routes', 'api', '/user/signup', 'User.signup'],
-      'Client tried to send null phone number.',
+    res.status(400).fail(signupTags, 'Client tried to send null phone number.',
       "Sorry, you didn't send us a phone number.");
   } else {
     User.signup(req.body.phoneNumber)
       .then(response => {
-        console.tag('routes', 'api', '/user/signup', 'User.signup', 'SMS').log(response);
-        res.ok(['routes', 'api', '/user/signup', 'User.signup'],
-          'New user created. Sending full welcome message.',
+        const restaurantID = 0;
+
+        console.tag('routes', 'api', '/user/signup', 'SMS').log(response);
+        const date = new Date(response.dateCreated).getTime();
+        create(normalize(response.to), restaurantID, response.body,
+            date, response.sid, normalize(response.from), false, true).then(() => {
+              // Get all tokens relevant to said id
+              const resBody = {
+                phoneNumber: normalize(response.to),
+                content: response.body, date,
+                sentByUser: false
+              };
+
+              findOne(restaurantID).then(result => {
+                result.tokens.forEach(token => {
+                  socketServer.emit(token, 'send', resBody, false);
+                });
+                res.ok(signupTags,
+                    'New send message created.',
+                    {phoneNumber: response.to, content: response.body},
+                    `We have sent your text message to the number: ${response.to}`);
+              }).catch(findOneError => {
+                res.status(500).fail(signupTags, findOneError, failResMsg);
+              });
+            }).catch(createError => {
+              res.status(500).fail(signupTags, createError, failResMsg);
+            });
+        res.ok(signupTags, 'New user created. Sending full welcome message.',
           {}, `We have sent a text message to your number: ${req.body.phoneNumber}`);
-      })
-      .catch(error => {
+      }).catch(error => {
         if (error.name === 'SequelizeValidationError') {
-          res.status(400);
-          res.fail(['routes', 'api', '/user/signup', 'User.signup'],
-            error,
+          res.status(400).fail(signupTags, error,
             'Sorry, that is not a valid number.');
         } else {
           switch (error.code) {
           // Invalid To Number
           case 21211:
-            res.status(400);
-            res.fail(['routes', 'api', '/user/signup', 'User.signup'],
-              error,
-              'Sorry, that is not a real phone number.');
+            res.status(400).fail(signupTags, error, 'Sorry, that is not a real phone number.');
             break;
           // Twilio Trial: Not a Verified number
           case 21608:
-            res.status(404);
-            res.fail(['routes', 'api', '/user/signup', 'User.signup'],
-              error,
-              'Sorry, we are currently in private beta. Our service is not available to you yet.');
+            res.status(404).fail(signupTags, error,
+                'Sorry, we are currently in private beta. Our service is not available to you yet.');
             break;
           default:
-            res.status(500);
-            res.fail(['routes', 'api', '/user/signup', 'User.signup'],
-              error,
+            res.status(500).fail(signupTags, error,
               'Sorry, a text message to your phone could not be sent! Please try again.');
           }
         }
