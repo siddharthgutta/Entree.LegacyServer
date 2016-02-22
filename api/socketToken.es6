@@ -18,10 +18,10 @@ const MAX_TOKENS = 4;
 export function addTokenOrCreate(restaurantId, token) {
   return new Promise((resolve, reject) => {
     models.SocketToken.findOneAndUpdate(
-        {restaurantId, numTokens: {$lt: MAX_TOKENS}},
-        {restaurantId, $push: {tokens: token}, $inc: {numTokens: 1}},
-        {new: true, upsert: true})
-        .exec().then(result => {
+      {restaurantId, numTokens: {$lt: MAX_TOKENS}},
+      {restaurantId, $push: {tokens: token}, $inc: {numTokens: 1}},
+      {new: true, upsert: true})
+      .exec().then(result => {
       resolve(result);
     }, err => reject(err));
   });
@@ -37,15 +37,15 @@ export function addTokenOrCreate(restaurantId, token) {
 export function removeToken(restaurantId, token) {
   return new Promise((resolve, reject) => {
     models.SocketToken.findOneAndUpdate(
-        {restaurantId, tokens: {$elemMatch: {$in: [token]}}},
-        {$pull: {tokens: token}, $inc: {numTokens: -1}},
-        {new: true})
-        .exec().then(result => {
+      {restaurantId, tokens: {$elemMatch: {$in: [token]}}},
+      {$pull: {tokens: token}, $inc: {numTokens: -1}},
+      {new: true})
+      .exec().then(result => {
       if (result) {
         resolve(result);
       } else {
         reject(Error(`Could not find valid SocketToken. Either restaurantId ${restaurantId} ` +
-            `is invalid or token ${token} does not exist for given SocketToken`));
+          `is invalid or token ${token} does not exist for given SocketToken`));
       }
     }, err => reject(err));
   });
@@ -61,11 +61,12 @@ export function removeToken(restaurantId, token) {
 export function isValidToken(restaurantId, token) {
   return new Promise((resolve, reject) => {
     models.SocketToken.findOne({restaurantId, tokens: {$elemMatch: {$in: [token]}}})
-        .exec().then(result => {
-      resolve(result ? true : false);
-    }, err => {
-      reject(err);
-    });
+      .exec()
+      .then(result => {
+        resolve(result ? true : false);
+      }, err => {
+        reject(err);
+      });
   });
 }
 

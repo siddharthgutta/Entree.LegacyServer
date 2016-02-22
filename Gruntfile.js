@@ -56,9 +56,9 @@ module.exports = grunt => {
     browserify: {
       dist: {
         options: {
-          transform: ['babelify', 'config-browserify'],
+          transform: [['babelify', {env: 'client'}]],
           browserifyOptions: {
-            debug: true, // source mapping
+            debug: false, // source mapping
             ignoreMTime: true
           }
         },
@@ -74,7 +74,7 @@ module.exports = grunt => {
         options: {
           watch: true,
           keepAlive: true,
-          transform: ['babelify', 'config-browserify'],
+          transform: [['babelify', {env: 'client'}]],
           browserifyOptions: {
             debug: true, // source mapping
             ignoreMTime: true
@@ -208,13 +208,13 @@ module.exports = grunt => {
     fs.writeFileSync('package.noDevDeps.json', JSON.stringify(pkg), 'utf8');
 
     exec('node node_modules/license-report/index.js ' +
-        '--package=./package.noDevDeps.json --output=json',
-        (err, stdout, stderr) => {
-          if (err || stderr) console.error(err, stderr);
-          else fs.writeFileSync('deps.json', JSON.stringify(JSON.parse(stdout), null, 2), 'utf8');
-          fs.unlinkSync('package.noDevDeps.json');
-          done();
-        });
+      '--package=./package.noDevDeps.json --output=json',
+      (err, stdout, stderr) => {
+        if (err || stderr) console.error(err, stderr);
+        else fs.writeFileSync('deps.json', JSON.stringify(JSON.parse(stdout), null, 2), 'utf8');
+        fs.unlinkSync('package.noDevDeps.json');
+        done();
+      });
   });
 
   grunt.registerTask('styles', [
@@ -259,11 +259,11 @@ module.exports = grunt => {
 
   grunt.registerTask('default', 'build');
 
-  grunt.registerTask('auto-build-scripts', [
+  grunt.registerTask('watch-scripts', [
     'browserify:dev'
   ]);
 
-  grunt.registerTask('auto-build-styles', [
+  grunt.registerTask('watch-styles', [
     'sass:dev',
     'watch:sass'
   ]);

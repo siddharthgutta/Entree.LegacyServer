@@ -30,28 +30,28 @@ route.use((req, res, next) => {
 function validateSockets(restaurantID) {
   return new Promise(resolve => {
     findOne(restaurantID)
-        .then(results => {
-          // run in parallel this should be fast
-          // 2 seconds for now; this can be reduced to 1 - 1.5 seconds
-          async.each(results.tokens, (token, callback) => {
-            console.log('Checking', token);
-            socketServer.emit(token, 'alive?', {}, 2000)
-                .then(data => {
-                  console.log('Received', data);
-                  callback();
-                })
-                .catch(() => {
-                  console.log('Removing', token);
-                  removeToken(restaurantID, token);
-                  socketServer.reject(token);
-                  callback();
-                });
-          }, () => resolve());
-        })
-        .catch(e => {
-          console.error(e);
-          resolve();
-        });
+      .then(results => {
+        // run in parallel this should be fast
+        // 2 seconds for now; this can be reduced to 1 - 1.5 seconds
+        async.each(results.tokens, (token, callback) => {
+          console.log('Checking', token);
+          socketServer.emit(token, 'alive?', {}, 2000)
+            .then(data => {
+              console.log('Received', data);
+              callback();
+            })
+            .catch(() => {
+              console.log('Removing', token);
+              removeToken(restaurantID, token);
+              socketServer.reject(token);
+              callback();
+            });
+        }, () => resolve());
+      })
+      .catch(e => {
+        console.error(e);
+        resolve();
+      });
   });
 }
 
@@ -64,26 +64,26 @@ route.post('/token', (req, res) => {
   console.log(reqToken);
 
   validateSockets(restaurantID)
-      .then(() => addTokenOrCreate(restaurantID, reqToken)
-          .then(() => Promise.all([socketServer.address(), socketServer.accept(reqToken)]))
-          .spread((address, token) => {
-            // add any listeners to remove disconnected ones; speeds up the general awk check
-            // this could have some implications like those who are trying to reconnect via socket.io poll
-            // TODO please review @jesse @jadesym
-            const removeEvent = socketServer.for(socketServer.eventMap.responseClientDisconnected, token);
-            socketServer.once(removeEvent, () => {
-              console.log('Removing token', token);
-              removeToken(restaurantID, token);
-              socketServer.reject(token);
-            });
+    .then(() => addTokenOrCreate(restaurantID, reqToken)
+      .then(() => Promise.all([socketServer.address(), socketServer.accept(reqToken)]))
+      .spread((address, token) => {
+        // add any listeners to remove disconnected ones; speeds up the general awk check
+        // this could have some implications like those who are trying to reconnect via socket.io poll
+        // TODO please review @jesse @jadesym
+        const removeEvent = socketServer.for(socketServer.eventMap.responseClientDisconnected, token);
+        socketServer.once(removeEvent, () => {
+          console.log('Removing token', token);
+          removeToken(restaurantID, token);
+          socketServer.reject(token);
+        });
 
-            const successMsg = `Successfully created token: ${token}`;
-            res.ok(['routes', 'messenger', 'token'], {token, address},
-                {token, address}, successMsg); // renaming for minimization
-          })
-      )
-      .catch(err => res.status(500).fail(['routes', 'messenger', 'token'],
-          err, `Unsuccessfully created token: ${reqToken}`));
+        const successMsg = `Successfully created token: ${token}`;
+        res.ok(['routes', 'messenger', 'token'], {token, address},
+          {token, address}, successMsg); // renaming for minimization
+      })
+    )
+    .catch(err => res.status(500).fail(['routes', 'messenger', 'token'],
+      err, `Unsuccessfully created token: ${reqToken}`));
 });
 
 // Used to get all messages
@@ -94,7 +94,7 @@ route.post('/messages', (req, res) => {
 
   findByRestaurant(restaurantID).then(messages => {
     const resMessages = _.map(messages, msg =>
-        msg.success ? msg : null
+      msg.success ? msg : null
     );
     const filteredMessages = _.without(resMessages, null);
     res.send({data: {count: filteredMessages.length, messages: filteredMessages}});
@@ -115,40 +115,40 @@ route.post('/send', (req, res) => {
   const phoneNumber = req.body.phoneNumber;
 
   sendSMS(phoneNumber, content)
-      .then(response => {
-        const date = new Date(response.dateCreated).getTime();
-        create(normalize(response.to), restaurantID, response.body,
-            date, response.sid, normalize(response.from), false, true).then(() => {
-              // Get all tokens relevant to said id
-              // TODO Give me the actual response from the db
-              const resBody = {
-                phoneNumber: normalize(response.to),
-                content: response.body, date,
-                twilioNumber: '5125200133',
-                sentByUser: false
-              };
+    .then(response => {
+      const date = new Date(response.dateCreated).getTime();
+      create(normalize(response.to), restaurantID, response.body,
+        date, response.sid, normalize(response.from), false, true).then(() => {
+          // Get all tokens relevant to said id
+          // TODO Give me the actual response from the db
+          const resBody = {
+            phoneNumber: normalize(response.to),
+            content: response.body, date,
+            twilioNumber: '5125200133',
+            sentByUser: false
+          };
 
-              findOne(restaurantID)
-                  .then(result => {
-                    result.tokens.forEach(token => {
-                      socketServer.emit(token, 'send', resBody, false);
-                    });
-                    res.ok(['routes', 'messenger', '/send', 'User.signup'],
-                        'New send message created.',
-                        {phoneNumber, content}, `We have sent your text message to the number:
+          findOne(restaurantID)
+            .then(result => {
+              result.tokens.forEach(token => {
+                socketServer.emit(token, 'send', resBody, false);
+              });
+              res.ok(['routes', 'messenger', '/send', 'User.signup'],
+                'New send message created.',
+                {phoneNumber, content}, `We have sent your text message to the number:
                         ${req.body.phoneNumber}`);
-                  })
-                  .catch(findOneError => {
-                    res.status(500).fail(sendFailTags, findOneError, failResMsg);
-                  });
             })
-            .catch(createError => {
-              res.status(500).fail(sendFailTags, createError, failResMsg);
+            .catch(findOneError => {
+              res.status(500).fail(sendFailTags, findOneError, failResMsg);
             });
-      })
-      .catch(sendSMSError => {
-        res.status(500).fail(sendFailTags, sendSMSError, failResMsg);
-      });
+        })
+        .catch(createError => {
+          res.status(500).fail(sendFailTags, createError, failResMsg);
+        });
+    })
+    .catch(sendSMSError => {
+      res.status(500).fail(sendFailTags, sendSMSError, failResMsg);
+    });
 });
 
 export default route;
