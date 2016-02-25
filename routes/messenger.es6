@@ -91,6 +91,11 @@ route.post('/send', (req, res) => {
       };
 
       Notification.notify(restaurantID, 'send', resBody, false);
+
+      res.ok(['routes', 'messenger', '/send'],
+             'New send message created.',
+             {phoneNumber, content}, `We have sent your text message to the number:
+              ${phoneNumber}`);
     })
     .catch(createError => {
       res.status(500)
