@@ -9,7 +9,8 @@ const port = config.get('Server.port');
 const server = supertest.agent(`https://localhost:${port}`);
 
 beforeEach(done => {
-  clearDatabase().then(() => done());
+  clearDatabase()
+  .then(() => done());
 });
 
 after(() => disconnectDatabase());
@@ -43,206 +44,251 @@ describe('User', () => {
       describe('/api/user/signup endpoint', () => {
         it('should send 400 response on null number', done => {
           server
-            .post(`/api/user/signup`)
-            .send({})
-            .expect('Content-type', 'application/json; charset=utf-8')
-            .expect(400, done);
+          .post(`/api/user/signup`)
+          .send({})
+          .expect('Content-type', 'application/json; charset=utf-8')
+          .expect(400, done);
         });
 
         it('should signup correctly with valid verified number', done => {
           server
-            .post(`/api/user/signup`)
-            .send({phoneNumber: productionPhoneNumber})
-            .expect('Content-type', 'application/json; charset=utf-8')
-            .expect(200, done);
+          .post(`/api/user/signup`)
+          .send({phoneNumber: productionPhoneNumber})
+          .expect('Content-type', 'application/json; charset=utf-8')
+          .expect(200, done);
         });
 
         it('should respond with status 400 on a non-real number', done => {
           server
-            .post(`/api/user/signup`)
-            .send({phoneNumber: fakeNumber})
-            .expect('Content-type', 'application/json; charset=utf-8')
-            .expect(400, done);
+          .post(`/api/user/signup`)
+          .send({phoneNumber: fakeNumber})
+          .expect('Content-type', 'application/json; charset=utf-8')
+          .expect(400, done);
         });
 
         // TEMPORARY TEST FOR TWILIO TRIAL
         it('should respond 404 for unverified number', done => {
           server
-            .post(`/api/user/signup`)
-            .send({phoneNumber: unverifiedNumber})
-            .expect('Content-type', 'application/json; charset=utf-8')
-            .expect(404, done);
+          .post(`/api/user/signup`)
+          .send({phoneNumber: unverifiedNumber})
+          .expect('Content-type', 'application/json; charset=utf-8')
+          .expect(404, done);
         });
       });
 
       it('should create a new user and send a real SMS message', done => {
-        User.signup(productionPhoneNumber).then(response => {
-          console.tag(global.TEST).log(`Real SMS response: ${JSON.stringify(response)}`);
-          expect(response.to).to.be(`+1${productionPhoneNumber}`);
-          expect(response.from).to.be(TWILIO_FROM_NUMBER);
-          expect(response.body).to.be.a('string');
-          fullWelcomeMessage = response.body;
+        User.signup(productionPhoneNumber)
+            .then(response => {
+              console.tag(global.TEST)
+                     .log(`Real SMS response: ${JSON.stringify(response)}`);
+              expect(response.to)
+              .to
+              .be(`+1${productionPhoneNumber}`);
+              expect(response.from)
+              .to
+              .be(TWILIO_FROM_NUMBER);
+              expect(response.body)
+              .to
+              .be
+              .a('string');
+              fullWelcomeMessage = response.body;
 
-          User.findOne(productionPhoneNumber).then(user => {
-            assert.equal(user.name, null);
-            assert.equal(user.email, null);
-            assert.equal(user.phoneNumber, productionPhoneNumber);
-            done();
-          }).catch(error => {
-            expect().fail(`Finding User Failed: ${error}`);
-          });
-        }).catch(error => {
-          expect().fail(`Signup Failed: ${error}`);
-        });
+              User.findOne(productionPhoneNumber)
+                  .then(user => {
+                    assert.equal(user.name, null);
+                    assert.equal(user.email, null);
+                    assert.equal(user.phoneNumber, productionPhoneNumber);
+                    done();
+                  })
+                  .catch(error => {
+                    expect()
+                    .fail(`Finding User Failed: ${error}`);
+                  });
+            })
+            .catch(error => {
+              expect()
+              .fail(`Signup Failed: ${error}`);
+            });
       });
 
       it('existing phone number should not be overridden', done => {
         let createdAt;
         let updatedAt;
-        User.create(productionPhoneNumber, name, email).then(() => {
-          User.findOne(productionPhoneNumber).then(user => {
-            createdAt = user.createdAt;
-            updatedAt = user.updatedAt;
-          });
-          User.signup(productionPhoneNumber).then(response => {
-            expect(response.to).to.be(`+1${productionPhoneNumber}`);
-            expect(response.from).to.be(TWILIO_FROM_NUMBER);
-            expect(response.body).to.be.a('string');
-            expect(fullWelcomeMessage).not.to.equal(response.body);
-          });
-          User.findOne(productionPhoneNumber).then(user => {
-            assert.deepEqual(user.createdAt, createdAt);
-            assert.deepEqual(user.updatedAt, updatedAt);
-            done();
-          });
-        });
+        User.create(productionPhoneNumber, name, email)
+            .then(() => {
+              User.findOne(productionPhoneNumber)
+                  .then(user => {
+                    createdAt = user.createdAt;
+                    updatedAt = user.updatedAt;
+                  });
+              User.signup(productionPhoneNumber)
+                  .then(response => {
+                    expect(response.to)
+                    .to
+                    .be(`+1${productionPhoneNumber}`);
+                    expect(response.from)
+                    .to
+                    .be(TWILIO_FROM_NUMBER);
+                    expect(response.body)
+                    .to
+                    .be
+                    .a('string');
+                    expect(fullWelcomeMessage)
+                    .not
+                    .to
+                    .equal(response.body);
+                  });
+              User.findOne(productionPhoneNumber)
+                  .then(user => {
+                    assert.deepEqual(user.createdAt, createdAt);
+                    assert.deepEqual(user.updatedAt, updatedAt);
+                    done();
+                  });
+            });
       });
     }
 
     it('should not create user with invalid phone number', done => {
-      User.signup('123').then(() => {
-        assert(false);
-        done();
-      }, err => {
-        assert.equal(err.errors.length, 1);
-        done();
-      });
+      User.signup('123')
+          .then(() => {
+            assert(false);
+            done();
+          }, err => {
+            assert.equal(err.errors.length, 1);
+            done();
+          });
     });
 
     // This test may be changed when we add more complex validation for phone numbers
     it('should not create user with a phone number with country code', done => {
-      User.signup(`+1${productionPhoneNumber}`).then(() => {
-        assert(false);
-        done();
-      }, err => {
-        assert.equal(err.errors.length, 1);
-        done();
-      });
+      User.signup(`+1${productionPhoneNumber}`)
+          .then(() => {
+            assert(false);
+            done();
+          }, err => {
+            assert.equal(err.errors.length, 1);
+            done();
+          });
     });
   });
 
 
   describe('#create()', () => {
     it('should insert into the database correctly', done => {
-      User.create(phoneNumber, name, email).then(user => {
-        assert.equal(user.name, name);
-        assert.equal(user.email, email);
-        assert.equal(user.phoneNumber, phoneNumber);
-        user.destroy().then(() => done());
-      });
+      User.create(phoneNumber, name, email)
+          .then(user => {
+            assert.equal(user.name, name);
+            assert.equal(user.email, email);
+            assert.equal(user.phoneNumber, phoneNumber);
+            user.destroy()
+                .then(() => done());
+          });
     });
 
     it('should not create Users that have null phoneNumber', done => {
-      User.create(null, name, email).then(user => {
-        user.destroy().then(() => {
-          assert(false);
-          done();
-        });
-      }, err => {
-        assert.equal(err.errors.length, 1);
-        done();
-      });
+      User.create(null, name, email)
+          .then(user => {
+            user.destroy()
+                .then(() => {
+                  assert(false);
+                  done();
+                });
+          }, err => {
+            assert.equal(err.errors.length, 1);
+            done();
+          });
     });
 
     it('should not create Users with invalid email  format', done => {
-      User.create(phoneNumber, name, 'NotValidEmail').then(user => {
-        user.destroy().then(() => {
-          assert(false);
-          done();
-        });
-      }, err => {
-        assert.equal(err.errors.length, 1);
-        done();
-      });
+      User.create(phoneNumber, name, 'NotValidEmail')
+          .then(user => {
+            user.destroy()
+                .then(() => {
+                  assert(false);
+                  done();
+                });
+          }, err => {
+            assert.equal(err.errors.length, 1);
+            done();
+          });
     });
 
     it('should not create Users with phone number not length 10', done => {
-      User.create('123', name, email).then(user => {
-        user.destroy().then(() => {
-          assert(false);
-          done();
-        });
-      }, err => {
-        assert.equal(err.errors.length, 1);
-        done();
-      });
+      User.create('123', name, email)
+          .then(user => {
+            user.destroy()
+                .then(() => {
+                  assert(false);
+                  done();
+                });
+          }, err => {
+            assert.equal(err.errors.length, 1);
+            done();
+          });
     });
 
     it('should not create Users with non numeric phone numbers', done => {
-      User.create('abcdefghij', name, email).then(user => {
-        user.destroy().then(() => {
-          assert(false);
-          done();
-        });
-      }, err => {
-        assert.equal(err.errors.length, 1);
-        done();
-      });
+      User.create('abcdefghij', name, email)
+          .then(user => {
+            user.destroy()
+                .then(() => {
+                  assert(false);
+                  done();
+                });
+          }, err => {
+            assert.equal(err.errors.length, 1);
+            done();
+          });
     });
   });
 
   describe('#update()', () => {
     it('should update and query from the database correctly', done => {
-      User.create(phoneNumber, name, email).then(() => {
-        User.update(phoneNumber, {
-          name: 'NewUser',
-          email: 'NewUser@gmail.com',
-          phoneNumber: '1234561234'
-        }).then(() => {
-          User.findOne('1234561234').then(user => {
-            assert.equal(user.name, 'NewUser');
-            assert.equal(user.email, 'NewUser@gmail.com');
-            assert.equal(user.phoneNumber, '1234561234');
-            done();
+      User.create(phoneNumber, name, email)
+          .then(() => {
+            User.update(phoneNumber, {name: 'NewUser', email: 'NewUser@gmail.com', phoneNumber: '1234561234'})
+                .then(() => {
+                  User.findOne('1234561234')
+                      .then(user => {
+                        assert.equal(user.name, 'NewUser');
+                        assert.equal(user.email, 'NewUser@gmail.com');
+                        assert.equal(user.phoneNumber, '1234561234');
+                        done();
+                      });
+                });
           });
-        });
-      });
     });
   });
 
   describe('#destroy()', () => {
     it('should delete from the database correctly', done => {
-      User.create(phoneNumber, name, email).then(() => {
-        User.destroy('1234567890').then(() => {
-          User.findOne('1234567890').then(user => {
-            assert.equal(user, null);
-            done();
+      User.create(phoneNumber, name, email)
+          .then(() => {
+            User.destroy('1234567890')
+                .then(() => {
+                  User.findOne('1234567890')
+                      .then(user => {
+                        assert.equal(user, null);
+                        done();
+                      });
+                });
           });
-        });
-      });
     });
   });
 
   describe('#findOne()', () => {
     it('should query from the database correctly', done => {
-      User.create(phoneNumber, name, email).then(() => {
-        User.findOne(phoneNumber).then(user => {
-          assert.equal(user.name, name);
-          assert.equal(user.email, email);
-          assert.equal(user.phoneNumber, phoneNumber);
-          user.destroy().then(() => done());
-        });
-      });
+      User.create(phoneNumber, name, email)
+          .then(() => {
+            User.findOne(phoneNumber)
+                .then(user => {
+                  assert.equal(user.name, name);
+                  assert.equal(user.email, email);
+                  assert.equal(user.phoneNumber, phoneNumber);
+                  user.destroy()
+                      .then(() => done());
+                });
+          });
     });
   });
 });

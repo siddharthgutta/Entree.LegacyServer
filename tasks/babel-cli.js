@@ -5,6 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const convert = require('convert-source-map');
 
+process.env.BABEL_ENV = 'server';
+
 exports.transform = function transform(input, output) {
   const source = fs.readFileSync(input, 'utf8');
   const generated = babel.transform(source, {

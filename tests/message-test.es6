@@ -3,7 +3,8 @@ import {clearDatabase, disconnectDatabase} from './test-init.es6';
 import * as Message from '../api/message.es6';
 
 beforeEach(done => {
-  clearDatabase().then(() => done());
+  clearDatabase()
+  .then(() => done());
 });
 
 after(() => disconnectDatabase());
@@ -32,17 +33,18 @@ describe('Message', () => {
         twilioSid,
         twilioNumber,
         sentByUser,
-        success).then(message => {
-          assert.equal(message.phoneNumber, phoneNumber);
-          assert.equal(message.restaurantId, restaurantId);
-          assert.equal(message.content, content);
-          assert.equal(message.date.getTime(), date);
-          assert.equal(message.twilioSid, twilioSid);
-          assert.equal(message.twilioNumber, twilioNumber);
-          assert.equal(message.sentByUser, sentByUser);
-          assert.equal(message.success, success);
-          done();
-        });
+        success)
+             .then(message => {
+               assert.equal(message.phoneNumber, phoneNumber);
+               assert.equal(message.restaurantId, restaurantId);
+               assert.equal(message.content, content);
+               assert.equal(message.date.getTime(), date);
+               assert.equal(message.twilioSid, twilioSid);
+               assert.equal(message.twilioNumber, twilioNumber);
+               assert.equal(message.sentByUser, sentByUser);
+               assert.equal(message.success, success);
+               done();
+             });
     });
 
     it('should not create message with invalid non 10-digit phone number', done => {
@@ -54,13 +56,15 @@ describe('Message', () => {
         twilioSid,
         twilioNumber,
         sentByUser,
-        success).then(() => {
-          assert(false);
-          done();
-        }).catch(err => {
-          assert.equal(Object.keys(err.errors).length, 1);
-          done();
-        });
+        success)
+             .then(() => {
+               assert(false);
+               done();
+             })
+             .catch(err => {
+               assert.equal(Object.keys(err.errors).length, 1);
+               done();
+             });
     });
   });
 
@@ -74,30 +78,33 @@ describe('Message', () => {
         twilioSid,
         twilioNumber,
         sentByUser,
-        success).then(() => {
-          Message.create(
-            '1112223333',
-            restaurantId,
-            content,
-            date,
-            twilioSid,
-            twilioNumber,
-            sentByUser,
-            success).then(() => {
-              Message.findByPhone(phoneNumber).then(result => {
-                assert.equal(result.length, 1);
-                assert.equal(result[0].phoneNumber, phoneNumber);
-                assert.equal(result[0].restaurantId, restaurantId);
-                assert.equal(result[0].content, content);
-                assert.equal(result[0].date.getTime(), date);
-                assert.equal(result[0].twilioSid, twilioSid);
-                assert.equal(result[0].twilioNumber, twilioNumber);
-                assert.equal(result[0].sentByUser, sentByUser);
-                assert.equal(result[0].success, success);
-                done();
-              });
-            });
-        });
+        success)
+             .then(() => {
+               Message.create(
+                 '1112223333',
+                 restaurantId,
+                 content,
+                 date,
+                 twilioSid,
+                 twilioNumber,
+                 sentByUser,
+                 success)
+                      .then(() => {
+                        Message.findByPhone(phoneNumber)
+                               .then(result => {
+                                 assert.equal(result.length, 1);
+                                 assert.equal(result[0].phoneNumber, phoneNumber);
+                                 assert.equal(result[0].restaurantId, restaurantId);
+                                 assert.equal(result[0].content, content);
+                                 assert.equal(result[0].date.getTime(), date);
+                                 assert.equal(result[0].twilioSid, twilioSid);
+                                 assert.equal(result[0].twilioNumber, twilioNumber);
+                                 assert.equal(result[0].sentByUser, sentByUser);
+                                 assert.equal(result[0].success, success);
+                                 done();
+                               });
+                      });
+             });
     });
 
     it('findByPhone messages correctly by phoneNumber and restaurantId', done => {
@@ -109,30 +116,33 @@ describe('Message', () => {
         twilioSid,
         twilioNumber,
         sentByUser,
-        success).then(() => {
-          Message.create(
-            phoneNumber,
-            2,
-            content,
-            date,
-            twilioSid,
-            twilioNumber,
-            sentByUser,
-            success).then(() => {
-              Message.findByPhone(phoneNumber, {restaurantId}).then(result => {
-                assert.equal(result.length, 1);
-                assert.equal(result[0].phoneNumber, phoneNumber);
-                assert.equal(result[0].restaurantId, restaurantId);
-                assert.equal(result[0].content, content);
-                assert.equal(result[0].date.getTime(), date);
-                assert.equal(result[0].twilioSid, twilioSid);
-                assert.equal(result[0].twilioNumber, twilioNumber);
-                assert.equal(result[0].sentByUser, sentByUser);
-                assert.equal(result[0].success, success);
-                done();
-              });
-            });
-        });
+        success)
+             .then(() => {
+               Message.create(
+                 phoneNumber,
+                 2,
+                 content,
+                 date,
+                 twilioSid,
+                 twilioNumber,
+                 sentByUser,
+                 success)
+                      .then(() => {
+                        Message.findByPhone(phoneNumber, {restaurantId})
+                               .then(result => {
+                                 assert.equal(result.length, 1);
+                                 assert.equal(result[0].phoneNumber, phoneNumber);
+                                 assert.equal(result[0].restaurantId, restaurantId);
+                                 assert.equal(result[0].content, content);
+                                 assert.equal(result[0].date.getTime(), date);
+                                 assert.equal(result[0].twilioSid, twilioSid);
+                                 assert.equal(result[0].twilioNumber, twilioNumber);
+                                 assert.equal(result[0].sentByUser, sentByUser);
+                                 assert.equal(result[0].success, success);
+                                 done();
+                               });
+                      });
+             });
     });
 
     it('orders messages descending by date', done => {
@@ -144,24 +154,27 @@ describe('Message', () => {
         twilioSid,
         twilioNumber,
         sentByUser,
-        success).then(() => {
-          Message.create(
-            phoneNumber,
-            restaurantId,
-            content,
-            date + 100,
-            twilioSid,
-            twilioNumber,
-            sentByUser,
-            success).then(() => {
-              Message.findByPhone(phoneNumber).then(result => {
-                assert.equal(result.length, 2);
-                assert.equal(result[0].date.getTime(), date + 100);
-                assert.equal(result[1].date.getTime(), date);
-                done();
-              });
-            });
-        });
+        success)
+             .then(() => {
+               Message.create(
+                 phoneNumber,
+                 restaurantId,
+                 content,
+                        date + 100,
+                 twilioSid,
+                 twilioNumber,
+                 sentByUser,
+                 success)
+                      .then(() => {
+                        Message.findByPhone(phoneNumber)
+                               .then(result => {
+                                 assert.equal(result.length, 2);
+                                 assert.equal(result[0].date.getTime(), date + 100);
+                                 assert.equal(result[1].date.getTime(), date);
+                                 done();
+                               });
+                      });
+             });
     });
   });
 
@@ -175,29 +188,32 @@ describe('Message', () => {
         twilioSid,
         twilioNumber,
         sentByUser,
-        success).then(() => {
-          Message.create(
-            phoneNumber,
-            2,
-            content,
-            date,
-            twilioSid,
-            twilioNumber,
-            sentByUser,
-            success).then(() => {
-              Message.findByRestaurant(restaurantId).then(result => {
-                assert.equal(result.length, 1);
-                assert.equal(result[0].phoneNumber, phoneNumber);
-                assert.equal(result[0].restaurantId, restaurantId);
-                assert.equal(result[0].content, content);
-                assert.equal(result[0].date.getTime(), date);
-                assert.equal(result[0].twilioSid, twilioSid);
-                assert.equal(result[0].sentByUser, sentByUser);
-                assert.equal(result[0].success, success);
-                done();
-              });
-            });
-        });
+        success)
+             .then(() => {
+               Message.create(
+                 phoneNumber,
+                 2,
+                 content,
+                 date,
+                 twilioSid,
+                 twilioNumber,
+                 sentByUser,
+                 success)
+                      .then(() => {
+                        Message.findByRestaurant(restaurantId)
+                               .then(result => {
+                                 assert.equal(result.length, 1);
+                                 assert.equal(result[0].phoneNumber, phoneNumber);
+                                 assert.equal(result[0].restaurantId, restaurantId);
+                                 assert.equal(result[0].content, content);
+                                 assert.equal(result[0].date.getTime(), date);
+                                 assert.equal(result[0].twilioSid, twilioSid);
+                                 assert.equal(result[0].sentByUser, sentByUser);
+                                 assert.equal(result[0].success, success);
+                                 done();
+                               });
+                      });
+             });
     });
 
     it('orders messages descending by date', done => {
@@ -209,24 +225,27 @@ describe('Message', () => {
         twilioSid,
         twilioNumber,
         sentByUser,
-        success).then(() => {
-          Message.create(
-            phoneNumber,
-            restaurantId,
-            content,
-            date + 100,
-            twilioSid,
-            twilioNumber,
-            sentByUser,
-            success).then(() => {
-              Message.findByRestaurant(restaurantId).then(result => {
-                assert.equal(result.length, 2);
-                assert.equal(result[0].date.getTime(), date + 100);
-                assert.equal(result[1].date.getTime(), date);
-                done();
-              });
-            });
-        });
+        success)
+             .then(() => {
+               Message.create(
+                 phoneNumber,
+                 restaurantId,
+                 content,
+                        date + 100,
+                 twilioSid,
+                 twilioNumber,
+                 sentByUser,
+                 success)
+                      .then(() => {
+                        Message.findByRestaurant(restaurantId)
+                               .then(result => {
+                                 assert.equal(result.length, 2);
+                                 assert.equal(result[0].date.getTime(), date + 100);
+                                 assert.equal(result[1].date.getTime(), date);
+                                 done();
+                               });
+                      });
+             });
     });
   });
 });

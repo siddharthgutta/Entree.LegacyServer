@@ -14,7 +14,8 @@
     "protocol": "SOCKET_SERVER_PROTOCOL",
     "search": "SOCKET_SERVER_SEARCH",
     "path": "SOCKET_SERVER_PATH",
-    "hostname": "SOCKET_SERVER_HOSTNAME"
+    "hostname": "SOCKET_SERVER_HOSTNAME",
+    "extHostname": "SOCKET_SERVER_EXT_HOSTNAME"
   },
   "Server": {
     "httpsRejectUnauthorized": {
@@ -28,6 +29,10 @@
     "sslKey": "HTTPS_SSL_KEY",
     "sslCert": "HTTPS_SSL_CERTIFICATE",
     "sslCa": "HTTPS_SSL_CA"
+  },
+  "IsTest": {
+    "__name": "IS_RUNNING_TEST",
+    "__format": "json"
   },
   "NodeEnv": "NODE_ENV",
   "Mode": "BRANCHOFF_MODE",

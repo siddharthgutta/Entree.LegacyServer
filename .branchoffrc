@@ -9,13 +9,15 @@
       "master#manual": 3000,
       "master": 443,
       "socket-master": 2999,
-      "socket-test": 2997
+      "socket-test": 2997,
+      "socket-shared": 2996
     }
   },
   "env": {
     "default": {
       "SOCKET_SERVER_PROTOCOL": "http",
       "SOCKET_SERVER_HOSTNAME": "127.0.0.1",
+      "SOCKET_SERVER_EXT_HOSTNAME": "textentree.com",
       "SOCKET_SERVER_USE_REMOTE": false
     },
     "mode": {
@@ -26,8 +28,8 @@
         "HTTPS_SSL_KEY": "./keys/localhost.key",
         "HTTPS_SSL_CERTIFICATE": "./keys/localhost.crt",
         "HTTPS_SSL_CA": "./keys/localhost.crt",
-        "SOCKET_SERVER_HOSTNAME": "127.0.0.1",
-        "SOCKET_SERVER_USE_REMOTE": false
+        "SOCKET_SERVER_EXT_HOSTNAME": "localhost",
+        "SOCKET_SERVER_USE_REMOTE": true
       },
       "stage": {
         "NODE_ENV": "staging",
@@ -42,7 +44,7 @@
     },
     "branch": {
       "default": {
-        "SOCKET_SERVER_PORT": 2997,
+        "SOCKET_SERVER_PORT": 2996,
         "SOCKET_SERVER_PATH": "",
         "SOCKET_SERVER_SEARCH": "?"
       },
@@ -58,6 +60,8 @@
     "min_uptime": "20s",
     "max_restarts": 3,
     "script": "./index.compiled.js",
+    "error_file": "/dev/null",
+    "out_file": "/dev/null",
     "next_gen_js": false,
     "max_memory_restart": "1G"
   }

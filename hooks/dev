@@ -1,15 +1,11 @@
 #!/usr/bin/env sh
 
 id=$(git rev-parse HEAD)
-#
-#curl "https://api.github.com/repos/siddharthgutta/Entree.Server/statuses/$id?access_token=f7a2fe34369a6b76f0cc3dfd02d1f982d424f281" \
-#  -H "Content-Type: application/json" \
-#  -X POST \
-#  -d "{\"state\": \"pending\", \"description\": \"BranchOff\", \"target_url\": \"http://textentree.com:4000\"}"
 
 sleep 10
 
 export NODE_ENV=staging;
+export IS_RUNNING_TEST=true;
 
 set -e
 npm run test-ci ./tests/socket-server-test.compiled.js

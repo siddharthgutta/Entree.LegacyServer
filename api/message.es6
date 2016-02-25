@@ -13,8 +13,8 @@ import models from '../models/mongo/index.es6';
  */
 export function findByPhone(phoneNumber, optional = {}) {
   return models.Message.find({phoneNumber, ...optional})
-    .sort({date: -1})
-    .exec();
+               .sort({date: -1})
+               .exec();
 }
 
 
@@ -27,8 +27,8 @@ export function findByPhone(phoneNumber, optional = {}) {
  */
 export function findByRestaurant(restaurantId, optional = {}) {
   return models.Message.find({restaurantId, ...optional})
-    .sort({date: -1})
-    .exec();
+               .sort({date: -1})
+               .exec();
 }
 
 /**
@@ -44,15 +44,14 @@ export function findByRestaurant(restaurantId, optional = {}) {
  * @param {boolean} success: was the message successfully sent or error
  * @returns {Promise}: Returns a list of all messages between numberA and numberB
  */
-export function create(
-    phoneNumber,
-    restaurantId,
-    content,
-    date,
-    twilioSid,
-    twilioNumber,
-    sentByUser,
-    success) {
+export function create(phoneNumber,
+                       restaurantId,
+                       content,
+                       date,
+                       twilioSid,
+                       twilioNumber,
+                       sentByUser,
+                       success) {
   return (new models.Message({
     phoneNumber,
     restaurantId,
@@ -61,5 +60,6 @@ export function create(
     twilioSid,
     twilioNumber,
     sentByUser,
-    success})).save();
+    success
+  })).save();
 }

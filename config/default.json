@@ -30,11 +30,13 @@
     "sslCert": "./keys/www.textentree.com.crt",
     "sslCa": "./keys/www.textentree.com.chain.crt"
   },
+  "IsTest": false,
   "AppId": "local",
   "NodeEnv": "development",
   "SocketServer": {
     "protocol": "http",
     "hostname": "ec2-52-89-1-140.us-west-2.compute.amazonaws.com",
+    "extHostname": "127.0.0.1",
     "port": 2997,
     "search": "?",
     "path": ""
@@ -42,13 +44,15 @@
   "UseRemoteSocketServer": false,
   "RemoteSocketServer": {
     "protocol": "http",
-    "hostname": "notifications.textentree.com",
+    "hostname": "www.textentree.com",
     "port": 2996,
     "search": "?",
     "path": ""
   },
   "Twilio": {
-    "numbers": [ "+15125200133" ],
+    "numbers": [
+      "+15125200133"
+    ],
     "production": {
       "sid": "AC98c288dd56d31217abb621f81b1415e4",
       "authToken": "6325c4f809a60e8c9b390a1355f477d7"

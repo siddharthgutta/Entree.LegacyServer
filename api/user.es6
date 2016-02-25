@@ -32,13 +32,13 @@ function getGreeting(name, firstTime) {
       'Type in /r to see where I work. Type in /help at any point if you need help.`;
   } else if (firstTime && !name) {
     return 'Hi, Entrée here. I can help you order ahead at your favorite restaurants. ' +
-        'Type in /r to see where I work. Type in /help at any point if you need help.';
+      'Type in /r to see where I work. Type in /help at any point if you need help.';
   } else if (!firstTime && name) {
     return `Welcome back ${name}! I'm here to help you order ahead at your favorite restaurants. ` +
-        'Type in /r to see where I work. Type in /help at any point if you need help.';
+      'Type in /r to see where I work. Type in /help at any point if you need help.';
   }
   return "Welcome back! I'm here to help you order ahead at your favorite restaurants. " +
-      'Type in /r to see where I work. Type in /help at any point if you need help.';
+    'Type in /r to see where I work. Type in /help at any point if you need help.';
 }
 
 /**
@@ -51,35 +51,43 @@ function getGreeting(name, firstTime) {
 export function signup(phoneNumber) {
   return new Promise((outerResolve, outerReject) => {
     db.sequelize.transaction(t =>
-      new Promise((resolve, reject) => {
-        models.User
-          .findOrCreate({where: {phoneNumber}, transaction: t})
-          .spread((user, created) => {
-            sendSMS(user.phoneNumber, getGreeting(user.name, created))
-              .then(response => {
-                // sendSMS will pass the response from twilio with text sent details
-                // this response is not currently being dealt with but needs to be stored in the Messages table
-                console.tag('routes', 'api', '/user/signup', 'User.signup')
-                  .log(`New user was ${created ? 'created' : 'found'} & ` +
-                    `${created ? 'full' : 'partial'} welcome message.`);
-                resolve(response);
-              }).catch(error => {
-                console.tag('api', 'user', 'signup', 'sendSMS')
-                  .error('Text Message not sent successfully, but user account was created.' +
-                    `User account was ${created ? 'created. Rolling it back now.' : 'not created.'} SMS Error:`, error);
-                reject(error);
-              });
-          }).catch(error => {
-            console.tag('api', 'user', 'signup', 'sendSMS')
-              .error(`User not created/found in the User table. No text message sent to user. Error: ${error}`);
-            reject(error);
-          });
+                               new Promise((resolve, reject) => {
+                                 models.User
+                                       .findOrCreate({where: {phoneNumber}, transaction: t})
+                                       .spread((user, created) => {
+                                         sendSMS(user.phoneNumber, getGreeting(user.name, created))
+                                         .then(response => {
+                                           // sendSMS will pass the response from twilio with text sent details
+                                           // this response is not currently being dealt with but needs to be stored
+                                           // in the Messages table
+                                           console.tag('routes', 'api', '/user/signup', 'User.signup')
+                                                  .log(`New user was ${created ? 'created' : 'found'} & ` +
+                                                       `${created ? 'full' : 'partial'} welcome message.`);
+                                           resolve(response);
+                                         })
+                                         .catch(error => {
+                                           console.tag('api', 'user', 'signup', 'sendSMS')
+                                                  .error('Text Message not sent successfully, but user account was ' +
+                                                         'created.' +
+                                                         `User account was ${created ? 'created. Rolling it back now.'
+                                                           : 'not created.'} SMS Error:`, error);
+                                           reject(error);
+                                         });
+                                       })
+                                       .catch(error => {
+                                         console.tag('api', 'user', 'signup', 'sendSMS')
+                                                .error(`User not created/found in the User table.
+  No text message sent to user. Error: ${error}`);
+                                         reject(error);
+                                       });
+                               })
+      )
+      .then(result => {
+        outerResolve(result);
       })
-    ).then(result => {
-      outerResolve(result);
-    }).catch(err => {
-      outerReject(err);
-    });
+      .catch(err => {
+        outerReject(err);
+      });
   });
 }
 
@@ -92,9 +100,9 @@ export function signup(phoneNumber) {
  */
 export function update(phoneNumber, attributes) {
   return models.User.update(
-      attributes, {
-        where: {phoneNumber}
-      }
+    attributes, {
+      where: {phoneNumber}
+    }
   );
 }
 
@@ -105,9 +113,7 @@ export function update(phoneNumber, attributes) {
  * @returns {Promise}: Returns the user object
  */
 export function destroy(phoneNumber) {
-  return models.User.destroy({
-    where: {phoneNumber}
-  });
+  return models.User.destroy({where: {phoneNumber}});
 }
 
 /**
@@ -117,7 +123,5 @@ export function destroy(phoneNumber) {
  * @returns {Promise}: Returns the user object
  */
 export function findOne(phoneNumber) {
-  return models.User.findOne({
-    where: {phoneNumber}
-  });
+  return models.User.findOne({where: {phoneNumber}});
 }

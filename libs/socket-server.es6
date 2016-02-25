@@ -4,12 +4,6 @@ import EventEmitter from 'events';
 import Promise from 'bluebird';
 import crypto from 'crypto';
 
-/**
- * Implementation is slightly modified to meet our requirements.
- * Code will eventually be going into an NPM module; let me know of any changes
- * @bluejamesbond
- */
-
 const defaultEventMap = {
   delimiter: '-',
 
@@ -19,6 +13,7 @@ const defaultEventMap = {
   requestServerAddress: 'get-server-address',
   requestAddToken: 'add-token',
   requestRemoveToken: 'remove-token',
+  requestAuthorization: 'authorize',
 
   // response events
   responseClientAwk: 'client-received',
@@ -29,30 +24,46 @@ const defaultEventMap = {
   responseTokenRemoved: 'token-removed'
 };
 
+const defaultOpts = {
+  resDefaultTimeout: 60000,
+  debug: false,
+  concurrency: 50,
+  scope: 'socket',
+  appspace: 'socket'
+};
+
 class SocketServer extends EventEmitter {
-  constructor(id, address, channel = 'socket', remote, debug = false,
-              eventMap = defaultEventMap,
-              resTimeout = 60000, concurrency = 50) {
+  constructor(origin, address, remote, eventMap = defaultEventMap, opts = defaultOpts) {
     super();
 
-    this.id = id.replace(/[^a-zA-Z0-9]/g, '');
-    this.channel = channel;
+    opts = Object.assign(defaultOpts, opts);
+
+    this.origin = origin;
+    this.opts = opts;
+    this.scope = opts.scope;
     this.eventMap = Object.assign(defaultEventMap, eventMap);
     this.remoteAddress = address;
     this.remote = remote;
-    this.resTimeout = resTimeout;
-    this.debug = debug;
+    this.resDefaultTimeout = opts.resDefaultTimeout;
+    this.debug = opts.debug;
 
     this.setMaxListeners(Number.MAX_SAFE_INTEGER);
 
     this.queue = async.queue((data, callback) => {
       const _callback = () => process.nextTick(callback);
       if (typeof data === 'function') {
-        return data(_callback);
+        if (data.length) {
+          data(_callback);
+        } else {
+          data();
+          _callback();
+        }
+
+        return;
       }
 
       this._handleTransmit(data, _callback);
-    }, concurrency);
+    }, opts.concurrency);
 
     this.queue.pause();
   }
@@ -84,68 +95,74 @@ class SocketServer extends EventEmitter {
     const eventMap = this.eventMap;
     const address = this.remoteAddress;
 
-    ipc.config.id = this.id;
-    ipc.config.retry = 5;
+    ipc.config.id = this.origin;
+    ipc.config.retry = 5000;
     ipc.config.maxRetries = 20;
     ipc.config.silent = !this.debug;
     ipc.config.networkHost = this.resolveHost(address);
     ipc.config.networkPort = this.resolvePort(address);
-
-    if (address.appspace) {
-      ipc.config.appspace = address.appspace;
-    }
+    ipc.config.appspace = this.opts.appspace;
 
     this.configure(ipc);
 
     return new Promise(resolve => {
-      ipc[this.remote ? 'connectToNet' : 'connectTo'](this.channel, () => {
-        ipc.of[this.channel].on('connect', () => {
-          ipc.config.stopRetrying = true;
+      ipc[this.remote ? 'connectToNet' : 'connectTo'](this.scope, () => {
+        ipc.of[this.scope].on('connect', () => {
+          ipc.config.stopRetrying = false;
           resolve();
+
+          this.queue.unshift(() => {
+            const req = {
+              id: ipc.config.id,
+              data: {origin: this.origin}
+            };
+
+            this._emitIPC(this.eventMap.requestAuthorization, this.wrap(req));
+          });
 
           this.queue.resume();
         });
       });
 
-      ipc.of[this.channel].on('disconnect', () => {
+      ipc.of[this.scope].on('disconnect', () => {
         this.queue.pause();
       });
 
-      ipc.of[this.channel].on(eventMap.responseTokenAdded, data => {
+      ipc.of[this.scope].on(eventMap.responseTokenAdded, data => {
         data = this.unwrap(data, eventMap.responseTokenAdded).data;
 
         this._emit(eventMap.responseTokenAdded, data);
         this._emit(this.for(eventMap.responseTokenAdded, data.token), data);
       });
 
-      ipc.of[this.channel].on(eventMap.responseServerAddress, data => {
+      ipc.of[this.scope].on(eventMap.responseServerAddress, data => {
         data = this.unwrap(data, eventMap.responseServerAddress).data;
 
         this._emit(eventMap.responseServerAddress, data);
       });
 
-      ipc.of[this.channel].on(eventMap.responseTokenRemoved, data => {
+      ipc.of[this.scope].on(eventMap.responseTokenRemoved, data => {
         data = this.unwrap(data, eventMap.responseTokenRemoved).data;
 
         this._emit(eventMap.responseTokenRemoved, data);
         this._emit(this.for(eventMap.responseTokenRemoved, data.token), data);
       });
 
-      ipc.of[this.channel].on(eventMap.responseClientAwk, data => {
+      ipc.of[this.scope].on(eventMap.responseClientAwk, data => {
         data = this.unwrap(data, eventMap.responseClientAwk).data;
 
         this._emit(eventMap.responseClientAwk, data);
         this._emit(this.for(eventMap.responseClientAwk, data.id), data);
       });
 
-      ipc.of[this.channel].on(eventMap.responseClientConnected, data => {
+      ipc.of[this.scope].on(eventMap.responseClientConnected, data => {
         data = this.unwrap(data, eventMap.responseClientConnected).data;
 
         this._emit(eventMap.responseClientConnected, data);
         this._emit(this.for(eventMap.responseClientConnected, data.token), data);
       });
 
-      ipc.of[this.channel].on(eventMap.responseClientDisconnected, data => {
+      ipc.of[this.scope].on(eventMap.responseClientDisconnected, data => {
         data = this.unwrap(data, eventMap.responseClientDisconnected).data;
 
         this._emit(eventMap.responseClientDisconnected, data);
@@ -171,7 +188,7 @@ class SocketServer extends EventEmitter {
     const eventId = this.generateUUID();
 
     if (action === this.eventMap.requestBroadcast) {
-      this._emitIPC(action, this.wrap({
+      const req = {
         id: ipc.config.id,
         data: {
           id: eventId,
@@ -180,7 +197,9 @@ class SocketServer extends EventEmitter {
           data,
           awk
         }
-      }));
+      };
+
+      this._emitIPC(action, this.wrap(req));
 
       return callback();
     }
@@ -195,17 +214,19 @@ class SocketServer extends EventEmitter {
 
     const timeout = () => {
       this.removeListener(event, accepted);
-      reject(new Error('No awk received'));
+      reject({token, channel, data, awk});
     };
 
     if (awk) {
       event = this.for(eventMap.responseClientAwk, eventId);
 
+      const wait = typeof awk === 'number' && awk > 0 ? awk : this.resDefaultTimeout;
+
       this.once(event, accepted);
-      tid = setTimeout(timeout, this.resTimeout);
+      tid = setTimeout(timeout, wait);
     }
 
-    this._emitIPC(action, this.wrap({
+    const req = {
       id: ipc.config.id,
       data: {
         id: eventId,
@@ -214,7 +235,9 @@ class SocketServer extends EventEmitter {
         data,
         awk
       }
-    }, action));
+    };
+
+    this._emitIPC(action, this.wrap(req, action));
 
     callback();
   }
@@ -224,7 +247,7 @@ class SocketServer extends EventEmitter {
   }
 
   _emitIPC(event, data) {
-    ipc.of[this.channel].emit(event, data);
+    ipc.of[this.scope].emit(event, data);
   }
 
   accept(token) {
@@ -232,13 +255,15 @@ class SocketServer extends EventEmitter {
 
     return new Promise(resolve => {
       if (eventMap.responseTokenAdded) {
-        this.once(this.for(eventMap.responseTokenAdded, token), () => resolve(token));
+        this.once(this.for(eventMap.responseTokenAdded, token), data => resolve(data));
       }
 
-      this._emitIPC(eventMap.requestAddToken, this.wrap({
+      const req = {
         id: ipc.config.id,
         data: {token}
-      }, eventMap.requestAddToken));
+      };
+
+      this._emitIPC(eventMap.requestAddToken, this.wrap(req, eventMap.requestAddToken));
 
       if (!eventMap.responseTokenAdded) {
         resolve(token);
@@ -251,13 +276,17 @@ class SocketServer extends EventEmitter {
 
     return new Promise(resolve => {
       if (eventMap.responseTokenRemoved) {
-        this.once(this.for(eventMap.responseTokenRemoved, token), () => resolve(token));
+        this.once(this.for(eventMap.responseTokenRemoved, token), () => {
+          resolve(token);
+        });
       }
 
-      this._emitIPC(eventMap.requestRemoveToken, this.wrap({
+      const req = {
         id: ipc.config.id,
         data: {token}
-      }, eventMap.requestRemoveToken));
+      };
+
+      this._emitIPC(eventMap.requestRemoveToken, this.wrap(req, eventMap.requestRemoveToken));
 
       if (!eventMap.responseTokenRemoved) {
         resolve(token);
@@ -288,10 +317,13 @@ class SocketServer extends EventEmitter {
       this._address = new Promise(resolve => {
         this.queue.push(callback => {
           this.once(this.eventMap.responseServerAddress, _address => resolve(_address));
-          this._emitIPC(this.eventMap.requestServerAddress, this.wrap({
+
+          const req = {
             id: ipc.config.id,
             data: {}
-          }, this.eventMap.requestServerAddress));
+          };
+
+          this._emitIPC(this.eventMap.requestServerAddress, this.wrap(req, this.eventMap.requestServerAddress));
           callback();
         });
       });
@@ -305,7 +337,7 @@ class SocketServer extends EventEmitter {
   }
 
   disconnect() {
-    ipc.disconnect(this.channel);
+    ipc.disconnect(this.scope);
   }
 
   isRemote() {

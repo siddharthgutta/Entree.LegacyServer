@@ -20,7 +20,8 @@ const productionSMS = new Twilio(fromNumber, productionCreds.sid, productionCred
  * @returns {Promise} error or response for sending message
  */
 export function sendSMS(toNumber, textBody) {
-  console.tag('api', 'sms', 'production').log(toNumber, textBody);
+  console.tag('api', 'sms', 'production')
+         .log(toNumber, textBody);
   return productionSMS.send(toNumber, textBody);
 }
 

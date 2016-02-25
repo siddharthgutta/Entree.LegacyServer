@@ -21,10 +21,11 @@ class Chat extends Influx.Component {
     this.setState({user, messages: MessageStore.getMessages(user)});
   }
 
-  _addMessage(message) {
-    const messages = this.state.messages;
-    messages.push(message);
-    this.setState({messages});
+  _addMessage() {
+    // TODO perform check and update only if necessary
+    if (this.state.user) {
+      this.setState({messages: MessageStore.getMessages(this.state.user)});
+    }
   }
 
   _insertMessage(message) {
@@ -43,7 +44,7 @@ class Chat extends Influx.Component {
 
     return (
         <Messenger messages={messages} me={MessageStore.getMe()} them={user}
-                  insertMessage={msg => this._insertMessage(msg)}/>
+                   insertMessage={msg => this._insertMessage(msg)}/>
     );
   }
 }
