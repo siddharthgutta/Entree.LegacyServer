@@ -31,14 +31,14 @@ function getGreeting(name, firstTime) {
     return `Hi ${name}, Entrée here. I can help you order ahead at your favorite restaurants. ' +
       'Type in /r to see where I work. Type in /help at any point if you need help.`;
   } else if (firstTime && !name) {
-    return 'Hi, Entrée here. I can help you order ahead at your favorite restaurants. ' +
-      'Type in /r to see where I work. Type in /help at any point if you need help.';
+    return 'Entrée helps you order ahead and cut the line at the best food trucks around you. ' +
+      'We are currently in closed beta but will notify you as soon as we launch!';
   } else if (!firstTime && name) {
     return `Welcome back ${name}! I'm here to help you order ahead at your favorite restaurants. ` +
       'Type in /r to see where I work. Type in /help at any point if you need help.';
   }
-  return "Welcome back! I'm here to help you order ahead at your favorite restaurants. " +
-    'Type in /r to see where I work. Type in /help at any point if you need help.';
+  return 'Entrée helps you order ahead and cut the line at the best food trucks around you. ' +
+    'We are currently in closed beta but will notify you as soon as we launch!';
 }
 
 /**
