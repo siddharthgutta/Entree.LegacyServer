@@ -5,7 +5,8 @@ import * as MenuItem from '../api/menuItem.es6';
 import Categories from '../models/mongo/menuItemCategories.es6';
 
 beforeEach(done => {
-  clearDatabase().then(() => done());
+  clearDatabase()
+  .then(() => done());
 });
 
 after(() => disconnectDatabase());
@@ -38,7 +39,8 @@ describe('MenuItem', () => {
 
   describe('#create()', () => {
     it('should create a menu item correctly', done => {
-      createItem().then(menuItem => {
+      createItem()
+      .then(menuItem => {
         assert.equal(menuItem.restaurantId, restaurantId);
         assert.equal(menuItem.category, category);
         assert.equal(menuItem.name, name);
@@ -54,7 +56,8 @@ describe('MenuItem', () => {
 
   describe('#find', () => {
     it('should query the correct menu items by restaurant id', done => {
-      createItem().then(() => {
+      createItem()
+      .then(() => {
         MenuItem.create(
           2,
           category,
@@ -63,27 +66,30 @@ describe('MenuItem', () => {
           price,
           hasSize,
           sizes,
-          mods).then(() => {
-            MenuItem.find(1).then(result => {
-              assert.equal(result.length, 1);
-              assert.equal(result[0].restaurantId, restaurantId);
-              assert.equal(result[0].category, category);
-              assert.equal(result[0].name, name);
-              assert.equal(result[0].description, description);
-              assert.equal(result[0].price, price);
-              assert.equal(result[0].hasSize, hasSize);
-              assert(_.isMatch(result[0].sizes, sizes));
-              assert(_.isMatch(result[0].mods, mods));
-              done();
-            });
-          });
+          mods)
+                .then(() => {
+                  MenuItem.find(1)
+                          .then(result => {
+                            assert.equal(result.length, 1);
+                            assert.equal(result[0].restaurantId, restaurantId);
+                            assert.equal(result[0].category, category);
+                            assert.equal(result[0].name, name);
+                            assert.equal(result[0].description, description);
+                            assert.equal(result[0].price, price);
+                            assert.equal(result[0].hasSize, hasSize);
+                            assert(_.isMatch(result[0].sizes, sizes));
+                            assert(_.isMatch(result[0].mods, mods));
+                            done();
+                          });
+                });
       });
     });
   });
 
   describe('#findByRestaurantIdAndCategory', () => {
     it('should query the correct menu items by category', done => {
-      createItem().then(() => {
+      createItem()
+      .then(() => {
         MenuItem.create(
           restaurantId,
           Categories.drink,
@@ -92,20 +98,22 @@ describe('MenuItem', () => {
           price,
           hasSize,
           sizes,
-          mods).then(() => {
-            MenuItem.find(restaurantId, {category}).then(result => {
-              assert.equal(result.length, 1);
-              assert.equal(result[0].restaurantId, restaurantId);
-              assert.equal(result[0].category, category);
-              assert.equal(result[0].name, name);
-              assert.equal(result[0].description, description);
-              assert.equal(result[0].price, price);
-              assert.equal(result[0].hasSize, hasSize);
-              assert(_.isMatch(result[0].sizes, sizes));
-              assert(_.isMatch(result[0].mods, mods));
-              done();
-            });
-          });
+          mods)
+                .then(() => {
+                  MenuItem.find(restaurantId, {category})
+                          .then(result => {
+                            assert.equal(result.length, 1);
+                            assert.equal(result[0].restaurantId, restaurantId);
+                            assert.equal(result[0].category, category);
+                            assert.equal(result[0].name, name);
+                            assert.equal(result[0].description, description);
+                            assert.equal(result[0].price, price);
+                            assert.equal(result[0].hasSize, hasSize);
+                            assert(_.isMatch(result[0].sizes, sizes));
+                            assert(_.isMatch(result[0].mods, mods));
+                            done();
+                          });
+                });
       });
     });
   });

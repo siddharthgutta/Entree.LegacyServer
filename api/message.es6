@@ -13,8 +13,8 @@ import models from '../models/mongo/index.es6';
  */
 export function findByPhone(phoneNumber, optional = {}) {
   return models.Message.find({phoneNumber, ...optional})
-      .sort({date: -1})
-      .exec();
+               .sort({date: -1})
+               .exec();
 }
 
 
@@ -27,8 +27,8 @@ export function findByPhone(phoneNumber, optional = {}) {
  */
 export function findByRestaurant(restaurantId, optional = {}) {
   return models.Message.find({restaurantId, ...optional})
-      .sort({date: -1})
-      .exec();
+               .sort({date: -1})
+               .exec();
 }
 
 /**

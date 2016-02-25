@@ -5,6 +5,7 @@ id=$(git rev-parse HEAD)
 sleep 10
 
 export NODE_ENV=staging;
+export IS_RUNNING_TEST=true;
 
 set -e
-npm run test-ci ./tests/messenger-test.compiled.js
+npm run test-ci ./tests/socket-server-test.compiled.js

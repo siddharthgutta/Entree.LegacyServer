@@ -3,7 +3,8 @@ import {clearDatabase, disconnectDatabase} from './test-init.es6';
 import * as Location from '../api/location.es6';
 
 beforeEach(done => {
-  clearDatabase().then(() => done());
+  clearDatabase()
+  .then(() => done());
 });
 
 after(() => disconnectDatabase());
@@ -21,35 +22,38 @@ describe('Location', () => {
 
   describe('#create()', () => {
     it('should insert location the database with valid arguments', done => {
-      Location.create(firstAddress, city, state, zipcode, {secondAddress}).then(location => {
-        assert.equal(location.firstAddress, firstAddress);
-        assert.equal(location.secondAddress, secondAddress);
-        assert.equal(location.city, city);
-        assert.equal(location.state, state);
-        assert.equal(location.zipcode, zipcode);
-        done();
-      });
+      Location.create(firstAddress, city, state, zipcode, {secondAddress})
+              .then(location => {
+                assert.equal(location.firstAddress, firstAddress);
+                assert.equal(location.secondAddress, secondAddress);
+                assert.equal(location.city, city);
+                assert.equal(location.state, state);
+                assert.equal(location.zipcode, zipcode);
+                done();
+              });
     });
 
     it('should not create Locations with null firstAddress, null city' +
-        'null state, or null zipcode', done => {
-      Location.create(null, null, null, null).then(() => {
-        assert(false);
-        done();
-      }, err => {
-        assert.equal(err.errors.length, 4);
-        done();
-      });
+       'null state, or null zipcode', done => {
+      Location.create(null, null, null, null)
+              .then(() => {
+                assert(false);
+                done();
+              }, err => {
+                assert.equal(err.errors.length, 4);
+                done();
+              });
     });
 
     it('should not create Locations with invalid state or zipcode lengths', done => {
-      Location.create(firstAddress, city, 'X', '1').then(() => {
-        assert(false);
-        done();
-      }, err => {
-        assert.equal(err.errors.length, 2);
-        done();
-      });
+      Location.create(firstAddress, city, 'X', '1')
+              .then(() => {
+                assert(false);
+                done();
+              }, err => {
+                assert.equal(err.errors.length, 2);
+                done();
+              });
     });
   });
 });

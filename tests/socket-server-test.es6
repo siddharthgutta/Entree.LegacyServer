@@ -3,131 +3,58 @@ import io from 'socket.io-client';
 import assert from 'assert';
 import {format} from 'url';
 import now from 'performance-now';
-import Promise from 'bluebird';
+import _ from 'underscore';
 import crypto from 'crypto';
-import ss from '../message/socket-server.es6';
-
-const message = global.TEST;
-const token = crypto.randomBytes(15).toString('hex');
-const msgCount = 10;
-const channel = 'send';
+import Promise from 'bluebird';
+import {RemoteSocketServer} from '../libs/socket-server/index.es6';
 
 let socket;
+let accessor;
 
-/**
- *
- * Stability - 3
- *
- * We can get much higher with some tweaking on the NodeJS level; naive test results
- *
- * Multi Client (100 clients)
- *
- * serial: 10 messages/s
- * parallel: 20 messages/s
- * parallel (volatile): 30 messages/s
- * parallel (callbacks): 50 messages/s
- *
- * Single Client
- *
- * serial: 1000 messages/s
- * parallel: 3000 messages/s
- * parallel (volatile): 4000 messages/s
- *
- **/
-
-
-/**
- *
- * ss.connect() :: Promise
- * -----------------------
- * Use this function to connect the socket server. All the information is pulled from the
- * branchoff@config depending on the running environment
- *
- *
- * ss.accept(token) :: Promise
- * -----------------------
- * Accepts any incoming websockets with the token you provide
- *
- *
- * ss.reject(token) :: Promise
- * -----------------------
- * Reject any tokens; all connected websockets will be disconnected
- *
- *
- * ss.emit(token, channel, data) :: Promise
- * -----------------------
- * Send to a token, on a specified channel, some data
- *
- *
- * ss.disconnect()
- * -----------------------
- * Disconnect ipc to ensure Node quits
- *
- */
+const message = global.TEST;
+const msgCount = 10;
+const channel = 'send';
+const ss = new RemoteSocketServer(global.TEST);
 
 describe(global.TEST, () => {
-  it('should create socket-server', done => {
-    ss.connect().then(() => done());
+  it('should create socket-server', async () => {
+    await ss.connect();
   });
 
-  it('should add token', done => {
-    ss.accept(token).then(() => done());
+  it('should add token', async () => {
+    accessor = await ss.accept(crypto.randomBytes(15)
+                                     .toString('hex'));
   });
 
-  it('should connect client', done => {
-    ss.address().then(address => {
-      const url = format(address);
+  it('should connect client', async done => {
+    const address = await ss.address();
+    const url = format(address);
 
-      console.log(url);
+    console.log(accessor);
 
-      socket = io(url, {query: `id=${token}`, secure: true});
-      socket.once('connect', () => done());
-    });
+    socket = io(url, {query: `id=${accessor.uuid}`, secure: true});
+    socket.once('connect', () => done());
   });
 
-  it(`should send ${msgCount} messages to client`, done => {
+  it(`should send ${msgCount} messages to client`, async () => {
     const start = now();
-    const messages = new Array(msgCount);
-    let received = 0;
 
     socket.on(channel, (data, respond) => {
       assert(data, message);
-
-      if (ss.isRemote()) {
-        respond({status: 'ok'});
-      }
-
-      if (ss.isLocal() && ++received === msgCount) {
-        const duration = ((now() - start) / 1000);
-        console.log(`throughput ${(msgCount / duration).toFixed(3)} messages/second`);
-        done();
-      }
+      respond({status: 'ok'});
     });
 
-    for (let i = 0; i < messages.length; i++) {
-      messages[i] = ss.emit(token, channel, message + i);
-    }
+    await Promise.map(_.range(msgCount), i => ss.emit(accessor.token, channel, message + i));
 
-    if (ss.isRemote()) {
-      Promise.all(messages).then(() => {
-        const duration = ((now() - start) / 1000);
-        console.log(`throughput ${(msgCount / duration).toFixed(3)} messages/second`);
-        done();
-      });
-    }
+    const duration = ((now() - start) / 1000);
+    console.log(`throughput ${(msgCount / duration).toFixed(3)} messages/second`);
   });
 
   it('should disconnect client (from server)', done => {
-    if (ss.isRemote()) {
-      const event = ss.for(ss.eventMap.responseClientDisconnected, token);
-      ss.once(event, () => done());
-    }
+    const event = ss.for(ss.eventMap.responseClientDisconnected, accessor.token);
+    ss.once(event, () => done());
 
     socket.disconnect();
-
-    if (!ss.isRemote()) {
-      done();
-    }
   });
 
   it('should disconnect socket-server', () => {

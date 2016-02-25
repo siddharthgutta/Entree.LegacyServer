@@ -25,9 +25,9 @@ export function create(name, password, optional = {phoneNumber: null}) {
  */
 export function update(id, attributes) {
   return models.Restaurant.update(
-      attributes, {
-        where: {id}
-      }
+    attributes, {
+      where: {id}
+    }
   );
 }
 
@@ -38,9 +38,7 @@ export function update(id, attributes) {
  * @returns {Promise}: Returns the Restaurant object
  */
 export function destroy(id) {
-  return models.Restaurant.destroy({
-    where: {id}
-  });
+  return models.Restaurant.destroy({where: {id}});
 }
 
 /**
@@ -50,9 +48,7 @@ export function destroy(id) {
  * @returns {Promise}: Returns the Restaurant object
  */
 export function findOne(id) {
-  return models.Restaurant.findOne({
-    where: {id}
-  });
+  return models.Restaurant.findOne({where: {id}});
 }
 
 /**
@@ -65,16 +61,19 @@ export function findOne(id) {
  */
 export function addOrUpdateHour(id, restaurantHour) {
   return new Promise(resolve => {
-    findOne(id).then(restaurant => {
-      restaurant.getRestaurantHours({where: {dayOfTheWeek: restaurantHour.dayOfTheWeek}}).then(results => {
-        if (results.length === 1) {
-          restaurant.removeRestaurantHour(results[0]).then(() => {
-            resolve(restaurant.addRestaurantHour(restaurantHour));
-          });
-        } else {
-          resolve(restaurant.addRestaurantHour(restaurantHour));
-        }
-      });
+    findOne(id)
+    .then(restaurant => {
+      restaurant.getRestaurantHours({where: {dayOfTheWeek: restaurantHour.dayOfTheWeek}})
+                .then(results => {
+                  if (results.length === 1) {
+                    restaurant.removeRestaurantHour(results[0])
+                              .then(() => {
+                                resolve(restaurant.addRestaurantHour(restaurantHour));
+                              });
+                  } else {
+                    resolve(restaurant.addRestaurantHour(restaurantHour));
+                  }
+                });
     });
   });
 }
@@ -87,7 +86,8 @@ export function addOrUpdateHour(id, restaurantHour) {
  */
 export function getHours(id) {
   return new Promise(resolve => {
-    findOne(id).then(restaurant => {
+    findOne(id)
+    .then(restaurant => {
       resolve(restaurant.getRestaurantHours());
     });
   });
@@ -103,16 +103,19 @@ export function getHours(id) {
  */
 export function setOrUpdateLocation(id, location) {
   return new Promise(resolve => {
-    findOne(id).then(restaurant => {
-      restaurant.getLocation().then(result => {
-        if (result) {
-          result.destroy().then(() => {
-            resolve(restaurant.setLocation(location));
-          });
-        } else {
-          resolve(restaurant.setLocation(location));
-        }
-      });
+    findOne(id)
+    .then(restaurant => {
+      restaurant.getLocation()
+                .then(result => {
+                  if (result) {
+                    result.destroy()
+                          .then(() => {
+                            resolve(restaurant.setLocation(location));
+                          });
+                  } else {
+                    resolve(restaurant.setLocation(location));
+                  }
+                });
     });
   });
 }
@@ -125,10 +128,12 @@ export function setOrUpdateLocation(id, location) {
  */
 export function removeLocation(id) {
   return new Promise(resolve => {
-    findOne(id).then(restaurant => {
-      restaurant.getLocation().then(location => {
-        resolve(location.destroy());
-      });
+    findOne(id)
+    .then(restaurant => {
+      restaurant.getLocation()
+                .then(location => {
+                  resolve(location.destroy());
+                });
     });
   });
 }
@@ -141,7 +146,8 @@ export function removeLocation(id) {
  */
 export function getLocation(id) {
   return new Promise(resolve => {
-    findOne(id).then(restaurant => {
+    findOne(id)
+    .then(restaurant => {
       resolve(restaurant.getLocation());
     });
   });

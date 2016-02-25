@@ -13,7 +13,9 @@ module.exports = grunt => {
       options: {
         banner: '/*! Grunt Uglify <%= grunt.template.today(\'yyyy-mm-dd\') %> */ ',
         compress: {
-          drop_console: false
+          drop_console: false,
+          keep_fnames: true,
+          keep_fargs: true
         }
       },
       dist: {

@@ -4,7 +4,7 @@ const twilio = require('twilio');
 const productionCreds = config.get('Twilio.production');
 const route = new Router();
 import {create} from '../api/message.es6';
-import socketServer from '../message/socket-server.es6';
+import * as Notification from '../api/notification.es6';
 import {findOne} from '../api/socketToken.es6';
 import Promise from 'bluebird';
 
@@ -18,7 +18,8 @@ function respond(res, message) {
 }
 
 function normalize(toNumber) {
-  return `${String(toNumber).replace('+1', '')}`;
+  return `${String(toNumber)
+  .replace('+1', '')}`;
 }
 
 route.use((req, res, next) => {
@@ -48,17 +49,24 @@ route.use((req, res, next) => {
  */
 export function createAndEmit(from, restaurantID, textBody, date, msgSid, twilioNumber, sent, success) {
   return new Promise((resolve, reject) => {
-    create(from, restaurantID, textBody, date, msgSid, twilioNumber, sent, success).then(message => {
-      findOne(restaurantID).then(result => {
+    create(from, restaurantID, textBody, date, msgSid, twilioNumber, sent, success)
+    .then(message => {
+      findOne(restaurantID)
+      .then(result => {
         console.log(`Emitting receive message to the following tokens: ${result.tokens}`);
-        result.tokens.forEach(token => {
-          socketServer.emit(token, 'receive', {phoneNumber: from, content: textBody, date, sentByUser: sent}, false);
+        Notification.notify(restaurantID, 'receive', {
+          phoneNumber: from,
+          content: textBody,
+          date,
+          sentByUser: sent
         });
         resolve(message);
-      }).catch(findOneError => {
+      })
+      .catch(findOneError => {
         reject(findOneError);
       });
-    }).catch(createError => {
+    })
+    .catch(createError => {
       reject(createError);
     });
   });
@@ -76,32 +84,34 @@ route.post('/receive', twilio.webhook(), (req, res) => {
   // NEEDS TO BE REPLACED WITH USER AUTHENTICATION
   // 0 for now for Sid's Messenger
   createAndEmit(normalize(req.body.From), 0, req.body.Body,
-      Date.now(), req.body.SmsMessageSid, normalize(req.body.To), true, true).then(() => {
-        console.tag('routes', 'twilio', 'receive').log('Successfully created/emitted message');
-        respond(res, '');
-      }).catch(err => {
-        res.status(500).fail(['routes', 'twilio', 'receive'], err,
-            'There was an error receiving this message.');
-      });
+                Date.now(), req.body.SmsMessageSid, normalize(req.body.To), true, true)
+  .then(() => {
+    console.tag('routes', 'twilio', 'receive').log('Successfully created/emitted message');
+    respond(res, '');
+  })
+  .catch(err => {
+    res.status(500).fail(['routes', 'twilio', 'receive'], err,
+                         'There was an error receiving this message.');
+  });
 });
 
 // Receiving a fallback text message from a user transferred by Twilio when /receive fails
-route.post('/fallback', twilio.webhook({
-  // Turning off standard validation
-  validate: false
-}), (req, res) => {
+route.post('/fallback', twilio.webhook({validate: false}), (req, res) => {
   // Make sure to use Twilio.normalize to convert number to 10 digit
-  console.tag('routes', 'twilio', 'fallback').log(`Request: ${JSON.stringify(req.body)}`);
+  console.tag('routes', 'twilio', 'fallback')
+         .log(`Request: ${JSON.stringify(req.body)}`);
   // NEEDS TO BE REPLACED WITH USER AUTHENTICATION
   // 0 for now for Sid's Messenger
   createAndEmit(normalize(req.body.From), 0, req.body.Body,
-      Date.now(), req.body.SmsMessageSid, normalize(req.body.To), true, true).then(() => {
-        console.tag('routes', 'twilio', 'fallback').log('Successfully created/emitted message');
-        respond(res, '');
-      }).catch(err => {
-        res.status(500).fail(['routes', 'twilio', 'fallback'], err,
-            'There was an error receiving this message.');
-      });
+                Date.now(), req.body.SmsMessageSid, normalize(req.body.To), true, true)
+  .then(() => {
+    console.tag('routes', 'twilio', 'fallback').log('Successfully created/emitted message');
+    respond(res, '');
+  })
+  .catch(err => {
+    res.status(500).fail(['routes', 'twilio', 'fallback'], err,
+                         'There was an error receiving this message.');
+  });
 });
 
 export default route;

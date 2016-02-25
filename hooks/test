@@ -5,7 +5,8 @@ id=$(git rev-parse HEAD)
 sleep 10
 
 export NODE_ENV=staging;
+export IS_RUNNING_TEST=true;
 
 set -e
 npm run tests-ci
-# npm run lint-ci
+npm run lint-ci

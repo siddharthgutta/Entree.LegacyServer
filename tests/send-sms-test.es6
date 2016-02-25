@@ -77,7 +77,8 @@ const testSMS = new Twilio(FROM_TEST_NUMS.FROM_VALID_NUMBER.num, testCreds.sid, 
 
 function sendTestSMS(toNumber, textBody, verboseLogging = VERBOSE_LOGGING) {
   if (verboseLogging) {
-    console.tag('api', 'sms', 'test').log(toNumber, textBody);
+    console.tag('api', 'sms', 'test')
+           .log(toNumber, textBody);
   }
 
   return testSMS.send(toNumber, textBody, VERBOSE_LOGGING);
@@ -85,19 +86,21 @@ function sendTestSMS(toNumber, textBody, verboseLogging = VERBOSE_LOGGING) {
 
 function checkError(expectedError, resultingError, responseOrErrorObject, verboseLogging = VERBOSE_LOGGING) {
   if (expectedError !== resultingError) {
-    console.tag(global.TEST).err(responseOrErrorObject);
+    console.tag(global.TEST)
+           .err(responseOrErrorObject);
   } else if (verboseLogging) {
-    console.tag(global.TEST).log(responseOrErrorObject);
+    console.tag(global.TEST)
+           .log(responseOrErrorObject);
   }
 }
 
 describe('Twilio Send', () => {
   describe('To', () => {
     /*
-    Only set REAL_SMS_TEST or BROADCAST_REAL_SMS_TEST or to true when wanting to test real text messages
-    Immediately set it to false when done testing
-    Disclaimer: Twilio will charge us for these!
-    */
+     Only set REAL_SMS_TEST or BROADCAST_REAL_SMS_TEST or to true when wanting to test real text messages
+     Immediately set it to false when done testing
+     Disclaimer: Twilio will charge us for these!
+     */
     const REAL_SMS_TEST = false;
     // Modify this number, to test with your own phone
     const REAL_PHONE_NUMBER_WITHOUT_COUNTRY_CODE = '2149664948';
@@ -109,67 +112,90 @@ describe('Twilio Send', () => {
     if (REAL_SMS_TEST) {
       _.map(REAL_NUMBERS, number => {
         it('sending real SMS to number with country code should send successfully', done => {
-          const testMessage = `TEST SMS ${moment().format('h:mm A')}`;
+          const testMessage = `TEST SMS ${moment()
+          .format('h:mm A')}`;
           sendSMS(number, testMessage)
-            .then(response => {
-              console.tag(global.TEST).log(`Real SMS response: ${JSON.stringify(response)}`);
-              expect(response.to).to.be(REAL_PHONE_NUMBER);
-              expect(response.from).to.be(TWILIO_FROM_NUMBER);
-              expect(response.body).to.contain(`${testMessage}`);
-              done();
-            })
-            .catch(err => {
-              console.tag(global.TEST).error(err);
-              expect().fail('Text message was not sent successfully even though it should have!');
-              done();
-            });
+          .then(response => {
+            console.tag(global.TEST)
+                   .log(`Real SMS response: ${JSON.stringify(response)}`);
+            expect(response.to)
+            .to
+            .be(REAL_PHONE_NUMBER);
+            expect(response.from)
+            .to
+            .be(TWILIO_FROM_NUMBER);
+            expect(response.body)
+            .to
+            .contain(`${testMessage}`);
+            done();
+          })
+          .catch(err => {
+            console.tag(global.TEST)
+                   .error(err);
+            expect()
+            .fail('Text message was not sent successfully even though it should have!');
+            done();
+          });
         });
       });
 
       it('should fail to send real SMS with invalid number', done => {
-        sendSMS('+123', `TEST SMS ${moment().format('h:mm A')}`)
-          .then(response => {
-            console.tag(global.TEST).log(`Real SMS response: ${JSON.stringify(response)}`);
-            expect().fail('Text message should not be sent successfully with invalid number!');
-            done();
-          })
-          .catch(err => {
-            console.tag(global.TEST).error(err);
-            done();
-          });
+        sendSMS('+123', `TEST SMS ${moment()
+        .format('h:mm A')}`)
+        .then(response => {
+          console.tag(global.TEST)
+                 .log(`Real SMS response: ${JSON.stringify(response)}`);
+          expect()
+          .fail('Text message should not be sent successfully with invalid number!');
+          done();
+        })
+        .catch(err => {
+          console.tag(global.TEST)
+                 .error(err);
+          done();
+        });
       });
     }
 
     if (BROADCAST_REAL_SMS_TEST) {
       it('broadcasting real SMS to admins should work successfully', done => {
-        broadcast(`BROADCAST TEST SMS ${moment().format('h:mm A')}`, admins)
-          .then(responses => {
-            responses.forEach(response => {
-              console.tag(global.TEST).log(`Broadcast response: ${JSON.stringify(response)}`);
-            });
-            done();
-          })
-          .catch(err => {
-            console.tag(global.TEST).error(err);
-            expect().fail('A text message was not sent successfully even though it should have!');
-            done();
+        broadcast(`BROADCAST TEST SMS ${moment()
+        .format('h:mm A')}`, admins)
+        .then(responses => {
+          responses.forEach(response => {
+            console.tag(global.TEST)
+                   .log(`Broadcast response: ${JSON.stringify(response)}`);
           });
+          done();
+        })
+        .catch(err => {
+          console.tag(global.TEST)
+                 .error(err);
+          expect()
+          .fail('A text message was not sent successfully even though it should have!');
+          done();
+        });
       });
     }
 
     _.map(TO_TEST_NUMS, test => {
       it(test.message, done => {
-        sendTestSMS(test.num, `TEST SMS ${moment().format('h:mm A')}`)
-          .then(response => {
-            checkError(test.error, false, response);
-            expect(test.error).to.be(false);
-            done();
-          })
-          .catch(err => {
-            checkError(test.error, true, err);
-            expect(test.error).to.be(true);
-            done();
-          });
+        sendTestSMS(test.num, `TEST SMS ${moment()
+        .format('h:mm A')}`)
+        .then(response => {
+          checkError(test.error, false, response);
+          expect(test.error)
+          .to
+          .be(false);
+          done();
+        })
+        .catch(err => {
+          checkError(test.error, true, err);
+          expect(test.error)
+          .to
+          .be(true);
+          done();
+        });
       });
     });
   });
@@ -180,17 +206,22 @@ describe('Twilio Send', () => {
     _.map(FROM_TEST_NUMS, test => {
       it(test.message, done => {
         testSMS.changeFromNumber(test.num);
-        sendTestSMS(validToNumber, `TEST SMS ${moment().format('h:mm A')}`)
-          .then(response => {
-            checkError(test.error, false, response);
-            expect(test.error).to.be(false);
-            done();
-          })
-          .catch(err => {
-            checkError(test.error, true, err);
-            expect(test.error).to.be(true);
-            done();
-          });
+        sendTestSMS(validToNumber, `TEST SMS ${moment()
+        .format('h:mm A')}`)
+        .then(response => {
+          checkError(test.error, false, response);
+          expect(test.error)
+          .to
+          .be(false);
+          done();
+        })
+        .catch(err => {
+          checkError(test.error, true, err);
+          expect(test.error)
+          .to
+          .be(true);
+          done();
+        });
       });
     });
   });

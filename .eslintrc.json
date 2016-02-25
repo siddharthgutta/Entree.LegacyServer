@@ -7,7 +7,8 @@
   "plugins": [
     "react",
     "mocha",
-    "markdown"
+    "markdown",
+    "babel"
   ],
   "parser": "babel-eslint",
   "env": {
@@ -32,10 +33,6 @@
     "no-console": 0,
     "no-extra-parens": 2,
     "arrow-body-style": [
-      2,
-      "as-needed"
-    ],
-    "arrow-parens": [
       2,
       "as-needed"
     ],
@@ -74,7 +71,10 @@
     "react/jsx-indent-props": 0,
     "indent": [
       2,
-      2
+      2,
+      {
+        "SwitchCase": 1
+      }
     ],
     "react/jsx-closing-bracket-location": [
       2,
@@ -88,7 +88,17 @@
       {
         "allowSingleLine": false
       }
-    ]
+    ],
+    "babel/generator-star-spacing": 1,
+    "babel/new-cap": 1,
+    "babel/array-bracket-spacing": 1,
+    "babel/object-curly-spacing": 1,
+    "babel/object-shorthand": 1,
+    "babel/arrow-parens": [
+      2,
+      "as-needed"
+    ],
+    "babel/no-await-in-loop": 1
   },
   "ecmaFeatures": {
     "jsx": true,

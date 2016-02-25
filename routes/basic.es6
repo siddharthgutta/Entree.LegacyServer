@@ -32,7 +32,8 @@ route.get('/tests', (req, res) => {
   child.stdout.on('message', data => capture += data);
   child.stdout.on('end', () => {
     res.type('text/html');
-    const resultCapture = capture.replace(/\n/g, '<br/>').replace(/\s/g, '&nbsp;');
+    const resultCapture = capture.replace(/\n/g, '<br/>')
+                                 .replace(/\s/g, '&nbsp;');
     res.send(convert.toHtml(resultCapture));
   });
 });

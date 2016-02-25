@@ -15,14 +15,17 @@ const Events = keyMirror({
   READY: null
 });
 
-const testNumbers = _.map(['7135011837', '+12149664948', '+18179751584']);
+const testNumbers = _.map(_.range(10), () => chance.phone());
 const testMe = testNumbers.shift();
+const sourceNumber = '0000000000';
 
 class MessageStore extends Influx.Store {
   constructor() {
     super(Dispatcher);
 
     this.data = {messages: []};
+
+    window.sendSMS = this.sendSMS;
   }
 
   getDispatcherListeners() {
@@ -32,12 +35,12 @@ class MessageStore extends Influx.Store {
   }
 
   getMe() {
-    return {number: '5125200133'};
+    return {number: sourceNumber};
   }
 
   sendSMS(to, content) {
     fetch('/messenger/send', {method: 'post', body: {content, phoneNumber: to}})
-        .then(({body}) => console.log(body));
+      .then(({body}) => console.log(body));
   }
 
   getMessages(user) {
@@ -69,7 +72,7 @@ class MessageStore extends Influx.Store {
   _transform(messages) {
     return _.map(messages, msg => ({
       [msg.sentByUser ? 'from' : 'to']: msg.phoneNumber,
-      [msg.sentByUser ? 'to' : 'from']: msg.twilioNumber,
+      [msg.sentByUser ? 'to' : 'from']: sourceNumber,
       ...msg // ,
       // content: String(msg.content).replace(/^(Sent from your Twilio trial account - )/, '')
     }));
@@ -79,13 +82,10 @@ class MessageStore extends Influx.Store {
     Promise.all([
       fetch('/messenger/token', {method: 'post'}),
       fetch('/messenger/messages', {method: 'post'})
-    ]).spread((socketResponse, messagesResponse) => {
-      const token = socketResponse.body.data.token;
-      const address = socketResponse.body.data.address;
-      const messages = messagesResponse.body.data.messages;
+    ]).spread(({body: {data: {address, accessor: {uuid}}}}, {body: {data: {messages}}}) => {
       const url = format(address);
 
-      const socket = io(url, {query: `id=${token}`, secure: true});
+      const socket = io(url, {query: `id=${uuid}`, secure: true});
       socket.on('send', message => {
         message = this._transform([message])[0];
 
@@ -104,7 +104,7 @@ class MessageStore extends Influx.Store {
       socket.on('alive?', (data, respond) => respond({status: 'ok'}));
 
       this.data.socket = socket;
-      this.data.token = token;
+      this.data.uuid = uuid;
       this.data.messages = this._transform(messages.reverse());
 
       this.emit(Events.READY, this.data.messages);

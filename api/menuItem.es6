@@ -12,7 +12,8 @@ import models from '../models/mongo/index.es6';
  * @returns {Promise}: Returns the menu object
  */
 export function find(restaurantId, optional = {}) {
-  return models.MenuItem.find({restaurantId, ...optional}).exec();
+  return models.MenuItem.find({restaurantId, ...optional})
+               .exec();
 }
 
 /**
