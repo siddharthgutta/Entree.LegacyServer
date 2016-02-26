@@ -12,19 +12,14 @@
     "sslCert": "HTTPS_SSL_CERTIFICATE",
     "sslCa": "HTTPS_SSL_CA"
   },
-  "ExternalSocketServer": {
-    "port": {
-      "__name": "SOCKET_SERVER_PORT",
-      "__format": "json"
-    },
-    "protocol": "SOCKET_SERVER_PROTOCOL",
-    "search": "SOCKET_SERVER_SEARCH",
-    "path": "SOCKET_SERVER_PATH",
-    "hostname": "SOCKET_SERVER_HOSTNAME"
-  },
   "NodeEnv": "NODE_ENV",
   "AppId": "BRANCHOFF_BRANCH",
   "Mode": "BRANCHOFF_MODE",
+  "Twilio": {
+    "sid": "TWILIO_AUTH_SID",
+    "token": "TWILIO_AUTH_TOKEN",
+    "number": "TWILIO_NUM"
+  },
   "IPC": {
     "allowRemote": {
       "__name": "IPC_ALLOW_REMOTE",

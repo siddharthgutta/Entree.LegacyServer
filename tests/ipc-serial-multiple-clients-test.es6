@@ -1,4 +1,4 @@
-import {getSocketServer} from './test-init.es6';
+import {getPubSub} from './test-init.es6';
 import io from 'socket.io-client';
 import assert from 'assert';
 import _ from 'underscore';
@@ -8,7 +8,7 @@ import now from 'performance-now';
 import crypto from 'crypto';
 import Promise from 'bluebird';
 
-const socketServer = getSocketServer();
+const ps = getPubSub();
 const message = global.TEST;
 const clientCount = 5;
 const msgCount = 5;
@@ -20,15 +20,15 @@ const range = _.range(clientCount);
 
 describe(global.TEST, () => {
   it('should create socket-server', async () => {
-    await socketServer.connect();
+    await ps.connect();
   });
 
   it('should add accessors', async () => {
-    accessors = await Promise.map(range, () => socketServer.accept(crypto.randomBytes(15).toString('hex')));
+    accessors = await Promise.map(range, () => ps.accept(crypto.randomBytes(15).toString('hex')));
   });
 
   it('should connect clients', async done => {
-    const address = await socketServer.address();
+    const address = await ps.address();
     const url = format(address);
 
     async.each(range, (idx, callback) => {
@@ -52,7 +52,7 @@ describe(global.TEST, () => {
       });
 
       for (let i = 0; i < msgCount; i++) {
-        await socketServer.emit(token, channel, message);
+        await ps.emit(token, channel, message);
       }
 
       process.nextTick(callback);
@@ -66,14 +66,14 @@ describe(global.TEST, () => {
   it('should disconnect client (from server)', done => {
     async.each(range, (idx, callback) => {
       const token = accessors[idx].token;
-      socketServer.once(`client-disconnected-${token}`, () => callback());
+      ps.once(`client-disconnected-${token}`, () => callback());
     }, () => done());
 
-    _.each(range, idx => socketServer.reject(accessors[idx].token));
+    _.each(range, idx => ps.reject(accessors[idx].token));
   });
 
   it('should disconnect socket-server', () => {
-    socketServer.disconnect();
+    ps.disconnect();
   });
 
   it('should force exit', () => {

@@ -5,5 +5,5 @@ sleep 10
 export NODE_ENV=staging;
 
 set -e
-npm run test-ci ./tests/ipc-parallel-volatile-test.compiled.js
+npm run test-ci ./tests/ipc-twilio-receive.compiled.js
 npm run lint-ci

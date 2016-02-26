@@ -1,11 +1,11 @@
-import {getSocketServer} from './test-init.es6';
+import {getPubSub} from './test-init.es6';
 import io from 'socket.io-client';
 import assert from 'assert';
 import {format} from 'url';
 import now from 'performance-now';
 import crypto from 'crypto';
 
-const socketServer = getSocketServer();
+const ps = getPubSub();
 const message = global.TEST;
 let accessor;
 const msgCount = 10;
@@ -15,15 +15,15 @@ let socket;
 
 describe(global.TEST, () => {
   it('should create socket-server', async () => {
-    await socketServer.connect();
+    await ps.connect();
   });
 
   it('should add accessor', async () => {
-    accessor = await socketServer.accept(crypto.randomBytes(15).toString('hex'));
+    accessor = await ps.accept(crypto.randomBytes(15).toString('hex'));
   });
 
   it('should connect client', async done => {
-    const address = await socketServer.address();
+    const address = await ps.address();
     const url = format(address);
 
     socket = io(url, {query: `id=${accessor.uuid}`, secure: true});
@@ -46,18 +46,18 @@ describe(global.TEST, () => {
     });
 
     for (let i = 0; i < msgCount; i++) {
-      socketServer.volatile(accessor.token, channel, message);
+      ps.volatile(accessor.token, channel, message);
     }
   });
 
   it('should disconnect client (from server)', done => {
-    socketServer.once(`client-disconnected-${accessor.token}`, () => done());
+    ps.once(`client-disconnected-${accessor.token}`, () => done());
 
-    socketServer.reject(accessor.token);
+    ps.reject(accessor.token);
   });
 
   it('should disconnect socket-server', () => {
-    socketServer.disconnect();
+    ps.disconnect();
   });
 
   it('should force exit', () => {

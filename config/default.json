@@ -17,6 +17,11 @@
       "name": "Sid Gutta"
     }
   ],
+  "Twilio": {
+    "sid": "0",
+    "token": "223cf0ce1f93d7e7bdfb7c0d99875be7",
+    "number": "+15125999765"
+  },
   "Server": {
     "protocol": "https",
     "portOffset": 10000,
@@ -25,13 +30,6 @@
     "sslKey": "./keys/www.textentree.com.key",
     "sslCert": "./keys/www.textentree.com.crt",
     "sslCa": "./keys/www.textentree.com.chain.crt"
-  },
-  "ExternalSocketServer": {
-    "protocol": "https",
-    "hostname": "localhost",
-    "port": 12997,
-    "search": "",
-    "path": ""
   },
   "AppId": "local",
   "NodeEnv": "development",

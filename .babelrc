@@ -1,19 +1,17 @@
 {
-    "env": {
-        "server": {
-           "presets": [
-             "node5",
-             "react",
-             "stage-0"
-           ],
-           plugins: [
-           "array-includes",
-            "transform-object-rest-spread",
-            "syntax-class-properties",
-            ["syntax-async-functions", {
-              "module": "bluebird"
-            }]
-           ]
-        }
-    }
+  "presets":[
+    "node5",
+    "stage-0"
+  ],
+  "plugins":[
+    "array-includes",
+    "transform-object-rest-spread",
+    "syntax-class-properties",
+    [
+      "syntax-async-functions",
+      {
+        "module":"bluebird"
+      }
+    ]
+  ]
 }
