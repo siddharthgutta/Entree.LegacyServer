@@ -12,6 +12,7 @@ route.use(bodyParser.urlencoded({extended: true}));
 
 PubSub.Slave.on('twilio-send', async (origin, data, respond) => {
   try {
+    data.from = twilio.number;
     const receipt = await client.sendMessage(data);
     respond(receipt);
     PubSub.Slave.broadcast('twilio-sent', {origin, receipt}, origin); // EXCEPT origin
