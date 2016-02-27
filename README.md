@@ -41,22 +41,21 @@ npm cache clear # if modules need to be downloaded again
  
 ### Setup
 ```bash
-# general env setup
-sudo apt-get update
-sudo apt-get -y install git build-essential git ruby libpam0g-dev debconf-utils automake libtool libpng-dev libkrb5-dev
-sudo gem install sass
-echo "sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000" >> ~/.bashrc
-
 # MAC OSX!
 brew install automake
 brew install libtool
 brew install libpng
 
+# general env setup
+sudo apt-get update
+sudo apt-get -y install git build-essential git ruby libpam0g-dev debconf-utils automake libtool libpng-dev libkrb5-dev
+sudo gem install sass
+
 # node via. nvm
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash
 source ~/.bashrc
-nvm install 5.5.0
-echo "5.5.0" > ~/.nvmrc
+nvm install 5.7.0
+echo "5.7.0" > ~/.nvmrc
 
 # node global
 npm install pm2 -g
@@ -66,9 +65,11 @@ npm install eslint-config-airbnb@4.0.0 -g
 npm install eslint-plugin-markdown@1.0.0-beta.1 -g
 npm install eslint-plugin-mocha@1.1.0 -g
 npm install eslint-plugin-react@3.16.1 -g
+npm install eslint-plugin-babel@3.1.0 -g
 npm install mocha -g
 npm install grunt-cli -g
 npm install sequelize-cli -g
+npm install branch-off -g
 
 # pm2
 pm2 conf branch-off:port 4000
@@ -91,11 +92,11 @@ sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again p
 sudo apt-get install -y mysql-server
 
 # open ports < 1024 for non-sudo
-sudo setcap cap_net_bind_service=+ep `readlink -f \`which node\``
+sudo setcap 'cap_net_bind_service=+ep' `which node`
 
-# clone
+# clone - required!
 git config --global credential.helper store
-mkdir Github && cd Github
+mkdir -p Github && cd Github
 git clone https://github.com/siddharthgutta/Entree.Server && cd Entree.Server
 
 # install app dependencies

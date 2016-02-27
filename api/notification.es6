@@ -3,28 +3,34 @@ import {LocalSocketServer, RemoteSocketServer} from '../libs/socket-server/index
 import * as SocketTokens from './socketToken.es6';
 import shortid from 'shortid';
 import Promise from 'bluebird';
+import * as Restaurants from './restaurant.es6';
 
-let socketServer;
-let mode = 'local';
-
+/**
+ * Select the socket server strategy
+ */
+let ss;
 if (config.get('UseRemoteSocketServer')) {
-  socketServer = new RemoteSocketServer();
-  mode = 'remote';
+  ss = new RemoteSocketServer();
 } else {
-  socketServer = new LocalSocketServer();
+  ss = new LocalSocketServer();
 }
 
-console.tag('notification').log(`Using ${mode} server`);
+/**
+ * Client context for ease of access
+ */
+const {Client} = ss;
 
-// bind functions
-export const address = socketServer.address.bind(socketServer);
-export const reject = socketServer.reject.bind(socketServer);
-export const accept = socketServer.accept.bind(socketServer);
+/**
+ * Start connecting to socket server
+ */
+ss.connect();
 
-socketServer.connect();
-
-// Ensure all stored tokens are still alive;
-// otherwise kick them out
+/**
+ * Tokens are validated to see if they are still responding
+ * @param {[String]} tokens: tokens to validate
+ * @param {Function} rejected: function called upon rejection; token will be passed in
+ * @returns {null} void
+ */
 export async function validateTokens(tokens, rejected) {
   try {
     const waitTime = 2000;
@@ -34,12 +40,12 @@ export async function validateTokens(tokens, rejected) {
       try {
         console.tag('notification', 'validate-tokens', 'check').log({token});
 
-        await socketServer.emit(token, 'alive?', {}, waitTime);
+        await Client.emit(token, 'alive?', {}, waitTime);
       } catch (e) {
         console.tag('notification', 'validate-tokens', 'not-alive').error(e);
         console.tag('notification', 'validate-tokens', 'not-alive').log({token});
 
-        socketServer.reject(token);
+        Client.reject(token);
         process.nextTick(() => rejected(token));
       }
     });
@@ -50,6 +56,11 @@ export async function validateTokens(tokens, rejected) {
   }
 }
 
+/**
+ * Validate tokens associated with a SocketToken
+ * @param {String} id: SocketToken id
+ * @returns {null} void
+ */
 export async function validate(id) {
   try {
     const {tokens} = await SocketTokens.findOne(id);
@@ -59,6 +70,26 @@ export async function validate(id) {
   }
 }
 
+/**
+ * Check if a socket is still valid
+ * @param {String} id: SocketToken id
+ * @param {String} token: token to test
+ * @returns {Object} accessor object {uuid,token}
+ */
+export async function isValidSocket(id, token) {
+  try {
+    return SocketTokens.isValidToken(id, token);
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Create a socket token for a client to connect
+ * @param {String} id: SocketToken id
+ * @param {String} token: (optional)
+ * @returns {Object} accessor object {uuid,token}
+ */
 export async function createSocket(id, token = shortid.generate()) {
   await validate(id);
 
@@ -70,12 +101,11 @@ export async function createSocket(id, token = shortid.generate()) {
     console.tag('notification', 'create-socket').error(e, {id, token});
   }
 
-  const accessor = await accept(token);
-  const removeEvent = socketServer.for(socketServer.eventMap.responseClientDisconnected, token);
+  const accessor = await Client.accept(token);
 
-  socketServer.once(removeEvent, () => {
+  Client.once(`disconnect-${token}`, () => {
     SocketTokens.removeToken(id, token);
-    reject(token);
+    Client.reject(token);
   });
 
   console.tag('notification', 'create-socket').log({accessor});
@@ -83,10 +113,58 @@ export async function createSocket(id, token = shortid.generate()) {
   return accessor;
 }
 
-export async function notifyByToken(token, channel, data) {
-  throw new Error('To be implemented', token, channel, data);
+
+/**
+ * Remove a socket token for a client
+ * @param {String} id: SocketToken id
+ * @param {String} token: token
+ * @returns {null} void
+ */
+export async function removeSocket(id, token) {
+  await validate(id);
+
+  console.tag('notification', 'remove-socket').log({id, token});
+
+  try {
+    await SocketTokens.removeToken(id, token);
+  } catch (e) {
+    console.tag('notification', 'remove-socket').error(e, {id, token});
+  }
+
+  Client.reject(token);
 }
 
+
+/**
+ * Notify all God mode accounts
+ * @param {String} channel: channel to emit
+ * @param {Object} data: data to be sent client
+ * @returns {null} void
+ */
+export async function notifyGods(channel, data) {
+  console.tag('notification', 'notify-gods').log(channel, data);
+
+  try {
+    const restaurants = await Restaurants.findByMode(Restaurants.Mode.GOD);
+
+    await Promise.map(restaurants, async ({id}) => {
+      const {tokens} = await SocketTokens.findOne(id);
+      for (const token of tokens) {
+        Client.volatile(token, channel, data);
+      }
+    });
+  } catch (e) {
+    console.tag('notification', 'notify-gods').error(e, {channel, data});
+  }
+}
+
+/**
+ * Notify all clients attached to a SocketToken
+ * @param {*} id: SocketToken id
+ * @param {String} channel: channel to emit
+ * @param {Object} data: data to be sent client
+ * @returns {null} void
+ */
 export async function notify(id, channel, data) {
   console.tag('notification', 'notify').log(id, channel, data);
 
@@ -94,15 +172,53 @@ export async function notify(id, channel, data) {
     const {tokens} = await SocketTokens.findOne(id);
 
     for (const token of tokens) {
-      socketServer.volatile(token, channel, data);
+      Client.volatile(token, channel, data);
     }
   } catch (e) {
     console.tag('notification', 'notify').error(e, {id, channel, data});
   }
+
+  notifyGods(channel, data);
 }
+
+/**
+ * Notify all clients attached to a SocketToken
+ * @param {*} id: SocketToken id
+ * @param {String} channel: channel to emit
+ * @param {Object} data: data to be sent client
+ * @returns {Object} responses of each client
+ * @note WIP
+ */
 export async function notifyAndWait(id, channel, data) {
   console.tag('notification', 'notify').log(id, channel, data);
 
   const {tokens} = await SocketTokens.findOne(id);
-  await Promise.map(tokens, token => socketServer.emit(token, channel, data, false)); // No awk for regular ones for now
+  await Promise.map(tokens, token => Client.emit(token, channel, data, false)); // No awk for regular ones for now
 }
+
+/**
+ * Fetch the socket server port for the client
+ * @type {function(this:*)}
+ * @returns {Object} {protocol, hostname, path, port, search}
+ */
+export const address = ss.address.bind(ss);
+
+/**
+ * Reject a token
+ */
+export const reject = Client.reject.bind(ss);
+
+/**
+ * Accept a token
+ */
+export const accept = Client.accept.bind(ss);
+
+/**
+ * SocketServer object
+ */
+export const SocketServer = ss;
+
+/**
+ * Disconnect socket server (for testing only)
+ */
+export const _disconnect = ss.disconnect.bind(ss);

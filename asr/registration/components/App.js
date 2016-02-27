@@ -88,17 +88,17 @@ class App extends Influx.Component {
     const node = findDOMNode(this.refs.phone);
     const phoneNumber = node.value;
 
-    fetch(`/api/user/signup`, {method: 'post', body: {phoneNumber}})
-        .then(res => {
-          this.block = DONE;
-          console2.tag('create-user').log(res.body);
-          alert(res.body.message);
-        })
-        .catch(err => {
-          this.block = false;
-          console2.tag('create-user').error(err);
-          alert(err.message);
-        });
+    fetch(`/api/v2/access/signup`, {method: 'post', body: {phoneNumber}})
+    .then(res => {
+      this.block = DONE;
+      console2.tag('create-user').log(res.body);
+      alert(res.body.message);
+    })
+    .catch(err => {
+      this.block = false;
+      console2.tag('create-user').error(err);
+      alert(err.message);
+    });
   }
 
   componentDidMount() {
@@ -119,31 +119,31 @@ class App extends Influx.Component {
 
   render() {
     return (
-        <div className='full background'>
-          <div className='flex center vertical animate-opacity' ref='brand' style={{width: '100%', height: '50%'}}>
-            <div className='main-logo'/>
-            <div className='catchphrase'>Order Ahead with SMS</div>
+      <div className='full background'>
+        <div className='flex center vertical animate-opacity' ref='brand' style={{width: '100%', height: '50%'}}>
+          <div className='main-logo'/>
+          <div className='catchphrase'>Order Ahead with SMS</div>
+        </div>
+        <div ref='mobile' className='animate-transform phone-wrapper'>
+          <div className='animate-opacity secondary-logo-wrapper' ref='icon'>
+            <div className='secondary-logo'/>
           </div>
-          <div ref='mobile' className='animate-transform phone-wrapper'>
-            <div className='animate-opacity secondary-logo-wrapper' ref='icon'>
-              <div className='secondary-logo'/>
-            </div>
-            <div ref='screen' className='phone'>
-              <div className='flex vertical viewport'>
-                <div className='status-bar'/>
-                <Messenger messages={this.state.messages} me={me} them={them}/>
-              </div>
-            </div>
-          </div>
-          <div className='modal'>
-            <div className='input-wrapper'>
-              <input type='tel' ref='phone' className='input' placeholder='Your Phone Number'/>
-            </div>
-            <div className='button' {...onClick(() => this._createUser())}><span style={{opacity: 0.7}}>TEXT</span>
-              &nbsp;YOUR ORDER!
+          <div ref='screen' className='phone'>
+            <div className='flex vertical viewport'>
+              <div className='status-bar'/>
+              <Messenger messages={this.state.messages} me={me} them={them}/>
             </div>
           </div>
         </div>
+        <div className='modal'>
+          <div className='input-wrapper'>
+            <input type='tel' ref='phone' className='input' placeholder='Your Phone Number'/>
+          </div>
+          <div className='button' {...onClick(() => this._createUser())}><span style={{opacity: 0.7}}>TEXT</span>
+            &nbsp;YOUR ORDER!
+          </div>
+        </div>
+      </div>
     );
   }
 

@@ -2,10 +2,12 @@ import {Router} from 'express';
 import {exec} from 'shelljs';
 import Convert from 'ansi-to-html';
 import config from 'config';
+import * as Runtime from '../libs/runtime.es6';
 
 const convert = new Convert();
 const route = new Router();
 const clientConfig = JSON.stringify(config.get('Client'));
+
 
 route.get('/', (req, res) => res.render('registration', {
   config: clientConfig,
@@ -14,15 +16,24 @@ route.get('/', (req, res) => res.render('registration', {
   get recommendations on where to eat, and find delicious deals`
 }));
 
+
 route.get('/restaurant', (req, res) => res.render('restaurant', {
   config: clientConfig,
   title: 'Entrée · Restaurant'
 }));
 
+
+// TEST hook
+route.post('/appinfo', (req, res) => {
+  res.json({pid: Runtime.pid});
+});
+
+
 route.get('/messenger', (req, res) => res.render('messenger', {
   config: clientConfig,
   title: 'Entrée · Messenger'
 }));
+
 
 route.get('/tests', (req, res) => {
   let capture = '';
@@ -32,10 +43,10 @@ route.get('/tests', (req, res) => {
   child.stdout.on('message', data => capture += data);
   child.stdout.on('end', () => {
     res.type('text/html');
-    const resultCapture = capture.replace(/\n/g, '<br/>')
-                                 .replace(/\s/g, '&nbsp;');
+    const resultCapture = capture.replace(/\n/g, '<br/>').replace(/\s/g, '&nbsp;');
     res.send(convert.toHtml(resultCapture));
   });
 });
+
 
 export default route;

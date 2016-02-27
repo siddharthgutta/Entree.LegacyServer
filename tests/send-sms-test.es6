@@ -1,9 +1,9 @@
-import './test-init.es6';
+import {disconnectDatabase} from './test-init.es6';
 import {sendSMS, broadcast} from '../api/sms.es6';
 import expect from 'expect.js';
 import moment from 'moment';
 import _ from 'underscore';
-import Twilio from '../libs/sms/twilio.es6';
+import {Twilio} from '../libs/sms/index.es6';
 import config from 'config';
 const testCreds = config.get('Twilio.test');
 const TWILIO_FROM_NUMBER = config.get('Twilio.numbers')[0];
@@ -77,8 +77,7 @@ const testSMS = new Twilio(FROM_TEST_NUMS.FROM_VALID_NUMBER.num, testCreds.sid, 
 
 function sendTestSMS(toNumber, textBody, verboseLogging = VERBOSE_LOGGING) {
   if (verboseLogging) {
-    console.tag('api', 'sms', 'test')
-           .log(toNumber, textBody);
+    console.tag('api', 'sms', 'test').log(toNumber, textBody);
   }
 
   return testSMS.send(toNumber, textBody, VERBOSE_LOGGING);
@@ -86,13 +85,15 @@ function sendTestSMS(toNumber, textBody, verboseLogging = VERBOSE_LOGGING) {
 
 function checkError(expectedError, resultingError, responseOrErrorObject, verboseLogging = VERBOSE_LOGGING) {
   if (expectedError !== resultingError) {
-    console.tag(global.TEST)
-           .err(responseOrErrorObject);
+    console.tag(global.TEST).err(responseOrErrorObject);
   } else if (verboseLogging) {
-    console.tag(global.TEST)
-           .log(responseOrErrorObject);
+    console.tag(global.TEST).log(responseOrErrorObject);
   }
 }
+
+after(() => {
+  disconnectDatabase();
+});
 
 describe('Twilio Send', () => {
   describe('To', () => {
@@ -210,16 +211,12 @@ describe('Twilio Send', () => {
         .format('h:mm A')}`)
         .then(response => {
           checkError(test.error, false, response);
-          expect(test.error)
-          .to
-          .be(false);
+          expect(test.error).to.be(false);
           done();
         })
         .catch(err => {
           checkError(test.error, true, err);
-          expect(test.error)
-          .to
-          .be(true);
+          expect(test.error).to.be(true);
           done();
         });
       });

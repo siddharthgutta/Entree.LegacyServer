@@ -1,21 +1,22 @@
-import SocketServer from '../socket-server.es6';
+import {Slave} from 'node-pubsub';
 import config from 'config';
-import cid from '../cluster-id.es6';
+import * as Runtime from '../runtime.es6';
+import Promise from 'bluebird';
 
-const id = config.get('AppId');
 const socketServer = config.get('SocketServer');
 const debug = true;
 
-class LocalSocketServer extends SocketServer {
-  constructor(_id = '') {
-    super([id + _id + cid].join('-'), socketServer, false, null, {debug, appspace: socketServer.port});
+class LocalSocketServer extends Slave {
+  constructor(id = '') {
+    super(id + Runtime.uid, socketServer, {debug, master: socketServer.port});
   }
 
   address() {
-    return super.address().then(address => {
-      address.hostname = socketServer.extHostname; // FIXME
-      return address;
-    });
+    return Promise.all([super.address(), Runtime.hostname()])
+                  .spread((address, hostname) => {
+                    address.hostname = hostname;
+                    return address;
+                  });
   }
 
   resolveHost() {

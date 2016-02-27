@@ -3,8 +3,7 @@ import {clearDatabase, disconnectDatabase} from './test-init.es6';
 import * as Location from '../api/location.es6';
 
 beforeEach(done => {
-  clearDatabase()
-  .then(() => done());
+  clearDatabase().then(() => done());
 });
 
 after(() => disconnectDatabase());

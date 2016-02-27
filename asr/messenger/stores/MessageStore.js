@@ -5,15 +5,15 @@ import _ from 'underscore';
 import Chance from 'chance';
 import fetch from '../../libs/fetch';
 import io from 'socket.io-client';
-import Promise from 'bluebird';
 import {format} from 'url';
 
 const chance = new Chance();
-
-const Events = keyMirror({
+const events = {
   RECEIVED: null,
   READY: null
-});
+};
+
+const Events = keyMirror(events);
 
 const testNumbers = _.map(_.range(10), () => chance.phone());
 const testMe = testNumbers.shift();
@@ -39,8 +39,8 @@ class MessageStore extends Influx.Store {
   }
 
   sendSMS(to, content) {
-    fetch('/messenger/send', {method: 'post', body: {content, phoneNumber: to}})
-      .then(({body}) => console.log(body));
+    fetch('/api/v2/messenger/send', {method: 'post', body: {content, phoneNumber: to}})
+    .then(({body}) => console.log(body));
   }
 
   getMessages(user) {
@@ -78,37 +78,37 @@ class MessageStore extends Influx.Store {
     }));
   }
 
-  _connect() {
-    Promise.all([
-      fetch('/messenger/token', {method: 'post'}),
-      fetch('/messenger/messages', {method: 'post'})
-    ]).spread(({body: {data: {address, accessor: {uuid}}}}, {body: {data: {messages}}}) => {
-      const url = format(address);
+  async _connect() {
+    const res = await fetch('/api/v2/access/login', {method: 'post', body: {id: 1, password: 'test'}});
+    const {body: {data: {address, uuid}}} = res;
 
-      const socket = io(url, {query: `id=${uuid}`, secure: true});
-      socket.on('send', message => {
-        message = this._transform([message])[0];
+    const {body: {data: {messages}}} = await fetch('/api/v2/message', {method: 'post'});
+    const url = format(address);
 
-        this.data.messages.push(message);
-        this.emit(Events.RECEIVED, message);
-      });
+    const socket = io(url, {query: `id=${uuid}`, secure: true});
 
-      // TODO optimize
-      socket.on('receive', message => {
-        message = this._transform([message])[0];
+    socket.on('send', message => {
+      message = this._transform([message])[0];
 
-        this.data.messages.push(message);
-        this.emit(Events.RECEIVED, message);
-      });
-
-      socket.on('alive?', (data, respond) => respond({status: 'ok'}));
-
-      this.data.socket = socket;
-      this.data.uuid = uuid;
-      this.data.messages = this._transform(messages.reverse());
-
-      this.emit(Events.READY, this.data.messages);
+      this.data.messages.push(message);
+      this.emit(Events.RECEIVED, message);
     });
+
+    // TODO optimize
+    socket.on('receive', message => {
+      message = this._transform([message])[0];
+
+      this.data.messages.push(message);
+      this.emit(Events.RECEIVED, message);
+    });
+
+    socket.on('alive?', (data, respond) => respond({status: 'ok'}));
+
+    this.data.socket = socket;
+    this.data.uuid = uuid;
+    this.data.messages = this._transform(messages.reverse());
+
+    this.emit(Events.READY, this.data.messages);
   }
 }
 

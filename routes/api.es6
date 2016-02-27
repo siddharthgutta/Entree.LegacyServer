@@ -1,159 +1,50 @@
 import {Router} from 'express';
-import * as Token from '../api/token.es6';
-import * as User from '../api/user.es6';
-import {ip, isEmpty} from '../libs/utils.es6';
-import {create} from '../api/message.es6';
-import * as Notification from '../api/notification.es6';
+import V1 from './api/v1/index.es6';
+import V2 from './api/v2/index.es6';
+import db from '../models/mongo/index.es6';
+import connectMongo from 'connect-mongo';
+import session from 'express-session';
+import cors from 'cors';
 
-const route = new Router();
 
-function normalize(toNumber) {
-  return `${String(toNumber)
-  .replace('+1', '')}`;
-}
+const router = new Router();
+const MongoStore = connectMongo(session);
 
-route.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
+
+/**
+ * Catching all errors
+ */
+router.use((err, req, res, next) => {
+  const message = err.message;
+  res.status(500);
+  res.json({status: 1, message});
+  next(err);
 });
 
-route.use((req, res, next) => {
-  res.ok = (tags, logMessage, data, resMessage, status = 0) => {
-    console.tag(...tags)
-           .log(logMessage);
-    res.json({status, message: resMessage, data: data && data.toJSON ? data.toJSON() : data});
-  };
-  res.fail = (tags, logMessage, resMessage, status = 1) => {
-    console.tag(...tags)
-           .error(logMessage);
-    res.json({status, message: resMessage});
-  };
-  next();
-});
 
-// token
-route.post('/token/create', (req, res) => {
-  const {username, password} = req.body;
-  Token.create(username, password)
-       .then(res.ok)
-       .catch(res.fail);
-});
+/**
+ * Cross Origin
+ */
+router.use(cors());
 
-route.get('/token/status', (req, res) => {
-  const {token} = req.body;
-  Token.status(token)
-       .then(res.ok)
-       .catch(res.fail);
-});
 
-route.post('/token/destroy', (req, res) => {
-  const {token} = req.body;
-  Token.destroy(token)
-       .then(res.ok)
-       .catch(res.fail);
-});
+/**
+ * Cluster friendly sessions
+ */
+const sessionOpts = {
+  secret: 'keyboard cat',
+  saveUninitialized: false,
+  store: new MongoStore({mongooseConnection: db.mongoose.connection}),
+  resave: false
+};
 
-// user
-route.post('/user/create', (req, res) => {
-  const {username, email, password, other} = req.body;
-  User.create(username, email, password, other)
-      .then(res.ok)
-      .catch(res.fail);
-});
+router.use(session(sessionOpts));
 
-route.post('/user/destroy', (req, res) => {
-  const {username, password} = req.body;
-  User.destroy(username, password)
-      .then(res.ok)
-      .catch(res.fail);
-});
 
-const signupTags = ['routes', 'api', '/user/signup'];
-const failResMsg = 'Sorry, a text message to your phone could not be sent! Please try again.';
+/**
+ * Versioned apis
+ */
+router.use('/v1', V1);
+router.use('/v2', V2);
 
-// Users sends in the phone number for initial first layer signup
-route.post('/user/signup', (req, res) => {
-  if (isEmpty(req.body.phoneNumber)) {
-    res.status(400)
-       .fail(signupTags, 'Client tried to send null phone number.',
-             "Sorry, you didn't send us a phone number.");
-  } else {
-    User.signup(req.body.phoneNumber)
-        .then(response => {
-          const restaurantID = 0;
-
-          console.tag('routes', 'api', '/user/signup', 'SMS')
-                 .log(response);
-          const date = new Date(response.dateCreated).getTime();
-          create(normalize(response.to), restaurantID, response.body,
-                 date, response.sid, normalize(response.from), false, true)
-          .then(() => {
-            // Get all tokens relevant to said id
-            const resBody = {
-              phoneNumber: normalize(response.to),
-              content: response.body, date,
-              sentByUser: false
-            };
-
-            Notification.notify(restaurantID, 'send', resBody);
-
-            res.ok(signupTags,
-                   'New send message created.',
-                   {phoneNumber: response.to, content: response.body},
-                   `We have sent your text message to the number: ${response.to}`);
-          }).catch(createError => {
-            res.status(500).fail(signupTags, createError, failResMsg);
-          });
-          res.ok(signupTags, 'New user created. Sending full welcome message.',
-                 {}, `We have sent a text message to your number: ${req.body.phoneNumber}`);
-        })
-        .catch(error => {
-          if (error.name === 'SequelizeValidationError') {
-            res.status(400).fail(signupTags, error,
-                                 'Sorry, that is not a valid number.');
-          } else {
-            switch (error.code) {
-              // Invalid To Number
-              case 21211:
-                res.status(400)
-                   .fail(signupTags, error, 'Sorry, that is not a real phone number.');
-                break;
-              // Twilio Trial: Not a Verified number
-              case 21608:
-                res.status(404).fail(signupTags, error,
-                                     `Sorry, we are currently in private beta. Our service is not
-                                     available to you yet.`);
-                break;
-              default:
-                res.status(500).fail(signupTags, error,
-                                     'Sorry, a text message to your phone could not be sent! Please try again.');
-            }
-          }
-        });
-  }
-});
-
-route.post('/telemetry/:expose', (req, res) => {
-  let tags = req.body.tags;
-  let message = req.body.message;
-
-  if (!tags) {
-    tags = [];
-  } else if (!Array.isArray(tags)) {
-    tags = [tags];
-  }
-
-  if (!message) {
-    message = [];
-  } else if (!Array.isArray(tags)) {
-    message = [message];
-  }
-
-  console.tag('telemetry', ip(req), ...tags).log(...message);
-
-  res.status(200);
-  res.ok(['telemetry'], 'Logging telemetry', null, 'Success');
-});
-
-export default route;
+export default router;

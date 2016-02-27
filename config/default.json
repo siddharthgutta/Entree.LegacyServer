@@ -28,7 +28,12 @@
     "httpsRejectUnauthorized": false,
     "sslKey": "./keys/www.textentree.com.key",
     "sslCert": "./keys/www.textentree.com.crt",
-    "sslCa": "./keys/www.textentree.com.chain.crt"
+    "sslCa": "./keys/www.textentree.com.chain.crt",
+    "hostnames": [
+      "textentree.com",
+      "127.0.0.1",
+      "0.0.0.0"
+    ]
   },
   "IsTest": false,
   "AppId": "local",
@@ -36,7 +41,6 @@
   "SocketServer": {
     "protocol": "http",
     "hostname": "ec2-52-89-1-140.us-west-2.compute.amazonaws.com",
-    "extHostname": "127.0.0.1",
     "port": 2997,
     "search": "?",
     "path": ""
@@ -49,6 +53,7 @@
     "search": "?",
     "path": ""
   },
+  "DeveloperNumber": "",
   "Twilio": {
     "numbers": [
       "+15125200133"

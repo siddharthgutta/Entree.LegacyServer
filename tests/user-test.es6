@@ -1,6 +1,7 @@
 import {clearDatabase, disconnectDatabase} from './test-init.es6';
 import assert from 'assert';
 import * as User from '../api/user.es6';
+import {_disconnect} from '../api/notification.es6';
 import config from 'config';
 const TWILIO_FROM_NUMBER = config.get('Twilio.numbers')[0];
 import expect from 'expect.js';
@@ -9,11 +10,13 @@ const port = config.get('Server.port');
 const server = supertest.agent(`https://localhost:${port}`);
 
 beforeEach(done => {
-  clearDatabase()
-  .then(() => done());
+  clearDatabase().then(() => done());
 });
 
-after(() => disconnectDatabase());
+after(() => {
+  disconnectDatabase();
+  _disconnect();
+});
 
 
 describe('User', () => {
@@ -123,19 +126,10 @@ describe('User', () => {
                   });
               User.signup(productionPhoneNumber)
                   .then(response => {
-                    expect(response.to)
-                    .to
-                    .be(`+1${productionPhoneNumber}`);
-                    expect(response.from)
-                    .to
-                    .be(TWILIO_FROM_NUMBER);
-                    expect(response.body)
-                    .to
-                    .be
-                    .a('string');
-                    expect(fullWelcomeMessage)
-                    .not
-                    .to
+                    expect(response.to).to.be(`+1${productionPhoneNumber}`);
+                    expect(response.from).to.be(TWILIO_FROM_NUMBER);
+                    expect(response.body).to.be.a('string');
+                    expect(fullWelcomeMessage).not.to
                     .equal(response.body);
                   });
               User.findOne(productionPhoneNumber)

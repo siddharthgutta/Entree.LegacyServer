@@ -52,7 +52,7 @@ export default function (id, opts = {
             const ptags = data.persistent.tags || [];
             const ttags = data.transient.tags || [];
 
-            fetch(`/api/telemetry/${data.expose}`, {
+            fetch(`/api/v2/telemetry/${data.expose}`, {
               method: 'post',
               body: {
                 tags: ptags.concat(ttags).concat(['']),

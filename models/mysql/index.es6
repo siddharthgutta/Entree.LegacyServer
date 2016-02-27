@@ -8,6 +8,10 @@ const basename = path.basename(module.filename);
 const db = {};
 const sequelize = new Sequelize(mysqlConfig.database, mysqlConfig.username, mysqlConfig.password, mysqlConfig);
 
+// sequelize.sync({force: true});
+
+// TODO logging => console.tag('sequelize').bind(console)
+
 fs.readdirSync(__dirname)
   .filter(file => (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js'))
   .forEach(file => {
