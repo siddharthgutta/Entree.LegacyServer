@@ -6,33 +6,26 @@
       "manual": 3000
     },
     "branch": {
-      "socket-shared": 2996
+      "socket-shared": 2996,
+      "socket-test": 2997,
+      "socket-master": 2998
     }
   },
   "env": {
     "default": {
-      "SOCKET_SERVER_PROTOCOL": "http",
-      "SOCKET_SERVER_HOSTNAME": "127.0.0.1",
       "TWILIO_AUTH_SID": "AC2cfef0378c382e4cba1dfef26577a610",
       "TWILIO_AUTH_TOKEN": "223cf0ce1f93d7e7bdfb7c0d99875be7",
       "TWILIO_AUTH_KEY": "mXJvQWAwM776Lsq1gQHgwU3bXwD2WIof",
       "TWILIO_NUM": "+15125999765"
     },
     "mode": {
-      "default": {
-        "SOCKET_SERVER_PORT": 2996,
-        "SOCKET_SERVER_PATH": "",
-        "SOCKET_SERVER_SEARCH": ""
-      },
       "manual": {
         "NODE_ENV": "staging",
         "HTTPS_REJECT_UNAUTHORIZED": false,
         "NODE_TLS_REJECT_UNAUTHORIZED": 0,
         "HTTPS_SSL_KEY": "./keys/localhost.key",
         "HTTPS_SSL_CERTIFICATE": "./keys/localhost.crt",
-        "HTTPS_SSL_CA": "./keys/localhost.crt",
-        "SOCKET_SERVER_HOSTNAME": "0.0.0.0",
-        "SOCKET_SERVER_PORT": 2996
+        "HTTPS_SSL_CA": "./keys/localhost.crt"
       },
       "stage": {
         "NODE_ENV": "staging",
@@ -49,8 +42,11 @@
       "socket-shared": {
         "IPC_ALLOW_REMOTE": true
       },
+      "socket-test": {
+        "IPC_ALLOW_REMOTE": false
+      },
       "socket-master": {
-        "TWILIO_AUTH_TOKEN": "223cf0ce1f93d7e7bdfb7c0d99875be7"
+        "IPC_ALLOW_REMOTE": false
       }
     }
   },

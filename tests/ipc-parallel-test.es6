@@ -46,15 +46,11 @@ describe(global.TEST, () => {
   });
 
   it('should disconnect client (from server)', done => {
-    ps.once(`client-disconnected-${accessor.token}`, () => done());
+    ps.Client.once(`disconnect-${accessor.token}`, () => done());
     ps.reject(accessor.token);
   });
 
   it('should disconnect socket-server', () => {
     ps.disconnect();
-  });
-
-  it('should force exit', () => {
-    process.exit(0);
   });
 });

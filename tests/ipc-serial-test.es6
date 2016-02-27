@@ -55,8 +55,4 @@ describe(global.TEST, () => {
   it('should disconnect socket-server', () => {
     ps.disconnect();
   });
-
-  it('should force exit', () => {
-    process.exit(0);
-  });
 });

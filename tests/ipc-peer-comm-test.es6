@@ -84,7 +84,7 @@ describe(global.TEST, () => {
   });
 
   it('should disconnect client (from server)', done => {
-    psa.once(`client-disconnected-${accessor.token}`, () => done());
+    psa.Client.once(`disconnect-${accessor.token}`, () => done());
     psa.reject(accessor.token);
   });
 

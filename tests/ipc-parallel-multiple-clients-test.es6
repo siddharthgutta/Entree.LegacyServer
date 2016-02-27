@@ -61,7 +61,7 @@ describe(global.TEST, () => {
   it('should disconnect client (from server)', done => {
     async.each(range, (idx, callback) => {
       const token = accessors[idx].token;
-      ps.once(`client-disconnected-${token}`, () => callback());
+      ps.Client.once(`disconnect-${token}`, () => callback());
     }, () => done());
 
     _.each(range, idx => ps.reject(accessors[idx].token));
@@ -69,9 +69,5 @@ describe(global.TEST, () => {
 
   it('should disconnect socket-server', () => {
     ps.disconnect();
-  });
-
-  it('should force exit', () => {
-    process.exit(0);
   });
 });
