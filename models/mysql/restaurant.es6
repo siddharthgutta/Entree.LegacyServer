@@ -21,6 +21,7 @@ export default function (sequelize, DataTypes) {
         Restaurant.hasOne(models.Location, {
           onDelete: 'CASCADE'
         });
+
         Restaurant.hasMany(models.RestaurantHour, {
           onDelete: 'CASCADE'
         });

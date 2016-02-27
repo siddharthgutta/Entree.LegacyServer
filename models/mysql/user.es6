@@ -19,6 +19,15 @@ export default function (sequelize, DataTypes) {
         isEmail: true
       }
     }
+  }, {
+    classMethods: {
+      associate: models => {
+        User.hasOne(models.ChatState, {
+          onDelete: 'CASCADE'
+        });
+      }
+    }
   });
+
   return User;
 }
