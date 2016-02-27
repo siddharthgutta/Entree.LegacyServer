@@ -20,8 +20,9 @@ class PubSubTest extends PubSub.Slave {
 
 let count = 0;
 export function getPubSub() {
-  return new PubSubTest(id + ++count, address, remote, {
+  return new PubSubTest(id + ++count, address, {
     debug: true,
-    appspace: address.port
+    remote,
+    master: address.port
   });
 }
