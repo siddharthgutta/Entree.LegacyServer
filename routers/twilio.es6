@@ -25,13 +25,13 @@ PubSub.Slave.on('twilio-number', async (origin, data, respond) => {
   respond(twilio.number);
 });
 
-route.post('/sms', Twilio.webhook(), (req, res) => {
+route.post('/sms', Twilio.webhook(twilio.token), (req, res) => {
   PubSub.Slave.broadcast('twilio-received', req.body);
   res.set('Content-Type', 'text/xml');
   res.send('<Response></Response>');
 });
 
-route.post('/fallback', Twilio.webhook({validate: false}), (req, res) => {
+route.post('/fallback', Twilio.webhook(twilio.token, {validate: false}), (req, res) => {
   PubSub.Slave.broadcast('twilio-received', req.body);
   res.set('Content-Type', 'text/xml');
   res.send('<Response></Response>');

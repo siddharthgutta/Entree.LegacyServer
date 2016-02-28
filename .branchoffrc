@@ -12,12 +12,6 @@
     }
   },
   "env": {
-    "default": {
-      "TWILIO_AUTH_SID": "AC2cfef0378c382e4cba1dfef26577a610",
-      "TWILIO_AUTH_TOKEN": "223cf0ce1f93d7e7bdfb7c0d99875be7",
-      "TWILIO_AUTH_KEY": "mXJvQWAwM776Lsq1gQHgwU3bXwD2WIof",
-      "TWILIO_NUM": "+15125999765"
-    },
     "mode": {
       "manual": {
         "NODE_ENV": "staging",
