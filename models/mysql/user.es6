@@ -3,7 +3,7 @@ import models from './index.es6';
 export default function (sequelize, DataTypes) {
   const User = sequelize.define('User', {
     phoneNumber: {
-      type: DataTypes.STRING(10), // eslint-disable-line new-cap
+      type: DataTypes.STRING(10), // eslint-disable-line new-cap,babel/new-cap
       allowNull: false,
       unique: true,
       validate: {
@@ -19,7 +19,7 @@ export default function (sequelize, DataTypes) {
       allowNull: true
     },
     email: {
-      type: DataTypes.STRING(128), // eslint-disable-line new-cap
+      type: DataTypes.STRING(128), // eslint-disable-line new-cap,babel/new-cap
       allowNull: true,
       validate: {
         isEmail: true
@@ -34,6 +34,17 @@ export default function (sequelize, DataTypes) {
       }
     }
   }, {
+    classMethods: {
+      associate: _models => {
+        User.hasOne(_models.ChatState, {
+          onDelete: 'CASCADE'
+        });
+
+        User.hasMany(_models.Order, {
+          onDelete: 'CASCADE'
+        });
+      }
+    },
     instanceMethods: {
       insertChatState: async function (state, transaction) { // eslint-disable-line
         const chatState = await this.getChatState();
@@ -47,17 +58,6 @@ export default function (sequelize, DataTypes) {
       },
       findChatState: async function () { // eslint-disable-line
         return await this.getChatState();
-      }
-    },
-    classMethods: {
-      associate: _models => {
-        User.hasOne(_models.ChatState, {
-          onDelete: 'CASCADE'
-        });
-
-        User.hasMany(_models.Order, {
-          onDelete: 'CASCADE'
-        });
       }
     }
   });
