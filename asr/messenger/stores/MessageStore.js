@@ -39,7 +39,7 @@ class MessageStore extends Influx.Store {
   }
 
   sendSMS(to, content) {
-    fetch('/api/v2/messenger/send', {method: 'post', body: {content, phoneNumber: to}})
+    fetch('/api/v2/message/send', {method: 'post', body: {content, phoneNumber: to}})
     .then(({body}) => console.log(body));
   }
 

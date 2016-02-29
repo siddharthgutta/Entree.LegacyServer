@@ -15,7 +15,7 @@ router.post('/', isAuthenticated, async (req, res) => {
   const {id} = req.user;
   const messages = await Message.findByRestaurant(id);
 
-  res.ok('Send messages', messages.filter(msg => msg.success));
+  res.ok({messages: messages.filter(msg => msg.success)}).debug('Sent messages');
 });
 
 
@@ -23,15 +23,10 @@ router.post('/', isAuthenticated, async (req, res) => {
  * Send a text
  */
 router.post('/send', isAuthenticated, async (req, res) => {
-  const {id} = req.user;
   const {content, phoneNumber} = req.body;
-
-  const messages = await Message.findByRestaurant(id);
   const text = await SMS.sendSMS(phoneNumber, content);
 
-  console.log(req.tags, {text});
-
-  res.ok('Sent message', messages.filter(msg => msg.success));
+  res.ok('Sent message').debug({text});
 });
 
 

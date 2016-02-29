@@ -1,9 +1,9 @@
 import {Router} from 'express';
-import authenticate from './authenticate.es6';
+import {isAuthenticated} from './authenticate.es6';
 
 const router = new Router();
 
-router.post('/orders', authenticate, async (req, res) => {
+router.post('/orders', isAuthenticated, async (req, res) => {
   res.ok({status: 1});
 });
 
