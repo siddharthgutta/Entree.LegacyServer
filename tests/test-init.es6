@@ -12,7 +12,8 @@ global.TEST = path.basename(stack()[7].getFileName());
 
 export function clearDatabase() {
   return new Promise((resolve, reject) => {
-    if (config.get('MySQL.database') === 'entree_test') {
+    if (config.get('MySQL.database') === 'entree_test'
+        && config.get('MongoDb.database') === 'entree_test') {
       for (const col in mongoose.connection.collections) { //eslint-disable-line
         mongoose.connection.collections[col].remove();
       }
