@@ -75,6 +75,16 @@ export function isValidToken(restaurantId, token) {
 }
 
 /**
+ * Returns the SocketToken object given a individual token
+ *
+ * @param {string} token: the input token we are querying by
+ * @returns {Promise}: returns a SocketToken object
+ */
+export function findByToken(token) {
+  return models.SocketToken.findOne({tokens: {$elemMatch: {$in: [token]}}}).exec();
+}
+
+/**
  * Finds a SocketToken object by restaurantId
  *
  * @param {number} restaurantId: id of restaurant the socket token corresponds to
