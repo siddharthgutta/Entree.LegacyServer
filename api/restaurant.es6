@@ -4,6 +4,8 @@ import models from '../models/mysql/index.es6';
  * IMPORTANT: Must return promises!
  */
 
+export {Mode} from '../models/mysql/restaurant.es6';
+
 /**
  * Create a restaurant
  *
@@ -12,6 +14,8 @@ import models from '../models/mysql/index.es6';
  * @param {Object} optional : Restaurant phone number is optional
  * @returns {Promise}: Returns the Restaurant object
  */
+
+// TODO @jesse set Mode default to Normal
 export function create(name, password, optional = {phoneNumber: null}) {
   return models.Restaurant.create({name, password, ...optional});
 }
@@ -29,6 +33,16 @@ export function update(id, attributes) {
       where: {id}
     }
   );
+}
+
+/**
+ * Find restaurants by mode
+ *
+ * @param {Object} mode : Mode of the restaurant
+ * @returns {Promise}: Returns the Restaurant objects
+ */
+export function findByMode(mode) {
+  return models.Restaurant.findAll({where: {mode}});
 }
 
 /**

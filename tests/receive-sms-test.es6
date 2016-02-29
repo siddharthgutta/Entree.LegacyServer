@@ -1,17 +1,18 @@
 import './test-init.es6';
 import expect from 'expect.js';
 import supertest from 'supertest';
-import {isNullOrUndefined} from '../libs/utils.es6';
-import {parseString} from 'xml2js';
-import selectn from 'selectn';
+import fetch from '../libs/fetch.es6';
+import {SMS} from '../api/sms.es6';
+import {Twilio} from '../libs/sms/index.es6';
+import io from 'socket.io-client';
 import config from 'config';
 import {clearDatabase, disconnectDatabase} from './test-init.es6';
-import * as SocketToken from '../api/socketToken.es6';
 import assert from 'assert';
-import {createAndEmit} from '../routes/twilio.es6';
+import {format} from 'url';
 
 const port = config.get('Server.port');
-const server = supertest.agent(`https://localhost:${port}`);
+const serverUrl = `https://localhost:${port}`;
+const server = supertest.agent(serverUrl);
 
 const REAL_RECEIVE_BODY = {
   ToCountry: 'US', ToState: 'TX', SmsMessageSid: 'SMa7934e2ae401ac3af943b9135ac2b970',
@@ -23,7 +24,18 @@ const REAL_RECEIVE_BODY = {
 
 const TWILIO_SIGNATURE = {key: 'x-twilio-signature', value: '7vATkqm2GnYiJXXeViUaas62WXc='};
 
-after(() => disconnectDatabase());
+after(async () => {
+  disconnectDatabase();
+});
+
+before(async done => {
+  if (!(SMS instanceof Twilio)) {
+    await console.log('Using remote. So skipping... staging will get ya!');
+    process.exit(0);
+  }
+
+  done();
+});
 
 describe('Twilio SMS Receive', () => {
   describe('/receive endpoint', () => {
@@ -51,59 +63,53 @@ describe('Twilio SMS Receive', () => {
       .then(() => done());
     });
 
-    it('should fail when cannot find matching SocketToken', done => {
-      server
-      .post(`/twilio/fallback`)
-      .set(TWILIO_SIGNATURE.key, TWILIO_SIGNATURE.value)
-      .send(REAL_RECEIVE_BODY)
-      .expect('Content-type', 'application/json; charset=utf-8')
-      .expect(500, done);
-    });
+    /*
+     it('should fail when cannot find matching SocketToken', done => {
+     server
+     .post(`/twilio/fallback`)
+     .set(TWILIO_SIGNATURE.key, TWILIO_SIGNATURE.value)
+     .send(REAL_RECEIVE_BODY)
+     .expect('Content-type', 'text/xml; charset=utf-8')
+     .expect(500, done);
+     });
+     */
 
+    it('should succeed when SocketToken exists', async done => {
+      const {body: {data: {address, accessor: {uuid}}}} =
+        await fetch(`${serverUrl}/api/v1/messenger/token`, {method: 'post'});
 
-    it('should succeed when SocketToken exists', done => {
-      SocketToken.addTokenOrCreate(0, '123456')
-                 .then(() => {
-                   server
-                   .post(`/twilio/fallback`)
-                   .set(TWILIO_SIGNATURE.key, TWILIO_SIGNATURE.value)
-                   .send(REAL_RECEIVE_BODY)
-                   .expect('Content-type', 'text/xml; charset=utf-8')
-                   .expect(200)
-                   .end((err, res) => {
-                     if (err) {
-                       // If expected error occurs, test is good
-                       console.tag(global.TEST)
-                              .log(err);
-                       expect()
-                       .fail('Error response returned');
-                     }
+      const url = format(address);
 
-                     // Checks the XML message text
-                     parseString(res.res.text, (xmlError, result) => {
-                       if (xmlError) {
-                         console.tag(global.TEST)
-                                .log(xmlError);
-                         expect()
-                         .fail('Could not parse XML');
-                       } else if (isNullOrUndefined(selectn('Response.Message', result)[0])) {
-                         console.tag(global.TEST)
-                                .log('Message Response is empty!');
-                         expect()
-                         .fail('Could not get message response');
-                       }
-                     });
-                     done();
-                   });
-                 })
-                 .catch(err => {
-                   expect()
-                   .fail(`Could not create SocketToken: ${err}`);
-                 });
+      console.tag(global.TEST).log(url, uuid);
+
+      const socket = io(url, {query: `id=${uuid}`, secure: true});
+      socket.once('receive', async text => {
+        await console.tag(global.TEST).log(text);
+        assert(text.content, 'Abc');
+        socket.disconnect();
+        done();
+      });
+
+      socket.once('connect', () => {
+        server
+        .post(`/twilio/fallback`)
+        .set(TWILIO_SIGNATURE.key, TWILIO_SIGNATURE.value)
+        .send(REAL_RECEIVE_BODY)
+        .expect('Content-type', 'text/xml; charset=utf-8')
+        .expect(200)
+        .end(err => {
+          if (err) {
+            // If expected error occurs, test is good
+            console.tag(global.TEST).log(err);
+            expect().fail('Error response returned');
+          }
+        });
+      });
     });
   });
 
-  describe('createAndEmit tests', () => {
+  /**
+   describe('createAndEmit tests', () => {
     const phoneNumber = '1234567890';
     const content = 'This is the message content';
     const restaurantId = 1;
@@ -161,18 +167,13 @@ describe('Twilio SMS Receive', () => {
                      done();
                    })
                    .catch(() => {
-                     expect()
-                     .fail(`Should succeed since SocketToken exists.`);
+                     expect().fail(`Should succeed since SocketToken exists.`);
                    });
                  })
                  .catch(() => {
-                   expect()
-                   .fail(`Should succeed since SocketToken exists.`);
+                   expect().fail(`Should succeed since SocketToken exists.`);
                  });
     });
-
-    it('should force exit', () => {
-      process.exit(0);
-    });
   });
+   **/
 });

@@ -1,4 +1,5 @@
 import models from '../models/mongo/index.es6';
+import * as Restaraunt from './restaurant.es6';
 
 /**
  * IMPORTANT: Must return promises!
@@ -25,10 +26,24 @@ export function findByPhone(phoneNumber, optional = {}) {
  * @param {Object} optional: optional query parameters
  * @returns {Promise}: Returns a list of all messages for restaurant
  */
-export function findByRestaurant(restaurantId, optional = {}) {
-  return models.Message.find({restaurantId, ...optional})
-               .sort({date: -1})
-               .exec();
+export async function findByRestaurant(restaurantId, optional = {}) {
+  let query;
+
+  try {
+    const {mode} = await Restaraunt.findOne(restaurantId);
+    if (mode === Restaraunt.Mode.GOD) {
+      query = models.Message.find({});
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  if (!query) {
+    query = models.Message.find({restaurantId, ...optional});
+  }
+
+  return query.sort({date: -1})
+              .exec();
 }
 
 /**

@@ -1,9 +1,10 @@
-import {initScribe} from '../bootstrap';
+import {initScribe} from '../bootstrap.es6';
 import path from 'path';
 import stack from 'callsite';
 import mongoose from 'mongoose';
 import models from '../models/mysql/index.es6';
 import config from 'config';
+import {_disconnect} from '../api/notification.es6';
 
 const console = initScribe(true, false, false,
                            {inspector: {colors: false, callsite: false, pre: false, tags: false}}); // set to true
@@ -19,13 +20,13 @@ export function clearDatabase() {
       }
 
       models.sequelize.query('SET FOREIGN_KEY_CHECKS=0')
-        .then(() => models.sequelize.sync({force: true}))
-        .then(() => models.sequelize.query('SET FOREIGN_KEY_CHECKS=1'))
-        .then(() => resolve())
-        .catch(err => reject(err));
+            .then(() => models.sequelize.sync({force: true}))
+            .then(() => models.sequelize.query('SET FOREIGN_KEY_CHECKS=1'))
+            .then(() => resolve())
+            .catch(err => reject(err));
     } else {
       reject(Error('Run the tests with NODE_ENV=staging or else you will clear the' +
-        'production database!'));
+                   'production database!'));
     }
   });
 }
@@ -34,3 +35,5 @@ export function disconnectDatabase() {
   mongoose.connection.close();
   models.sequelize.close();
 }
+
+after(() => _disconnect());

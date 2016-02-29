@@ -4,7 +4,7 @@ id=$(git rev-parse HEAD)
 
 sleep 10
 
-export NODE_ENV=staging;
+export NODE_ENV=staging; # enforce staging
 export IS_RUNNING_TEST=true;
 
 set -e

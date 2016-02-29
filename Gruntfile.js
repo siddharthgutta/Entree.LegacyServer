@@ -178,11 +178,14 @@ module.exports = grunt => {
     filetransform: {
       babel: {
         options: {
-          transformer: require('./tasks/babel-cli')
+          transformer: require('./tasks/babel-cli'),
+          extSrc: '.es6',
+          extDest: '.compiled.js',
+          env: 'server'
         },
         files: [{
           expand: true,
-          src: ['**/*.es6'],
+          src: ['**/*.es6', '!**/node_modules/**'],
           ext: '.compiled.js'
         }]
       }

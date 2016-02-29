@@ -1,3 +1,10 @@
+import keyMirror from 'keymirror';
+
+export const Mode = keyMirror({
+  REGULAR: null,
+  GOD: null
+});
+
 export default function (sequelize, DataTypes) {
   const Restaurant = sequelize.define('Restaurant', {
     name: {
@@ -14,6 +21,9 @@ export default function (sequelize, DataTypes) {
         isNumeric: true,
         len: 10
       }
+    },
+    mode: {
+      type: DataTypes.ENUM(...Object.keys(Mode)) // eslint-disable-line new-cap
     }
   }, {
     classMethods: {

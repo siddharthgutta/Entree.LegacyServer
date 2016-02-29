@@ -4,21 +4,20 @@
 
 module.exports = function fileTransform(grunt) {
   grunt.registerMultiTask('filetransform', 'File transform module', function transform() {
-    const transformer = this.options({
-      transformer: null
-    }).transformer;
+    const options = this.options({transformer: null});
+    const transformer = options.transformer;
 
     if (transformer && typeof transformer.transform === 'function') {
       this.files.forEach(file => {
         const input = file.src[0];
-        let output = file.dest; // grunt multi-ext fix
-        if (file.orig.ext) {
-          const dotidx = input.lastIndexOf('.');
-          output = input.substring(0, dotidx < 0 ? input.length : dotidx) + file.orig.ext;
-        }
+        const output = file.dest;
+        const data = transformer.transform(input, output, options);
 
-        grunt.log.writeln(`Transforming...${input} --> ${output}`);
-        transformer.transform(input, output);
+        for (const f in data) {
+          if (data.hasOwnProperty(f)) {
+            grunt.file.write(f, data[f]);
+          }
+        }
       });
     }
   });
