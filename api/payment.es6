@@ -6,11 +6,16 @@ import Braintree from '../libs/payment/braintree.es6';
 import config from 'config';
 import * as User from './user.es6';
 import * as Restaurant from './restaurant.es6';
+const slackConfigs = config.get('Slack.Braintree');
+import Slack from '../libs/notifier/slack.es6';
+import Promise from 'bluebird';
+import braintree from 'braintree';
+import {Router} from 'express';
+import bodyParser from 'body-parser';
 
 const productionCreds = config.get('Braintree.production');
 const sandboxCreds = config.get('Braintree.sandbox');
-const logTags = ['api', 'braintree'];
-
+const logTags = ['api', 'payment'];
 
 /**
  * Payment strategy for Production
@@ -30,12 +35,116 @@ const sandboxBraintree = new Braintree(false, sandboxCreds.merchantId,
  *
  * @returns {Braintree.gateway} braintree sandbox gateway
  */
-export function getTestGateway() {
-  const bt = sandboxBraintree;
+export function getGateway(production = false) {
+  const bt = production ? productionBraintree : sandboxBraintree;
   return bt.gateway;
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * Parses braintree signature and payload to check if valid
+ *
+ * @param {Slack} slackbot: Slack Bot Object to emit
+ * @param {String} btSignature: braintree signature
+ * @param {String} btPayload: braintree payload
+ * @param {Boolean} production: whether or not production or sandbox
+ * @returns {Promise} message promise or error
+ */
+export function parse(slackbot, btSignature, btPayload,
+                      production = false, test = false) {
+  return new Promise((resolve, reject) => {
+    try {
+      getGateway(production).webhookNotification.parse(btSignature, btPayload, (err, webhookNotification) => {
+        if (err) reject(new Error('Webhook Notification Parsing Error - [Probably Incorrect Gateway]'));
+        else {
+          let color = '#764FA5';
+          const fields = [];
+          let msg = `~~~~~THIS IS ${test ? '' : 'NOT'} A TEST~~~~~`;
+          msg += production ? `Production\n` : `Sandbox\nTimeStamp: ${webhookNotification.timestamp}\n`;
+          fields.push(Slack.generateField('Environment', production ? `Production` : `Sandbox`));
+
+          switch (webhookNotification.kind) {
+            case braintree.WebhookNotification.Kind.SubMerchantAccountApproved:
+              color = test ? color : 'good';
+              fields.push(Slack.generateField('Merchant Account', `Approved`));
+              fields.push(Slack.generateField('Merchant Status', `${webhookNotification.merchantAccount.status}`));
+              fields.push(Slack.generateField('Merchant ID', `${webhookNotification.merchantAccount.id}`));
+              msg += `Merchant Account: Approved\nStatus: ${webhookNotification.merchantAccount.status}\n`
+                + `Merchant Id: ${webhookNotification.merchantAccount.id}`;
+              console.tag(logTags).log(msg);
+              resolve(msg);
+              break;
+            case braintree.WebhookNotification.Kind.SubMerchantAccountDeclined:
+              color = test ? color : 'danger';
+              fields.push(Slack.generateField('Merchant Account', `Declined`));
+              fields.push(Slack.generateField('Merchant Status', `${webhookNotification.merchantAccount.status}`));
+              fields.push(Slack.generateField('Reason Declined', `${webhookNotification.message}`));
+              msg += `Merchant Account: Declined\nReason: ${webhookNotification.message}`;
+              console.tag(logTags).error(msg, webhookNotification.errors);
+              resolve(msg);
+              break;
+            default:
+              color = test ? color : '#3aa3e3';
+              msg += `Notification Type: ${webhookNotification.kind}`;
+              fields.push(Slack.generateField('Notification Type', `${webhookNotification.kind}`));
+              console.tag(logTags).error(webhookNotification);
+              reject(new Error(`Not implemented Error - ${msg}`));
+              break;
+          }
+
+          const data = Slack.generateData(msg, color, fields, test);
+
+          // Temporary Solution to prevent spamming
+          if (!test) {
+            slackbot.send(slackConfigs.channelId, data, '');
+          }
+        }
+      });
+    } catch (err) {
+      console.tag(logTags).error(err);
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Webhook for Braintree Webhook Notifications
+ *
+ * @returns {null} return object not used
+ */
+export function initRouter() {
+  /**
+   * Braintree Slack Bot
+   *
+   * @type {Slack}
+   */
+  const braintreeSlackbot = new Slack(slackConfigs.apiToken, slackConfigs.username);
+  const route = new Router();
+  route.use(bodyParser.urlencoded({extended: true}));
+
+  route.post(`/webhooks`, async (req, res) => {
+    const btSignature = req.body.bt_signature;
+    const btPayload = req.body.bt_payload;
+    try {
+      try {
+        // Check if production webhook
+        await parse(braintreeSlackbot, btSignature, btPayload, true);
+        // TODO Add id into production database
+      } catch (productionError) {
+        // Check if sandbox webhook
+        await parse(braintreeSlackbot, btSignature, btPayload, false);
+      }
+      res.status(200).send('Webhook Success');
+    } catch (err) {
+      res.status(500).send('Webhook Failed');
+    }
+  });
+  return route;
+}
+
+/**
+>>>>>>> implemented braintree and test
  * Generate Client Token to pass to the client browser
  *
  * @param {Boolean} production: production/sandbox braintree

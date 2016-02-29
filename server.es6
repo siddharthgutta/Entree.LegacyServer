@@ -9,6 +9,7 @@ import compression from 'compression';
 import BasicRouter from './routes/basic.es6';
 import ApiRouter from './routes/api.es6';
 import TwilioRouter from './routes/twilio.es6';
+import BraintreeRouter from './routes/braintree.es6';
 import * as fs from 'fs';
 
 const app = express();
@@ -40,5 +41,6 @@ app.use(express.static(path.join(__dirname, 'public'))); // points app to public
 app.use('/', BasicRouter);
 app.use('/api', ApiRouter);
 app.use('/twilio', TwilioRouter);
+app.use('/braintree', BraintreeRouter);
 
 export default server;
