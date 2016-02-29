@@ -10,12 +10,16 @@ console.persistent('tags', []);
 global.TEST = path.basename(stack()[7].getFileName());
 
 export function clearDatabase() {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     for (const col in mongoose.connection.collections) { //eslint-disable-line
       mongoose.connection.collections[col].remove();
     }
 
-    resolve(models.sequelize.sync({force: true})); // Remove once we finalize model
+    models.sequelize.query('SET FOREIGN_KEY_CHECKS=0')
+          .then(() => models.sequelize.sync({force: true}))
+          .then(() => models.sequelize.query('SET FOREIGN_KEY_CHECKS=1'))
+          .then(() => resolve())
+          .catch(err => reject(err));
   });
 }
 

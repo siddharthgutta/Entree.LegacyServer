@@ -44,7 +44,7 @@
     },
     "branch": {
       "default": {
-        "SOCKET_SERVER_PORT": 2996,
+        "SOCKET_SERVER_PORT": 2997,
         "SOCKET_SERVER_PATH": "",
         "SOCKET_SERVER_SEARCH": "?"
       },
