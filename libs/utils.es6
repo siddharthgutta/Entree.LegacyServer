@@ -43,7 +43,13 @@ export class TraceError extends Error {
           } else if (cause instanceof Error) {
             causeStacktrace += `\n${cause.stack}`;
           } else {
-            causeStacktrace += `\n${cause}`;
+            try {
+              const json = JSON.stringify(cause, null, 2);
+              causeStacktrace += `\n${json.split('\n').join('\n    ')}`;
+            } catch (e) {
+              causeStacktrace += `\n${cause}`;
+              // ignore
+            }
           }
         }
 

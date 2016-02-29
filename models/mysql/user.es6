@@ -24,6 +24,14 @@ export default function (sequelize, DataTypes) {
       validate: {
         isEmail: true
       }
+    },
+    customerId: {
+      type: DataTypes.STRING(36), // eslint-disable-line new-cap
+      allowNull: true,
+      unique: true,
+      validate: {
+        len: [1, 36]
+      }
     }
   }, {
     instanceMethods: {

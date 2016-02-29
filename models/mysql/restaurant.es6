@@ -31,6 +31,35 @@ export default function (sequelize, DataTypes) {
     mode: {
       type: DataTypes.ENUM(...Object.keys(Mode)), // eslint-disable-line new-cap,babel/new-cap
       allowNull: false
+    },
+    merchantId: {
+      type: DataTypes.STRING(32), // eslint-disable-line new-cap
+      allowNull: true,
+      unique: true,
+      validate: {
+        len: [1, 32]
+      }
+    },
+    merchantApproved: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    percentageFee: {
+      type: DataTypes.DECIMAL(5, 2), // eslint-disable-line new-cap
+      allowNull: true,
+      validate: {
+        isDecimal: true,
+        max: 100,
+        min: 0
+      }
+    },
+    transactionFee: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      validate: {
+        isInt: true,
+        min: 0
+      }
     }
   }, {
     classMethods: {

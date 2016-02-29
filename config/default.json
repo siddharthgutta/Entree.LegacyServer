@@ -73,6 +73,20 @@
       "authToken": "3e7ae8aebc9dc023b66ee071065089b0"
     }
   },
+  "Braintree": {
+    "production": {
+      "merchantId": "v6zb835f45syvv22",
+      "publicKey": "bgym47w7jf2zzw3k",
+      "privateKey": "031ace2676db6a9428c3ddbd5fc8527d",
+      "masterMerchantAccountId": "Entree_marketplace"
+    },
+    "sandbox": {
+      "merchantId": "ztyv8k2ffxjky29g",
+      "publicKey": "wwhgzzgjhgzfpyxv",
+      "privateKey": "9469ab72ffbf5c755b2487153c8dffc3",
+      "masterMerchantAccountId": "entree"
+    }
+  },
   "MySQL": {
     "username": "root",
     "password": "123456",

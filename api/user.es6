@@ -35,6 +35,19 @@ export function updateByPhoneNumber(phoneNumber, attributes) {
 }
 
 /**
+ * Update a user attributes
+ *
+ * @param {string} id: User id
+ * @param {Object} attributes: Attributes to update
+ * @returns {Promise}: Returns the user object
+ */
+export function update(id, attributes) {
+  return models.User.update(
+    attributes, {where: {id}}
+  );
+}
+
+/**
  * Destroy a user
  *
  * @param {string} phoneNumber: User phone number
