@@ -24,7 +24,6 @@ export function find(restaurantId, optional = {}) {
  * @param {string} name: name the menu item
  * @param {string} description: description of the menu item
  * @param {Number} price: price of restaurant item
- * @param {boolean} hasSize: true if the menu item has size options
  * @param {Object} sizes: size modifications for the object
  * @param {Object} mods: extra modifications for the menu item
  * @returns {Promise}: Returns the menu object
@@ -34,7 +33,6 @@ export function create(restaurantId,
                        name,
                        description,
                        price,
-                       hasSize,
                        sizes,
                        mods) {
   return (new models.MenuItem({
@@ -43,7 +41,6 @@ export function create(restaurantId,
     name,
     description,
     price,
-    hasSize,
     sizes,
     mods
   })).save();

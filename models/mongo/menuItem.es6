@@ -1,12 +1,28 @@
 import mongoose from 'mongoose';
 
+const menuItemCategories = {entree: 'Entree', drink: 'Drink'};
+
 const menuItemSchema = new mongoose.Schema({
-  restaurantId: Number,
-  category: String,
-  name: String,
-  description: String,
-  price: Number,
-  hasSize: Boolean,
+  restaurantId: {
+    type: Number,
+    required: true
+  },
+  category: {
+    type: String,
+    required: true
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  price: {
+    type: Number,
+    required: true
+  },
   sizes: {
     small: Number,
     medium: Number,
@@ -14,5 +30,7 @@ const menuItemSchema = new mongoose.Schema({
   },
   mods: [{mod: String, price: Number}]
 });
+
+export {menuItemCategories};
 
 export default mongoose.model('MenuItem', menuItemSchema);
