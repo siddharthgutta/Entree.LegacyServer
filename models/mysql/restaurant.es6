@@ -23,7 +23,8 @@ export default function (sequelize, DataTypes) {
       }
     },
     mode: {
-      type: DataTypes.ENUM(...Object.keys(Mode)) // eslint-disable-line new-cap
+      type: DataTypes.ENUM(...Object.keys(Mode)), // eslint-disable-line new-cap
+      allowNull: false
     }
   }, {
     classMethods: {

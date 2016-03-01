@@ -14,6 +14,7 @@ describe('Restaurant', () => {
   const name = 'TestRestaurant';
   const password = '1234';
   const phoneNumber = '1234567890';
+  const mode = Restaurant.Mode.REGULAR;
 
   const dayOfTheWeek = 'Monday';
   const openTime = '11:11:11';
@@ -31,10 +32,11 @@ describe('Restaurant', () => {
 
   describe('#create()', () => {
     it('should insert to and query from the database correctly', done => {
-      Restaurant.create(name, password, {phoneNumber})
+      Restaurant.create(name, password, mode, {phoneNumber})
                 .then(restaurant => {
                   assert.equal(restaurant.name, name);
                   assert.equal(restaurant.password, password);
+                  assert.equal(restaurant.mode, mode);
                   assert.equal(restaurant.phoneNumber, phoneNumber);
                   done();
                 });
@@ -46,24 +48,25 @@ describe('Restaurant', () => {
                 .then(restaurant => {
                   assert.equal(restaurant.name, name);
                   assert.equal(restaurant.password, password);
+                  assert.equal(restaurant.mode, mode);
                   done();
                 });
     });
 
-    it('should not create Restaurants that have null name, null password' +
+    it('should not create Restaurants that have null name, null password, null mode' +
        'or phone number of length not 10', done => {
-      Restaurant.create(null, null, {phoneNumber: '123'})
+      Restaurant.create(null, null, null, {phoneNumber: '123'})
                 .then(() => {
                   assert(false);
                   done();
                 }, err => {
-                  assert.equal(err.errors.length, 3);
+                  assert.equal(err.errors.length, 4);
                   done();
                 });
     });
 
     it('should not create Restaurant with non numeric phone number', done => {
-      Restaurant.create(name, password, {phoneNumber: 'abcdefghij'})
+      Restaurant.create(name, password, mode, {phoneNumber: 'abcdefghij'})
                 .then(() => {
                   assert(false);
                   done();
@@ -77,7 +80,7 @@ describe('Restaurant', () => {
   describe('#update()', () => {
     it('should update and query from the database correctly', done => {
       Restaurant
-      .create(name, password, {phoneNumber})
+      .create(name, password, mode, {phoneNumber})
       .then(result => {
         Restaurant.update(result.id, {name: 'NewRestaurant', password: '5678', phoneNumber: '1234561234'})
                   .then(() => {
@@ -85,6 +88,7 @@ describe('Restaurant', () => {
                               .then(restaurant => {
                                 assert.equal(restaurant.name, 'NewRestaurant');
                                 assert.equal(restaurant.password, '5678');
+                                assert.equal(restaurant.mode, mode);
                                 assert.equal(restaurant.phoneNumber, '1234561234');
                                 done();
                               });
@@ -95,7 +99,7 @@ describe('Restaurant', () => {
 
   describe('#destroy()', () => {
     it('should delete from the database correctly', done => {
-      Restaurant.create(name, password, {phoneNumber})
+      Restaurant.create(name, password, mode, {phoneNumber})
                 .then(result => {
                   Restaurant.destroy(result.id)
                             .then(() => {
@@ -111,7 +115,7 @@ describe('Restaurant', () => {
     it('should cascade delete location when deleting restaurant', done => {
       let restaurant;
 
-      Restaurant.create(name, password, {phoneNumber})
+      Restaurant.create(name, password, mode, {phoneNumber})
                 .then(_restuarant => restaurant = _restuarant)
                 .then(() => Location.create(firstAddress, city, state, zipcode, {secondAddress}))
                 .then(location => Restaurant.setOrUpdateLocation(restaurant.id, location))
@@ -124,7 +128,7 @@ describe('Restaurant', () => {
     });
 
     it('should cascade delete restaurant hours when deleting restaurant', done => {
-      Restaurant.create(name, password, {phoneNumber})
+      Restaurant.create(name, password, mode, {phoneNumber})
                 .then(restaurant => {
                   RestaurantHour.create(dayOfTheWeek, openTime, closeTime)
                                 .then(restaurantHour => {
@@ -146,7 +150,7 @@ describe('Restaurant', () => {
 
   describe('#addOrUpdateRestaurantHours()', () => {
     it('should add and query restaurant hours for a restaurant correctly', done => {
-      Restaurant.create(name, password, {phoneNumber})
+      Restaurant.create(name, password, mode, {phoneNumber})
                 .then(restaurant => {
                   RestaurantHour.create(dayOfTheWeek, openTime, closeTime)
                                 .then(restaurantHour => {
@@ -166,7 +170,7 @@ describe('Restaurant', () => {
     });
 
     it('should update and query restaurant hours for a restaurant correctly', done => {
-      Restaurant.create(name, password, {phoneNumber})
+      Restaurant.create(name, password, mode, {phoneNumber})
                 .then(restaurant => {
                   RestaurantHour.create(dayOfTheWeek, openTime, closeTime)
                                 .then(restaurantHour => {
@@ -197,7 +201,7 @@ describe('Restaurant', () => {
     });
 
     it('should support multiple days of the week', done => {
-      Restaurant.create(name, password, {phoneNumber})
+      Restaurant.create(name, password, mode, {phoneNumber})
                 .then(restaurant => {
                   RestaurantHour.create(dayOfTheWeek, openTime, closeTime)
                                 .then(restaurantHour => {
@@ -223,7 +227,7 @@ describe('Restaurant', () => {
 
   describe('#setOrUpdateLocation()', () => {
     it('should set the location of a restaurant if one does not exist', done => {
-      Restaurant.create(name, password, {phoneNumber})
+      Restaurant.create(name, password, mode, {phoneNumber})
                 .then(restaurant => {
                   Location.create(firstAddress, city, state, zipcode, {secondAddress})
                           .then(location => {
@@ -244,7 +248,7 @@ describe('Restaurant', () => {
     });
 
     it('should replace an existing location correctly', done => {
-      Restaurant.create(name, password, {phoneNumber})
+      Restaurant.create(name, password, mode, {phoneNumber})
                 .then(restaurant => {
                   Location.create(firstAddress, city, state, zipcode, {secondAddress})
                           .then(location => {
@@ -273,7 +277,7 @@ describe('Restaurant', () => {
     });
 
     it('should delete the old location when replacing', done => {
-      Restaurant.create(name, password, {phoneNumber})
+      Restaurant.create(name, password, mode, {phoneNumber})
                 .then(restaurant => {
                   Location.create(firstAddress, city, state, zipcode, {secondAddress})
                           .then(location => {
@@ -299,7 +303,7 @@ describe('Restaurant', () => {
 
   describe('#removeLocation()', () => {
     it('should remove the location for a specific restaurant', done => {
-      Restaurant.create(name, password, {phoneNumber})
+      Restaurant.create(name, password, mode, {phoneNumber})
                 .then(restaurant => {
                   Location.create(firstAddress, city, state, zipcode, {secondAddress})
                           .then(location => {
