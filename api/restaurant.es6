@@ -4,7 +4,8 @@ import models from '../models/mysql/index.es6';
  * IMPORTANT: Must return promises!
  */
 
-export {Mode} from '../models/mysql/restaurant.es6';
+import {Mode} from '../models/mysql/restaurant.es6';
+export {Mode};
 
 /**
  * Create a restaurant
@@ -15,9 +16,8 @@ export {Mode} from '../models/mysql/restaurant.es6';
  * @returns {Promise}: Returns the Restaurant object
  */
 
-// TODO @jesse set Mode default to Normal
-export function create(name, password, optional = {phoneNumber: null}) {
-  return models.Restaurant.create({name, password, ...optional});
+export function create(name, password, mode = Mode.REGULAR, optional = {phoneNumber: null}) {
+  return models.Restaurant.create({name, password, mode, ...optional});
 }
 
 /**
