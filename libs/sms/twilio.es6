@@ -31,7 +31,8 @@ export default class Twilio extends SMS {
       const req = {body: textBody, to: toNumber, from: this.fromNumber};
       this.client.messages.create(req, (err, response) => {
         if (err) return reject(err);
-        resolve(response);
+        const smsData = Twilio.createSMSData(response);
+        resolve(smsData);
       });
     });
   }
