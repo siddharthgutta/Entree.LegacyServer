@@ -22,10 +22,10 @@
     "server":{
       "presets":[
         "node5",
-        "react",
         "stage-0"
       ],
       "plugins":[
+        "transform-runtime",
         "transform-object-rest-spread",
         "syntax-class-properties",
         [

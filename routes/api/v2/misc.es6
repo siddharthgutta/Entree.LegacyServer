@@ -3,7 +3,7 @@ import {ip} from '../../../libs/utils.es6';
 
 const router = new Router();
 
-router.post('telemetry/:expose', (req, res) => {
+router.post('/telemetry/:expose', (req, res) => {
   let tags = req.body.tags;
   let message = req.body.message;
 

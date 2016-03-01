@@ -1,6 +1,14 @@
 import Scribe from 'scribe-js';
 import config from 'config';
 import extend from 'extend';
+import {TraceError, useSourceOnError} from './libs/utils.es6';
+
+export function initErrorHandling() {
+  // Promise.suppressUnhandledRejections();
+
+  useSourceOnError();
+  global.TraceError = TraceError;
+}
 
 export function initScribe(override = true, mongo = true, socket = true, opts = {}, ...exposers) {
   console.log(`Scribe assuming you have mongo installed - ${mongo}!!!`);
@@ -70,5 +78,5 @@ export function initServer() {
   const port = config.get('Server.port');
 
   require('./server.es6').default.listen(port,
-      () => console.tag('server').log(`Listening on ${port}`));
+                                         () => console.tag('server').log(`Listening on ${port}`));
 }

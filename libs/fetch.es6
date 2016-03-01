@@ -6,7 +6,7 @@ import extend from 'extend';
 export default function fetch(url, opts = {}) {
   return new Promise((resolve, reject) => {
     if (typeof opts.body === 'object') {
-      opts.headers = extend(true, opts.headers || {}, {'Content-Type': 'application/json'});
+      opts.headers = extend(true, {'Content-Type': 'application/json'}, opts.headers || {});
     }
 
     const method = opts.method || 'get';

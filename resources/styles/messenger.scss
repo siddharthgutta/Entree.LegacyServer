@@ -101,3 +101,93 @@ body {
   padding: 0 20px;
   color: #CCC;
 }
+
+.modal {
+  width: 500px;
+  margin: 0 auto;
+  background: #FFF;
+  border-radius: 10px;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  transform: translateY(50%);
+  position: relative;
+  padding: 40px;
+}
+
+.label {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+  color: #999;
+  margin-top: 20px;
+}
+
+.input {
+  width: 100%;
+  color: #000;
+  background: #FFF;
+  line-height: 19px;
+  padding: 12px;
+  font-size: 15px;
+  text-align: left;
+  border-radius: 4px;
+  margin-top: 10px;
+  font-weight: bold;
+  border: 1px solid #DDD;
+}
+
+.button {
+  width: 100%;
+  background: #228AE6;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+  font-size: 15px;
+  color: #FFF;
+  letter-spacing: 1.25px;
+  line-height: 19px;
+  padding: 16px;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 300ms;
+  margin-top: 20px;
+  border-radius: 5px;
+  text-transform: uppercase;
+}
+
+.animate-show {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.2s cubic-bezier(.36, .07, .19, .97);
+}
+
+.animate-hide {
+  opacity: 0.0;
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(.36, .07, .19, .97);
+}
+
+.animate-shake {
+  animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}

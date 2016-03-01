@@ -7,7 +7,7 @@ export {default as fetch} from '../../libs/fetch.es6';
 // fetch tailored for Entree responses
 export default async function (url, opts = {}) {
   try {
-    const res = fetch(url, opts);
+    const res = await fetch(url, opts);
     res.body = res.body || {};
     return res;
   } catch (err) {

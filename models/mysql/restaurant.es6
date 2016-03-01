@@ -1,9 +1,6 @@
-import keyMirror from 'keymirror';
+import {Mode} from '../constants/restaurant.es6';
 
-export const Mode = keyMirror({
-  REGULAR: null,
-  GOD: null
-});
+export {Mode};
 
 export default function (sequelize, DataTypes) {
   const Restaurant = sequelize.define('Restaurant', {
@@ -39,5 +36,6 @@ export default function (sequelize, DataTypes) {
       }
     }
   });
+
   return Restaurant;
 }

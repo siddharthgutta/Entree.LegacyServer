@@ -1,9 +1,9 @@
 import {Router} from 'express';
-import * as User from '../../../api/user.es6';
+import * as User from '../../../api/controllers/user.es6';
 import {ip, isEmpty} from '../../../libs/utils.es6';
 import Messsenger from './messenger.es6';
 import {create} from '../../../api/message.es6';
-import * as Notification from '../../../api/notification.es6';
+import * as Notification from '../../../api/controllers/notification.es6';
 
 const route = new Router();
 
