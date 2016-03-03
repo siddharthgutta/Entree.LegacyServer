@@ -26,7 +26,7 @@ export function create(phoneNumber, name, email) {
  * @param {Object} attributes: Attributes to update
  * @returns {Promise}: Returns the user object
  */
-export function update(phoneNumber, attributes) {
+export function updateByPhoneNumber(phoneNumber, attributes) {
   return models.User.update(
     attributes, {
       where: {phoneNumber}
@@ -40,7 +40,7 @@ export function update(phoneNumber, attributes) {
  * @param {string} phoneNumber: User phone number
  * @returns {Promise}: Returns the user object
  */
-export function destroy(phoneNumber) {
+export function destroyByPhoneNumber(phoneNumber) {
   return models.User.destroy({where: {phoneNumber}});
 }
 
@@ -50,20 +50,30 @@ export function destroy(phoneNumber) {
  * @param {string} phoneNumber: User phone number
  * @returns {Promise}: Returns the user object
  */
-export function findOne(phoneNumber) {
+export function findOneByPhoneNumber(phoneNumber) {
   return models.User.findOne({where: {phoneNumber}});
+}
+
+/**
+ * Find a user by id
+ *
+ * @param {string} userId: User id
+ * @returns {Promise}: Returns the user object
+ */
+export function findOne(userId) {
+  return models.User.findOne({where: {id: userId}});
 }
 
 /**
  * Create a secret id for a user
  *
- * @param {string} phoneNumber: user phone number
+ * @param {string} userId: user id
  * @returns {Promise}: Returns the secret object
  */
-export async function createSecret(phoneNumber) {
+export async function createSecret(userId) {
   // TODO test if user exists
   try {
-    return await new UserSecret({phoneNumber}).save();
+    return await new UserSecret({userId}).save();
   } catch (e) {
     if (e.name === 'ValidationError') {
       throw new TraceError(`Validation failed for fields`, e, ...Object.values(e.errors));
@@ -80,8 +90,8 @@ export async function createSecret(phoneNumber) {
  * @returns {Promise}: Returns the user object
  */
 export async function findBySecret(secret) {
-  const {phoneNumber} = await UserSecret.findOne({secret}).exec();
-  return findOne(phoneNumber);
+  const {userId} = await UserSecret.findOne({secret}).exec();
+  return findOne(userId);
 }
 
 /**

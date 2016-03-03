@@ -87,8 +87,13 @@ export async function resolveProfileEditAddress(secret) {
   return format(address);
 }
 
-export async function requestProfileEdit(phoneNumber) {
-  return User.createSecret(phoneNumber);
+export async function requestProfileEdit(userId) {
+  return User.createSecret(userId);
+}
+
+export async function requestProfileEditByPhoneNumber(phoneNumber) {
+  const {id: userId} = await User.findOneByPhoneNumber(phoneNumber);
+  return requestProfileEdit(userId);
 }
 
 export async function getUserProfile(secret) {
@@ -107,8 +112,8 @@ export async function getUserProfile(secret) {
 export async function updateUserProfile(secret, {name, email} = {}) {
   const {phoneNumber, ...other} = await User.findBySecret(secret);
   const updateAttrs = Object.assign(other, {name, email});
-  await User.update(phoneNumber, updateAttrs);
-  const user = await User.findOne(phoneNumber);
+  await User.updateByPhoneNumber(phoneNumber, updateAttrs);
+  const user = await User.findOneByPhoneNumber(phoneNumber);
   return user.get();
 }
 

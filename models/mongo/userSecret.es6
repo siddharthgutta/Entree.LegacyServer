@@ -3,9 +3,8 @@ import mongoose from 'mongoose';
 const {Schema} = mongoose;
 
 const userSecretSchema = new Schema({
-  phoneNumber: {
+  userId: {
     type: String, // TODO add validation
-    unique: true,
     index: true,
     required: true
   },

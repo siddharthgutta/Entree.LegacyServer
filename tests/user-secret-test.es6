@@ -17,7 +17,7 @@ describe('User', () => {
   });
 
   it('should create a user edit session', async () => {
-    const {secret} = await User.requestProfileEdit(phone);
+    const {secret} = await User.requestProfileEditByPhoneNumber(phone);
     session = secret;
   });
 

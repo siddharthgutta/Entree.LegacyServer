@@ -95,7 +95,7 @@ describe('User', () => {
           .a('string');
           fullWelcomeMessage = response.body;
 
-          User.findOne(productionPhoneNumber)
+          User.findOneByPhoneNumber(productionPhoneNumber)
               .then(user => {
                 assert.equal(user.name, null);
                 assert.equal(user.email, null);
@@ -118,7 +118,7 @@ describe('User', () => {
         let updatedAt;
         User.create(productionPhoneNumber, name, email)
             .then(() => {
-              User.findOne(productionPhoneNumber)
+              User.findOneByPhoneNumber(productionPhoneNumber)
                   .then(user => {
                     createdAt = user.createdAt;
                     updatedAt = user.updatedAt;
@@ -131,7 +131,7 @@ describe('User', () => {
                 expect(fullWelcomeMessage).not.to
                                           .equal(response.body);
               });
-              User.findOne(productionPhoneNumber)
+              User.findOneByPhoneNumber(productionPhoneNumber)
                   .then(user => {
                     assert.deepEqual(user.createdAt, createdAt);
                     assert.deepEqual(user.updatedAt, updatedAt);
@@ -239,9 +239,10 @@ describe('User', () => {
     it('should update and query from the database correctly', done => {
       User.create(phoneNumber, name, email)
           .then(() => {
-            User.update(phoneNumber, {name: 'NewUser', email: 'NewUser@gmail.com', phoneNumber: '1234561234'})
+            User.updateByPhoneNumber(phoneNumber,
+                                     {name: 'NewUser', email: 'NewUser@gmail.com', phoneNumber: '1234561234'})
                 .then(() => {
-                  User.findOne('1234561234')
+                  User.findOneByPhoneNumber('1234561234')
                       .then(user => {
                         assert.equal(user.name, 'NewUser');
                         assert.equal(user.email, 'NewUser@gmail.com');
@@ -257,9 +258,9 @@ describe('User', () => {
     it('should delete from the database correctly', done => {
       User.create(phoneNumber, name, email)
           .then(() => {
-            User.destroy('1234567890')
+            User.destroyByPhoneNumber('1234567890')
                 .then(() => {
-                  User.findOne('1234567890')
+                  User.findOneByPhoneNumber('1234567890')
                       .then(user => {
                         assert.equal(user, null);
                         done();
@@ -273,7 +274,7 @@ describe('User', () => {
     it('should query from the database correctly', done => {
       User.create(phoneNumber, name, email)
           .then(() => {
-            User.findOne(phoneNumber)
+            User.findOneByPhoneNumber(phoneNumber)
                 .then(user => {
                   assert.equal(user.name, name);
                   assert.equal(user.email, email);
