@@ -8,29 +8,37 @@ import io from 'socket.io-client';
 import {format} from 'url';
 
 const chance = new Chance();
-const events = {
-  RECEIVED: null,
-  READY: null
-};
 
-const Events = keyMirror(events);
+const Events = keyMirror({RECEIVED: null, READY: null});
 
 const testNumbers = _.map(_.range(10), () => chance.phone());
 const testMe = testNumbers.shift();
 const sourceNumber = '0000000000';
 
+// @formatter:off
+export const Status = keyMirror({
+  CONNECTING: null,
+  CONNECTED: null,
+  DISCONNECTED: null
+});
+// @formatter:on
+
 class MessageStore extends Influx.Store {
   constructor() {
     super(Dispatcher);
 
-    this.data = {messages: []};
+    this.data = {messages: [], status: Status.DISCONNECTED};
 
-    window.sendSMS = this.sendSMS;
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      this._fetchMessagesAndStart(token);
+    }
   }
 
   getDispatcherListeners() {
     return [
-      [Dispatcher, Dispatcher.Events.CONNECT, this._connect]
+      [Dispatcher, Dispatcher.Events.LOGIN, this._login]
     ];
   }
 
@@ -78,22 +86,39 @@ class MessageStore extends Influx.Store {
     }));
   }
 
-  async _connect(id, password) {
-    let url;
-    let uuid;
+  getConnectionStatus() {
+    return this.data.status;
+  }
+
+  _setConnectionStatus(status) {
+    this.data.status = status;
+
+    Dispatcher.emit(Dispatcher.Events.CONNECTION_STATUS, status);
+  }
+
+  async _fetchMessagesAndStart(token) {
+    let messages;
+
+    this._setConnectionStatus(Status.CONNECTING);
 
     try {
-      const res = await fetch('/api/v2/restaurant/login', {method: 'post', body: {id, password}});
-      const {body: {data: {address, uuid: _uuid}}} = res;
-      uuid = _uuid;
-      url = format(address);
+      const {body: {data}} = await fetch('/api/v2/message', {method: 'post', body: {token}});
+      messages = data.messages;
     } catch (e) {
-      return Dispatcher.emit(Dispatcher.Events.DISCONNECTED, e.message);
+      return this._setConnectionStatus(Status.DISCONNECTED, e.message);
     }
 
-    const {body: {data: {messages}}} = await fetch('/api/v2/message', {method: 'post'});
+    this.data.messages = this._transform(messages.reverse());
 
-    const socket = io(url, {query: `id=${uuid}`, secure: true});
+    this.emit(Events.READY, this.data.messages);
+
+    this._setConnectionStatus(Status.CONNECTED);
+
+    const {body: {data: {address, uuid}}} = await fetch('api/v2/restaurant/socket', {method: 'post', body: {token}});
+    const socket = io(format(address), {query: `id=${uuid}`, secure: true});
+
+    this.data.socket = socket;
+    this.data.uuid = uuid;
 
     socket.on('send', message => {
       message = this._transform([message])[0];
@@ -111,14 +136,31 @@ class MessageStore extends Influx.Store {
     });
 
     socket.on('alive?', (data, respond) => respond({status: 'ok'}));
+  }
 
-    this.data.socket = socket;
-    this.data.uuid = uuid;
-    this.data.messages = this._transform(messages.reverse());
+  async _login(id, password) {
+    const token = await this._connect(id, password);
 
-    this.emit(Events.READY, this.data.messages);
+    localStorage.setItem('token', token);
 
-    Dispatcher.emit(Dispatcher.Events.CONNECTED);
+    this._fetchMessagesAndStart(token);
+  }
+
+  async _connect(id, password) {
+    let token;
+
+    this._setConnectionStatus(Status.CONNECTING);
+
+    try {
+      const {body: {data}} = await fetch('/api/v2/restaurant/login', {method: 'post', body: {id, password}});
+      token = data.token;
+    } catch (e) {
+      return this._setConnectionStatus(Status.DISCONNECTED, e.message);
+    }
+
+    this.data.token = token;
+
+    return token;
   }
 }
 

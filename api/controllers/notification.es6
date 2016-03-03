@@ -33,7 +33,7 @@ ss.connect();
  */
 export async function validateTokens(tokens, rejected) {
   try {
-    const waitTime = 2000;
+    const waitTime = 1500;
 
     // run in parallel
     await Promise.map(tokens, async token => {
@@ -46,7 +46,8 @@ export async function validateTokens(tokens, rejected) {
         console.tag('notification', 'validate-tokens', 'not-alive').log({token});
 
         Client.reject(token);
-        process.nextTick(() => rejected(token));
+
+        await rejected(token);
       }
     });
 
@@ -58,7 +59,7 @@ export async function validateTokens(tokens, rejected) {
 
 /**
  * Validate tokens associated with a SocketToken
- * @param {String} id: SocketToken id
+ * @param {number} id: SocketToken id
  * @returns {null} void
  */
 export async function validate(id) {
@@ -72,7 +73,7 @@ export async function validate(id) {
 
 /**
  * Check if a socket is still valid
- * @param {String} id: SocketToken id
+ * @param {number} id: SocketToken id
  * @param {String} token: token to test
  * @returns {Object} accessor object {uuid,token}
  */
@@ -86,7 +87,7 @@ export async function isValidSocket(id, token) {
 
 /**
  * Create a socket token for a client to connect
- * @param {String} id: SocketToken id
+ * @param {number} id: SocketToken id
  * @param {String} token: (optional)
  * @returns {Object} accessor object {uuid,token}
  */
@@ -98,7 +99,7 @@ export async function createSocket(id, token = shortid.generate()) {
   try {
     await SocketTokens.addTokenOrCreate(id, token);
   } catch (e) {
-    console.tag('notification', 'create-socket').error(e, {id, token});
+    throw new TraceError('No more tokens available', e);
   }
 
   const accessor = await Client.accept(token);
@@ -147,7 +148,7 @@ export async function notifyGods(channel, data) {
   try {
     const restaurants = await Restaurants.findByMode(Restaurants.Mode.GOD);
 
-    await Promise.map(restaurants, async ({id}) => {
+    await Promise.map(restaurants, async({id}) => {
       const {tokens} = await SocketTokens.findOne(id);
       for (const token of tokens) {
         Client.volatile(token, channel, data);
@@ -160,7 +161,7 @@ export async function notifyGods(channel, data) {
 
 /**
  * Notify all clients attached to a SocketToken
- * @param {*} id: SocketToken id
+ * @param {number} id: SocketToken id
  * @param {String} channel: channel to emit
  * @param {Object} data: data to be sent client
  * @returns {null} void
@@ -183,7 +184,7 @@ export async function notify(id, channel, data) {
 
 /**
  * Notify all clients attached to a SocketToken
- * @param {*} id: SocketToken id
+ * @param {number} id: SocketToken id
  * @param {String} channel: channel to emit
  * @param {Object} data: data to be sent client
  * @returns {Object} responses of each client

@@ -1,6 +1,7 @@
 import Influx from 'react-influx';
 import React from 'react';
 import Dispatcher from '../../dispatchers/Dispatcher';
+import MessageStore, {Status} from '../../stores/MessageStore';
 import {onClick} from '../../../libs/utils';
 import {findDOMNode} from 'react-dom';
 
@@ -9,30 +10,41 @@ class Chat extends Influx.Component {
   constructor(props, context) {
     super(props, context);
 
-    this.state = {status: 'disconnected'};
+    this.state = {status: MessageStore.getConnectionStatus()};
   }
 
   getListeners() {
     return [
-      [Dispatcher, Dispatcher.Events.CONNECTED, this._handleConnection.bind(this, true)],
-      [Dispatcher, Dispatcher.Events.DISCONNECTED, this._handleConnection.bind(this, false)]
+      [Dispatcher, Dispatcher.Events.CONNECTION_STATUS, this._onDispatcherConnectionStatus]
     ];
   }
 
-  _handleConnection(connected, error) {
-    this.setState({status: connected ? 'connected' : 'disconnected'});
+  _onDispatcherConnectionStatus(status) {
+    this.setState({status});
+    this._handleConnection(status);
+  }
 
+  _handleConnection(status) {
     const root = this.refs.root;
 
-    if (error) {
-      root.classList.remove('animate-hide');
-      root.classList.add('animate-show');
-
-      this._shake();
-    } else {
-      root.classList.remove('animate-show');
-      root.classList.add('animate-hide');
+    switch (status) {
+      case Status.CONNECTED:
+        root.classList.remove('animate-show');
+        root.classList.add('animate-hide');
+        break;
+      default:
+      case Status.CONNECTING:
+        break;
+      case Status.DISCONNECTED:
+        root.classList.remove('animate-hide');
+        root.classList.add('animate-show');
+        this._shake();
+        break;
     }
+  }
+
+  componentDidMount() {
+    this._handleConnection(this.state.status);
   }
 
   _shake() {
@@ -49,14 +61,14 @@ class Chat extends Influx.Component {
   }
 
   _handleLogin() {
-    if (this.state.status !== 'disconnected') {
+    if (this.state.status !== Status.DISCONNECTED) {
       return this._shake();
     }
 
     const id = this.refs.id.value;
     const password = this.refs.password.value;
 
-    Dispatcher.emit(Dispatcher.Events.CONNECT, id, password);
+    Dispatcher.emit(Dispatcher.Events.LOGIN, id, password);
 
     this.setState({status: 'connecting'});
   }
@@ -64,13 +76,13 @@ class Chat extends Influx.Component {
   render() {
     return (
       <div className='full' ref='root' style={{position: 'fixed', left: 0, top: 0, zIndex: 999}}>
-        <div className='full-abs' style={{background: 'rgba(255,255,255,0.8)'}}/>
+        <div className='full-abs' style={{background: 'rgba(232,232,232,0.8)'}}/>
         <div className='full' ref='wrapper'>
           <div className='modal'>
             <div className='label'>Username</div>
             <input className='input' ref='id'/>
             <div className='label'>Password</div>
-            <input className='input' ref='password'/>
+            <input type='password' className='input' ref='password'/>
             <div className='button' {...onClick(() => this._handleLogin())}>Login</div>
           </div>
         </div>

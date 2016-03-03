@@ -5,7 +5,7 @@ const authTokenSchema = new mongoose.Schema({
     type: Number,
     required: true,
     index: true,
-    unique: true
+    unique: false
   },
   token: {
     type: String,

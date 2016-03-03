@@ -40,10 +40,8 @@ describe('Messenger Tests', () => {
                    .end((err, res) => {
                      if (err) {
                        // If expected error occurs, test is good
-                       console.tag(global.TEST)
-                              .log(err);
-                       expect()
-                       .fail('Error response returned');
+                       console.tag(global.TEST).log(err);
+                       expect().fail('Error response returned');
                      }
                      const newToken = res.body.data.accessor.token;
                      SocketToken.findOne(restaurantId)
@@ -54,16 +52,13 @@ describe('Messenger Tests', () => {
                                   done();
                                 })
                                 .catch(findOneError => {
-                                  console.tag(global.TEST)
-                                         .log(findOneError);
-                                  expect()
-                                  .fail('Could not find SocketToken');
+                                  console.tag(global.TEST).log(findOneError);
+                                  expect().fail('Could not find SocketToken');
                                 });
                    });
                  })
                  .catch(() => {
-                   expect()
-                   .fail('Failed to create SocketToken');
+                   expect().fail('Failed to create SocketToken');
                  });
     });
 
@@ -76,10 +71,8 @@ describe('Messenger Tests', () => {
       .end((err, res) => {
         if (err) {
           // If expected error occurs, test is good
-          console.tag(global.TEST)
-                 .log(err);
-          expect()
-          .fail('Error response returned');
+          console.tag(global.TEST).log(err);
+          expect().fail('Error response returned');
         }
         const newToken = res.body.data.accessor.token;
         SocketToken.findOne(restaurantId)
@@ -90,10 +83,8 @@ describe('Messenger Tests', () => {
                      done();
                    })
                    .catch(findOneError => {
-                     console.tag(global.TEST)
-                            .log(findOneError);
-                     expect()
-                     .fail('Could not find SocketToken');
+                     console.tag(global.TEST).log(findOneError);
+                     expect().fail('Could not find SocketToken');
                    });
       });
     });
@@ -176,13 +167,11 @@ describe('Messenger Tests', () => {
                         });
                       })
                       .catch(secondCreateError => {
-                        expect()
-                        .fail(`Second message could not be created: ${secondCreateError}`);
+                        expect().fail(`Second message could not be created: ${secondCreateError}`);
                       });
              })
              .catch(firstCreateError => {
-               expect()
-               .fail(`First message could not be created: ${firstCreateError}`);
+               expect().fail(`First message could not be created: ${firstCreateError}`);
              });
     });
 
@@ -220,13 +209,11 @@ describe('Messenger Tests', () => {
                         });
                       })
                       .catch(secondCreateError => {
-                        expect()
-                        .fail(`Second message could not be created: ${secondCreateError}`);
+                        expect().fail(`Second message could not be created: ${secondCreateError}`);
                       });
              })
              .catch(firstCreateError => {
-               expect()
-               .fail(`First message could not be created: ${firstCreateError}`);
+               expect().fail(`First message could not be created: ${firstCreateError}`);
              });
     });
   });
@@ -262,8 +249,7 @@ describe('Messenger Tests', () => {
                      .expect(200, done);
                    })
                    .catch(createError => {
-                     expect()
-                     .fail(`Token could not be created: ${createError}`);
+                     expect().fail(`Token could not be created: ${createError}`);
                    });
       });
     }

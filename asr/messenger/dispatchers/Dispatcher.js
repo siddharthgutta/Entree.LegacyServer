@@ -3,9 +3,8 @@ import keyMirror from 'keymirror';
 
 // @formatter:off
 const Events = keyMirror({
-  CONNECT: null,
-  DISCONNECTED: null,
-  CONNECTED: null,
+  LOGIN: null,
+  CONNECTION_STATUS: null,
   SELECT_USER: null
 });
 // @formatter:on

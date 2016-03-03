@@ -21,11 +21,11 @@ export function addTokenOrCreate(restaurantId, token) {
           .findOneAndUpdate(
             {restaurantId, numTokens: {$lt: MAX_TOKENS}},
             {restaurantId, $push: {tokens: token}, $inc: {numTokens: 1}},
-            {new: true, upsert: true})
+            {new: true, upsert: true}) // TODO @jesse returnNewDocument?
           .exec()
           .then(result => {
             resolve(result);
-          }, err => reject(err));
+          }, err => reject(new TraceError(`No entity with tokens < MAX_TOKENS for ${restaurantId}`, err)));
   });
 }
 
