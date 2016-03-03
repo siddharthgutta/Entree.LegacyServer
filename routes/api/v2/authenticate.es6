@@ -1,7 +1,7 @@
 import {Strategy as LocalStrategy} from 'passport-local';
 import passport from 'passport';
-import * as Restaurant from '../../../api/restaurant.es6';
-import * as Notification from '../../../api/notification.es6';
+import * as Restaurant from '../../../api/controllers/restaurant.es6';
+import * as Notification from '../../../api/controllers/notification.es6';
 
 
 /**
@@ -13,39 +13,47 @@ passport.use('local', new LocalStrategy({
   passReqToCallback: true,
   session: true
 }, async (req, id, password, done) => {
+  function next(a = null, res = false) {
+    console.tag('passport').log(res);
+    done(a, res);
+  }
+
   let restaurant;
 
   if (req.user) {
-    return done(null, req.user);
+    return next(null, req.user);
   }
 
   try {
-    restaurant = await Restaurant.findOne(id);
+    restaurant = await Restaurant.Model.findOne(id);
   } catch (e) {
-    return done(null, false, e);
+    return next(e);
   }
 
   if (!restaurant) {
-    return done(null, false);
+    return next();
   }
 
   const {password: expected} = restaurant;
 
   if (password !== expected) {
-    return done(null, false);
+    return next();
   }
 
   try {
     const {token, uuid} = await Notification.createSocket(restaurant.id);
     const address = await Notification.address();
-    done(null, {id, token, uuid, address});
+    next(null, {id, token, uuid, address});
   } catch (e) {
-    done(null, false);
+    next(e);
   }
 }));
 
 passport.serializeUser(({id, token, uuid}, done) => {
   const serialized = [id, token, uuid].join(';');
+
+  console.tag('serialize').log(serialized);
+
   done(null, serialized);
 });
 
@@ -57,11 +65,15 @@ passport.deserializeUser(async (req, access, done) => {
   console.tag('deserialize').log({id, token, uuid});
 
   if (!valid) {
-    done(null, null);
+    return done(null, null);
   }
 
-  const address = await Notification.address();
-  done(null, {id, token, uuid, address});
+  try {
+    const address = await Notification.address();
+    done(null, {id, token, uuid, address});
+  } catch (e) {
+    done(null, null);
+  }
 });
 
 export function isAuthenticated(req, res, next) {

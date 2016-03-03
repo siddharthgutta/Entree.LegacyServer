@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {SMS} from '../api/sms.es6';
+import {SMS} from '../api/controllers/sms.es6';
 import {Twilio} from '../libs/sms/index.es6';
 
 const route = new Router();

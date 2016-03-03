@@ -88,7 +88,7 @@ class App extends Influx.Component {
     const node = findDOMNode(this.refs.phone);
     const phoneNumber = node.value;
 
-    fetch(`/api/v2/access/signup`, {method: 'post', body: {phoneNumber}})
+    fetch(`/api/v2/user/signup`, {method: 'post', body: {phoneNumber}})
     .then(res => {
       this.block = DONE;
       console2.tag('create-user').log(res.body);

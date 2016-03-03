@@ -2,7 +2,7 @@ import './test-init.es6';
 import expect from 'expect.js';
 import supertest from 'supertest';
 import fetch from '../libs/fetch.es6';
-import {SMS} from '../api/sms.es6';
+import {SMS} from '../api/controllers/sms.es6';
 import {Twilio} from '../libs/sms/index.es6';
 import io from 'socket.io-client';
 import config from 'config';

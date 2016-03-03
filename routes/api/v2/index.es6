@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {ip} from '../../../libs/utils.es6';
-import Access from './access.es6';
+import User from './user.es6';
 import Message from './message.es6';
 import Misc from './misc.es6';
 import Restaurant from './restaurant.es6';
@@ -34,7 +34,8 @@ router.use((req, res, next) => {
 
   // add multiple args
   res.debug = function debug(...args) {
-    console.tag(...[..._tags, stat]).log(...args);
+    console.tag(...[..._tags, stat])[stat === 'fail' ? 'error' : 'log'](...args);
+    return this;
   };
 
   req.tags = _tags;
@@ -48,9 +49,9 @@ router.use(passport.session());
 /**
  * API Controllers
  */
-router.use('/access', Access);
+router.use('/user', User);
 router.use('/restaurant', Restaurant);
 router.use('/message', Message);
-router.use('/misc', Misc);
+router.use(Misc);
 
 export default router;

@@ -1,0 +1,48 @@
+@import "shared/reset";
+@import "shared/fonts";
+@import "shared/base";
+@import "shared/scroll";
+@import "shared/layouts";
+@import "shared/tabs";
+@import "shared/messenger";
+
+body {
+  font-family: 'Proxima Nova', "Helvetica", "Helvetic Neue", "Open Sans", sans-serif;
+  overflow: hidden;
+}
+
+input, textarea {
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: none;
+  -webkit-appearance: none;
+}
+
+#app {
+  overflow: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.input-wrapper {
+  padding: 5px;
+  background: #EEE;
+}
+
+.input {
+  color: #000;
+  background: #FFF;
+  line-height: 19px;
+  padding: 12px;
+  font-size: 15px;
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  border-radius: 4px;
+  font-weight: bold;
+  border: 1px solid #DDD;
+}

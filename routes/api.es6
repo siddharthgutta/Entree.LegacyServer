@@ -12,17 +12,6 @@ const MongoStore = connectMongo(session);
 
 
 /**
- * Catching all errors
- */
-router.use((err, req, res, next) => {
-  const message = err.message;
-  res.status(500);
-  res.json({status: 1, message});
-  next(err);
-});
-
-
-/**
  * Cross Origin
  */
 router.use(cors());
@@ -46,5 +35,17 @@ router.use(session(sessionOpts));
  */
 router.use('/v1', V1);
 router.use('/v2', V2);
+
+
+/**
+ * Catching all errors
+ */
+router.use((err, req, res, next) => {
+  const message = err.message;
+  res.status(500);
+  res.json({status: 1, message});
+  next(err);
+});
+
 
 export default router;

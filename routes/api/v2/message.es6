@@ -1,6 +1,5 @@
 import {Router} from 'express';
-import * as Message from '../../../api/message.es6';
-import * as SMS from '../../../api/sms.es6';
+import * as SMS from '../../../api/controllers/sms.es6';
 import {isAuthenticated} from './authenticate.es6';
 
 
@@ -13,7 +12,7 @@ const router = new Router();
  */
 router.post('/', isAuthenticated, async (req, res) => {
   const {id} = req.user;
-  const messages = await Message.findByRestaurant(id);
+  const messages = await SMS.MessageModel.findByRestaurant(id);
 
   res.ok({messages: messages.filter(msg => msg.success)}).debug('Sent messages');
 });

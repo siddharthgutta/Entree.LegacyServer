@@ -1,7 +1,7 @@
 import {clearDatabase, disconnectDatabase} from './test-init.es6';
 import assert from 'assert';
 import * as User from '../api/user.es6';
-import {_disconnect} from '../api/notification.es6';
+import {signup} from '../api/controllers/user.es6';
 import config from 'config';
 const TWILIO_FROM_NUMBER = config.get('Twilio.numbers')[0];
 import expect from 'expect.js';
@@ -15,7 +15,6 @@ beforeEach(done => {
 
 after(() => {
   disconnectDatabase();
-  _disconnect();
 });
 
 
@@ -80,38 +79,38 @@ describe('User', () => {
       });
 
       it('should create a new user and send a real SMS message', done => {
-        User.signup(productionPhoneNumber)
-            .then(response => {
-              console.tag(global.TEST)
-                     .log(`Real SMS response: ${JSON.stringify(response)}`);
-              expect(response.to)
-              .to
-              .be(`+1${productionPhoneNumber}`);
-              expect(response.from)
-              .to
-              .be(TWILIO_FROM_NUMBER);
-              expect(response.body)
-              .to
-              .be
-              .a('string');
-              fullWelcomeMessage = response.body;
+        signup(productionPhoneNumber)
+        .then(response => {
+          console.tag(global.TEST)
+                 .log(`Real SMS response: ${JSON.stringify(response)}`);
+          expect(response.to)
+          .to
+          .be(`+1${productionPhoneNumber}`);
+          expect(response.from)
+          .to
+          .be(TWILIO_FROM_NUMBER);
+          expect(response.body)
+          .to
+          .be
+          .a('string');
+          fullWelcomeMessage = response.body;
 
-              User.findOne(productionPhoneNumber)
-                  .then(user => {
-                    assert.equal(user.name, null);
-                    assert.equal(user.email, null);
-                    assert.equal(user.phoneNumber, productionPhoneNumber);
-                    done();
-                  })
-                  .catch(error => {
-                    expect()
-                    .fail(`Finding User Failed: ${error}`);
-                  });
-            })
-            .catch(error => {
-              expect()
-              .fail(`Signup Failed: ${error}`);
-            });
+          User.findOne(productionPhoneNumber)
+              .then(user => {
+                assert.equal(user.name, null);
+                assert.equal(user.email, null);
+                assert.equal(user.phoneNumber, productionPhoneNumber);
+                done();
+              })
+              .catch(error => {
+                expect()
+                .fail(`Finding User Failed: ${error}`);
+              });
+        })
+        .catch(error => {
+          expect()
+          .fail(`Signup Failed: ${error}`);
+        });
       });
 
       it('existing phone number should not be overridden', done => {
@@ -124,14 +123,14 @@ describe('User', () => {
                     createdAt = user.createdAt;
                     updatedAt = user.updatedAt;
                   });
-              User.signup(productionPhoneNumber)
-                  .then(response => {
-                    expect(response.to).to.be(`+1${productionPhoneNumber}`);
-                    expect(response.from).to.be(TWILIO_FROM_NUMBER);
-                    expect(response.body).to.be.a('string');
-                    expect(fullWelcomeMessage).not.to
-                    .equal(response.body);
-                  });
+              signup(productionPhoneNumber)
+              .then(response => {
+                expect(response.to).to.be(`+1${productionPhoneNumber}`);
+                expect(response.from).to.be(TWILIO_FROM_NUMBER);
+                expect(response.body).to.be.a('string');
+                expect(fullWelcomeMessage).not.to
+                                          .equal(response.body);
+              });
               User.findOne(productionPhoneNumber)
                   .then(user => {
                     assert.deepEqual(user.createdAt, createdAt);
@@ -143,26 +142,26 @@ describe('User', () => {
     }
 
     it('should not create user with invalid phone number', done => {
-      User.signup('123')
-          .then(() => {
-            assert(false);
-            done();
-          }, err => {
-            assert.equal(err.errors.length, 1);
-            done();
-          });
+      signup('123')
+      .then(() => {
+        assert(false);
+        done();
+      }, err => {
+        assert.equal(err.errors.length, 1);
+        done();
+      });
     });
 
     // This test may be changed when we add more complex validation for phone numbers
     it('should not create user with a phone number with country code', done => {
-      User.signup(`+1${productionPhoneNumber}`)
-          .then(() => {
-            assert(false);
-            done();
-          }, err => {
-            assert.equal(err.errors.length, 1);
-            done();
-          });
+      signup(`+1${productionPhoneNumber}`)
+      .then(() => {
+        assert(false);
+        done();
+      }, err => {
+        assert.equal(err.errors.length, 1);
+        done();
+      });
     });
   });
 

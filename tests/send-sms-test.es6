@@ -1,5 +1,5 @@
 import {disconnectDatabase} from './test-init.es6';
-import {sendSMS, broadcast} from '../api/sms.es6';
+import {sendSMS, broadcast} from '../api/controllers/sms.es6';
 import expect from 'expect.js';
 import moment from 'moment';
 import _ from 'underscore';

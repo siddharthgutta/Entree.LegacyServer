@@ -1,8 +1,8 @@
 import {Router} from 'express';
 import _ from 'underscore';
 import {create, findByRestaurant} from '../../../api/message.es6';
-import {sendSMS} from '../../../api/sms.es6';
-import * as Notification from '../../../api/notification.es6';
+import {sendSMS} from '../../../api/controllers/sms.es6';
+import * as Notification from '../../../api/controllers/notification.es6';
 
 const route = new Router();
 

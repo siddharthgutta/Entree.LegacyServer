@@ -10,14 +10,13 @@ mongoose.connect(`mongodb://${mongoConfig.host}:${mongoConfig.port}/${mongoConfi
 const basename = path.basename(module.filename);
 const db = {};
 
-mongoose.connection.once('open', () => {
-  fs.readdirSync(__dirname)
-    .filter(file => (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js'))
-    .forEach(file => {
-      const model = require(path.join(__dirname, file)).default;
-      db[model.modelName] = model;
-    });
-});
+fs.readdirSync(__dirname)
+  .filter(file => (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js'))
+  .forEach(file => {
+    const model = require(path.join(__dirname, file)).default;
+    db[model.modelName] = model;
+    exports[model.modelName] = model;
+  });
 
 db.mongoose = mongoose;
 

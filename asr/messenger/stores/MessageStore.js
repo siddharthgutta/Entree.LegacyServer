@@ -78,12 +78,20 @@ class MessageStore extends Influx.Store {
     }));
   }
 
-  async _connect() {
-    const res = await fetch('/api/v2/access/login', {method: 'post', body: {id: 1, password: 'test'}});
-    const {body: {data: {address, uuid}}} = res;
+  async _connect(id, password) {
+    let url;
+    let uuid;
+
+    try {
+      const res = await fetch('/api/v2/restaurant/login', {method: 'post', body: {id, password}});
+      const {body: {data: {address, uuid: _uuid}}} = res;
+      uuid = _uuid;
+      url = format(address);
+    } catch (e) {
+      return Dispatcher.emit(Dispatcher.Events.DISCONNECTED, e.message);
+    }
 
     const {body: {data: {messages}}} = await fetch('/api/v2/message', {method: 'post'});
-    const url = format(address);
 
     const socket = io(url, {query: `id=${uuid}`, secure: true});
 
@@ -109,6 +117,8 @@ class MessageStore extends Influx.Store {
     this.data.messages = this._transform(messages.reverse());
 
     this.emit(Events.READY, this.data.messages);
+
+    Dispatcher.emit(Dispatcher.Events.CONNECTED);
   }
 }
 
