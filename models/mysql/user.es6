@@ -3,7 +3,7 @@ export default function (sequelize, DataTypes) {
     phoneNumber: {
       type: DataTypes.STRING(10), // eslint-disable-line new-cap
       allowNull: false,
-      primaryKey: true,
+      unique: true,
       validate: {
         is: /^\d{10}$/
       }

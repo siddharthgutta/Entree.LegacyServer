@@ -6,4 +6,4 @@ export NODE_ENV=staging;
 export IS_RUNNING_TEST=true;
 
 set -e
-npm run test-ci ./tests/user-secret-test.compiled.js
+npm run test-ci ./tests/user-test.compiled.js
