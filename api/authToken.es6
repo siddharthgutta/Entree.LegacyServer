@@ -12,7 +12,7 @@ import models from '../models/mongo/index.es6';
  * @returns {Promise}: an auth token
  */
 export async function create(restaurantId, token) {
-  return await models.AuthToken.create({restaurantId, token});
+  return await (new models.AuthToken({restaurantId, token})).save();
 }
 
 /**
@@ -22,7 +22,7 @@ export async function create(restaurantId, token) {
  * @returns {Promise}: an auth token
  */
 export async function findById(restaurantId) {
-  return await models.AuthToken.findOne({restaurantId});
+  return await models.AuthToken.findOne({restaurantId}).exec();
 }
 
 /**
@@ -32,7 +32,7 @@ export async function findById(restaurantId) {
  * @returns {Promise}: an auth token
  */
 export async function findByToken(token) {
-  return await models.AuthToken.findOne({token});
+  return await models.AuthToken.findOne({token}).exec();
 }
 
 /**
@@ -42,5 +42,5 @@ export async function findByToken(token) {
  * @returns {Promise}: Returns an error if something went wrong
  */
 export async function destroy(token) {
-  return await models.AuthToken.remove({token});
+  return await models.AuthToken.remove({token}).exec();
 }
