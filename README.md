@@ -13,6 +13,8 @@ http://ec2-52-26-163-35.us-west-2.compute.amazonaws.com:3000/postreceive
 ### Connect
 ```bash
 ssh -i <pem> ubuntu@<public-dns>
+
+chmod 400 <path_to_pem_file_in_keys_directory>
 ssh -i <path_to_pem_file_in_keys_directory> ubuntu@ec2-52-11-141-187.us-west-2.compute.amazonaws.com
 ```
 
