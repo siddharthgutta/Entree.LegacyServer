@@ -104,6 +104,6 @@ export default class Twilio extends SMS {
    * @note accepts US numbers ONLY
    */
   static normalize(to) {
-    return `+1${String(to).replace('+1', '')}`;
+    return `+1${String(to).replace('+1', '').substr(-10)}`;
   }
 }

@@ -1,7 +1,7 @@
 import {Strategy as LocalStrategy} from 'passport-local';
 import passport from 'passport';
 import * as Restaurant from '../../../api/controllers/restaurant.es6';
-import * as Notification from '../../../api/controllers/notification.es6';
+import * as Session from '../../../api/controllers/session.es6';
 
 
 /**
@@ -12,7 +12,7 @@ passport.use('local', new LocalStrategy({
   passwordField: 'password',
   passReqToCallback: true,
   session: true
-}, async (req, id, password, done) => {
+}, async(req, id, password, done) => {
   function next(a = null, res = false) {
     console.tag('passport').log(res);
     done(a, res);
@@ -41,44 +41,64 @@ passport.use('local', new LocalStrategy({
   }
 
   try {
-    const {token, uuid} = await Notification.createSocket(restaurant.id);
-    const address = await Notification.address();
-    next(null, {id, token, uuid, address});
+    const token = await Session.create(restaurant.id);
+    next(null, {token});
   } catch (e) {
     next(e);
   }
 }));
 
-passport.serializeUser(({id, token, uuid}, done) => {
-  const serialized = [id, token, uuid].join(';');
+passport.serializeUser(({token}, done) => {
+  console.tag('serialize').log(token);
 
-  console.tag('serialize').log(serialized);
-
-  done(null, serialized);
+  done(null, token);
 });
 
 // TODO provide REST validation
-passport.deserializeUser(async (req, access, done) => {
-  const [id, token, uuid] = access.split(';');
-  const valid = await Notification.isValidSocket(id, token);
+passport.deserializeUser(async(req, token, done) => {
+  if (req.user) {
+    return done(null, req.user);
+  }
 
-  console.tag('deserialize').log({id, token, uuid});
+  const valid = await Session.isValid(token);
 
   if (!valid) {
+    console.tag('deserialize').log('expired', {token});
     return done(null, null);
   }
 
-  try {
-    const address = await Notification.address();
-    done(null, {id, token, uuid, address});
-  } catch (e) {
-    done(null, null);
-  }
+  const {id} = await Session.getRestaurant(token);
+
+  Session.renew(id, token); // async
+
+  return done(null, {id, token});
 });
 
-export function isAuthenticated(req, res, next) {
+export async function isAuthenticated(req, res, next) {
   if (req.isAuthenticated && req.isAuthenticated()) {
     return next();
+  }
+
+  const {token} = req.body;
+
+  if (token) {
+    const valid = await Session.isValid(token);
+
+    if (valid) {
+      try {
+        const {id} = await Session.getRestaurant(token);
+
+        Session.renew(id, token); // async
+
+        req.user = req.user || {};
+        req.user.id = id;
+        req.user.token = token;
+
+        return next();
+      } catch (e) {
+        // ignore
+      }
+    }
   }
 
   res.fail('Not authenticated', null, 400);

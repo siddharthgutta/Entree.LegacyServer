@@ -7,9 +7,9 @@ import * as Notification from '../../../api/controllers/notification.es6';
 const router = new Router();
 
 router.post('/login', authenticate, (req, res) => {
-  const {token, uuid, address} = req.user;
+  const {token} = req.user;
 
-  res.ok({token, uuid, address}).debug('Signed in');
+  res.ok({token}).debug('Signed in');
 });
 
 router.post('/logout', authenticate, (req, res) => {
@@ -20,7 +20,19 @@ router.post('/logout', authenticate, (req, res) => {
   res.ok(null, 'Success').debug('Signed out');
 });
 
-router.post('/orders', isAuthenticated, async (req, res) => {
+router.post('/socket', isAuthenticated, async(req, res) => {
+  const {id} = req.user;
+
+  try {
+    const {uuid} = await Notification.createSocket(id);
+    const address = await Notification.address();
+    res.ok({uuid, address}).debug('Created order');
+  } catch (e) {
+    res.fail(e.message).debug(e, 'Could not create socket');
+  }
+});
+
+router.post('/orders', isAuthenticated, async(req, res) => {
   const {id} = req.user;
 
   try {
@@ -31,7 +43,7 @@ router.post('/orders', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/order/:id', isAuthenticated, async (req, res) => {
+router.get('/order/:id', isAuthenticated, async(req, res) => {
   const {id} = req.params;
 
   try {
@@ -42,7 +54,7 @@ router.get('/order/:id', isAuthenticated, async (req, res) => {
   }
 });
 
-router.post('/order/:id/status', isAuthenticated, async (req, res) => {
+router.post('/order/:id/status', isAuthenticated, async(req, res) => {
   const {id: order} = req.params;
   const {status, time, message} = req.body;
 
@@ -54,7 +66,7 @@ router.post('/order/:id/status', isAuthenticated, async (req, res) => {
   }
 });
 
-router.post('/operate', isAuthenticated, async (req, res) => {
+router.post('/operate', isAuthenticated, async(req, res) => {
   const {id} = req.user;
   const {status} = req.body;
 

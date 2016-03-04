@@ -102,7 +102,7 @@
     "lint": "eslint --ext js,.es6,.jsx ./",
     "lint-ci": "set -e; eslint --no-color --ext js,.es6,.jsx ./",
     "boss": "export NODE_ENV=staging; set -e; branch-off start manual",
-    "bos": "set -e; branch-off start manual",
+    "bos": "set -e; export NODE_ENV=development; branch-off start manual",
     "bot": "set -e; branch-off trigger test manual",
     "bod": "set -e; branch-off trigger dev",
     "bob": "set -e; branch-off trigger benchmark",

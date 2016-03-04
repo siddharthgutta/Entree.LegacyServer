@@ -108,7 +108,7 @@ describe('Twilio SMS Receive', () => {
     });
   });
 
-  /**
+  /*
    describe('createAndEmit tests', () => {
     const phoneNumber = '1234567890';
     const content = 'This is the message content';
@@ -175,5 +175,5 @@ describe('Twilio SMS Receive', () => {
                  });
     });
   });
-   **/
+  */
 });

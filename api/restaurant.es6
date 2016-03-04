@@ -38,7 +38,7 @@ export function update(id, attributes) {
 /**
  * Find restaurants by mode
  *
- * @param {Object} mode : Mode of the restaurant
+ * @param {String} mode : Mode of the restaurant
  * @returns {Promise}: Returns the Restaurant objects
  */
 export function findByMode(mode) {
