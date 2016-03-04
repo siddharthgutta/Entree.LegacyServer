@@ -8,7 +8,7 @@ const basename = path.basename(module.filename);
 const db = {};
 const sequelize = new Sequelize(mysqlConfig.database, mysqlConfig.username, mysqlConfig.password, mysqlConfig);
 
-// sequelize.sync({force: true});
+sequelize.sync({force: true});
 
 // TODO logging => console.tag('sequelize').bind(console)
 
