@@ -15,7 +15,7 @@ const authTokenSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    expires: 300,
+    expires: 60 * 60 * 2, // 120 minutes
     default: Date.now
   }
 });
