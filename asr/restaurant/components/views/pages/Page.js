@@ -13,17 +13,17 @@ class OrderFocus extends Influx.Component {
     this.modals = this.getModals();
 
     _.each(this.modals,
-        (component, name) => {
-          Dispatcher.emit(Dispatcher.Events.REGISTER_MODAL, name, component);
-          Dispatcher.emit(Dispatcher.Events.MODAL_VISIBILITY, name, false);
-        });
+           (component, name) => {
+             Dispatcher.emit(Dispatcher.Events.REGISTER_MODAL, name, component);
+             Dispatcher.emit(Dispatcher.Events.MODAL_VISIBILITY, name, false);
+           });
   }
 
   _unregisterModals() {
     _.each(this.modals,
-        (component, name) => {
-          Dispatcher.emit(Dispatcher.Events.MODAL_VISIBILITY, name, false);
-        });
+           (component, name) => {
+             Dispatcher.emit(Dispatcher.Events.MODAL_VISIBILITY, name, false);
+           });
   }
 
   componentDidUpdate() {

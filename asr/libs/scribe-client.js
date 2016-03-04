@@ -2,6 +2,10 @@ import BasicConsole from 'scribe-js/dist/readers/BasicConsole';
 import JSON2Converter from 'scribe-js/dist/transforms/JSON2Converter';
 import ErrorExtractor from 'scribe-js/dist/transforms/ErrorExtractor';
 import fetch from './fetch';
+import config from './config';
+import {format} from 'url';
+
+const SERVER_URL = format(config.get('Server'));
 
 class ChromeInspector {
   constructor(opts = {styles: {}}) {
@@ -17,12 +21,12 @@ class ChromeInspector {
     const opts = this.opts;
 
     window.console.log(
-        `%c${app}-${id} %c${data.expose.toUpperCase()} ${tags.map(a => `%c${a.toUpperCase()}`).join(' ')}`,
-        opts.styles.pre,
-        opts.styles.expose,
-        ...ptags.map(() => opts.styles.ptags),
-        ...ttags.map(() => opts.styles.ttags),
-        ...data.args);
+      `%c${app}-${id} %c${data.expose.toUpperCase()} ${tags.map(a => `%c${a.toUpperCase()}`).join(' ')}`,
+      opts.styles.pre,
+      opts.styles.expose,
+      ...ptags.map(() => opts.styles.ptags),
+      ...ttags.map(() => opts.styles.ttags),
+      ...data.args);
 
     callback();
   }
@@ -46,23 +50,23 @@ export default function (id, opts = {
     console.pipe(expose, 'console', new ErrorExtractor(), new JSON2Converter(), new ChromeInspector(opts.inspector));
 
     console.pipe(expose, 'request',
-        new ErrorExtractor(),
-        new JSON2Converter(), {
-          through(data, callback) {
-            const ptags = data.persistent.tags || [];
-            const ttags = data.transient.tags || [];
+                 new ErrorExtractor(),
+                 new JSON2Converter(), {
+                   through(data, callback) {
+                     const ptags = data.persistent.tags || [];
+                     const ttags = data.transient.tags || [];
 
-            fetch(`/api/v2/telemetry/${data.expose}`, {
-              method: 'post',
-              body: {
-                tags: ptags.concat(ttags).concat(['']),
-                message: data.args
-              }
-            }).then(res => window.console.log(res.body.data))
-                .catch(err => window.console.error(err))
-                .then(() => callback());
-          }
-        });
+                     fetch(`${window.cordova ? SERVER_URL : ''}/api/v2/telemetry/${data.expose}`, {
+                       method: 'post',
+                       body: {
+                         tags: ptags.concat(ttags).concat(['']),
+                         message: data.args
+                       }
+                     }).then(res => window.console.log(res.body.data))
+                       .catch(err => window.console.error(err))
+                       .then(() => callback());
+                   }
+                 });
   });
 
   return console;

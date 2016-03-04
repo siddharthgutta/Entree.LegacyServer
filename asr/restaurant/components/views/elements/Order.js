@@ -1,6 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import {ifcat, onClick} from '../../../../libs/utils';
+import {OrderConstants} from '../../../../../api/constants/client.es6';
 
 class Order extends React.Component {
 
@@ -12,34 +13,45 @@ class Order extends React.Component {
     history: React.PropTypes.object
   };
 
+  // TODO use OrderStore function
+  _calculateCost() {
+    const {order} = this.props;
+
+    return order.Items.reduce((memo, item) => item.price + memo, 0);
+  }
+
   render() {
     const {order} = this.props;
     const {history} = this.context;
+    const cost = this._calculateCost();
+
+    const colorSelector = {
+      clock: order.status === OrderConstants.Status.ACCEPTED,
+      check: order.status === OrderConstants.Status.COMPLETED,
+      cross: order.status === OrderConstants.Status.DECLINED,
+      mail: order.status === OrderConstants.Status.RECEIVED_PAYMENT,
+      bgGreen: order.status === OrderConstants.Status.ACCEPTED,
+      bgGray: order.status === OrderConstants.Status.COMPLETED,
+      bgRed: order.status === OrderConstants.Status.DECLINED,
+      bgBlue: order.status === OrderConstants.Status.RECEIVED_PAYMENT
+    };
 
     return (
-        <div className='order flex' style={{height: 80}}
-            {...onClick(() => history.push(`order/${order.id}`))}>
-          <div className='id box flex left'>{order.id}</div>
-          <div className='box flex left'>
-            <div>
-              <div className='name'>{order.name.split(' ')[0]}</div>
-              <div className='date'>{moment(order.date).format('h:mm A')}</div>
-            </div>
+      <div className='order flex' style={{height: 80}}
+        {...onClick(() => history.push(`order/${order.id}`))}>
+        <div className='id box flex left'>{order.id}</div>
+        <div className='box flex left'>
+          <div>
+            <div className='name'>{order.User.firstName.split(' ')[0]}</div>
+            <div className='date'>{moment(order.date).format('h:mm A')}</div>
           </div>
-          <div className='cost box flex center'>{order.cost.toFixed(2)}</div>
-          <div className='box flex right hide'>
-            <div className={ifcat('button blue box icon flex center', {
-              clock: order.status === 'accepted',
-              check: order.status === 'completed',
-              cross: order.status === 'declined',
-              mail: order.status === 'received',
-              bgGreen: order.status === 'accepted',
-              bgGray: order.status === 'completed',
-              bgRed: order.status === 'declined',
-              bgBlue: order.status === 'received'})}>{order.status}</div>
-          </div>
-          <div className='box flex center vertical evil-icon forward'/>
         </div>
+        <div className='cost box flex center'>{cost.toFixed(2)}</div>
+        <div className='box flex right hide'>
+          <div className={ifcat('button blue box icon flex center', colorSelector)}>{order.status}</div>
+        </div>
+        <div className='box flex center vertical evil-icon forward'/>
+      </div>
     );
   }
 }

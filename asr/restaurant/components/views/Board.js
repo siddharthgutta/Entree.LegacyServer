@@ -6,7 +6,7 @@ import ModalManager from './modals/ModalManager';
 import Dispatcher from '../../dispatchers/Dispatcher';
 import Sidebar from './elements/Sidebar';
 import {findDOMNode} from 'react-dom';
-import {apply} from '../../../libs/utils';
+import {apply, onClick} from '../../../libs/utils';
 
 class Board extends Influx.Component {
   static propTypes = {children: React.PropTypes.node, location: React.PropTypes.object};
@@ -40,13 +40,14 @@ class Board extends Influx.Component {
     const sidebar = findDOMNode(this.refs.sidebar);
     const node = findDOMNode(this);
 
-    this.menuActive = visible;
-
     if (visible) {
       apply(node, {transform: `translate3d(${sidebar.offsetWidth}px, 0, 0)`});
     } else {
       apply(node, {transform: `translate3d(0, 0, 0)`});
     }
+
+    clearTimeout(this.timeout);
+    this.timeout = setTimeout(() => this.menuActive = visible, 500);
   }
 
   _handleMenuCollapse() {
@@ -57,23 +58,23 @@ class Board extends Influx.Component {
 
   render() {
     return (
-        <div className='full animate-transform flex vertical' onClick={() => this._handleMenuCollapse()}>
-          <Sidebar ref='sidebar'/>
-          <Header />
-          <ModalManager />
-          <div className='full'>
-            <ReactCSSTransitionGroup
-                component='div'
-                className='full-abs board'
-                transitionName='board'
-                transitionEnterTimeout={500}
-                transitionLeaveTimeout={500}>
-              {React.cloneElement(this.props.children, {
-                key: this.props.location.pathname
-              })}
-            </ReactCSSTransitionGroup>
-          </div>
+      <div className='full animate-transform flex vertical' {...onClick(() => this._handleMenuCollapse())}>
+        <Sidebar ref='sidebar'/>
+        <Header />
+        <ModalManager />
+        <div className='full'>
+          <ReactCSSTransitionGroup
+            component='div'
+            className='full-abs board'
+            transitionName='board'
+            transitionEnterTimeout={500}
+            transitionLeaveTimeout={500}>
+            {React.cloneElement(this.props.children, {
+              key: this.props.location.pathname
+            })}
+          </ReactCSSTransitionGroup>
         </div>
+      </div>
     );
   }
 }

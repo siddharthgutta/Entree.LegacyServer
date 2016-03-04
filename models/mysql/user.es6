@@ -8,7 +8,11 @@ export default function (sequelize, DataTypes) {
         is: /^\d{10}$/
       }
     },
-    name: {
+    firstName: {
+      type: DataTypes.STRING(64), // eslint-disable-line new-cap
+      allowNull: true
+    },
+    lastName: {
       type: DataTypes.STRING(64), // eslint-disable-line new-cap
       allowNull: true
     },
@@ -23,6 +27,10 @@ export default function (sequelize, DataTypes) {
     classMethods: {
       associate: models => {
         User.hasOne(models.ChatState, {
+          onDelete: 'CASCADE'
+        });
+
+        User.hasMany(models.Order, {
           onDelete: 'CASCADE'
         });
       }

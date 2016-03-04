@@ -7,17 +7,23 @@
         "files": {}
     },
     "installed_plugins": {
-        "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "com.entree"
+        "cordova-plugin-app-event": {
+            "PACKAGE_NAME": "com.entreeapp.producer"
+        },
+        "cordova-plugin-background-mode": {
+            "PACKAGE_NAME": "com.entreeapp.producer"
         },
         "cordova-plugin-device": {
-            "PACKAGE_NAME": "com.entree"
-        },
-        "cordova-plugin-console": {
-            "PACKAGE_NAME": "com.entree"
+            "PACKAGE_NAME": "com.entreeapp.producer"
         },
         "cordova-plugin-statusbar": {
-            "PACKAGE_NAME": "com.entree"
+            "PACKAGE_NAME": "com.entreeapp.producer"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.entreeapp.producer"
+        },
+        "de.appplant.cordova.plugin.local-notification": {
+            "PACKAGE_NAME": "com.entreeapp.producer"
         }
     },
     "dependent_plugins": {}

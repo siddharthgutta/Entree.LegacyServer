@@ -25,6 +25,12 @@ const {Client} = ss;
  */
 ss.connect();
 
+
+/**
+ * Client events
+ */
+export {default as Events} from '../constants/client.es6';
+
 /**
  * Tokens are validated to see if they are still responding
  * @param {[String]} tokens: tokens to validate
@@ -33,7 +39,7 @@ ss.connect();
  */
 export async function validateTokens(tokens, rejected) {
   try {
-    const waitTime = 1500;
+    const waitTime = 2000;
 
     // run in parallel
     await Promise.map(tokens, async token => {
@@ -42,7 +48,6 @@ export async function validateTokens(tokens, rejected) {
 
         await Client.emit(token, 'alive?', {}, waitTime);
       } catch (e) {
-        console.tag('notification', 'validate-tokens', 'not-alive').error(e);
         console.tag('notification', 'validate-tokens', 'not-alive').log({token});
 
         Client.reject(token);
@@ -171,6 +176,8 @@ export async function notify(id, channel, data) {
 
   try {
     const {tokens} = await SocketTokens.findOne(id);
+
+    console.log(tokens);
 
     for (const token of tokens) {
       Client.volatile(token, channel, data);

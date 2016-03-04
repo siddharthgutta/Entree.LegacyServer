@@ -1,5 +1,6 @@
 import request from 'superagent';
 import extend from 'extend';
+import URL from 'url-parse';
 
 // mimics fetch using superagent to improve cross-browser compatibility
 // refer to https://github.com/github/fetch for the fetch API
@@ -10,6 +11,13 @@ export default function fetch(url, opts = {}) {
     }
 
     const method = opts.method || 'get';
+
+    if (method === 'get') {
+      const urlParts = new URL(url);
+      urlParts.query = Object.assign(urlParts.query || {}, opts.body);
+      url = urlParts.toString();
+    }
+
     let req = request[method.toLowerCase()](url);
 
     req = req.withCredentials();
@@ -26,7 +34,29 @@ export default function fetch(url, opts = {}) {
 
     req.end((err, res) => {
       if (err) {
-        err.res = res;
+        try {
+          if (err.response && err.response.error) {
+            err = err.response.error;
+          } else if (res.error) {
+            err = res.error;
+          }
+
+          const {status, method: _method, path, text} = err;
+
+          Object.defineProperty(err, 'res', {value: res, enumerable: false, configurable: false});
+          Object.defineProperty(err, 'status', {value: status, enumerable: false, configurable: false});
+          Object.defineProperty(err, 'method', {value: _method, enumerable: false, configurable: false});
+          Object.defineProperty(err, 'path', {value: path, enumerable: false, configurable: false});
+          Object.defineProperty(err, 'text', {value: text, enumerable: false, configurable: false});
+        } catch (e) {
+          try {
+            Object.defineProperty(err, 'res', {value: res, enumerable: false, configurable: false});
+          } catch (ee) {
+            // fallback for crappy browsers
+            err.res = res;
+          }
+        }
+
         reject(err);
       } else {
         resolve(res);

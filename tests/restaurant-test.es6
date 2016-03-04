@@ -60,7 +60,7 @@ describe('Restaurant', () => {
                   assert(false);
                   done();
                 }, err => {
-                  assert.equal(err.errors.length, 4);
+                  assert.equal(err.causes().length, 5);
                   done();
                 });
     });
@@ -71,7 +71,7 @@ describe('Restaurant', () => {
                   assert(false);
                   done();
                 }, err => {
-                  assert.equal(err.errors.length, 1);
+                  assert.equal(err.causes().length, 2);
                   done();
                 });
     });
@@ -104,8 +104,7 @@ describe('Restaurant', () => {
                   Restaurant.destroy(result.id)
                             .then(() => {
                               Restaurant.findOne(result.id)
-                                        .then(restaurant => {
-                                          assert.equal(restaurant, null);
+                                        .catch(() => {
                                           done();
                                         });
                             });
@@ -314,7 +313,7 @@ describe('Restaurant', () => {
                                                     Restaurant.getLocation(restaurant.id)
                                                               .then(result => {
                                                                 assert.equal(result, null);
-                                                                restaurant.destroy()
+                                                                Restaurant.destroy(restaurant.id)
                                                                           .then(() => done());
                                                               });
                                                   });

@@ -18,6 +18,21 @@
     "es6": true
   },
   "rules": {
+    "react/jsx-no-bind": [
+      2,
+      {
+        "ignoreRefs": true,
+        "allowArrowFunctions": true,
+        "allowBind": false
+      }
+    ],
+    "react/jsx-indent-props": 0,
+    "react/jsx-closing-bracket-location": [
+      2,
+      {
+        "location": "after-props"
+      }
+    ],
     "mocha/no-exclusive-tests": 2,
     "comma-dangle": [
       2,
@@ -41,14 +56,6 @@
     "no-unreachable": 2,
     "prefer-template": 2,
     "prefer-arrow-callback": 2,
-    "react/jsx-no-bind": [
-      2,
-      {
-        "ignoreRefs": true,
-        "allowArrowFunctions": true,
-        "allowBind": false
-      }
-    ],
     "arrow-spacing": [
       2,
       {
@@ -69,18 +76,11 @@
       2,
       "prefer-single"
     ],
-    "react/jsx-indent-props": 0,
     "indent": [
       2,
       2,
       {
         "SwitchCase": 1
-      }
-    ],
-    "react/jsx-closing-bracket-location": [
-      2,
-      {
-        "location": "after-props"
       }
     ],
     "brace-style": [

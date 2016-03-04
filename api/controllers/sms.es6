@@ -5,8 +5,10 @@ import Promise from 'bluebird';
 import {SocketServer} from './notification.es6';
 import * as Message from './../message.es6';
 import * as Notification from './notification.es6';
+import Emitter, {Events} from '../events/index.es6';
 
 const admins = config.get('Admins');
+const forceLocalStrategy = false;
 
 /**
  * Purpose of this API is to handle everything SMS. All incoming and sent
@@ -17,7 +19,7 @@ const admins = config.get('Admins');
  * Select the strategy
  */
 let sms;
-if (SocketServer instanceof RemoteSocketServer) {
+if (!forceLocalStrategy && SocketServer instanceof RemoteSocketServer) {
   sms = new TwilioRemote(SocketServer);
 
   const devNumber = config.get('DeveloperNumber');
@@ -36,7 +38,7 @@ if (SocketServer instanceof RemoteSocketServer) {
  * @param {String} number: number as string
  * @returns {String} cleaned number
  */
-function stripAreaCode(number) {
+function stripCountryCode(number) {
   return number.substr(-10);
 }
 
@@ -48,11 +50,12 @@ function stripAreaCode(number) {
 async function processReceive(text) {
   console.tag('api', 'sms', 'processReceive').log('Processing text', text.id, text);
 
-  const {id, from, to, body: content, date, status} = text;
+  text.to = stripCountryCode(text.to);
+  text.from = stripCountryCode(text.from);
+
+  const {id, from: phoneNumber, to: twilioNumber, body: content, date, status} = text;
   const sentByUser = true;
   const success = !!status;
-  const phoneNumber = stripAreaCode(from);
-  const twilioNumber = stripAreaCode(to);
 
   try {
     // TODO Core logic here, we can extract to a core engine class
@@ -61,11 +64,10 @@ async function processReceive(text) {
     // if message.create fails, we know that another instance
     await Message.create(phoneNumber, 0, content, date, id, twilioNumber, sentByUser, success);
 
-    // TODO @jesse please update as necessary
-    // TODO notify ChatBot(text) : {who do I send to?, what do i send?, entity?}
-    // SMS.sendSMS(text, )
+    Emitter.emit(Events.TEXT_RECEIVED, text);
 
-    await Notification.notify(0, 'receive', {phoneNumber, content, date, sentByUser});
+    // only notify the gods since restaurants are disabled
+    await Notification.notifyGods(Notification.Events.TEXT_RECEIVED, {phoneNumber, content, date, sentByUser});
   } catch (e) {
     return console.tag('api', 'sms', 'processReceive').error(e);
   }
@@ -79,15 +81,18 @@ async function processReceive(text) {
 async function processSent(text) {
   console.tag('api', 'sms', 'processSent').log('Processing text', text.id, text);
 
-  const {id, from, to, body: content, date, status} = text;
+  text.to = stripCountryCode(text.to);
+  text.from = stripCountryCode(text.from);
+
+  const {id, from: twilioNumber, to: phoneNumber, body: content, date, status} = text;
   const sentByUser = false;
   const success = !!status;
-  const twilioNumber = stripAreaCode(from);
-  const phoneNumber = stripAreaCode(to);
 
   try {
     await Message.create(phoneNumber, 0, content, date, id, twilioNumber, sentByUser, success);
-    await Notification.notify(0, 'send', {phoneNumber, content, date, sentByUser});
+
+    // only notify the gods since restaurants are disabled
+    await Notification.notifyGods(Notification.Events.TEXT_SENT, {phoneNumber, content, date, sentByUser});
   } catch (e) {
     return console.tag('api', 'sms', 'processSent').error(e);
   }

@@ -25,10 +25,14 @@ class Header extends Influx.Component {
   }
 
   _onRequestHeader(title, subtitle, other) {
+    if (!title) {
+      return this.setState({style: {display: 'none'}});
+    }
+
     other.onLeftClick = typeof other.onLeftClick === 'function' ? other.onLeftClick : () => 0;
     other.onRightClick = typeof other.onRightClick === 'function' ? other.onRightClick : () => 0;
 
-    this.setState({
+    const state = {
       children: null,
       onLeftClick: null,
       onRightClick: null,
@@ -37,24 +41,26 @@ class Header extends Influx.Component {
       title,
       subtitle,
       ...other
-    });
+    };
+
+    this.setState(state);
   }
 
   render() {
     return (
-        <div className='header' style={this.state.style}>
-          <div className='nav flex'>
-            <div {...onClick(() => this.state.onLeftClick())}
-                className={`box flex center vertical nav-left ${this.state.leftIcon}`}/>
-            <div className='text' style={{flex: 1}}>
-              <div className='title'>{this.state.title}</div>
-              <div className='subtitle'>{this.state.subtitle}</div>
-            </div>
-            <div {...onClick(() => this.state.onLeftClick())}
-                className={`nav-right center vertical ${this.state.rightIcon}`}/>
+      <div className='header' style={this.state.style}>
+        <div className='nav flex'>
+          <div {...onClick(() => this.state.onLeftClick())}
+            className={`box flex center vertical nav-left ${this.state.leftIcon}`}/>
+          <div className='text' style={{flex: 1}}>
+            <div className='title'>{this.state.title}</div>
+            <div className='subtitle'>{this.state.subtitle}</div>
           </div>
-          {this.state.children}
+          <div {...onClick(() => this.state.onRightClick())}
+            className={`nav-right center vertical ${this.state.rightIcon}`}/>
         </div>
+        {this.state.children}
+      </div>
     );
   }
 }

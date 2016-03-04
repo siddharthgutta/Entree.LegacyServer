@@ -6,6 +6,7 @@ import Chance from 'chance';
 import fetch from '../../libs/fetch';
 import io from 'socket.io-client';
 import {format} from 'url';
+import SocketEvents from '../../../api/constants/client.es6';
 
 const chance = new Chance();
 
@@ -32,7 +33,7 @@ class MessageStore extends Influx.Store {
     const token = localStorage.getItem('token');
 
     if (token) {
-      this._fetchMessagesAndStart(token);
+      this._fetchMessagesAndStream(token);
     }
   }
 
@@ -96,7 +97,7 @@ class MessageStore extends Influx.Store {
     Dispatcher.emit(Dispatcher.Events.CONNECTION_STATUS, status);
   }
 
-  async _fetchMessagesAndStart(token) {
+  async _fetchMessagesAndStream(token) {
     let messages;
 
     this._setConnectionStatus(Status.CONNECTING);
@@ -117,10 +118,7 @@ class MessageStore extends Influx.Store {
     const {body: {data: {address, uuid}}} = await fetch('api/v2/restaurant/socket', {method: 'post', body: {token}});
     const socket = io(format(address), {query: `id=${uuid}`, secure: true});
 
-    this.data.socket = socket;
-    this.data.uuid = uuid;
-
-    socket.on('send', message => {
+    socket.on(SocketEvents.TEXT_SENT, message => {
       message = this._transform([message])[0];
 
       this.data.messages.push(message);
@@ -128,7 +126,7 @@ class MessageStore extends Influx.Store {
     });
 
     // TODO optimize
-    socket.on('receive', message => {
+    socket.on(SocketEvents.TEXT_RECEIVED, message => {
       message = this._transform([message])[0];
 
       this.data.messages.push(message);
@@ -143,7 +141,7 @@ class MessageStore extends Influx.Store {
 
     localStorage.setItem('token', token);
 
-    this._fetchMessagesAndStart(token);
+    this._fetchMessagesAndStream(token);
   }
 
   async _connect(id, password) {

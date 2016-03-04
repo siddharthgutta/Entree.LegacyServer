@@ -74,3 +74,15 @@ export function type(node, text, time, then) {
     node.value = node.value + letter;
   }, time / letters.length);
 }
+
+export function shake(node) {
+  node.classList.remove('animate-shake');
+
+  try {
+    node.offsetWidth = node.offsetWidth;
+  } catch (e) {
+    node.offsetWidth; // eslint-disable-line
+  }
+
+  node.classList.add('animate-shake');
+}

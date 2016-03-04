@@ -1,8 +1,9 @@
 import * as User from '../user.es6';
 import {sendSMS} from './sms.es6';
+import Emitter, {Events} from '../events/index.es6';
 import {format} from 'url';
 import config from 'config';
-import Runtime from '../../libs/runtime.es6';
+import {hostname} from '../../libs/runtime.es6';
 
 // FIXME @jesse: why are the raw db connections used here?
 const {User: _User, sequelize: Sequelize} = User.connection;
@@ -81,8 +82,9 @@ export function signup(phoneNumber) {
 export async function resolveProfileEditAddress(secret) {
   const address = config.get('Server');
 
-  address.hostname = await Runtime.hostname();
-  address.path = `/api/v2/user/profile/${secret}`; // TODO idk how to not make this a constant
+  address.hostname = await hostname();
+  address.pathname = `profile`; // TODO idk how to not make this a constant
+  address.search = `token=${secret}`;
 
   return format(address);
 }
@@ -109,12 +111,31 @@ export async function getUserProfile(secret) {
   }
 }
 
-export async function updateUserProfile(secret, {name, email} = {}) {
-  const {phoneNumber, ...other} = await User.findBySecret(secret);
-  const updateAttrs = Object.assign(other, {name, email});
-  await User.updateByPhoneNumber(phoneNumber, updateAttrs);
-  const user = await User.findOneByPhoneNumber(phoneNumber);
-  return user.get();
+export async function updateUserProfile(secret, attributes) {
+  let updatedUser;
+
+  try {
+    const {id, phoneNumber, ...lastProps} = (await User.findBySecret(secret)).get();
+    updatedUser = Object.assign(lastProps, attributes, {phoneNumber, id});
+  } catch (e) {
+    throw new TraceError(`Could not find user ${secret}`, e);
+  }
+
+  const {phoneNumber} = updatedUser;
+
+  try {
+    await console.tag('controller', 'updateUserProfile').log({updatedUser});
+    await User.updateByPhoneNumber(phoneNumber, updatedUser);
+    const user = (await User.findOneByPhoneNumber(phoneNumber)).get();
+
+    // why use an emitter here?
+    // does the user care about the chatbot? no
+    Emitter.emit(Events.USER_PROFILE_UPDATED, user);
+
+    return user;
+  } catch (e) {
+    throw new TraceError(`Could not update user ${secret}`, e);
+  }
 }
 
 export {User as UserModel};

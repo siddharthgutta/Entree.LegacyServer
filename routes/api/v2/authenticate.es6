@@ -25,7 +25,7 @@ passport.use('local', new LocalStrategy({
   }
 
   try {
-    restaurant = await Restaurant.Model.findOne(id);
+    restaurant = await Restaurant.RestaurantModel.findOne(id);
   } catch (e) {
     return next(e);
   }
@@ -67,11 +67,15 @@ passport.deserializeUser(async(req, token, done) => {
     return done(null, null);
   }
 
-  const {id} = await Session.getRestaurant(token);
+  try {
+    const {id} = await Session.getRestaurant(token);
 
-  Session.renew(id, token); // async
+    Session.renew(id, token); // async
 
-  return done(null, {id, token});
+    done(null, {id, token});
+  } catch (e) {
+    done(null, null);
+  }
 });
 
 export async function isAuthenticated(req, res, next) {
@@ -79,9 +83,9 @@ export async function isAuthenticated(req, res, next) {
     return next();
   }
 
-  const {token} = req.body;
+  const token = req.body.token || req.query.token;
 
-  if (token) {
+  if (typeof token === 'string') {
     const valid = await Session.isValid(token);
 
     if (valid) {

@@ -47,10 +47,10 @@ export function removeToken(restaurantId, token) {
             if (result) {
               resolve(result);
             } else {
-              reject(Error(`Could not find valid SocketToken. Either restaurantId ${restaurantId} ` +
-                           `is invalid or token ${token} does not exist for given SocketToken`));
+              reject(new TraceError(`Could not find valid SocketToken. Either restaurantId ${restaurantId} ` +
+                `is invalid or token ${token} does not exist for given SocketToken`));
             }
-          }, err => reject(err));
+          }, err => reject(new TraceError('Note token error', err)));
   });
 }
 

@@ -12,12 +12,16 @@ export {Mode};
  *
  * @param {string} name : Name of restaurant
  * @param {string} password: Password for restaurant login
- * @param {Object} optional : Restaurant phone number is optional
+ * @param {Object} attributes : Restaurant phone number is optional
  * @returns {Promise}: Returns the Restaurant object
  */
 
-export function create(name, password, mode = Mode.REGULAR, optional = {phoneNumber: null}) {
-  return models.Restaurant.create({name, password, mode, ...optional});
+export async function create(name, password, mode = Mode.REGULAR, attributes = {phoneNumber: null}) {
+  try {
+    return (await models.Restaurant.create({name, password, mode, ...attributes})).toJSON();
+  } catch (e) {
+    throw new TraceError('Could not create restaurant', e, ...(e.errors || []));
+  }
 }
 
 /**
@@ -27,12 +31,16 @@ export function create(name, password, mode = Mode.REGULAR, optional = {phoneNum
  * @param {Object} attributes : Attributes to update
  * @returns {Promise}: Returns the Restaurant object
  */
-export function update(id, attributes) {
-  return models.Restaurant.update(
-    attributes, {
-      where: {id}
-    }
-  );
+export async function update(id, attributes) {
+  try {
+    return await models.Restaurant.update(
+      attributes, {
+        where: {id}
+      }
+    );
+  } catch (e) {
+    throw new TraceError('Could not update restaurant', e);
+  }
 }
 
 /**
@@ -61,8 +69,66 @@ export function destroy(id) {
  * @param {Number} id: primary key of restaurant
  * @returns {Promise}: Returns the Restaurant object
  */
-export function findOne(id) {
-  return models.Restaurant.findOne({where: {id}});
+export async function findOne(id) {
+  try {
+    return (await models.Restaurant.findOne({where: {id}})).toJSON();
+  } catch (e) {
+    throw new TraceError('Could not find restaurant', e);
+  }
+}
+
+export const MetaData = {
+  ORDERS: Symbol(),
+  ORDERS_ITEMS: Symbol(),
+  ORDER_SUMMARY: 'OrderSummary'
+};
+
+/**
+ * Find a restaurant by id (with order information)
+ *
+ * @param {Number} id: primary key of restaurant
+ * @param {Symbol} metadata: how much information you want
+ * @returns {Promise}: Returns the Restaurant object
+ */
+// TODO @jesse can you make a versatile findOne
+export async function findOneWithMetaData(id, ...metadata) {
+  const {Order, Item, sequelize} = models;
+  const query = {where: {id}};
+
+  // TODO @jesse loop through and build query?
+  switch (metadata[0]) {
+    case MetaData.ORDERS:
+      query.include = [{model: Order}];
+      break;
+    case MetaData.ORDERS_ITEMS:
+      query.include = [{model: Order, include: [{model: Item}]}];
+      break;
+    default:
+    case MetaData.ORDER_SUMMARY:
+      query.include = [{
+        model: Order,
+        attributes: [
+          ['id', 'orderId'],
+          [sequelize.fn('SUM', sequelize.col('price')), 'netPrice'],
+          [sequelize.fn('COUNT', sequelize.col('itemId')), 'netItemsCount'],
+          [sequelize.fn('COUNT', sequelize.col('orderId')), 'netCount']
+        ],
+        include: [{
+          model: Item,
+          attributes: [
+            ['id', 'itemId'],
+            ['price', 'price']
+          ]
+        }],
+        group: ['orderId']
+      }];
+  }
+
+  try {
+    return (await models.Restaurant.findOne(query)).toJSON();
+  } catch (e) {
+    throw new TraceError('Could not find restaurant', e);
+  }
 }
 
 /**
@@ -75,20 +141,21 @@ export function findOne(id) {
  */
 export function addOrUpdateHour(id, restaurantHour) {
   return new Promise(resolve => {
-    findOne(id)
-    .then(restaurant => {
-      restaurant.getRestaurantHours({where: {dayOfTheWeek: restaurantHour.dayOfTheWeek}})
-                .then(results => {
-                  if (results.length === 1) {
-                    restaurant.removeRestaurantHour(results[0])
-                              .then(() => {
-                                resolve(restaurant.addRestaurantHour(restaurantHour));
-                              });
-                  } else {
-                    resolve(restaurant.addRestaurantHour(restaurantHour));
-                  }
-                });
-    });
+    models.Restaurant
+          .findOne({where: {id}})
+          .then(restaurant => {
+            restaurant.getRestaurantHours({where: {dayOfTheWeek: restaurantHour.dayOfTheWeek}})
+                      .then(results => {
+                        if (results.length === 1) {
+                          restaurant.removeRestaurantHour(results[0])
+                                    .then(() => {
+                                      resolve(restaurant.addRestaurantHour(restaurantHour));
+                                    });
+                        } else {
+                          resolve(restaurant.addRestaurantHour(restaurantHour));
+                        }
+                      });
+          });
   });
 }
 
@@ -100,10 +167,11 @@ export function addOrUpdateHour(id, restaurantHour) {
  */
 export function getHours(id) {
   return new Promise(resolve => {
-    findOne(id)
-    .then(restaurant => {
-      resolve(restaurant.getRestaurantHours());
-    });
+    models.Restaurant
+          .findOne({where: {id}})
+          .then(restaurant => {
+            resolve(restaurant.getRestaurantHours());
+          });
   });
 }
 
@@ -117,20 +185,21 @@ export function getHours(id) {
  */
 export function setOrUpdateLocation(id, location) {
   return new Promise(resolve => {
-    findOne(id)
-    .then(restaurant => {
-      restaurant.getLocation()
-                .then(result => {
-                  if (result) {
-                    result.destroy()
-                          .then(() => {
-                            resolve(restaurant.setLocation(location));
-                          });
-                  } else {
-                    resolve(restaurant.setLocation(location));
-                  }
-                });
-    });
+    models.Restaurant
+          .findOne({where: {id}})
+          .then(restaurant => {
+            restaurant.getLocation()
+                      .then(result => {
+                        if (result) {
+                          result.destroy()
+                                .then(() => {
+                                  resolve(restaurant.setLocation(location));
+                                });
+                        } else {
+                          resolve(restaurant.setLocation(location));
+                        }
+                      });
+          });
   });
 }
 
@@ -141,14 +210,21 @@ export function setOrUpdateLocation(id, location) {
  * @returns {Promise}: Returns a promise with no data(?)
  */
 export function removeLocation(id) {
-  return new Promise(resolve => {
-    findOne(id)
-    .then(restaurant => {
-      restaurant.getLocation()
-                .then(location => {
-                  resolve(location.destroy());
-                });
-    });
+  return new Promise((resolve, reject) => {
+    models.Restaurant
+          .findOne({where: {id}})
+          .then(restaurant => {
+            restaurant.getLocation()
+                      .then(location => {
+                        resolve(location.destroy());
+                      })
+                      .catch(e => {
+                        reject(e);
+                      });
+          })
+          .catch(e => {
+            reject(e);
+          });
   });
 }
 
@@ -160,9 +236,23 @@ export function removeLocation(id) {
  */
 export function getLocation(id) {
   return new Promise(resolve => {
-    findOne(id)
-    .then(restaurant => {
-      resolve(restaurant.getLocation());
-    });
+    models.Restaurant
+          .findOne({where: {id}})
+          .then(restaurant => {
+            resolve(restaurant.getLocation());
+          });
   });
+}
+
+
+export async function setEnabled(id, enabled) {
+  const {Restaurant} = models;
+
+  try {
+    await Restaurant.update({enabled}, {where: {id}});
+  } catch (e) {
+    throw new TraceError('Could not toggle enabled', e);
+  }
+
+  return findOne(id);
 }

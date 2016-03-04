@@ -1,3 +1,4 @@
+import './api/controllers/dispatcher.es6';
 import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';

@@ -1,110 +1,262 @@
 import Influx from 'react-influx';
 import Dispatcher from '../dispatchers/Dispatcher.js';
 import keyMirror from 'keymirror';
-import extend from 'extend';
-import Chance from 'chance';
+import fetch from '../../libs/fetch';
+import {format} from 'url';
+import config from '../../libs/config';
+import io from 'socket.io-client';
+import {SocketEvents} from '../../../api/constants/client.es6';
 import _ from 'underscore';
 
-const Events = keyMirror({
+// @formatter:off
+export const Events = keyMirror({
+  READY: null,
   ORDER_RECEIVED: null,
-  ORDER_UPDATED: null
+  ORDER_UPDATED: null,
+  RESTAURANT_UPDATED: null
 });
 
-const chance = new Chance();
+export const Status = keyMirror({
+  CONNECTING: null,
+  CONNECTED: null,
+  DISCONNECTED: null
+});
+// @formatter:on
 
-const sampleData = [
-  {
-    id: 1,
-    phone: '713-505-1837',
-    name: 'Tiraj Parikh',
-    items: [],
-    status: 'NEW'
-  }, {
-    id: 2,
-    phone: '713-505-1837',
-    name: 'Calvin Bench',
-    items: [],
-    status: 'ACCEPTED'
-  }, {
-    id: 3,
-    phone: '713-505-1837',
-    name: 'Kevin Fu',
-    items: [],
-    status: 'NEW'
-  }
-];
-
-let counter = 0;
+const SERVER_URL = format(config.get('Server'));
+// TODO extract to UserStore
 
 class OrderStore extends Influx.Store {
   constructor() {
     super(Dispatcher);
 
-    this.data = {orders: []};
+    this.data = {orders: [], status: Status.DISCONNECTED};
 
-    window.orders = this.data.orders;
+    document.addEventListener('resume', () => {
+      console.log('Resuming!');
+    }, false);
+
+    document.addEventListener('deviceready', () => {
+      if (window.cordova) {
+        window.cordova.plugins.notification.local.hasPermission(granted => {
+          if (!granted) {
+            return window.cordova.plugins.notification
+                         .local.registerPermission(_granted => this.data.granted = _granted);
+          }
+
+          this.data.granted = granted;
+        });
+
+        window.cordova.plugins.backgroundMode.enable();
+        window.cordova.plugins.backgroundMode.setDefaults({text: 'Listening for orders'});
+      }
+    }, false);
+
+    this._login();
   }
 
   getDispatcherListeners() {
     return [
-      [Dispatcher, Dispatcher.Events.CONNECT_STREAM, this._onDispatcherConnectStream]
+      [Dispatcher, Dispatcher.Events.LOGIN, this._login]
     ];
   }
 
-  getOrders() {
-    return this.data.orders;
+  _notify(title, text) {
+    if (window.cordova) {
+      const sound = window.device.platform === 'Android' ? 'file://sound.mp3' : 'file://beep.caf';
+      const notification = {
+        id: Date.now(),
+        title,
+        text,
+        message: text,
+        at: new Date(),
+        sound
+      };
+
+      window.cordova.plugins.notification.local.schedule(notification);
+    }
   }
 
-  injectTestOrder() {
-    const order = extend({}, sampleData[parseInt(Math.random() * sampleData.length, 10)]);
-    order.id = ++counter;
-    order.name = chance.name();
-    order.date = Date.now();
-    order.cost = Number((Math.random() * 50).toFixed(2));
-    order.status = chance.pick(['received', 'accepted', 'completed']);
+  getOrders(status) {
+    console.log(this.data.orders, status);
+    return status ? this.data.orders.filter(order => order.status === status) : this.data.orders;
+  }
 
-    this.data.orders.unshift(order);
+  // TODO extract UserStore, RestaurantStore
+  async fetchRestaurantInfo() {
+    const {body: {data: {restaurant}}} =
+      await fetch(`${SERVER_URL}/api/v2/restaurant/info`, {
+        body: {token: this.data.token}
+      });
 
-    this.emit(Events.ORDER_RECEIVED, order);
-    this.emit(Events.ORDER_UPDATED, order);
+    this.emit(Events.RESTAURANT_UPDATED, restaurant);
+
+    return restaurant;
+  }
+
+  async setOrderStatus(id, status, {prepTime, message}) {
+    const {body: {data: {order}}} =
+      await fetch(`${SERVER_URL}/api/v2/restaurant/order/${id}/status`, {
+        method: 'post',
+        body: {
+          token: this.data.token,
+          status,
+          prepTime,
+          message
+        }
+      });
 
     return order;
   }
 
-  fetchOrderById(id) {
-    id = parseInt(id, 10);
+  async fetchOrderById(id) {
+    const {body: {data: {order}}} =
+      await fetch(`${SERVER_URL}/api/v2/restaurant/order/${id}`, {body: {token: this.data.token}});
 
-    if (id) {
-      const {orders} = this.data;
-      const idx = _.findIndex(orders, {id});
+    this._addOrder(order);
 
-      if (idx > -1) {
-        return orders[idx];
-      }
-    }
+    this.emit(Events.ORDER_UPDATED, order);
 
-    return {
-      id: 'NA',
-      cost: 0,
-      status: 'loading',
-      name: 'loading'
-    };
+    return order;
   }
 
   off(type, listener) {
     return super.removeListener(type, listener);
   }
 
-  _onDispatcherConnectStream() {
-    for (let i = 0; i < 20; i++) {
-      this.injectTestOrder();
+  _setConnectionStatus(status) {
+    this.data.status = status;
+
+    Dispatcher.emit(Dispatcher.Events.CONNECTION_STATUS, status);
+  }
+
+  _addOrder(order) {
+    let {orders} = this.data;
+
+    if (Array.isArray(order)) {
+      order.forEach(a => a.updatedAt = new Date(a.updatedAt));
+      orders = orders.concat(order);
+    } else if (typeof order === 'object') {
+      order.updatedAt = new Date(order.updatedAt);
+      orders.push(order);
+    } else {
+      return orders;
     }
 
-    setInterval(() => {
-      setTimeout(() => {
-        this.injectTestOrder();
-      }, parseInt(Math.random() * 500, 10));
-    }, 5000);
+    orders = _.values(_.indexBy(orders, 'id'));
+    orders.sort((a, b) => b.updatedAt - a.updatedAt);
+
+    this.data.orders = orders;
+
+    return orders;
+  }
+
+  getTotalCost(order) {
+    return order.Items.reduce((memo, item) => item.price + memo, 0);
+  }
+
+  async _login(id, password) {
+    let token = localStorage.getItem('token');
+
+    this.data.token = token;
+
+    if (token) {
+      this._setConnectionStatus(Status.CONNECTING);
+
+      try {
+        await fetch(`${SERVER_URL}/api/v2/restaurant/connection`, {body: {token}});
+      } catch (e) {
+        console.error(e);
+        token = null;
+        localStorage.removeItem('token');
+        return this._setConnectionStatus(Status.DISCONNECTED, e.message);
+      }
+
+      this._setConnectionStatus(Status.CONNECTED);
+    }
+
+    if (id && password) {
+      this._setConnectionStatus(Status.CONNECTING);
+
+      try {
+        token = await this._connect(id, password);
+        this.data.token = token;
+        localStorage.setItem('token', token);
+      } catch (e) {
+        console.error(e);
+        return this._setConnectionStatus(Status.DISCONNECTED, e.message);
+      }
+
+      this._setConnectionStatus(Status.CONNECTED);
+    }
+
+    if (this.data.status === Status.CONNECTED) {
+      try {
+        await this._fetchOrders(token);
+      } catch (e) {
+        console.error(e);
+      }
+
+      this.emit(Events.READY, this.data.orders);
+
+      const {socket} = this.data;
+      if (!socket || (socket && !socket.connected)) {
+        try {
+          this.data.socket = await this._startStream(token);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+  }
+
+  async _fetchOrders(token) {
+    try {
+      const {body: {data: {orders}}} =
+        await fetch(`${SERVER_URL}/api/v2/restaurant/orders`, {body: {token}});
+
+      this._addOrder(orders);
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  async _startStream(token) {
+    const {body: {data: {address, uuid}}} = await fetch(`${SERVER_URL}/api/v2/restaurant/socket`, {
+      method: 'post',
+      body: {token}
+    });
+
+    const socket = io(format(address), {query: `id=${uuid}`, secure: true});
+
+    socket.on(SocketEvents.NEW_ORDER, order => {
+      this._addOrder(order);
+      this._notify('New order', `From ${order.User.firstName}`);
+      this.emit(Events.ORDER_RECEIVED, order);
+    });
+
+    socket.on(SocketEvents.ORDER_UPDATE, order => {
+      this._addOrder(order);
+      this._notify('Updated order', `From ${order.User.firstName}`);
+      this.emit(Events.ORDER_UPDATED, order);
+    });
+
+    socket.on('alive?', (data, respond) => respond({status: 'ok'}));
+
+    return socket;
+  }
+
+  getConnectionStatus() {
+    return this.data.status;
+  }
+
+  async _connect(id, password) {
+    const {body: {data: {token}}} = await fetch(`${SERVER_URL}/api/v2/restaurant/login`, {
+      method: 'post',
+      body: {id, password}
+    });
+
+    return token;
   }
 }
 

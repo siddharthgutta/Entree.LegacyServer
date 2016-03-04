@@ -20,7 +20,9 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-router.get('/profile/:secret', async (req, res) => {
+const profile = router.route('/profile/:secret');
+
+profile.get(async (req, res) => {
   const {secret} = req.params;
 
   if (isEmpty(secret)) {
@@ -29,15 +31,18 @@ router.get('/profile/:secret', async (req, res) => {
   }
 
   try {
-    const profile = await User.getUserProfile(secret);
-    res.ok(profile, 'Sent profile!').debug(profile);
+    const user = await User.getUserProfile(secret);
+    res.ok({user}, 'Sent profile!').debug(user);
   } catch (e) {
     res.fail(`Sorry, we couldn't provide you with the profile`, null, 500).debug(e);
   }
 });
 
-router.post('/profile/:secret', async (req, res) => {
+profile.post(async (req, res) => {
   const {secret} = req.params;
+
+  // TODO remove
+  console.log(req.body);
 
   if (isEmpty(secret)) {
     return res.fail('Please try again. Invalid secret', null, 400)
@@ -45,9 +50,10 @@ router.post('/profile/:secret', async (req, res) => {
   }
 
   try {
-    const {email, name} = req.body;
-    const profile = await User.updateUserProfile(secret, {email, name});
-    res.ok(profile, 'Updated profile!').debug(profile);
+    const user = await User.updateUserProfile(secret, req.body);
+
+    // TODO @jadesym Payment.extractFields(user.id, req)
+    res.ok({user}, 'Updated profile!').debug(user);
   } catch (e) {
     res.fail(`Sorry, we couldn't update your profile`, null, 500).debug(e);
   }

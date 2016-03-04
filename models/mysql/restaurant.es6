@@ -19,6 +19,14 @@ export default function (sequelize, DataTypes) {
         len: 10
       }
     },
+    enabled: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    deleted: { // soft delete
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     mode: {
       type: DataTypes.ENUM(...Object.keys(Mode)), // eslint-disable-line new-cap
       allowNull: false
@@ -31,6 +39,10 @@ export default function (sequelize, DataTypes) {
         });
 
         Restaurant.hasMany(models.RestaurantHour, {
+          onDelete: 'CASCADE'
+        });
+
+        Restaurant.hasMany(models.Order, {
           onDelete: 'CASCADE'
         });
       }

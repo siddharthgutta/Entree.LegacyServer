@@ -1,10 +1,10 @@
 import React from 'react';
-import {onClick} from '../../../../libs/utils';
+import {onClick, shake} from '../../../../libs/utils';
 
 class OrderTime extends React.Component {
 
   static propTypes = {
-    onAcceptTime: React.PropTypes.func.isRequired,
+    onSubmitTime: React.PropTypes.func.isRequired,
     onCancel: React.PropTypes.func.isRequired,
     hide: React.PropTypes.func.isRequired,
     startTime: React.PropTypes.number.isRequired,
@@ -12,7 +12,7 @@ class OrderTime extends React.Component {
   };
 
   static defaultProps = {
-    onAcceptTime: Function,
+    onSubmitTime: Function,
     onCancel: Function,
     hide: Function,
     startTime: 0,
@@ -39,9 +39,16 @@ class OrderTime extends React.Component {
   }
 
   _handleAccept() {
-    const {onAcceptTime, hide} = this.props;
+    const {onSubmitTime, hide} = this.props;
+    let {time} = this.state;
 
-    onAcceptTime(this.state.time);
+    time = Number(time);
+
+    if (isNaN(time) || time === 0) {
+      return shake(this.refs.body);
+    }
+
+    onSubmitTime(time);
     hide();
   }
 
@@ -51,33 +58,33 @@ class OrderTime extends React.Component {
 
   render() {
     return (
-        <div className='modal-box center'>
-          <div className='flex modal-header'>
-            <div className='box flex center vertical' style={{padding: 15}}>
-              <div className='value'>
-                <div className='bubble icon dollar'/>
-                {this.props.cost}</div>
-              <div className='desc'>TOTAL COST</div>
-            </div>
-          </div>
-          <div className='body'>
-            <div className='desc bold normal' style={{marginBottom: 20}}>Select a preparation time</div>
-            <div className='button navy flex center' {...onClick(() => this._addTime(1))}>
-              <span className='icon add'/><span>&nbsp;1 Minutes</span>
-            </div>
-            <div className='button navy flex center' {...onClick(() => this._addTime(5))}>
-              <span className='icon add'/><span>&nbsp;5 Minutes</span>
-            </div>
-            <div className='button navy flex center' {...onClick(() => this._addTime(15))}>
-              <span className='icon add'/><span>&nbsp;15 Minutes</span>
-            </div>
-            <div className='desc' style={{marginBottom: 10}}>OR</div>
-            <input type='number' placeholder='minutes' value={this.state.time} style={{paddingRight: 0}}
-                   onChange={e => this._setTime(e.target.value)}/>
-            <div className='button' {...onClick(() => this._handleAccept())}>submit
-            </div>
+      <div className='modal-box center'>
+        <div className='flex modal-header'>
+          <div className='box flex center vertical' style={{padding: 15}}>
+            <div className='value'>
+              <div className='bubble icon dollar'/>
+              {this.props.cost}</div>
+            <div className='desc'>TOTAL COST</div>
           </div>
         </div>
+        <div className='body' ref='body'>
+          <div className='desc bold normal' style={{marginBottom: 20}}>Select a preparation time</div>
+          <div className='button navy flex center' {...onClick(() => this._addTime(1))}>
+            <span className='icon add'/><span>&nbsp;1 Minutes</span>
+          </div>
+          <div className='button navy flex center' {...onClick(() => this._addTime(5))}>
+            <span className='icon add'/><span>&nbsp;5 Minutes</span>
+          </div>
+          <div className='button navy flex center' {...onClick(() => this._addTime(15))}>
+            <span className='icon add'/><span>&nbsp;15 Minutes</span>
+          </div>
+          <div className='desc' style={{marginBottom: 10}}>OR</div>
+          <input type='number' placeholder='minutes' value={this.state.time} style={{paddingRight: 0}}
+                 onChange={e => this._setTime(e.target.value)}/>
+          <div className='button' {...onClick(() => this._handleAccept())}>submit
+          </div>
+        </div>
+      </div>
     );
   }
 }

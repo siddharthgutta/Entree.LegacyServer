@@ -11,10 +11,14 @@ export default function (sequelize, DataTypes) {
           'Thursday',
           'Friday',
           'Saturday',
-          'Sunday'
+          'Sunday',
+          'Custom',
+          'Forever'
         ]]
       }
     },
+    // TODO add openDate
+    // TODO add closeDate
     openTime: {
       type: DataTypes.TIME,
       allowNull: false,

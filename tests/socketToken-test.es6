@@ -4,17 +4,12 @@ import * as SocketToken from '../api/socketToken.es6';
 import _ from 'underscore';
 
 beforeEach(done => {
-  clearDatabase()
-  .then(() => done());
+  clearDatabase().then(() => done());
 });
 
 after(() => disconnectDatabase());
 
 describe('Message', () => {
-  if (console) {
-    console.log('true');
-  }
-
   const restaurantId = 1;
   const token = 'abc';
 
@@ -135,13 +130,13 @@ describe('Message', () => {
   describe('#findByToken', () => {
     it('should find the correct SocketToken given an individual token', done => {
       SocketToken.addTokenOrCreate(restaurantId, token)
-                  .then(() => SocketToken.findByToken(token))
-                  .then(result => {
-                    assert.equal(result.restaurantId, restaurantId);
-                    assert.equal(result.numTokens, 1);
-                    assert(_.isEqual(result.tokens, [token]));
-                    done();
-                  });
+                 .then(() => SocketToken.findByToken(token))
+                 .then(result => {
+                   assert.equal(result.restaurantId, restaurantId);
+                   assert.equal(result.numTokens, 1);
+                   assert(_.isEqual(result.tokens, [token]));
+                   done();
+                 });
     });
 
     it('should throw an error if query does not find anything', done => {

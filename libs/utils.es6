@@ -30,30 +30,26 @@ export class TraceError extends Error {
   constructor(message, ...causes) {
     super(message);
 
-    const stack = this.stack;
-    let formattedStack = '';
+    const stack = Object.getOwnPropertyDescriptor(this, 'stack');
 
     Object.defineProperty(this, 'stack', {
       get: () => {
-        if (formattedStack) {
-          return formattedStack;
-        }
-
-        let causeStack = '';
+        const stacktrace = stack.get.call(this);
+        let causeStacktrace = '';
 
         for (const cause of causes) {
-          if (cause.hasOwnProperty('sourceStack')) {
-            causeStack += `\n${cause.sourceStack}`;
+          if (cause.sourceStack) { // trigger lookup
+            causeStacktrace += `\n${cause.sourceStack}`;
           } else if (cause instanceof Error) {
-            causeStack += `\n${cause.stack}`;
+            causeStacktrace += `\n${cause.stack}`;
           } else {
-            causeStack += `\n${cause}`;
+            causeStacktrace += `\n${cause}`;
           }
         }
 
-        causeStack = causeStack.split('\n').join('\n    ');
+        causeStacktrace = causeStacktrace.split('\n').join('\n    ');
 
-        formattedStack = stack + causeStack;
+        return stacktrace + causeStacktrace;
       }
     });
 
@@ -98,4 +94,16 @@ export function useSourceOnError() {
     }
   });
   /* eslint-enable no-extend-native */
+}
+
+export function stripUndefNull(obj) {
+  for (const k in obj) {
+    if (obj.hasOwnProperty(k)) {
+      if (isNullOrUndefined(obj[k])) {
+        delete obj[k];
+      }
+    }
+  }
+
+  return obj;
 }

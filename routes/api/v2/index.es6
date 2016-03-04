@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import {ip} from '../../../libs/utils.es6';
 import User from './user.es6';
+import Test from './test.es6';
 import Message from './message.es6';
 import Misc from './misc.es6';
 import Restaurant from './restaurant.es6';
@@ -52,6 +53,7 @@ router.use(passport.session());
 router.use('/user', User);
 router.use('/restaurant', Restaurant);
 router.use('/message', Message);
+router.use('/test', Test);
 router.use(Misc);
 
 export default router;
