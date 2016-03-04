@@ -25,6 +25,8 @@ export async function hostname() {
   for (const hn of hostnames) {
     const url = `${format({...address, hostname: hn})}/appinfo`;
 
+    console.tag('runtime', 'hostname').log('attempting', url);
+
     try {
       const {body: {pid: _pid}} = await fetch(url, {method: 'post'});
 

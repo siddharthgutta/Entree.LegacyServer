@@ -3,12 +3,13 @@
 'use strict';
 
 const mozjpeg = require('imagemin-mozjpeg');
+const autoprefixer = require('autoprefixer');
 
 module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
   require('./tasks/grunt-filetransform')(grunt);
 
-  grunt.initConfig({
+  const gruntConfig = {
     uglify: {
       options: {
         banner: '/*! Grunt Uglify <%= grunt.template.today(\'yyyy-mm-dd\') %> */ ',
@@ -95,9 +96,7 @@ module.exports = grunt => {
       options: {
         map: false,
         processors: [
-          require('autoprefixer')({
-            browsers: ['> 1%', 'last 10 versions']
-          })
+          autoprefixer({browsers: ['> 1%', 'last 10 versions']})
         ]
       },
       dist: {
@@ -195,7 +194,9 @@ module.exports = grunt => {
         command: 'npm run cordova-build'
       }
     }
-  });
+  };
+
+  grunt.initConfig(gruntConfig);
 
   grunt.registerTask('compile', [
     'clean:compiled',
@@ -213,13 +214,13 @@ module.exports = grunt => {
     fs.writeFileSync('package.noDevDeps.json', JSON.stringify(pkg), 'utf8');
 
     exec('node node_modules/license-report/index.js ' +
-      '--package=./package.noDevDeps.json --output=json',
-      (err, stdout, stderr) => {
-        if (err || stderr) console.error(err, stderr);
-        else fs.writeFileSync('deps.json', JSON.stringify(JSON.parse(stdout), null, 2), 'utf8');
-        fs.unlinkSync('package.noDevDeps.json');
-        done();
-      });
+         '--package=./package.noDevDeps.json --output=json',
+         (err, stdout, stderr) => {
+           if (err || stderr) console.error(err, stderr);
+           else fs.writeFileSync('deps.json', JSON.stringify(JSON.parse(stdout), null, 2), 'utf8');
+           fs.unlinkSync('package.noDevDeps.json');
+           done();
+         });
   });
 
   grunt.registerTask('styles', [
@@ -241,7 +242,6 @@ module.exports = grunt => {
   ]);
 
   grunt.registerTask('production', [
-    'clean:build',
     'clean:compiled',
     'filetransform:babel',
     'copy:dist',
