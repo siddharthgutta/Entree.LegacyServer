@@ -8,7 +8,10 @@ const basename = path.basename(module.filename);
 const db = {};
 const sequelize = new Sequelize(mysqlConfig.database, mysqlConfig.username, mysqlConfig.password, mysqlConfig);
 
-sequelize.sync({force: true});
+/* This is for whenver we update schema, need to create a better solution */
+sequelize.query('SET FOREIGN_KEY_CHECKS=0')
+  .then(() => sequelize.sync({force: true}))
+  .then(() => sequelize.query('SET FOREIGN_KEY_CHECKS=1'));
 
 // TODO logging => console.tag('sequelize').bind(console)
 
