@@ -11,7 +11,8 @@
       "socket-master": 2999,
       "socket-test": 2997,
       "socket-shared": 2996,
-      "orders2": 3030
+      "orders2": 3030,
+      "cordova": 3031
     }
   },
   "env": {

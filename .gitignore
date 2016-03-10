@@ -62,4 +62,13 @@ xcuserdata
 public/
 www/
 
+cordova/hooks/
+cordova/www/
+cordova/platforms/
+cordova/plugins/
+
+Android/bin/
+Android/gen/
+Android/assets/
+
 package.noDevDeps.json
