@@ -43,6 +43,7 @@
   },
   "IsTest": false,
   "AppId": "local",
+  "AppBranch": "local",
   "NodeEnv": "development",
   "SocketServer": {
     "protocol": "http",

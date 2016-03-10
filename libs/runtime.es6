@@ -12,9 +12,9 @@ if (cluster.isWorker) {
   clusterId = cluster.worker.id;
 }
 
-export const cid = clusterId;
-export const pid = process.pid + config.get('AppId');
-export const uid = cid + pid;
+export const cid = clusterId; // cluster id
+export const pid = config.get('NodeEnv') + config.get('Mode') + config.get('AppId'); // process level id (virtual)
+export const uid = process.pid + config.get('Mode') + cid + config.get('AppBranch'); // unique id
 
 let _hostname;
 export async function hostname() {
@@ -32,6 +32,8 @@ export async function hostname() {
         _hostname = hn;
         return _hostname;
       }
+
+      await console.log(`${url} mismatch`);
     } catch (e) {
       // ignore;
     }

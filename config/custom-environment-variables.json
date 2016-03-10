@@ -44,5 +44,6 @@
   "DeveloperNumber": "DEVELOPER_NUMBER",
   "NodeEnv": "NODE_ENV",
   "Mode": "BRANCHOFF_MODE",
-  "AppId": "BRANCHOFF_BRANCH"
+  "AppId": "BRANCHOFF_VPID",
+  "AppBranch": "BRANCHOFF_BRANCH"
 }
