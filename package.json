@@ -25,6 +25,7 @@
     "body-parser": "1.14.2",
     "brace": "0.7.0",
     "braintree-web": "2.21.0",
+    "braintree": "1.36.0",
     "callsite": "1.0.0",
     "chalk": "1.1.1",
     "chance": "0.8.0",
@@ -142,6 +143,7 @@
     "eslint-plugin-react": "3.16.1",
     "grunt-cli": "0.1.13",
     "mocha": "2.3.4",
-    "pre-commit": "1.1.2"
+    "pre-commit": "1.1.2",
+    "wtfnode": "^0.2.1"
   }
 }
