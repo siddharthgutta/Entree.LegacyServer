@@ -12,8 +12,7 @@ export default function (sequelize, DataTypes) {
           'Friday',
           'Saturday',
           'Sunday',
-          'Custom',
-          'Forever'
+          'Custom'
         ]]
       }
     },
@@ -40,8 +39,10 @@ export default function (sequelize, DataTypes) {
     }
   }, {
     classMethods: {
-      associate: models => {
-        RestaurantHour.belongsTo(models.Restaurant);
+      associate: db => {
+        RestaurantHour.belongsTo(db.Restaurant, {
+          onDelete: 'CASCADE'
+        });
       }
     }
   });

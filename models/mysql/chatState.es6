@@ -1,23 +1,81 @@
+import models from './index.es6';
+
 export default function (sequelize, DataTypes) {
   const ChatState = sequelize.define('ChatState', {
     state: {
-      type: DataTypes.STRING(16), // eslint-disable-line new-cap
-      allowNull: false,
-      validate: {
-        isIn: [[/* The valid states */]]
-      }
+      type: DataTypes.STRING(16), // eslint-disable-line new-cap,babel/new-cap
+      allowNull: false
     }
-    /*
-    * Other attributes that we will need to maintain for each state
-    * */
   }, {
     classMethods: {
-      associate: models => {
-        ChatState.belongsTo(models.User);
-
-        ChatState.hasMany(models.OrderItem, {
+      associate: db => {
+        ChatState.belongsTo(db.User, {
           onDelete: 'CASCADE'
         });
+
+        ChatState.hasMany(db.OrderItem, {
+          onDelete: 'CASCADE'
+        });
+
+        ChatState.hasMany(db.CommandMap, {
+          onDelete: 'CASCADE'
+        });
+
+        /* Used to main order context */
+        ChatState.belongsTo(db.Restaurant);
+        ChatState.belongsTo(db.MenuItem);
+      }
+    },
+    instanceMethods: {
+      insertCommandMap: async function (key, value) { // eslint-disable-line
+        const commandMap = await models.CommandMap.create({key, value});
+        await this.addCommandMap(commandMap);
+        return commandMap;
+      },
+      clearCommandMaps: async function () { // eslint-disable-line
+        return await this.setCommandMaps(null);
+      },
+      findCommandMaps: async function () { // eslint-disable-line
+        return await this.getCommandMaps();
+      },
+      setRestaurantCtx: async function (restaurant) { // eslint-disable-line
+        await this.setMenuItem(null);
+        await this.setRestaurant(restaurant);
+      },
+      findRestaurantCtx: async function () { // eslint-disable-line
+        return await this.getRestaurant();
+      },
+      clearRestaurantCtx: async function() { // eslint-disable-line
+        await this.setRestaurant(null);
+      },
+      setMenuItemCtx: async function (item) { // eslint-disable-line
+        await this.setMenuItem(item);
+      },
+      clearMenuItemCtx: async function () { // eslint-disable-line
+        await this.setMenuItem(null);
+      },
+      findMenuItemCtx: async function () { // eslint-disable-line
+        return await this.getMenuItem();
+      },
+      updateState: async function (state) { // eslint-disable-line
+        this.state = state;
+        await this.save();
+        return this;
+      },
+      insertOrderItem: async function(name, price) { // eslint-disable-line
+        const orderItem = await models.OrderItem.create({name, price});
+        await this.addOrderItem(orderItem);
+        return orderItem;
+      },
+      findOrderItems: async function () { // eslint-disable-line
+        return await this.getOrderItems();
+      },
+      findLastOrderItem: async function() { // eslint-disable-line
+        const orderItems = await this.getOrderItems({order: 'id DESC'});
+        return orderItems[0];
+      },
+      clearOrderItems: async function() { // eslint-disable-line
+        await this.setOrderItems(null);
       }
     }
   });

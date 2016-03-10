@@ -51,8 +51,8 @@ router.get('/generate/user', async (req, res) => {
 });
 
 
-router.get('/generate/restaurant', async (req, res) => {
-  const name = chance.word();
+router.get('/generate/restaurant/:name*?', async (req, res) => {
+  const name = req.params.name || chance.word();
   const {mode} = String(req.query.mode).toUpperCase() === Restaurant.RestaurantModel.Mode.GOD ?
     Restaurant.RestaurantModel.Mode.GOD : Restaurant.RestaurantModel.Mode.REGULAR;
   const restaurant = await Restaurant.RestaurantModel.create(name, 'test', mode);

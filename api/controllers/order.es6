@@ -21,28 +21,29 @@ export async function setOrderStatus(id, status, {prepTime, message} = {}, isRes
   if (status === Status.ACCEPTED) {
     if (!prepTime) {
       throw Error('Preparation time is required for accepting an order!');
-    } else {
-      prepTime = null;
     }
+  } else {
+    prepTime = null;
   }
 
   if (status === Status.DECLINED) {
     if (!message) {
       throw Error('Message is required for accepting an order!');
-    } else {
-      message = null;
     }
+  } else {
+    message = null;
   }
 
   switch (status) {
     case Status.RECEIVED_PAYMENT:
       notificationEvent = Notification.Events.NEW_ORDER;
+      internalEvent = Events.UPDATED_ORDER;
       break;
     case Status.ACCEPTED:
     case Status.COMPLETED:
     case Status.DECLINED:
       notificationEvent = Notification.Events.ORDER_UPDATE;
-      internalEvent = Events.RESTAURANT_UPDATED_ORDER;
+      internalEvent = Events.UPDATED_ORDER;
       break;
     case Status.FAILED_PAYMENT:
       break;

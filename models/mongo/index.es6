@@ -2,9 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import config from 'config';
 import mongoose from 'mongoose';
+import Promise from 'bluebird';
 
 const mongoConfig = config.get('MongoDb');
-mongoose.Promise = require('bluebird');
+mongoose.Promise = Promise;
 mongoose.connect(`mongodb://${mongoConfig.host}:${mongoConfig.port}/${mongoConfig.database}`);
 
 const basename = path.basename(module.filename);

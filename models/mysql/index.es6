@@ -19,8 +19,8 @@ const sequelize = new Sequelize(mysqlConfig.database, mysqlConfig.username, mysq
 // TODO logging => console.tag('sequelize').bind(console)
 
 // sequelize.query('SET FOREIGN_KEY_CHECKS=0')
-//         .then(() => sequelize.sync({force: true}))
-//         .then(() => sequelize.query('SET FOREIGN_KEY_CHECKS=1'));
+//        .then(() => sequelize.sync({force: true}))
+//        .then(() => sequelize.query('SET FOREIGN_KEY_CHECKS=1'));
 
 fs.readdirSync(__dirname)
   .filter(file => (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js'))

@@ -9,6 +9,7 @@ import Emitter, {Events} from '../events/index.es6';
 
 const admins = config.get('Admins');
 const forceLocalStrategy = false;
+const forceAllNumbersWithRemote = true; // FIXME temp solution
 
 /**
  * Purpose of this API is to handle everything SMS. All incoming and sent
@@ -105,7 +106,7 @@ sms.on(Twilio.RECEIVED, async text => {
   if (sms instanceof TwilioRemote) {
     // TODO export DEVELOPER_NUMBER=+1<your_number>
     // put that into .bashrc or .bash_profile
-    if (text.from !== config.get('DeveloperNumber')) {
+    if (!forceAllNumbersWithRemote && text.from !== config.get('DeveloperNumber')) {
       console.tag('api', 'sms', 'ignored-text', {text});
       return;
     }

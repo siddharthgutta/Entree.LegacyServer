@@ -7,7 +7,7 @@ import keyMirror from 'keymirror';
 // @formatter:off
 export default keyMirror({
   USER_PROFILE_UPDATED: null,
-  RESTAURANT_UPDATED_ORDER: null,
+  UPDATED_ORDER: null,
   ORDER_PLACED: null,
   USER_PAYMENT_REGISTERED: true
 });

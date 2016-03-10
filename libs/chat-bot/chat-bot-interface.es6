@@ -4,24 +4,18 @@
  */
 export default class ChatBotInterface {
   constructor() {
-    throw new Error('Not implemented');
+    /* Empty constructor */
   }
 
   /**
-   * @param {number} userId: userId's state to update
+   * Updates the chat bot state and state metadata for a user given the user command
+   *
+   * @param {String} phoneNumber: phoneNumber of user to update state to update
    * @param {String} input: the user input
-   * @returns {Promise}: the output of the state transition
+   * @returns {String}: the output of the state transition
    */
-  updateState(userId, input) {
-    throw new Error('Not implemented', userId, input);
-  }
-
-  /**
-   * @param {number} userId: userId of the chat state we want to create
-   * @returns {Promise}: empty promise
-   */
-  initUserState(userId) {
-    throw new Error('Not implemented', userId);
+  updateState(phoneNumber, input) {
+    throw new Error('Not implemented', phoneNumber, input);
   }
 
 }

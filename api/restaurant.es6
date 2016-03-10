@@ -15,10 +15,10 @@ export {Mode};
  * @param {Object} attributes : Restaurant phone number is optional
  * @returns {Promise}: Returns the Restaurant object
  */
-
+// TODO @jesse please send back a JSON via toJSON
 export async function create(name, password, mode = Mode.REGULAR, attributes = {phoneNumber: null}) {
   try {
-    return (await models.Restaurant.create({name, password, mode, ...attributes})).toJSON();
+    return (await models.Restaurant.create({name, password, mode, ...attributes}));
   } catch (e) {
     throw new TraceError('Could not create restaurant', e, ...(e.errors || []));
   }
@@ -63,6 +63,9 @@ export function destroy(id) {
   return models.Restaurant.destroy({where: {id}});
 }
 
+// TODO @jesse we need to normalize the response objects from api/*.es6 files. I need simple objects not db bound
+// instances
+
 /**
  * Find a restaurant by id
  *
@@ -71,7 +74,7 @@ export function destroy(id) {
  */
 export async function findOne(id) {
   try {
-    return (await models.Restaurant.findOne({where: {id}})).toJSON();
+    return (await models.Restaurant.findOne({where: {id}}));
   } catch (e) {
     throw new TraceError('Could not find restaurant', e);
   }
@@ -125,15 +128,14 @@ export async function findOneWithMetaData(id, ...metadata) {
   }
 
   try {
-    return (await models.Restaurant.findOne(query)).toJSON();
+    return (await models.Restaurant.findOne(query));
   } catch (e) {
     throw new TraceError('Could not find restaurant', e);
   }
 }
 
 /**
- * Insert restaurantHour to restaurant if the day is not already defined
- * Otherwise, updates existing entry for the day
+ * Find a restaurant by name
  *
  * @param {Number} id: primary key of restaurant to be added to
  * @param {Object} restaurantHour: RestaurantHour information to add to restaurant
@@ -229,10 +231,17 @@ export function removeLocation(id) {
 }
 
 /**
- * Gets the location for the restaurant
- *
- * @param {Number} id: primary key of restaurant to get location of
- * @returns {Promise}: Returns a promise with the Location object
+ * @param {string} name: name of restaurant
+ * @returns {Promise}: Returns the Restaurant object
+ */
+export function findByName(name) {
+  return models.Restaurant.findOne({where: {name}});
+}
+
+/**
+ * Finds all restauarnts
+ * @param {number} id: id of restaurant
+ * @returns {Promise}: A list of all restaurants
  */
 export function getLocation(id) {
   return new Promise(resolve => {
@@ -242,6 +251,10 @@ export function getLocation(id) {
             resolve(restaurant.getLocation());
           });
   });
+}
+
+export function findAll() {
+  return models.Restaurant.findAll();
 }
 
 

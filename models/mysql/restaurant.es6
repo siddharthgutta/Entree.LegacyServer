@@ -1,19 +1,20 @@
 import {Mode} from '../constants/restaurant.es6';
-
 export {Mode};
+import models from './index.es6';
 
 export default function (sequelize, DataTypes) {
   const Restaurant = sequelize.define('Restaurant', {
     name: {
-      type: DataTypes.STRING(64), // eslint-disable-line new-cap
+      type: DataTypes.STRING(64), // eslint-disable-line new-cap,babel/new-cap
+      unique: true,
       allowNull: false
     },
     password: {
-      type: DataTypes.STRING(64), // eslint-disable-line new-cap
+      type: DataTypes.STRING(64), // eslint-disable-line new-cap,babel/new-cap
       allowNull: false
     },
     phoneNumber: {
-      type: DataTypes.STRING(10), // eslint-disable-line new-cap
+      type: DataTypes.STRING(10), // eslint-disable-line new-cap,babel/new-cap
       validate: {
         isNumeric: true,
         len: 10
@@ -28,23 +29,73 @@ export default function (sequelize, DataTypes) {
       defaultValue: false
     },
     mode: {
-      type: DataTypes.ENUM(...Object.keys(Mode)), // eslint-disable-line new-cap
+      type: DataTypes.ENUM(...Object.keys(Mode)), // eslint-disable-line new-cap,babel/new-cap
       allowNull: false
     }
   }, {
     classMethods: {
-      associate: models => {
-        Restaurant.hasOne(models.Location, {
+      associate: db => {
+        Restaurant.hasOne(db.Location, {
           onDelete: 'CASCADE'
         });
 
-        Restaurant.hasMany(models.RestaurantHour, {
+        Restaurant.hasMany(db.Category, {
           onDelete: 'CASCADE'
         });
 
-        Restaurant.hasMany(models.Order, {
+        Restaurant.hasMany(db.Order, {
           onDelete: 'CASCADE'
         });
+
+        Restaurant.hasMany(db.RestaurantHour, {
+          onDelete: 'CASCADE'
+        });
+      }
+    },
+    instanceMethods: {
+      insertCategory: async function (name) { // eslint-disable-line
+        const categories = await this.getCategories({where: {name}});
+        if (categories.length >= 1) {
+          throw (Error(`Tried to add a category ${name} to restaurant id ${this.id} that already exists`));
+        }
+
+        const newCategory = await models.Category.create({name});
+        await this.addCategory(newCategory);
+        return newCategory;
+      },
+      findCategories: async function () { // eslint-disable-line
+        return await this.getCategories();
+      },
+      upsertLocation: async function (address, city, state, zipcode) { // eslint-disable-line
+        const oldLocation = await this.getLocation();
+        if (oldLocation) {
+          oldLocation.destroy();
+        }
+
+        const newLocation = await models.Location.create({address, city, state, zipcode});
+        await this.setLocation(newLocation);
+        return newLocation;
+      },
+      findLocation: async function () { // eslint-disable-line
+        return await this.getLocation();
+      },
+      addOrUpdateHour: async function (dayOfTheWeek, openTime, closeTime) { // eslint-disable-line
+        const oldHours = await this.getRestaurantHours({where: {dayOfTheWeek}});
+
+        /* Since we are finding hours by name length of oldHours should only be max 1
+         *   (e.g.) there should not be multiple 'Tuesday' restaurant hours per restaurant */
+        if (oldHours.length >= 1) {
+          for (let i = 0; i < oldHours.length; i++) {
+            await oldHours[i].destroy();
+          }
+        }
+
+        const newHour = await models.RestaurantHour.create({dayOfTheWeek, openTime, closeTime});
+        await this.addRestaurantHour(newHour);
+        return newHour;
+      },
+      findHours: async function () { // eslint-disable-line
+        return await this.getRestaurantHours();
       }
     }
   });

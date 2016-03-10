@@ -19,7 +19,6 @@ export function create(phoneNumber, {firstName, lastName, email}) {
   return models.User.create({phoneNumber, firstName, lastName, email});
 }
 
-
 /**
  * Update a user attributes
  *

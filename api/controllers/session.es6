@@ -17,8 +17,6 @@ export async function isValid(token) {
   } catch (e) {
     return false;
   }
-
-  console.tag('session', 'isValid').log({token, valid: !!res});
 }
 
 export async function renew(restaurantId, token) {

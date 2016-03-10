@@ -42,7 +42,7 @@ class Order extends React.Component {
         <div className='id box flex left'>{order.id}</div>
         <div className='box flex left'>
           <div>
-            <div className='name'>{order.User.firstName.split(' ')[0]}</div>
+            <div className='name'>{order.User.firstName || 'Mathew'}</div>
             <div className='date'>{moment(order.date).format('h:mm A')}</div>
           </div>
         </div>
