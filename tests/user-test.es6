@@ -22,6 +22,7 @@ describe('User', () => {
   const firstName = 'TestUser';
   const email = 'TestUser@gmail.com';
   const phoneNumber = '1234567890';
+
   // Modify this number to test your own phone
   const productionPhoneNumber = '2149664948';
   const fakeNumber = '1234567890';
@@ -263,7 +264,7 @@ describe('User', () => {
     });
   });
 
-  describe('#findOne()', () => {
+  describe('#findOneByPhoneNumber()', () => {
     it('should query from the database correctly', done => {
       User.create(phoneNumber, {firstName, email})
           .then(() => {

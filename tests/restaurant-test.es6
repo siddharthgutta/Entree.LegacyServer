@@ -3,6 +3,7 @@ import {clearDatabase, disconnectDatabase} from './test-init.es6';
 import * as Restaurant from '../api/restaurant.es6';
 import * as RestaurantHour from '../api/restaurantHour.es6';
 import * as Location from '../api/location.es6';
+import * as Category from '../api/category.es6';
 
 beforeEach(done => {
   clearDatabase().then(() => done());
@@ -20,11 +21,12 @@ describe('Restaurant', () => {
   const openTime = '11:11:11';
   const closeTime = '12:34:56';
 
-  const firstAddress = '1234 Main Street';
-  const secondAddress = '5678 Burbon Street';
+  const address = '1234 Main Street';
   const city = 'Houston';
   const state = 'TX';
   const zipcode = '48921';
+
+  const category = 'Entree';
 
   if (console) {
     console.log('true');
@@ -79,21 +81,18 @@ describe('Restaurant', () => {
 
   describe('#update()', () => {
     it('should update and query from the database correctly', done => {
-      Restaurant
-      .create(name, password, mode, {phoneNumber})
-      .then(result => {
-        Restaurant.update(result.id, {name: 'NewRestaurant', password: '5678', phoneNumber: '1234561234'})
-                  .then(() => {
-                    Restaurant.findOne(result.id)
-                              .then(restaurant => {
-                                assert.equal(restaurant.name, 'NewRestaurant');
-                                assert.equal(restaurant.password, '5678');
-                                assert.equal(restaurant.mode, mode);
-                                assert.equal(restaurant.phoneNumber, '1234561234');
-                                done();
-                              });
-                  });
-      });
+      let id;
+      Restaurant.create(name, password, mode, {phoneNumber})
+                .then(result => id = result.id)
+                .then(() => Restaurant.update(id, {name: 'Rest', password: 'a', phoneNumber: '1234561234'}))
+                .then(() => Restaurant.findOne(id))
+                .then(restaurant => {
+                  assert.equal(restaurant.name, 'Rest');
+                  assert.equal(restaurant.password, 'a');
+                  assert.equal(restaurant.mode, mode);
+                  assert.equal(restaurant.phoneNumber, '1234561234');
+                  done();
+                });
     });
   });
 
@@ -104,7 +103,7 @@ describe('Restaurant', () => {
                   Restaurant.destroy(result.id)
                             .then(() => {
                               Restaurant.findOne(result.id)
-                                        .catch(() => {
+                                        .then(() => {
                                           done();
                                         });
                             });
@@ -113,11 +112,9 @@ describe('Restaurant', () => {
 
     it('should cascade delete location when deleting restaurant', done => {
       let restaurant;
-
       Restaurant.create(name, password, mode, {phoneNumber})
-                .then(_restuarant => restaurant = _restuarant)
-                .then(() => Location.create(firstAddress, city, state, zipcode, {secondAddress}))
-                .then(location => Restaurant.setOrUpdateLocation(restaurant.id, location))
+                .then(_restaurant => restaurant = _restaurant)
+                .then(() => restaurant.upsertLocation(address, city, state, zipcode))
                 .then(() => Restaurant.destroy(restaurant.id))
                 .then(() => Location.findAll())
                 .then(result => {
@@ -127,198 +124,28 @@ describe('Restaurant', () => {
     });
 
     it('should cascade delete restaurant hours when deleting restaurant', done => {
+      let restaurant;
       Restaurant.create(name, password, mode, {phoneNumber})
-                .then(restaurant => {
-                  RestaurantHour.create(dayOfTheWeek, openTime, closeTime)
-                                .then(restaurantHour => {
-                                  Restaurant.addOrUpdateHour(restaurant.id, restaurantHour)
-                                            .then(() => {
-                                              Restaurant.destroy(restaurant.id)
-                                                        .then(() => {
-                                                          RestaurantHour.findAll()
-                                                                        .then(result => {
-                                                                          assert.equal(result.length, 0);
-                                                                          done();
-                                                                        });
-                                                        });
-                                            });
-                                });
-                });
-    });
-  });
-
-  describe('#addOrUpdateRestaurantHours()', () => {
-    it('should add and query restaurant hours for a restaurant correctly', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-                .then(restaurant => {
-                  RestaurantHour.create(dayOfTheWeek, openTime, closeTime)
-                                .then(restaurantHour => {
-                                  Restaurant.addOrUpdateHour(restaurant.id, restaurantHour)
-                                            .then(() => {
-                                              Restaurant.getHours(restaurant.id)
-                                                        .then(hours => {
-                                                          assert.equal(hours.length, 1);
-                                                          assert.equal(hours[0].dayOfTheWeek, dayOfTheWeek);
-                                                          assert.equal(hours[0].openTime, openTime);
-                                                          assert.equal(hours[0].closeTime, closeTime);
-                                                          done();
-                                                        });
-                                            });
-                                });
+                .then(_restaurant => restaurant = _restaurant)
+                .then(() => restaurant.addOrUpdateHour(dayOfTheWeek, openTime, closeTime))
+                .then(() => Restaurant.destroy(restaurant.id))
+                .then(() => RestaurantHour.findAll())
+                .then(result => {
+                  assert.equal(result.length, 0);
+                  done();
                 });
     });
 
-    it('should update and query restaurant hours for a restaurant correctly', done => {
+    it('should cascade delete categories when deleting restaurant', done => {
+      let restaurant;
       Restaurant.create(name, password, mode, {phoneNumber})
-                .then(restaurant => {
-                  RestaurantHour.create(dayOfTheWeek, openTime, closeTime)
-                                .then(restaurantHour => {
-                                  Restaurant.addOrUpdateHour(restaurant.id, restaurantHour)
-                                            .then(() => {
-                                              RestaurantHour.create(dayOfTheWeek, '22:22:22', '33:33:33')
-                                                            .then(restaurantHourNew => {
-                                                              Restaurant.addOrUpdateHour(restaurant.id,
-                                                                                         restaurantHourNew)
-                                                                        .then(() => {
-                                                                          Restaurant.getHours(restaurant.id)
-                                                                                    .then(hours => {
-                                                                                      assert.equal(hours.length, 1);
-                                                                                      assert.equal(
-                                                                                        hours[0].dayOfTheWeek,
-                                                                                        dayOfTheWeek);
-                                                                                      assert.equal(hours[0].openTime,
-                                                                                                   '22:22:22');
-                                                                                      assert.equal(hours[0].closeTime,
-                                                                                                   '33:33:33');
-                                                                                      done();
-                                                                                    });
-                                                                        });
-                                                            });
-                                            });
-                                });
-                });
-    });
-
-    it('should support multiple days of the week', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-                .then(restaurant => {
-                  RestaurantHour.create(dayOfTheWeek, openTime, closeTime)
-                                .then(restaurantHour => {
-                                  Restaurant.addOrUpdateHour(restaurant.id, restaurantHour)
-                                            .then(() => {
-                                              RestaurantHour.create('Tuesday', openTime, closeTime)
-                                                            .then(restaurantHourNew => {
-                                                              Restaurant.addOrUpdateHour(restaurant.id,
-                                                                                         restaurantHourNew)
-                                                                        .then(() => {
-                                                                          Restaurant.getHours(restaurant.id)
-                                                                                    .then(hours => {
-                                                                                      assert.equal(hours.length, 2);
-                                                                                      done();
-                                                                                    });
-                                                                        });
-                                                            });
-                                            });
-                                });
-                });
-    });
-  });
-
-  describe('#setOrUpdateLocation()', () => {
-    it('should set the location of a restaurant if one does not exist', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-                .then(restaurant => {
-                  Location.create(firstAddress, city, state, zipcode, {secondAddress})
-                          .then(location => {
-                            Restaurant.setOrUpdateLocation(restaurant.id, location)
-                                      .then(() => {
-                                        Restaurant.getLocation(restaurant.id)
-                                                  .then(result => {
-                                                    assert.equal(result.firstAddress, firstAddress);
-                                                    assert.equal(result.secondAddress, secondAddress);
-                                                    assert.equal(result.city, city);
-                                                    assert.equal(result.state, state);
-                                                    assert.equal(result.zipcode, zipcode);
-                                                    done();
-                                                  });
-                                      });
-                          });
-                });
-    });
-
-    it('should replace an existing location correctly', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-                .then(restaurant => {
-                  Location.create(firstAddress, city, state, zipcode, {secondAddress})
-                          .then(location => {
-                            Restaurant.setOrUpdateLocation(restaurant.id, location)
-                                      .then(() => {
-                                        Location.create('Main St', 'NewCity', 'AB', '09876',
-                                                        {secondAddress: 'NewSecond'})
-                                                .then(locationNew => {
-                                                  Restaurant.setOrUpdateLocation(restaurant.id, locationNew)
-                                                            .then(() => {
-                                                              Restaurant.getLocation(restaurant.id)
-                                                                        .then(result => {
-                                                                          assert.equal(result.firstAddress, 'Main St');
-                                                                          assert.equal(result.secondAddress,
-                                                                                       'NewSecond');
-                                                                          assert.equal(result.city, 'NewCity');
-                                                                          assert.equal(result.state, 'AB');
-                                                                          assert.equal(result.zipcode, '09876');
-                                                                          done();
-                                                                        });
-                                                            });
-                                                });
-                                      });
-                          });
-                });
-    });
-
-    it('should delete the old location when replacing', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-                .then(restaurant => {
-                  Location.create(firstAddress, city, state, zipcode, {secondAddress})
-                          .then(location => {
-                            Restaurant.setOrUpdateLocation(restaurant.id, location)
-                                      .then(() => {
-                                        Location.create('Main St', 'NewCity', 'AB', '09876',
-                                                        {secondAddress: 'NewSecond'})
-                                                .then(locationNew => {
-                                                  Restaurant.setOrUpdateLocation(restaurant.id, locationNew)
-                                                            .then(() => {
-                                                              Location.findAll()
-                                                                      .then(result => {
-                                                                        assert.equal(result.length, 1);
-                                                                        done();
-                                                                      });
-                                                            });
-                                                });
-                                      });
-                          });
-                });
-    });
-  });
-
-  describe('#removeLocation()', () => {
-    it('should remove the location for a specific restaurant', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-                .then(restaurant => {
-                  Location.create(firstAddress, city, state, zipcode, {secondAddress})
-                          .then(location => {
-                            Restaurant.setOrUpdateLocation(restaurant.id, location)
-                                      .then(() => {
-                                        Restaurant.removeLocation(restaurant.id)
-                                                  .then(() => {
-                                                    Restaurant.getLocation(restaurant.id)
-                                                              .then(result => {
-                                                                assert.equal(result, null);
-                                                                Restaurant.destroy(restaurant.id)
-                                                                          .then(() => done());
-                                                              });
-                                                  });
-                                      });
-                          });
+                .then(_restaurant => restaurant = _restaurant)
+                .then(() => restaurant.insertCategory(category))
+                .then(() => Restaurant.destroy(restaurant.id))
+                .then(() => Category.findAll())
+                .then(result => {
+                  assert.equal(result.length, 0);
+                  done();
                 });
     });
   });
