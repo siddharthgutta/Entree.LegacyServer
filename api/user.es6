@@ -9,15 +9,15 @@ import {UserSecret} from '../models/mongo/index.es6';
 /**
  * Create a user
  *
- * @param {string} phoneNumber: User phone number
- * @param {string} name: User name
- * @param {string} email: User email
+ * @param {string} phoneNumber: user phone number
+ * @param {string} firstName: user first name
+ * @param {string} lastName: user last name
+ * @param {string} email: user email
  * @returns {Promise}: Returns the user object
  */
-export function create(phoneNumber, name, email) {
-  return models.User.create({phoneNumber, name, email});
+export function create(phoneNumber, {firstName, lastName, email}) {
+  return models.User.create({phoneNumber, firstName, lastName, email});
 }
-
 
 /**
  * Update a user attributes

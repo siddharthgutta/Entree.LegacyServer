@@ -23,6 +23,12 @@ route.get('/restaurant', (req, res) => res.render('restaurant', {
 }));
 
 
+route.get('/profile', (req, res) => res.render('profile', {
+  config: clientConfig,
+  title: 'Entrée · Profile'
+}));
+
+
 // TEST hook
 route.post('/appinfo', (req, res) => {
   res.json({pid: Runtime.pid});

@@ -1,8 +1,10 @@
 import * as User from '../user.es6';
 import {sendSMS} from './sms.es6';
+import Emitter, {Events} from '../events/index.es6';
 import {format} from 'url';
 import config from 'config';
-import Runtime from '../../libs/runtime.es6';
+import {hostname} from '../../libs/runtime.es6';
+import {chatStates} from '../../libs/chat-bot/index.es6';
 
 // FIXME @jesse: why are the raw db connections used here?
 const {User: _User, sequelize: Sequelize} = User.connection;
@@ -47,13 +49,15 @@ export function signup(phoneNumber) {
                                        // sendSMS will pass the response from twilio with text sent details
                                        // this response is not currently being dealt with but needs to be stored
                                        // in the Messages table
-                                       console.tag('routes', 'api', '/user/signup', 'User.signup')
+                                       console.tag('controller', 'signup')
                                               .log(`New user was ${created ? 'created' : 'found'} & ` +
                                                    `${created ? 'full' : 'partial'} welcome message.`);
-                                       resolve(response);
+                                       user.insertChatState(chatStates.start, t)
+                                           .then(() => resolve(response))
+                                           .catch(err => reject(err));
                                      })
                                      .catch(error => {
-                                       console.tag('api', 'user', 'signup', 'sendSMS')
+                                       console.tag('controller', 'signup', 'sms')
                                               .error('Text Message not sent successfully, but user account was ' +
                                                      'created.' +
                                                      `User account was ${created ? 'created. Rolling it back now.'
@@ -62,7 +66,7 @@ export function signup(phoneNumber) {
                                      });
                                    })
                                    .catch(error => {
-                                     console.tag('api', 'user', 'signup', 'sendSMS')
+                                     console.tag('controller', 'signup', 'sms')
                                             .error(`User not created/found in the User table. No text message sent
                                            to user. Error: ${error}`);
                                      reject(error);
@@ -81,8 +85,9 @@ export function signup(phoneNumber) {
 export async function resolveProfileEditAddress(secret) {
   const address = config.get('Server');
 
-  address.hostname = await Runtime.hostname();
-  address.path = `/api/v2/user/profile/${secret}`; // TODO idk how to not make this a constant
+  address.hostname = await hostname();
+  address.pathname = `profile`; // TODO idk how to not make this a constant
+  address.search = `token=${secret}`;
 
   return format(address);
 }
@@ -109,12 +114,31 @@ export async function getUserProfile(secret) {
   }
 }
 
-export async function updateUserProfile(secret, {name, email} = {}) {
-  const {phoneNumber, ...other} = await User.findBySecret(secret);
-  const updateAttrs = Object.assign(other, {name, email});
-  await User.updateByPhoneNumber(phoneNumber, updateAttrs);
-  const user = await User.findOneByPhoneNumber(phoneNumber);
-  return user.get();
+export async function updateUserProfile(secret, attributes) {
+  let updatedUser;
+
+  try {
+    const {id, phoneNumber, ...lastProps} = (await User.findBySecret(secret)).get();
+    updatedUser = Object.assign(lastProps, attributes, {phoneNumber, id});
+  } catch (e) {
+    throw new TraceError(`Could not find user ${secret}`, e);
+  }
+
+  const {phoneNumber} = updatedUser;
+
+  try {
+    await console.tag('controller', 'updateUserProfile').log({updatedUser});
+    await User.updateByPhoneNumber(phoneNumber, updatedUser);
+    const user = (await User.findOneByPhoneNumber(phoneNumber)).get();
+
+    // why use an emitter here?
+    // does the user care about the chatbot? no
+    Emitter.emit(Events.USER_PROFILE_UPDATED, user);
+
+    return user;
+  } catch (e) {
+    throw new TraceError(`Could not update user ${secret}`, e);
+  }
 }
 
 export {User as UserModel};

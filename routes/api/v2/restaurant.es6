@@ -20,6 +20,24 @@ router.post('/logout', authenticate, (req, res) => {
   res.ok(null, 'Success').debug('Signed out');
 });
 
+
+router.get('/connection', isAuthenticated, (req, res) => {
+  res.ok({loggedIn: true}, 'Success');
+});
+
+
+router.get('/info', isAuthenticated, async(req, res) => {
+  const {id} = req.user;
+
+  try {
+    const restaurant = await Restaurant.getRestaurantWithMetaData(id);
+    res.ok({restaurant}).debug('Created order');
+  } catch (e) {
+    res.fail(e.message).debug(e, 'Could not create socket');
+  }
+});
+
+
 router.post('/socket', isAuthenticated, async(req, res) => {
   const {id} = req.user;
 
@@ -32,12 +50,13 @@ router.post('/socket', isAuthenticated, async(req, res) => {
   }
 });
 
-router.post('/orders', isAuthenticated, async(req, res) => {
+router.get('/orders', isAuthenticated, async(req, res) => {
   const {id} = req.user;
 
+  // TODO verify the restaurant! check if GOD and return all
   try {
-    const orders = await Order.Model.findByRestaurant(id);
-    res.ok(orders).debug('Found orders');
+    const orders = await Order.OrderModel.findByRestaurant(id, Order.OrderModel.RestaurantReadableStatuses);
+    res.ok({orders}).debug('Found orders');
   } catch (e) {
     res.fail(e.message).debug(e, 'Could not find orders');
   }
@@ -47,32 +66,34 @@ router.get('/order/:id', isAuthenticated, async(req, res) => {
   const {id} = req.params;
 
   try {
-    const order = await Order.Model.findOne(id);
-    res.ok(order).debug('Found order');
+    const order = await Order.OrderModel.findOne(id, Order.OrderModel.RestaurantReadableStatuses);
+    res.ok({order}).debug('Found order');
   } catch (e) {
     res.fail(e.message).debug(e, 'Could not find order');
   }
 });
 
 router.post('/order/:id/status', isAuthenticated, async(req, res) => {
-  const {id: order} = req.params;
-  const {status, time, message} = req.body;
+  const {id} = req.params;
+  const {status, prepTime, message} = req.body;
 
+  // TODO verify the restaurant! check if GOD
+  console.log('SUPPPP', status, prepTime);
   try {
-    const {status: nextStatus} = await Order.setStatus(order, status, {time, message});
-    res.ok({status: nextStatus}, `Order status is now ${nextStatus}`);
+    const order = await Order.setOrderStatus(id, status, {prepTime, message}, true);
+    res.ok(order, `Order status is now ${order.status}`);
   } catch (e) {
     res.fail(`Failed to set status of order: ${e.message}`).debug(e);
   }
 });
 
-router.post('/operate', isAuthenticated, async(req, res) => {
+router.post('/enabled', isAuthenticated, async(req, res) => {
   const {id} = req.user;
-  const {status} = req.body;
+  const {enabled} = req.body;
 
   try {
-    const {status: nextStatus} = await Restaurant.setOperation(id, status);
-    res.ok({status: nextStatus}, `Status is now ${nextStatus}`);
+    const restaurant = await Restaurant.setEnabled(id, enabled);
+    res.ok(restaurant, `Status is now ${restaurant.enabled}`);
   } catch (e) {
     res.fail(`Failed to set state: ${e.message}`).debug(e);
   }

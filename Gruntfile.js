@@ -4,6 +4,7 @@
 
 const mozjpeg = require('imagemin-mozjpeg');
 const autoprefixer = require('autoprefixer');
+const config = require('config');
 
 module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
@@ -121,6 +122,7 @@ module.exports = grunt => {
     jade: {
       dist: {
         options: {
+          data: {config: JSON.stringify(config.get('Client'))},
           optimizationLevel: 3
         },
         files: [{

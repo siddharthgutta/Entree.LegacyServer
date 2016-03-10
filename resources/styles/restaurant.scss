@@ -16,6 +16,9 @@ body {
   &.green {
     background: linear-gradient(to bottom, #3FB5B0, #573273);
   }
+  &.black {
+    background: linear-gradient(to bottom, #303242, #000);
+  }
 }
 
 input, textarea {
@@ -45,6 +48,11 @@ a {
     letter-spacing: 1px;
     text-transform: uppercase;
     color: #777;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    right: 0;
+    position: absolute;
   }
   .header {
     background: #111;
@@ -119,6 +127,9 @@ a {
     }
     .blue & {
       background: rgba(64, 88, 181, 0.6);
+    }
+    .entree {
+
     }
   }
   .cost {
@@ -788,4 +799,70 @@ a {
 .blur {
   filter: blur(50px);
   -webkit-filter: blur(50px);
+}
+
+.animate-show {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.2s cubic-bezier(.36, .07, .19, .97);
+}
+
+.animate-hide {
+  opacity: 0.0;
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(.36, .07, .19, .97);
+}
+
+.animate-shake {
+  animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.login {
+  .input {
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 5px;
+    color: #FFF;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.12);
+    width: 100%;
+    font-size: 12px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+}
+
+.secondary-logo {
+  background: url(../images/logo10.png) center center;
+  background-size: cover;
+  height: 92px;
+  width: 91px;
+  margin: 0 auto;
+  position: absolute;
+  top: 30%;
+  transform: translateY(-50%);
+  left: 0;
+  right: 0;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
 }

@@ -4,7 +4,7 @@ import fetch from '../libs/fetch.es6';
 import assert from 'assert';
 
 const phone = '7135011837';
-let session;
+let secret;
 
 const {SERVER_URL} = global;
 
@@ -13,37 +13,40 @@ after(() => disconnectDatabase());
 
 describe('User', () => {
   it('should create a user', async () => {
-    await User.UserModel.create('7135011837', 'Mathew Kurian', 'test@gmail.com');
+    await User.UserModel.create('7135011837', {firstName: 'Mathew', email: 'test@gmail.com'});
   });
 
-  it('should create a user edit session', async () => {
-    const {secret} = await User.requestProfileEditByPhoneNumber(phone);
-    session = secret;
+  it('should create a user edit secret', async () => {
+    const {secret: _secret} = await User.requestProfileEditByPhoneNumber(phone);
+    secret = _secret;
   });
 
   it('should retrieve user profile', async () => {
-    const {body: {data: {phoneNumber, name, email}}} =
-      await fetch(`${SERVER_URL}/api/v2/user/profile/${session}`);
+    const {body: {data: {user: {phoneNumber, firstName, lastName, email}}}} =
+      await fetch(`${SERVER_URL}/api/v2/user/profile/${secret}`);
 
-    assert(phoneNumber, '7135011837');
-    assert(name, 'Mathew Kurian');
-    assert(email, 'test@gmail.com');
+    assert.equal(phoneNumber, '7135011837');
+    assert.equal(firstName, 'Mathew');
+    assert.equal(lastName, null);
+    assert.equal(email, 'test@gmail.com');
   });
 
   it('should edit user profile', async () => {
-    const {body: {data: {phoneNumber, name, email}}} =
-      await fetch(`${SERVER_URL}/api/v2/user/profile/${session}`, {
+    const {body: {data: {user: {phoneNumber, firstName, lastName, email}}}} =
+      await fetch(`${SERVER_URL}/api/v2/user/profile/${secret}`, {
         method: 'post',
         body: {
           phoneNumber: '5555555555',
-          name: 'Jesse Mao',
+          firstName: 'Jesse',
+          lastName: 'Mao',
           email: 'kfu@gmail.com'
         }
       });
 
-    assert(phoneNumber, '7135011837');
-    assert(name, 'Jesse Mao');
-    assert(email, 'kfu@gmail.com');
+    assert.equal(phoneNumber, '7135011837');
+    assert.equal(firstName, 'Jesse');
+    assert.equal(lastName, 'Mao');
+    assert.equal(email, 'kfu@gmail.com');
   });
 
   it('should throw an error', async () => {
@@ -52,7 +55,7 @@ describe('User', () => {
         method: 'post',
         body: {
           phoneNumber: null,
-          name: null,
+          firstName: null,
           email: null
         }
       });

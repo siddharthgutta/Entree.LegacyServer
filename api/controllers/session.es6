@@ -11,11 +11,12 @@ export async function create(restaurantId) {
 }
 
 export async function isValid(token) {
-  const res = await AuthToken.findByToken(token);
-
-  console.tag('session', 'isValid').log({token, valid: !!res});
-
-  return !!res;
+  try {
+    const res = await AuthToken.findByToken(token);
+    return !!res;
+  } catch (e) {
+    return false;
+  }
 }
 
 export async function renew(restaurantId, token) {

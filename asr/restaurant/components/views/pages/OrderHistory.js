@@ -6,11 +6,9 @@ import Dispatcher from '../../../dispatchers/Dispatcher';
 import Feedback from '../modals/Feedback';
 import {onClick} from '../../../../libs/utils';
 import keyMirror from 'keymirror';
+import {OrderConstants} from '../../../../../api/constants/client.es6';
 
-const Modals = keyMirror({
-  FEEDBACK: null
-});
-
+const Modals = keyMirror({FEEDBACK: null});
 
 class OrderHistory extends Page {
   constructor(context, props) {
@@ -20,8 +18,14 @@ class OrderHistory extends Page {
   }
 
   _handleTabChange(tab) {
-    document.body.classList.remove('red', 'green', 'blue');
-    document.body.classList.add({Received: 'red', Progress: 'green', Completed: 'blue'}[tab]);
+    const bgSelector = {
+      Received: 'red',
+      Progress: 'green',
+      Completed: 'blue'
+    };
+
+    document.body.classList.remove('red', 'green', 'blue', 'black');
+    document.body.classList.add(bgSelector[tab]);
   }
 
   getModals() {
@@ -39,24 +43,31 @@ class OrderHistory extends Page {
   }
 
   render() {
-    const received = <OrderList status='received'/>;
-    const completed = <OrderList status='completed'/>;
-    const accepted = <OrderList status='accepted'/>;
+    const received = <OrderList status={OrderConstants.Status.RECEIVED_PAYMENT} empty='No New Orders'/>;
+    const completed = <OrderList status={OrderConstants.Status.COMPLETED} empty='No Completed Orders'/>;
+    const progress = <OrderList status={OrderConstants.Status.ACCEPTED} empty='No Accepted Orders'/>;
+
+    const tabSetup = {
+      Received: received,
+      Completed: completed,
+      Progress: progress,
+      tabs: ['Received', 'Progress', 'Completed']
+    };
 
     return (
-        <div className='full flex vertical'>
-          <TabbedPane spread onChange={tab => this._handleTabChange(tab)} Received={received}
-                      Completed={completed} Progress={accepted} tabs={['Received', 'Progress', 'Completed']}/>
-          <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 45}}>
-            <div className='floater'>
-              <div className='flex'>
-                <div className='button box dim' {...onClick(() =>
-                    Dispatcher.emit(Dispatcher.Events.MODAL_VISIBILITY, Modals.FEEDBACK, true))}>HAVING ISSUES?
-                </div>
+      <div className='full flex vertical'>
+        <TabbedPane spread onChange={tab => this._handleTabChange(tab)} {...tabSetup}/>
+        <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 45}}>
+          <div className='floater'>
+            <div className='flex'>
+              <div className='button box dim'
+                {...onClick(() => Dispatcher.emit(Dispatcher.Events.MODAL_VISIBILITY, Modals.FEEDBACK, true))}>
+                HAVING ISSUES?
               </div>
             </div>
           </div>
         </div>
+      </div>
     );
   }
 }

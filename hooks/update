@@ -14,7 +14,7 @@ if [[ ${message} == *"release"* || ${message} == *"RELEASE"* ]] && [[ ${1} != *"
 then
 # push ios release
 ios_raw=$(curl https://api.tryouts.io/v1/applications/NCKHE4E1/releases/ \
-    -F "build=@./cordova/build/Entree.ipa" \
+    -F "build=@../cordova/build/Entree.ipa" \
     -F "notes=$message" \
     -F "notify=1" \
     -F "status=2" \
@@ -22,7 +22,7 @@ ios_raw=$(curl https://api.tryouts.io/v1/applications/NCKHE4E1/releases/ \
 
 # push android release
 android_raw=$(curl https://api.tryouts.io/v1/applications/6A6cacUG/releases/ \
-    -F "build=@./cordova/build/android-debug.apk" \
+    -F "build=@../cordova/build/android-debug.apk" \
     -F "notes=$message" \
     -F "notify=1" \
     -F "status=2" \

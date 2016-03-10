@@ -10,7 +10,8 @@
       "master": 443,
       "socket-master": 2999,
       "socket-test": 2997,
-      "socket-shared": 2996
+      "socket-shared": 2996,
+      "orders2": 3030
     }
   },
   "env": {

@@ -1,12 +1,14 @@
 import Scribe from 'scribe-js';
 import config from 'config';
 import extend from 'extend';
-import {TraceError, useSourceOnError} from './libs/utils.es6';
+import {TraceError} from './libs/utils.es6';
+import Promise from 'bluebird';
 
 export function initErrorHandling() {
   // Promise.suppressUnhandledRejections();
+  Promise.config({longStackTraces: false});
 
-  useSourceOnError();
+  // useSourceOnError();
   global.TraceError = TraceError;
 }
 

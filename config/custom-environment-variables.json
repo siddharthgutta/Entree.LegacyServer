@@ -1,6 +1,13 @@
 {
   "Client": {
-    "socketPort": "SOCKET_SERVER_PORT"
+    "Server": {
+      "protocol": "https",
+      "port": {
+        "__name": "BRANCHOFF_PORT",
+        "__format": "json"
+      },
+      "hostname": "localhost"
+    }
   },
   "UseRemoteSocketServer": {
     "__name": "SOCKET_SERVER_USE_REMOTE",

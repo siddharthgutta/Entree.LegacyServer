@@ -3,6 +3,8 @@ import expect from 'expect.js';
 import supertest from 'supertest';
 import fetch from '../libs/fetch.es6';
 import {SMS} from '../api/controllers/sms.es6';
+import * as Restaurant from '../api/controllers/restaurant.es6';
+import SocketEvents from '../api/constants/client.es6';
 import {Twilio} from '../libs/sms/index.es6';
 import io from 'socket.io-client';
 import config from 'config';
@@ -75,15 +77,19 @@ describe('Twilio SMS Receive', () => {
      */
 
     it('should succeed when SocketToken exists', async done => {
-      const {body: {data: {address, accessor: {uuid}}}} =
-        await fetch(`${serverUrl}/api/v1/messenger/token`, {method: 'post'});
+      const {RestaurantModel} = Restaurant;
+      const {id, password} = await RestaurantModel.create('test', 'test', RestaurantModel.Mode.GOD);
+      const {body: {data: {token}}} = await fetch(`${serverUrl}/api/v2/restaurant/login`,
+                                                  {method: 'post', body: {id, password}});
+      const {body: {data: {address, uuid}}} =
+        await fetch(`${serverUrl}/api/v2/restaurant/socket`, {method: 'post', body: {token}});
 
       const url = format(address);
 
       console.tag(global.TEST).log(url, uuid);
 
       const socket = io(url, {query: `id=${uuid}`, secure: true});
-      socket.once('receive', async text => {
+      socket.once(SocketEvents.TEXT_RECEIVED, async text => {
         await console.tag(global.TEST).log(text);
         assert(text.content, 'Abc');
         socket.disconnect();
@@ -110,70 +116,70 @@ describe('Twilio SMS Receive', () => {
 
   /*
    describe('createAndEmit tests', () => {
-    const phoneNumber = '1234567890';
-    const content = 'This is the message content';
-    const restaurantId = 1;
-    const date = Date.now();
-    const twilioSid = 'abc123';
-    const twilioNumber = '0987654321';
-    const sentByUser = true;
-    const success = true;
+   const phoneNumber = '1234567890';
+   const content = 'This is the message content';
+   const restaurantId = 1;
+   const date = Date.now();
+   const twilioSid = 'abc123';
+   const twilioNumber = '0987654321';
+   const sentByUser = true;
+   const success = true;
 
-    beforeEach(done => {
-      clearDatabase()
-      .then(() => done());
-    });
+   beforeEach(done => {
+   clearDatabase()
+   .then(() => done());
+   });
 
-    it('should fail without SocketToken', done => {
-      createAndEmit(
-        phoneNumber,
-        restaurantId,
-        content,
-        date,
-        twilioSid,
-        twilioNumber,
-        sentByUser,
-        success)
-      .then(() => {
-        expect()
-        .fail(`Should fail since no SocketToken exists.`);
-      })
-      .catch(() => {
-        done();
-      });
-    });
+   it('should fail without SocketToken', done => {
+   createAndEmit(
+   phoneNumber,
+   restaurantId,
+   content,
+   date,
+   twilioSid,
+   twilioNumber,
+   sentByUser,
+   success)
+   .then(() => {
+   expect()
+   .fail(`Should fail since no SocketToken exists.`);
+   })
+   .catch(() => {
+   done();
+   });
+   });
 
-    it('should succeed if SocketToken exists', done => {
-      SocketToken.addTokenOrCreate(restaurantId, '123456')
-                 .then(() => {
-                   createAndEmit(
-                     phoneNumber,
-                     restaurantId,
-                     content,
-                     date,
-                     twilioSid,
-                     twilioNumber,
-                     sentByUser,
-                     success)
-                   .then(message => {
-                     assert.equal(message.phoneNumber, phoneNumber);
-                     assert.equal(message.restaurantId, restaurantId);
-                     assert.equal(message.content, content);
-                     assert.equal(message.date.getTime(), date);
-                     assert.equal(message.twilioSid, twilioSid);
-                     assert.equal(message.twilioNumber, twilioNumber);
-                     assert.equal(message.sentByUser, sentByUser);
-                     assert.equal(message.success, success);
-                     done();
-                   })
-                   .catch(() => {
-                     expect().fail(`Should succeed since SocketToken exists.`);
-                   });
-                 })
-                 .catch(() => {
-                   expect().fail(`Should succeed since SocketToken exists.`);
-                 });
-    });
-  });
-  */
+   it('should succeed if SocketToken exists', done => {
+   SocketToken.addTokenOrCreate(restaurantId, '123456')
+   .then(() => {
+   createAndEmit(
+   phoneNumber,
+   restaurantId,
+   content,
+   date,
+   twilioSid,
+   twilioNumber,
+   sentByUser,
+   success)
+   .then(message => {
+   assert.equal(message.phoneNumber, phoneNumber);
+   assert.equal(message.restaurantId, restaurantId);
+   assert.equal(message.content, content);
+   assert.equal(message.date.getTime(), date);
+   assert.equal(message.twilioSid, twilioSid);
+   assert.equal(message.twilioNumber, twilioNumber);
+   assert.equal(message.sentByUser, sentByUser);
+   assert.equal(message.success, success);
+   done();
+   })
+   .catch(() => {
+   expect().fail(`Should succeed since SocketToken exists.`);
+   });
+   })
+   .catch(() => {
+   expect().fail(`Should succeed since SocketToken exists.`);
+   });
+   });
+   });
+   */
 });
