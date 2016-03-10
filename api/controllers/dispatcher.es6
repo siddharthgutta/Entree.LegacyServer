@@ -9,6 +9,12 @@ import Chance from 'chance';
 const chance = new Chance();
 const chatBot = new DefaultChatBot();
 
+const waitlistText = ['We know you\'re hungry! You have been added to our waitlist, and',
+  'we\'ll text you when we launch!'].join(' ');
+
+// const silentSignupText = `Entree lets you text to order ahead, pre-pay, and skip the line at the best food
+// trucks around you. We are launching during SXSW and will notify you when we’re ready!`;
+
 /**
  * Dispatcher to handle system events
  */
@@ -21,33 +27,53 @@ const chatBot = new DefaultChatBot();
 Emitter.on(Events.TEXT_RECEIVED, async text => {
   console.tag('api', 'sms', 'processReceive').log('Processing text', text.id, text);
 
-  try {
-    const response = await chatBot.updateState(text.from, text.body);
-    if (typeof response === 'object') {
-      const items = response.order.items.map(item => {
-        item.price = chance.floating({min: 0, max: 10, fixed: 2});
-        return item;
-      });
+  if (false) {
+    try {
+      const response = await chatBot.updateState(text.from, text.body);
+      if (typeof response === 'object') {
+        const items = response.order.items.map(item => {
+          item.price = chance.floating({min: 0, max: 10, fixed: 2});
+          return item;
+        });
 
-      const user = await User.UserModel.findOneByPhoneNumber(text.from);
-      const restaurant = await Restaurant.RestaurantModel.findByName(response.restaurant);
-      const order = await Order.createOrder(user.id, restaurant.id, items);
+        const user = await User.UserModel.findOneByPhoneNumber(text.from);
+        const restaurant = await Restaurant.RestaurantModel.findByName(response.restaurant);
+        const order = await Order.createOrder(user.id, restaurant.id, items);
 
-      setTimeout(() => {
-        Order.setOrderStatus(order.id, Order.Status.RECEIVED_PAYMENT);
-      }, 5000);
+        setTimeout(() => {
+          Order.setOrderStatus(order.id, Order.Status.RECEIVED_PAYMENT);
+        }, 5000);
 
-      await sendSMS(text.from, response.response);
-    } else if (response) {
-      await sendSMS(text.from, response);
-    } else {
-      throw Error('Not passing in a text?');
+        await sendSMS(text.from, response.response);
+      } else if (response) {
+        await sendSMS(text.from, response);
+      } else {
+        throw Error('Not passing in a text?');
+      }
+    } catch (err) {
+      console.error(err);
+
+      /* Best way to handle errors? */
+      await sendSMS(text.from, 'Something went wrong');
     }
-  } catch (err) {
-    console.error(err);
+  } else {
+    try {
+      // check if user exists
+      const user = await User.UserModel.findOneByPhoneNumber(text.from);
+      if (!user) {
+        throw Error('User not in db. Try signing them up');
+      }
+    } catch (e) {
+      try {
+        // if user doesn't exist try to sign them up (which will send a text)
+        return await User.signup(text.from, waitlistText);
+      } catch (ee) {
+        // if that fails go to default fallback message
+        console.error(ee);
+      }
+    }
 
-    /* Best way to handle errors? */
-    await sendSMS(text.from, 'Something went wrong');
+    await sendSMS(text.from, waitlistText);
   }
 });
 

@@ -17,18 +17,23 @@ const {User: _User, sequelize: Sequelize} = User.connection;
  * @returns {string}: Returns greeting message
  */
 function getGreeting(name, firstTime) {
-  if (firstTime && name) {
-    return `Hi ${name}, Entrée here. I can help you order ahead at your favorite restaurants. ' +
+  if (false) {
+    if (firstTime && name) {
+      return `Hi ${name}, Entrée here. I can help you order ahead at your favorite restaurants. ' +
       'Type in /r to see where I work. Type in /help at any point if you need help.`;
-  } else if (firstTime && !name) {
+    } else if (firstTime && !name) {
+      return 'Entrée helps you order ahead and cut the line at the best food trucks around you. ' +
+        'We are currently in closed beta but will notify you as soon as we launch!';
+    } else if (!firstTime && name) {
+      return `Welcome back ${name}! I'm here to help you order ahead at your favorite restaurants. ` +
+        'Type in /r to see where I work. Type in /help at any point if you need help.';
+    }
     return 'Entrée helps you order ahead and cut the line at the best food trucks around you. ' +
       'We are currently in closed beta but will notify you as soon as we launch!';
-  } else if (!firstTime && name) {
-    return `Welcome back ${name}! I'm here to help you order ahead at your favorite restaurants. ` +
-      'Type in /r to see where I work. Type in /help at any point if you need help.';
   }
-  return 'Entrée helps you order ahead and cut the line at the best food trucks around you. ' +
-    'We are currently in closed beta but will notify you as soon as we launch!';
+
+  return ['Thanks for signing up! Entree lets you text to order ahead, pre-pay, and skip the line at the best food',
+    'trucks around you. We are launching during SXSW and will notify you when we’re ready!'].join(' ');
 }
 
 /**
@@ -36,15 +41,16 @@ function getGreeting(name, firstTime) {
  * Create user with just a phone number
  *
  * @param {string} phoneNumber: User phone number
+ * @param {string} overrideGreeting: String override greeting
  * @returns {Promise}: Returns the user object.
  */
-export function signup(phoneNumber) {
+export function signup(phoneNumber, overrideGreeting) {
   return new Promise((outerResolve, outerReject) => {
     Sequelize.transaction(t =>
                             new Promise((resolve, reject) => {
                               _User.findOrCreate({where: {phoneNumber}, transaction: t})
                                    .spread((user, created) => {
-                                     sendSMS(user.phoneNumber, getGreeting(user.name, created))
+                                     sendSMS(user.phoneNumber, overrideGreeting || getGreeting(user.name, created))
                                      .then(response => {
                                        // sendSMS will pass the response from twilio with text sent details
                                        // this response is not currently being dealt with but needs to be stored
@@ -52,9 +58,17 @@ export function signup(phoneNumber) {
                                        console.tag('controller', 'signup')
                                               .log(`New user was ${created ? 'created' : 'found'} & ` +
                                                    `${created ? 'full' : 'partial'} welcome message.`);
-                                       user.insertChatState(chatStates.start, t)
-                                           .then(() => resolve(response))
-                                           .catch(err => reject(err));
+
+                                       // TODO @jadesym @jesse move getGreeting into chatbot. then ask chatbot
+                                       // what to say and send that to the client.
+                                       // TODO @jadesym lets get this into async/await if you get some downtime
+
+                                       // FIXME disabling chatState insertion for ensuring texts are sent out
+                                       // TODO this is temporary only. @jesse a more permanent solution?
+                                       user.insertChatState(chatStates.start, t);
+                                       // .then(() => resolve(response))
+                                       // .catch(err => reject(err));
+                                       resolve(response);
                                      })
                                      .catch(error => {
                                        console.tag('controller', 'signup', 'sms')

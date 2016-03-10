@@ -86,7 +86,7 @@ class App extends Influx.Component {
     this.block = true;
 
     const node = findDOMNode(this.refs.phone);
-    const phoneNumber = node.value;
+    const phoneNumber = String(node.value).replace(/[^0-9]/g, '');
 
     fetch(`/api/v2/user/signup`, {method: 'post', body: {phoneNumber}})
     .then(res => {
