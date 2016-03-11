@@ -120,6 +120,8 @@ class App extends Influx.Component {
   render() {
     return (
       <div className='full background'>
+        <a className='twitter' href='https://twitter.com/textentree'><span className='icon twitter'/></a>
+        <a className='contact' href='mailto:hi@textentree.com'>CONTACT</a>
         <div className='flex center vertical animate-opacity' ref='brand' style={{width: '100%', height: '50%'}}>
           <div className='main-logo'/>
           <div className='catchphrase'>Order Ahead with SMS</div>
@@ -139,8 +141,10 @@ class App extends Influx.Component {
           <div className='input-wrapper'>
             <input type='tel' ref='phone' className='input' placeholder='Your Phone Number'/>
           </div>
-          <div className='button' {...onClick(() => this._createUser())}><span style={{opacity: 0.7}}>TEXT</span>
-            &nbsp;YOUR ORDER!
+          <div className='flex'>
+            <div className='box button' {...onClick(() => this._createUser())}><span style={{opacity: 0.7}}>TEXT</span>
+              &nbsp;YOUR ORDER!
+            </div>
           </div>
         </div>
       </div>

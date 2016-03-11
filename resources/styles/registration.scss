@@ -177,3 +177,45 @@ video {
   width: 60px;
   margin: 0 auto;
 }
+
+.contact {
+  display: block;
+  text-decoration: none;
+  width: 90px;
+  height: 25px;
+  position: fixed;
+  text-indent: 7px;
+  background: #228AE6;
+  border-radius: 0 0 0 30px;
+  right: 0;
+  top: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  text-align: center;
+  line-height: 25px;
+  font-size: 11px;
+  color: #FFF;
+  letter-spacing: 1px;
+  z-index: 999;
+  font-weight: bold;
+}
+
+
+.twitter {
+  display: block;
+  text-decoration: none;
+  width: 40px;
+  height: 25px;
+  position: fixed;
+  background: #228AE6;
+  border-radius: 0 0 30px 0;
+  left: 0;
+  top: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  text-align: center;
+  line-height: 25px;
+  font-size: 12px;
+  color: #FFF;
+  letter-spacing: 1px;
+  z-index: 999;
+  font-weight: bold;
+}
