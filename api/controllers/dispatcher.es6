@@ -9,11 +9,12 @@ import Chance from 'chance';
 const chance = new Chance();
 const chatBot = new DefaultChatBot();
 
-const waitlistText = ['We know you\'re hungry! You have been added to our waitlist, and',
+const waitlistText = ['We are almost ready. You have been added to our waitlist, and',
   'we\'ll text you when we launch!'].join(' ');
 
-// const silentSignupText = `Entree lets you text to order ahead, pre-pay, and skip the line at the best food
-// trucks around you. We are launching during SXSW and will notify you when we’re ready!`;
+const silentSignupText = ['We know you\'re hungry! Entree lets you text to order ahead, pre-pay, and skip',
+  'the line at the best food',
+  'trucks around you. We are launching during SXSW and will notify you when we’re ready!'].join(' ');
 
 /**
  * Dispatcher to handle system events
@@ -66,7 +67,7 @@ Emitter.on(Events.TEXT_RECEIVED, async text => {
     } catch (e) {
       try {
         // if user doesn't exist try to sign them up (which will send a text)
-        return await User.signup(text.from, waitlistText);
+        return await User.signup(text.from, silentSignupText);
       } catch (ee) {
         // if that fails go to default fallback message
         console.error(ee);
