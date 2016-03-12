@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.compiled.js",
   "dependencies": {
+    "@slack/client": "^2.1.0",
     "ansi-to-html": "0.3.0",
     "async": "1.5.2",
     "autoprefixer": "6.2.1",
@@ -24,6 +25,7 @@
     "bluebird": "3.2.1",
     "body-parser": "1.14.2",
     "brace": "0.7.0",
+    "braintree": "1.36.0",
     "braintree-web": "2.21.0",
     "braintree": "1.36.0",
     "callsite": "1.0.0",

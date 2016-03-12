@@ -74,6 +74,13 @@
       "authToken": "3e7ae8aebc9dc023b66ee071065089b0"
     }
   },
+  "Slack": {
+    "Braintree": {
+      "apiToken": "xoxb-24692177427-lmcy1B4DFJ1VbCg4BQm9w2ce",
+      "channelId": "C0QLEKSV8",
+      "username": "braintreebot"
+    }
+  },
   "Braintree": {
     "production": {
       "merchantId": "v6zb835f45syvv22",

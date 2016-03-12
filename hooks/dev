@@ -6,8 +6,4 @@ export NODE_ENV=staging;
 export IS_RUNNING_TEST=true;
 
 set -e
-<<<<<<< 346ebc3e7448ef99115dcd7e7625e3f4e0e9ce84
 npm run test-ci ./tests/messenger-test.compiled.js
-=======
-npm run test-ci ./tests/braintree-test.compiled.js
->>>>>>> implemented braintree and test

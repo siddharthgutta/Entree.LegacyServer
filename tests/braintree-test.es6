@@ -10,6 +10,14 @@ import assert from 'assert';
 import {clearDatabase, disconnectDatabase} from './test-init.es6';
 import _ from 'underscore';
 import braintree from 'braintree';
+import config from 'config';
+import supertest from 'supertest';
+import Slack from '../libs/notifier/slack.es6';
+const slackConfigs = config.get('Slack.Braintree');
+
+const port = config.get('Server.port');
+const serverUrl = `https://localhost:${port}`;
+const server = supertest.agent(serverUrl);
 
 beforeEach(done => {
   clearDatabase().then(() => done());
@@ -290,6 +298,56 @@ describe('Braintree', () => {
       assert.deepEqual(merchantAccount.status, 'pending');
       assert.deepEqual(merchantAccount.subMerchantAccount, true);
       done();
+    });
+  });
+
+  describe('webhooks', () => {
+    const slackbot = new Slack(slackConfigs.apiToken, slackConfigs.username);
+
+    it('should fail when not send signature or payload', done => {
+      server
+        .post(`/braintree/webhooks`)
+        .send({})
+        .expect(500, done);
+    });
+
+    it('should succeed with sample merchant account approved', async done => {
+      try {
+        const sampleNotification = Braintree.getGateway(false).webhookTesting.sampleNotification(
+          braintree.WebhookNotification.Kind.SubscriptionWentPastDue,
+          'myId'
+        );
+        Braintree.parse(slackbot, sampleNotification.bt_signature, sampleNotification.bt_payload, false, true);
+        assert(false);
+      } catch (err) {
+        done();
+      }
+    });
+
+    it('should succeed with sample merchant account approved', async done => {
+      try {
+        const sampleNotification = Braintree.getGateway(false).webhookTesting.sampleNotification(
+          braintree.WebhookNotification.Kind.SubMerchantAccountApproved,
+          'myId'
+        );
+        Braintree.parse(slackbot, sampleNotification.bt_signature, sampleNotification.bt_payload, false, true);
+        done();
+      } catch (err) {
+        assert(false);
+      }
+    });
+
+    it('should succeed with sample merchant account declined', async done => {
+      try {
+        const sampleNotification = Braintree.getGateway(false).webhookTesting.sampleNotification(
+          braintree.WebhookNotification.Kind.SubMerchantAccountDeclined,
+          'myId'
+        );
+        Braintree.parse(slackbot, sampleNotification.bt_signature, sampleNotification.bt_payload, false, true);
+        done();
+      } catch (err) {
+        assert(false);
+      }
     });
   });
 });
