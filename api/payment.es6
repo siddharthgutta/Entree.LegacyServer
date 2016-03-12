@@ -41,8 +41,6 @@ export function getGateway(production = false) {
 }
 
 /**
-<<<<<<< HEAD
-=======
  * Parses braintree signature and payload to check if valid
  *
  * @param {Slack} slackbot: Slack Bot Object to emit
