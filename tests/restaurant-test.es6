@@ -16,6 +16,8 @@ describe('Restaurant', () => {
   const password = '1234';
   const phoneNumber = '1234567890';
   const mode = Restaurant.Mode.REGULAR;
+  const merchantId = 'abc';
+  const merchantApproved = true;
 
   const dayOfTheWeek = 'Monday';
   const openTime = '11:11:11';
@@ -34,12 +36,14 @@ describe('Restaurant', () => {
 
   describe('#create()', () => {
     it('should insert to and query from the database correctly', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
+      Restaurant.create(name, password, mode, {phoneNumber, merchantApproved, merchantId})
                 .then(restaurant => {
                   assert.equal(restaurant.name, name);
                   assert.equal(restaurant.password, password);
                   assert.equal(restaurant.mode, mode);
                   assert.equal(restaurant.phoneNumber, phoneNumber);
+                  assert.equal(restaurant.merchantApproved, merchantApproved);
+                  assert.equal(restaurant.merchantId, merchantId);
                   done();
                 });
     });
@@ -57,12 +61,12 @@ describe('Restaurant', () => {
 
     it('should not create Restaurants that have null name, null password, null mode' +
        'or phone number of length not 10', done => {
-      Restaurant.create(null, null, null, {phoneNumber: '123'})
+      Restaurant.create(null, null, null, {phoneNumber: '123', merchantId: 'a'.repeat(33)})
                 .then(() => {
                   assert(false);
                   done();
                 }, err => {
-                  assert.equal(err.causes().length, 5);
+                  assert.equal(err.causes().length, 6);
                   done();
                 });
     });
@@ -84,13 +88,16 @@ describe('Restaurant', () => {
       let id;
       Restaurant.create(name, password, mode, {phoneNumber})
                 .then(result => id = result.id)
-                .then(() => Restaurant.update(id, {name: 'Rest', password: 'a', phoneNumber: '1234561234'}))
+                .then(() => Restaurant.update(id, {name: 'Rest', password: 'a', phoneNumber: '1234561234',
+                  merchantId: true, merchantApproved: false}))
                 .then(() => Restaurant.findOne(id))
                 .then(restaurant => {
                   assert.equal(restaurant.name, 'Rest');
                   assert.equal(restaurant.password, 'a');
                   assert.equal(restaurant.mode, mode);
                   assert.equal(restaurant.phoneNumber, '1234561234');
+                  assert.equal(restaurant.merchantId, true);
+                  assert.equal(restaurant.merchantApproved, false);
                   done();
                 });
     });

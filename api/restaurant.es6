@@ -16,7 +16,8 @@ export {Mode};
  * @returns {Promise}: Returns the Restaurant object
  */
 // TODO @jesse please send back a JSON via toJSON
-export async function create(name, password, mode = Mode.REGULAR, attributes = {phoneNumber: null}) {
+export async function create(name, password, mode = Mode.REGULAR, attributes = {phoneNumber: null,
+  merchantApproved: null, merchantId: null}) {
   try {
     return (await models.Restaurant.create({name, password, mode, ...attributes}));
   } catch (e) {
@@ -52,6 +53,17 @@ export async function update(id, attributes) {
 export function findByMode(mode) {
   return models.Restaurant.findAll({where: {mode}});
 }
+
+/**
+ * Find restaurants by merchantId
+ *
+ * @param {String} merchantId : merchantId of the restaurant
+ * @returns {Promise}: Returns a Restaurant object
+ */
+export function findByMerchantId(merchantId) {
+  return models.Restaurant.findOne({where: {merchantId}});
+}
+
 
 /**
  * Destroy a restaurant

@@ -311,7 +311,7 @@ describe('Braintree', () => {
         .expect(500, done);
     });
 
-    it('should succeed with sample merchant account approved', async done => {
+    it('should fail with subscription since not implemented yet', async done => {
       try {
         const sampleNotification = Braintree.getGateway(false).webhookTesting.sampleNotification(
           braintree.WebhookNotification.Kind.SubscriptionWentPastDue,

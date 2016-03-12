@@ -71,23 +71,24 @@ export function parse(slackbot, btSignature, btPayload,
               msg += `Merchant Account: Approved\nStatus: ${webhookNotification.merchantAccount.status}\n`
                 + `Merchant Id: ${webhookNotification.merchantAccount.id}`;
               console.tag(logTags).log(msg);
-              resolve(msg);
+              resolve({kind: webhookNotification.kind, result: webhookNotification.merchantAccount});
               break;
             case braintree.WebhookNotification.Kind.SubMerchantAccountDeclined:
               color = test ? color : 'danger';
               fields.push(Slack.generateField('Merchant Account', `Declined`));
-              fields.push(Slack.generateField('Merchant Status', `${webhookNotification.merchantAccount.status}`));
               fields.push(Slack.generateField('Reason Declined', `${webhookNotification.message}`));
               msg += `Merchant Account: Declined\nReason: ${webhookNotification.message}`;
               console.tag(logTags).error(msg, webhookNotification.errors);
-              resolve(msg);
+              reject({kind: webhookNotification.kind, message: webhookNotification.message,
+                errors: webhookNotification.errors});
               break;
             default:
               color = test ? color : '#3aa3e3';
               msg += `Notification Type: ${webhookNotification.kind}`;
               fields.push(Slack.generateField('Notification Type', `${webhookNotification.kind}`));
               console.tag(logTags).error(webhookNotification);
-              reject(new Error(`Not implemented Error - ${msg}`));
+              reject(new Error(`Not implemented Error - ${{kind: webhookNotification.kind,
+                result: webhookNotification}}`));
               break;
           }
 
@@ -104,6 +105,30 @@ export function parse(slackbot, btSignature, btPayload,
       reject(err);
     }
   });
+}
+
+/**
+ * Handles the parse results from webhook notifications via braintree
+ *
+ * @param {braintree.WebhookNotification.Kind} kind: type of braintree webhook notification
+ * @param {Object} result: resulting braintree object, i.e. merchantAccount
+ * @returns {Promise}: result of parsing the message
+ */
+async function handleParseResult(kind, result) {
+  try {
+    const merchantId = result.id;
+    const restaurantId = (await Restaurant.findByMerchantId(merchantId)).id;
+    switch (kind) {
+      case braintree.WebhookNotification.Kind.SubMerchantAccountApproved:
+        Restaurant.update(restaurantId, {merchantApproved: true});
+        break;
+      default:
+        // Future Implementations of other Parse Result cases here
+        break;
+    }
+  } catch (err) {
+    throw err;
+  }
 }
 
 /**
@@ -127,14 +152,16 @@ export function initRouter() {
     try {
       try {
         // Check if production webhook
-        await parse(braintreeSlackbot, btSignature, btPayload, true);
-        // TODO Add id into production database
+        const {kind, result} = await parse(braintreeSlackbot, btSignature, btPayload, true);
+        await handleParseResult(kind, result);
       } catch (productionError) {
         // Check if sandbox webhook
-        await parse(braintreeSlackbot, btSignature, btPayload, false);
+        const {kind, result} = await parse(braintreeSlackbot, btSignature, btPayload, false);
+        await handleParseResult(kind, result);
       }
       res.status(200).send('Webhook Success');
     } catch (err) {
+      console.tag(logTags).error(err);
       res.status(500).send('Webhook Failed');
     }
   });
