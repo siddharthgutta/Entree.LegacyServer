@@ -75,11 +75,18 @@ export async function safelyCreate(userId, restaurantId, items) {
   return findOne(order.id);
 }
 
+/**
+ * Set braintree transactionId for a specific order
+ *
+ * @param {Number} orderId: order id from database
+ * @param {String} transactionId: braintree transaction id attached to an order
+ * @returns {Promise}: result of updating Order
+ */
 export async function setTransactionId(orderId, transactionId) {
   const {Order} = models;
 
   try {
-    await Order.update({transactionId}, {where: {id: orderId}});
+    return await Order.update({transactionId}, {where: {id: orderId}});
   } catch (e) {
     throw new TraceError('Could not set order transactionId', e);
   }

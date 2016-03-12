@@ -96,6 +96,20 @@ export async function getOrder(orderId) {
   }
 }
 
+/**
+ * Set braintree transactionId for a specific order
+ *
+ * @param {Number} orderId: order id from database
+ * @param {String} transactionId: braintree transaction id attached to an order
+ * @returns {Promise}: result of updating Order
+ */
+export async function setOrderTransactionId(orderId, transactionId) {
+  try {
+    return (await Order.setTransactionId(orderId, transactionId));
+  } catch (e) {
+    throw new TraceError(`Could not find order for ${orderId}`, e);
+  }
+}
 
 /**
  * Expose model
