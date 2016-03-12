@@ -142,7 +142,6 @@ export function initRouter() {
 }
 
 /**
->>>>>>> implemented braintree and test
  * Generate Client Token to pass to the client browser
  *
  * @param {Boolean} production: production/sandbox braintree
