@@ -87,8 +87,8 @@ export function parse(slackbot, btSignature, btPayload,
               msg += `Notification Type: ${webhookNotification.kind}`;
               fields.push(Slack.generateField('Notification Type', `${webhookNotification.kind}`));
               console.tag(logTags).error(webhookNotification);
-              reject(new Error(`Not implemented Error - ${{kind: webhookNotification.kind,
-                result: webhookNotification}}`));
+              reject(new Error(`Not implemented Error - ${JSON.stringify({kind: webhookNotification.kind,
+                result: webhookNotification})}`));
               break;
           }
 
@@ -185,6 +185,38 @@ export async function generateClientToken(production = true) {
 }
 
 /**
+ * Makes a real braintree payment
+ *
+ * @param {String} amount: string amount to pay, converted from number
+ * @param {String} merchantId: merchant Id from braintree
+ * @param {String} name: restaurant name
+ * @param {String} paymentMethodToken: token gotten for a specific payment method
+ * @param {String} customerId: customer Id from braintree
+ * @param {String} serviceFee: string amount service fee that we take
+ * @param {Boolean} production: production/sandbox braintree
+ * @returns {Promise}: returns the transaction object if successful, error if not
+ */
+async function makePayment(amount, merchantId, name, paymentMethodToken, customerId, serviceFee, production = true) {
+  const bt = production ? productionBraintree : sandboxBraintree;
+  try {
+    const result = await bt.transaction(amount, merchantId, name, paymentMethodToken, customerId, serviceFee);
+    if (!result.success && !result.errors.deepErrors()) {
+      console.tag(logTags).error(`Failed to Execute Transaction`);
+      console.tag(logTags).error(result.errors.deepErrors());
+      throw result.transaction;
+    } else if (!result.success) {
+      console.tag(logTags).error(`Failed to Execute Transaction`);
+      console.tag(logTags).error(result.transaction.status);
+      throw result.transaction;
+    } else {
+      return result.transaction;
+    }
+  } catch (transactionError) {
+    throw transactionError;
+  }
+}
+
+/**
  * Create customer with Braintree and execute initial transaction
  * OR add new payment for existing customer
  *
@@ -247,12 +279,61 @@ export async function paymentforCustomer(userId, restaurantId, paymentMethodNonc
     }
 
     try {
-      const result = await bt.transaction((amount / 100).toString(), restaurant.merchantId, restaurant.name,
+      const result = await makePayment((amount / 100).toString(), restaurant.merchantId, restaurant.name,
         paymentMethodToken, customerId,
-        (bt.calculateServiceFee(amount, restaurant.percentageFee, restaurant.transactionFee) / 100).toString());
-      return result.transaction;
+        (bt.calculateServiceFee(amount, restaurant.percentageFee, restaurant.transactionFee) / 100).toString(),
+        production);
+      return result;
     } catch (transactionError) {
       console.tag(logTags).error(`Failed to Execute Transaction`, transactionError);
+      throw transactionError;
+    }
+  } catch (err) {
+    throw err;
+  }
+}
+
+/**
+ * Execute transaction with payment method token
+ *
+ * @param {Number} userId: id of the user
+ * @param {String} restaurantId: restaurant ID from db
+ * @param {String} paymentMethodToken: payment method token from braintree after calling getDefaultPayment
+ * @param {Number} amount: total amount of order in cents $1.00 -> 100
+ * @param {Boolean} production: production/sandbox braintree
+ * @returns {Promise}: result of the transaction or error
+ */
+export async function paymentWithToken(userId, restaurantId, paymentMethodToken, amount, production = true) {
+  const bt = production ? productionBraintree : sandboxBraintree;
+  try {
+    let user;
+    try {
+      user = await User.findOne(userId);
+    } catch (findUserErr) {
+      console.tag(logTags).error(`Failed to find User by Id: ${findUserErr}`);
+      throw findUserErr;
+    }
+    const customerId = user.customerId;
+    // Check if user does already have a customerId - indicates that signup2 hasn't occurred
+    if (!customerId) {
+      throw new Error('Failed to find customer Id. Customer id needs to exist before calling paymentWithToken.');
+    }
+
+    let restaurant;
+    try {
+      restaurant = await Restaurant.findOne(restaurantId);
+    } catch (findRestaurantErr) {
+      console.tag(logTags).error(`Failed to find restaurant by id`, findRestaurantErr);
+      throw findRestaurantErr;
+    }
+
+    try {
+      const result = await makePayment((amount / 100).toString(), restaurant.merchantId, restaurant.name,
+        paymentMethodToken, customerId,
+        (bt.calculateServiceFee(amount, restaurant.percentageFee, restaurant.transactionFee) / 100).toString(),
+        production);
+      return result;
+    } catch (transactionError) {
       throw transactionError;
     }
   } catch (err) {

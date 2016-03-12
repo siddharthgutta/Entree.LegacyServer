@@ -75,6 +75,16 @@ export async function safelyCreate(userId, restaurantId, items) {
   return findOne(order.id);
 }
 
+export async function setTransactionId(orderId, transactionId) {
+  const {Order} = models;
+
+  try {
+    await Order.update({transactionId}, {where: {id: orderId}});
+  } catch (e) {
+    throw new TraceError('Could not set order transactionId', e);
+  }
+}
+
 export async function findOneAndUpdateStatus(id, status, {prepTime, message}) {
   const {Order} = models;
 

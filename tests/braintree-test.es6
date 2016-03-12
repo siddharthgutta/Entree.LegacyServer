@@ -89,23 +89,33 @@ describe('Braintree', () => {
       });
 
       it('declined processor should fail with processor response code', async done => {
-        const transaction = await Braintree.paymentforCustomer(
-          userId, restaurantId, validNonce, processorDeclinedAmount, false);
-        assert.deepEqual((processorDeclinedAmount / 100), parseFloat(transaction.amount));
-        assert.deepEqual((calculateServiceFee(processorDeclinedAmount) / 100),
-          parseFloat(transaction.serviceFeeAmount));
-        assert.deepEqual('failed', transaction.status);
-        assert.deepEqual(processorDeclinedAmount / 100, parseFloat(transaction.processorResponseCode));
-        done();
+        try {
+          await Braintree.paymentforCustomer(
+            userId, restaurantId, validNonce, processorDeclinedAmount, false);
+          assert(false);
+        } catch (err) {
+          const transaction = err;
+          assert.deepEqual((processorDeclinedAmount / 100), parseFloat(transaction.amount));
+          assert.deepEqual((calculateServiceFee(processorDeclinedAmount) / 100),
+            parseFloat(transaction.serviceFeeAmount));
+          assert.deepEqual('failed', transaction.status);
+          assert.deepEqual(processorDeclinedAmount / 100, parseFloat(transaction.processorResponseCode));
+          done();
+        }
       });
 
       it('gateway rejected should fail', async done => {
-        const transaction = await Braintree.paymentforCustomer(
-          userId, restaurantId, validNonce, gatewayRejectedAmount, false);
-        assert.deepEqual((gatewayRejectedAmount / 100), parseFloat(transaction.amount));
-        assert.deepEqual((calculateServiceFee(gatewayRejectedAmount) / 100), parseFloat(transaction.serviceFeeAmount));
-        assert.deepEqual('gateway_rejected', transaction.status);
-        done();
+        try {
+          await Braintree.paymentforCustomer(
+            userId, restaurantId, validNonce, gatewayRejectedAmount, false);
+        } catch (err) {
+          const transaction = err;
+          assert.deepEqual((gatewayRejectedAmount / 100), parseFloat(transaction.amount));
+          assert.deepEqual((calculateServiceFee(gatewayRejectedAmount) / 100),
+            parseFloat(transaction.serviceFeeAmount));
+          assert.deepEqual('gateway_rejected', transaction.status);
+          done();
+        }
       });
 
       const gatewayRejectedNonces = [
@@ -235,6 +245,19 @@ describe('Braintree', () => {
               done();
             }
           }
+        });
+
+        it(`should succeed with #paymentWithToken`, async done => {
+          const transaction = await Braintree.paymentforCustomer(
+            userId, restaurantId, ccNonces.valid[0].nonce, authorizedAmount, false);
+          console.log(transaction);
+          assert.deepEqual((authorizedAmount / 100), parseFloat(transaction.amount));
+          assert.deepEqual((calculateServiceFee(authorizedAmount) / 100), parseFloat(transaction.serviceFeeAmount));
+          assert.deepEqual('submitted_for_settlement', transaction.status);
+          const defaultPayment = await Braintree.getCustomerDefaultPayment(userId, false);
+          assert.deepEqual(defaultPayment.cardType, ccNonces.valid[0].cardType);
+          await Braintree.paymentWithToken(userId, restaurantId, defaultPayment.token, authorizedAmount, false);
+          done();
         });
       });
     });
