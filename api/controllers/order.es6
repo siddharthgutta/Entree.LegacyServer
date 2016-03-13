@@ -7,7 +7,7 @@ export {Status};
 
 const restaurantStatuses = [Status.ACCEPTED, Status.DECLINED, Status.COMPLETED];
 
-export async function setOrderStatus(id, status, {prepTime, message} = {}, isRestaurant = false) {
+export async function setOrderStatus(id, status, {prepTime, message, transactionId} = {}, isRestaurant = false) {
   const {RestaurantId: restaurantId} = await Order.findOne(id);
   let notificationEvent;
   let internalEvent;
@@ -34,6 +34,14 @@ export async function setOrderStatus(id, status, {prepTime, message} = {}, isRes
     message = null;
   }
 
+  if (status === Status.RECEIVED_PAYMENT) {
+    if (!transactionId) {
+      throw Error('TransactionID is required for received payment!');
+    }
+  } else {
+    transactionId = null;
+  }
+
   switch (status) {
     case Status.RECEIVED_PAYMENT:
       notificationEvent = Notification.Events.NEW_ORDER;
@@ -51,7 +59,7 @@ export async function setOrderStatus(id, status, {prepTime, message} = {}, isRes
   }
 
   try {
-    const _order = await Order.findOneAndUpdateStatus(id, status, {prepTime, message});
+    const _order = await Order.findOneAndUpdateStatus(id, status, {prepTime, message, transactionId});
 
     if (notificationEvent) {
       Notification.notify(restaurantId, notificationEvent, _order);
@@ -91,21 +99,6 @@ export async function getOrders(restaurantId) {
 export async function getOrder(orderId) {
   try {
     return (await Order.findOne(orderId));
-  } catch (e) {
-    throw new TraceError(`Could not find order for ${orderId}`, e);
-  }
-}
-
-/**
- * Set braintree transactionId for a specific order
- *
- * @param {Number} orderId: order id from database
- * @param {String} transactionId: braintree transaction id attached to an order
- * @returns {Promise}: result of updating Order
- */
-export async function setOrderTransactionId(orderId, transactionId) {
-  try {
-    return (await Order.setTransactionId(orderId, transactionId));
   } catch (e) {
     throw new TraceError(`Could not find order for ${orderId}`, e);
   }
