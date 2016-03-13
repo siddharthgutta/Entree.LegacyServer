@@ -49,61 +49,52 @@ export function getGateway(production = false) {
  * @param {Boolean} production: whether or not production or sandbox
  * @returns {Promise} message promise or error
  */
-export function parse(slackbot, btSignature, btPayload,
-                      production = false, test = false) {
+export function parse(slackbot, btSignature, btPayload, production = false, test = false) {
   return new Promise((resolve, reject) => {
-    try {
-      getGateway(production).webhookNotification.parse(btSignature, btPayload, (err, webhookNotification) => {
-        if (err) reject(new Error('Webhook Notification Parsing Error - [Probably Incorrect Gateway]'));
-        else {
-          let color = '#764FA5';
-          const fields = [];
-          let msg = `~~~~~THIS IS ${test ? '' : 'NOT'} A TEST~~~~~`;
-          msg += production ? `Production\n` : `Sandbox\nTimeStamp: ${webhookNotification.timestamp}\n`;
-          fields.push(Slack.generateField('Environment', production ? `Production` : `Sandbox`));
+    getGateway(production).webhookNotification.parse(btSignature, btPayload, (err, webhookNotification) => {
+      if (err) reject(new TraceError('Webhook Notification Parsing Error - [Probably Incorrect Gateway]'));
+      else {
+        let color = '#764FA5';
+        const fields = [];
+        let msg = `~~~~~THIS IS ${test ? '' : 'NOT'} A TEST~~~~~`;
+        msg += production ? `Production\n` : `Sandbox\nTimeStamp: ${webhookNotification.timestamp}\n`;
+        fields.push(Slack.generateField('Environment', production ? `Production` : `Sandbox`));
 
-          switch (webhookNotification.kind) {
-            case braintree.WebhookNotification.Kind.SubMerchantAccountApproved:
-              color = test ? color : 'good';
-              fields.push(Slack.generateField('Merchant Account', `Approved`));
-              fields.push(Slack.generateField('Merchant Status', `${webhookNotification.merchantAccount.status}`));
-              fields.push(Slack.generateField('Merchant ID', `${webhookNotification.merchantAccount.id}`));
-              msg += `Merchant Account: Approved\nStatus: ${webhookNotification.merchantAccount.status}\n`
-                + `Merchant Id: ${webhookNotification.merchantAccount.id}`;
-              console.tag(logTags).log(msg);
-              resolve({kind: webhookNotification.kind, result: webhookNotification.merchantAccount});
-              break;
-            case braintree.WebhookNotification.Kind.SubMerchantAccountDeclined:
-              color = test ? color : 'danger';
-              fields.push(Slack.generateField('Merchant Account', `Declined`));
-              fields.push(Slack.generateField('Reason Declined', `${webhookNotification.message}`));
-              msg += `Merchant Account: Declined\nReason: ${webhookNotification.message}`;
-              console.tag(logTags).error(msg, webhookNotification.errors);
-              reject({kind: webhookNotification.kind, message: webhookNotification.message,
-                errors: webhookNotification.errors});
-              break;
-            default:
-              color = test ? color : '#3aa3e3';
-              msg += `Notification Type: ${webhookNotification.kind}`;
-              fields.push(Slack.generateField('Notification Type', `${webhookNotification.kind}`));
-              console.tag(logTags).error(webhookNotification);
-              reject(new Error(`Not implemented Error - ${{kind: webhookNotification.kind,
-                result: webhookNotification}}`));
-              break;
-          }
-
-          const data = Slack.generateData(msg, color, fields, test);
-
-          // Temporary Solution to prevent spamming
-          if (!test) {
-            slackbot.send(slackConfigs.channelId, data, '');
-          }
+        switch (webhookNotification.kind) {
+          case braintree.WebhookNotification.Kind.SubMerchantAccountApproved:
+            color = test ? color : 'good';
+            fields.push(Slack.generateField('Merchant Account', `Approved`));
+            fields.push(Slack.generateField('Merchant Status', `${webhookNotification.merchantAccount.status}`));
+            fields.push(Slack.generateField('Merchant ID', `${webhookNotification.merchantAccount.id}`));
+            msg += `Merchant Account: Approved\nStatus: ${webhookNotification.merchantAccount.status}\n`
+              + `Merchant Id: ${webhookNotification.merchantAccount.id}`;
+            resolve({kind: webhookNotification.kind, result: webhookNotification.merchantAccount});
+            break;
+          case braintree.WebhookNotification.Kind.SubMerchantAccountDeclined:
+            color = test ? color : 'danger';
+            fields.push(Slack.generateField('Merchant Account', `Declined`));
+            fields.push(Slack.generateField('Reason Declined', `${webhookNotification.message}`));
+            msg += `Merchant Account: Declined\nReason: ${webhookNotification.message}`;
+            reject(new TraceError(webhookNotification.message, {kind: webhookNotification.kind,
+              errors: webhookNotification.errors}));
+            break;
+          default:
+            color = test ? color : '#3aa3e3';
+            msg += `Notification Type: ${webhookNotification.kind}`;
+            fields.push(Slack.generateField('Notification Type', `${webhookNotification.kind}`));
+            reject(new TraceError('Not Implemented Error', {kind: webhookNotification.kind,
+              result: webhookNotification}));
+            break;
         }
-      });
-    } catch (err) {
-      console.tag(logTags).error(err);
-      reject(err);
-    }
+
+        const data = Slack.generateData(msg, color, fields, test);
+
+        // Temporary fix to prevent merchant spam
+        if (!test) {
+          slackbot.send(slackConfigs.channelId, data, '');
+        }
+      }
+    });
   });
 }
 
@@ -127,7 +118,7 @@ async function handleParseResult(kind, result) {
         break;
     }
   } catch (err) {
-    throw err;
+    throw new TraceError('Could not Parse Result', err);
   }
 }
 
@@ -179,8 +170,35 @@ export async function generateClientToken(production = true) {
   try {
     return await bt.generateClientToken();
   } catch (err) {
-    console.tag(logTags).error(`Client Generation Token Error: ${err}`);
-    throw err;
+    throw new TraceError('Client Generation Token Error for generateClientToken', err);
+  }
+}
+
+/**
+ * Makes a real braintree payment
+ *
+ * @param {String} amount: string amount to pay, converted from number
+ * @param {String} merchantId: merchant Id from braintree
+ * @param {String} name: restaurant name
+ * @param {String} paymentMethodToken: token gotten for a specific payment method
+ * @param {String} customerId: customer Id from braintree
+ * @param {String} serviceFee: string amount service fee that we take
+ * @param {Boolean} production: production/sandbox braintree
+ * @returns {Promise}: returns the transaction object if successful, error if not
+ */
+async function makePayment(amount, merchantId, name, paymentMethodToken, customerId, serviceFee, production = true) {
+  const bt = production ? productionBraintree : sandboxBraintree;
+  const result = await bt.transaction(amount, merchantId, name, paymentMethodToken, customerId, serviceFee);
+  if (!result.success && !result.errors.deepErrors()) {
+    console.tag(logTags).error(`Validation Errors on makePayment`);
+    console.tag(logTags).error(result.errors.deepErrors());
+    throw result.transaction;
+  } else if (!result.success) {
+    console.tag(logTags).error(`Failed to Execute Transaction on makePayment`);
+    console.tag(logTags).error(result.transaction.status);
+    throw result.transaction;
+  } else {
+    return result.transaction;
   }
 }
 
@@ -188,75 +206,84 @@ export async function generateClientToken(production = true) {
  * Create customer with Braintree and execute initial transaction
  * OR add new payment for existing customer
  *
+ * @param {String} userId: id of the user
+ * @param {String} paymentMethodNonce: nonce from client browser
+ * @param {Boolean} production: production/sandbox braintree
+ * @returns {Promise}: result of the transaction or error
+ */
+export async function registerPaymentForUser(userId, paymentMethodNonce, production = true) {
+  const bt = production ? productionBraintree : sandboxBraintree;
+  let customerResult;
+  let user;
+  try {
+    user = await User.findOne(userId);
+  } catch (findUserErr) {
+    throw new TraceError('Failed to find User by Id for registerPaymentForUser', findUserErr);
+  }
+  const phone = user.phoneNumber;
+  let customerId = user.customerId;
+  // Check if user does already have a customerId - indicates that signup2 hasn't occurred
+  if (!customerId) {
+    try {
+      const firstName = user.firstName;
+      const lastName = user.lastName;
+
+      customerResult = await bt.createCustomer(firstName, lastName, phone, paymentMethodNonce);
+      customerId = customerResult.customer.id;
+      await User.update(userId, {customerId});
+    } catch (createCustomerErr) {
+      throw new TraceError('Failed to Create Customer for registerPaymentForUser', createCustomerErr);
+    }
+  } else {
+    try {
+      customerResult = await bt.addNewPaymentMethod(customerId, paymentMethodNonce);
+    } catch (addPaymentMethodError) {
+      throw new TraceError('Failed to Find/Update Customer for registerPaymentForUser', addPaymentMethodError);
+    }
+  }
+  return customerResult;
+}
+
+/**
+ * Execute transaction with payment method token
+ *
  * @param {Number} userId: id of the user
  * @param {String} restaurantId: restaurant ID from db
- * @param {String} paymentMethodNonce: nonce from client browser
+ * @param {String} paymentMethodToken: payment method token from braintree after calling getDefaultPayment
  * @param {Number} amount: total amount of order in cents $1.00 -> 100
  * @param {Boolean} production: production/sandbox braintree
  * @returns {Promise}: result of the transaction or error
  */
-export async function paymentforCustomer(userId, restaurantId, paymentMethodNonce, amount, production = true) {
+export async function paymentWithToken(userId, restaurantId, paymentMethodToken, amount, production = true) {
   const bt = production ? productionBraintree : sandboxBraintree;
+  let user;
   try {
-    let customerResult;
-    let user;
-    try {
-      user = await User.findOne(userId);
-    } catch (findUserErr) {
-      console.tag(logTags).error(`Failed to find User by Id: ${findUserErr}`);
-      throw findUserErr;
-    }
-    const phone = user.phoneNumber;
-    let customerId = user.customerId;
-    // Check if user does already have a customerId - indicates that signup2 hasn't occurred
-    if (!customerId) {
-      try {
-        const firstName = user.firstName;
-        const lastName = user.lastName;
+    user = await User.findOne(userId);
+  } catch (findUserErr) {
+    throw new TraceError('Failed to find User by Id for paymentWithToken', findUserErr);
+  }
+  const customerId = user.customerId;
+  // Check if user does already have a customerId - indicates that signup2 hasn't occurred
+  if (!customerId) {
+    throw new TraceError('Customer Id not found for paymentWithToken');
+  }
 
-        customerResult = await bt.createCustomer(firstName, lastName, phone, paymentMethodNonce);
-        customerId = customerResult.customer.id;
-        await User.update(userId, {customerId});
-      } catch (createCustomerErr) {
-        console.tag(logTags).error(`Failed to Create Customer:`, createCustomerErr);
-        throw createCustomerErr;
-      }
-    } else {
-      try {
-        customerResult = await bt.addNewPaymentMethod(customerId, paymentMethodNonce);
-      } catch (addPaymentMethodError) {
-        console.tag(logTags).error(`Failed to Find/Update Customer:`, addPaymentMethodError);
-        throw addPaymentMethodError;
-      }
-    }
+  let restaurant;
+  try {
+    restaurant = await Restaurant.findOne(restaurantId);
+  } catch (findRestaurantErr) {
+    throw new TraceError('Failed to find restaurant by Id for paymentWithToken', findRestaurantErr);
+  }
 
-    let paymentMethodToken;
-    try {
-      paymentMethodToken = bt.getDefaultPayment(customerResult.customer).token;
-    } catch (defaultPaymentErr) {
-      console.tag(logTags).error(`Failed to get Default Payment`, defaultPaymentErr);
-      throw defaultPaymentErr;
-    }
-
-    let restaurant;
-    try {
-      restaurant = await Restaurant.findOne(restaurantId);
-    } catch (findRestaurantErr) {
-      console.tag(logTags).error(`Failed to find restaurant by id`, findRestaurantErr);
-      throw findRestaurantErr;
-    }
-
-    try {
-      const result = await bt.transaction((amount / 100).toString(), restaurant.merchantId, restaurant.name,
-        paymentMethodToken, customerId,
-        (bt.calculateServiceFee(amount, restaurant.percentageFee, restaurant.transactionFee) / 100).toString());
-      return result.transaction;
-    } catch (transactionError) {
-      console.tag(logTags).error(`Failed to Execute Transaction`, transactionError);
-      throw transactionError;
-    }
-  } catch (err) {
-    throw err;
+  try {
+    const amountString = (amount / 100).toString();
+    const serviceFeeString = (bt.calculateServiceFee(amount, restaurant.percentageFee,
+      restaurant.transactionFee) / 100).toString();
+    const result = await makePayment(amountString, restaurant.merchantId, restaurant.name,
+      paymentMethodToken, customerId, serviceFeeString, production);
+    return result;
+  } catch (transactionError) {
+    throw transactionError;
   }
 }
 
@@ -269,30 +296,23 @@ export async function paymentforCustomer(userId, restaurantId, paymentMethodNonc
  */
 export async function getCustomerDefaultPayment(userId, production = true) {
   const bt = production ? productionBraintree : sandboxBraintree;
+  let customer;
   try {
-    let customer;
-    try {
-      customer = await User.findOne(userId);
-    } catch (findUserErr) {
-      console.tag(logTags).error(`Failed to Find User: ${findUserErr}`);
-      throw findUserErr;
-    }
+    customer = await User.findOne(userId);
+  } catch (findUserErr) {
+    throw new TraceError('Failed to Find User in getCustomerDefaultPayment', findUserErr);
+  }
 
-    try {
-      customer = await bt.findCustomer(customer.customerId);
-    } catch (findCustomerErr) {
-      console.tag(logTags).error(`Failed to Find Customer: ${findCustomerErr}`);
-      throw findCustomerErr;
-    }
+  try {
+    customer = await bt.findCustomer(customer.customerId);
+  } catch (findCustomerErr) {
+    throw new TraceError('Failed to Find Customer in getCustomerDefaultPayment', findCustomerErr);
+  }
 
-    try {
-      return await bt.getDefaultPayment(customer);
-    } catch (findingPaymentErr) {
-      console.tag(logTags).error(`Failed to Find Default Payment Method: ${findingPaymentErr}`);
-      throw findingPaymentErr;
-    }
-  } catch (err) {
-    throw err;
+  try {
+    return await bt.getDefaultPayment(customer);
+  } catch (findingPaymentErr) {
+    throw new TraceError('Failed to Find Default Payment Method in getCustomerDefaultPayment', findingPaymentErr);
   }
 }
 
@@ -311,26 +331,23 @@ export async function getCustomerDefaultPayment(userId, production = true) {
  * @param {Boolean} production: production/sandbox braintree
  * @returns {Promise}: promise containing resulting merchant account object
  */
-export async function createMerchantAccount(restaurantId, individual, business, funding, production = true) {
+export async function registerRestaurantWithPaymentSystem(restaurantId, individual, business,
+                                                          funding, production = true) {
   const bt = production ? productionBraintree : sandboxBraintree;
+  let merchantAccount;
   try {
-    let merchantAccount;
-    try {
-      merchantAccount = await bt.createMerchant(individual, business, funding);
-    } catch (createMerchantErr) {
-      console.tag(logTags).error(`Failed to create merchant account`, createMerchantErr);
-      throw createMerchantErr;
-    }
-
-    try {
-      await Restaurant.update(restaurantId, {merchantId: merchantAccount.id});
-    } catch (restaurantUpdateErr) {
-      console.tag(logTags).error(`Failed to find update restaurant merchant id`, restaurantUpdateErr);
-      throw restaurantUpdateErr;
-    }
-
-    return merchantAccount;
-  } catch (err) {
-    throw err;
+    merchantAccount = await bt.createMerchant(individual, business, funding);
+  } catch (createMerchantErr) {
+    throw new TraceError('Failed to create merchant account for registerRestaurantWithPaymentSystem',
+      createMerchantErr);
   }
+
+  try {
+    await Restaurant.update(restaurantId, {merchantId: merchantAccount.id});
+  } catch (restaurantUpdateErr) {
+    throw new TraceError('Failed to find/update restaurant by merchant id for registerRestaurantWithPaymentSystem',
+      restaurantUpdateErr);
+  }
+
+  return merchantAccount;
 }

@@ -75,14 +75,14 @@ export async function safelyCreate(userId, restaurantId, items) {
   return findOne(order.id);
 }
 
-export async function findOneAndUpdateStatus(id, status, {prepTime, message}) {
+export async function findOneAndUpdateStatus(id, status, {prepTime, message, transactionId}) {
   const {Order} = models;
 
   // ensure the reverse
   const previousStatus = _.compact(_.map(OrderStatusStates, (v, k) => v.includes(status) ? k : null));
 
   // ensure anything that is set does not get set back to NULL
-  const attributes = {status, ...stripUndefNull({prepTime, message})};
+  const attributes = {status, ...stripUndefNull({prepTime, message, transactionId})};
 
   console.tag('api', 'orders').log({attributes, previousStatus, status, id});
 

@@ -122,7 +122,7 @@ router.get('/order/:id/status', async (req, res) => {
 
   try {
     try {
-      await Order.setOrderStatus(id, Order.Status.RECEIVED_PAYMENT);
+      await Order.setOrderStatus(id, Order.Status.RECEIVED_PAYMENT, {transactionId: 0});
     } catch (e) {
       if (status === Order.Status.RECEIVED_PAYMENT) {
         throw e;

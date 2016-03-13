@@ -42,7 +42,7 @@ Emitter.on(Events.TEXT_RECEIVED, async text => {
         const order = await Order.createOrder(user.id, restaurant.id, items);
 
         setTimeout(() => {
-          Order.setOrderStatus(order.id, Order.Status.RECEIVED_PAYMENT);
+          Order.setOrderStatus(order.id, Order.Status.RECEIVED_PAYMENT, {transactionId: 0});
         }, 5000);
 
         await sendSMS(text.from, response.response);
