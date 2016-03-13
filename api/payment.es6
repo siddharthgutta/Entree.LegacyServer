@@ -141,6 +141,11 @@ export function initRouter() {
     const btSignature = req.body.bt_signature;
     const btPayload = req.body.bt_payload;
     try {
+      console.log(btSignature, btPayload);
+      if (!btSignature || !btPayload) {
+        throw new TraceError('Empty Braintree Signature/Payload');
+      }
+
       try {
         // Check if production webhook
         const {kind, result} = await parse(braintreeSlackbot, btSignature, btPayload, true);
@@ -153,7 +158,7 @@ export function initRouter() {
       res.status(200).send('Webhook Success');
     } catch (err) {
       console.tag(logTags).error(err);
-      res.status(500).send('Webhook Failed');
+      res.status(500).send('Webhook Failed.');
     }
   });
   return route;
