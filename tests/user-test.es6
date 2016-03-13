@@ -1,4 +1,4 @@
-import {clearDatabase, disconnectDatabase} from './test-init.es6';
+import {clearDatabase} from './test-init.es6';
 import assert from 'assert';
 import * as User from '../api/user.es6';
 import {signup} from '../api/controllers/user.es6';
@@ -9,14 +9,9 @@ import supertest from 'supertest';
 const port = config.get('Server.port');
 const server = supertest.agent(`https://localhost:${port}`);
 
-beforeEach(done => {
-  clearDatabase().then(() => done());
+beforeEach(async () => {
+  await clearDatabase();
 });
-
-after(() => {
-  disconnectDatabase();
-});
-
 
 describe('User', () => {
   const firstName = 'TestUser';

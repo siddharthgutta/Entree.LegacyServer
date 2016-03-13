@@ -38,11 +38,14 @@
     "username": "root",
     "password": "123456",
     "database": "entree_test",
+    "clearOnStart": true,
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "logging": false
+    "logging": false,
+    "revision": false
   },
   "MongoDb": {
+    "clearOnStart": true,
     "username": "root",
     "password": "123456",
     "database": "entree_test",

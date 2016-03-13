@@ -96,14 +96,11 @@ sudo apt-get install -y mysql-server
 # open ports < 1024 for non-sudo
 sudo setcap 'cap_net_bind_service=+ep' `which node`
 
-# clone - required!
+# clone and install - required!
 git config --global credential.helper store
 mkdir -p Github && cd Github
 git clone https://github.com/siddharthgutta/Entree.Server && cd Entree.Server
-
-# install app dependencies
 npm install
-
 ```
 
 ### Third Party Libraries/References:
