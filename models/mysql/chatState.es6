@@ -38,23 +38,23 @@ export default function (sequelize, DataTypes) {
       findCommandMaps: async function () { // eslint-disable-line
         return await this.getCommandMaps();
       },
-      setRestaurantCtx: async function (restaurant) { // eslint-disable-line
+      setRestaurantContext: async function (restaurant) { // eslint-disable-line
         await this.setMenuItem(null);
         await this.setRestaurant(restaurant);
       },
-      findRestaurantCtx: async function () { // eslint-disable-line
+      findRestaurantContext: async function () { // eslint-disable-line
         return await this.getRestaurant();
       },
-      clearRestaurantCtx: async function() { // eslint-disable-line
+      clearRestaurantContext: async function() { // eslint-disable-line
         await this.setRestaurant(null);
       },
-      setMenuItemCtx: async function (item) { // eslint-disable-line
+      setMenuItemContext: async function (item) { // eslint-disable-line
         await this.setMenuItem(item);
       },
-      clearMenuItemCtx: async function () { // eslint-disable-line
+      clearMenuItemContext: async function () { // eslint-disable-line
         await this.setMenuItem(null);
       },
-      findMenuItemCtx: async function () { // eslint-disable-line
+      findMenuItemContext: async function () { // eslint-disable-line
         return await this.getMenuItem();
       },
       updateState: async function (state) { // eslint-disable-line

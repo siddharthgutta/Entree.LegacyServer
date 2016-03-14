@@ -1,6 +1,7 @@
 import {Mode} from '../constants/restaurant.es6';
 export {Mode};
 import models from './index.es6';
+import _ from 'underscore';
 
 export default function (sequelize, DataTypes) {
   const Restaurant = sequelize.define('Restaurant', {
@@ -113,11 +114,7 @@ export default function (sequelize, DataTypes) {
 
         /* Since we are finding hours by name length of oldHours should only be max 1
          *   (e.g.) there should not be multiple 'Tuesday' restaurant hours per restaurant */
-        if (oldHours.length >= 1) {
-          for (let i = 0; i < oldHours.length; i++) {
-            await oldHours[i].destroy();
-          }
-        }
+        _.each(oldHours, async oldHour => await oldHour.destroy());
 
         const newHour = await models.RestaurantHour.create({dayOfTheWeek, openTime, closeTime});
         await this.addRestaurantHour(newHour);

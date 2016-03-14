@@ -1,8 +1,7 @@
 export default function (sequelize, DataTypes) {
   const Size = sequelize.define('Size', {
     name: {
-      type: DataTypes.ENUM,
-      values: ['Small', 'Medium', 'Large'],
+      type: DataTypes.STRING(12), // eslint-disable-line
       allowNull: false
     },
     addPrice: {

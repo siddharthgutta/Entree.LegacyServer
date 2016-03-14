@@ -63,17 +63,16 @@ describe('Restaurant', () => {
         });
     });
 
-    it('should not create a restaurant hour with null day of the week', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(restaurant => restaurant.addOrUpdateHour(dayOfTheWeek, openTime, closeTime))
-        .then(() => {
-          assert(false);
-          done();
-        })
-        .catch(() => {
-          assert(true);
-          done();
-        });
+    it('should not create a restaurant hour with null day of the week', async done => {
+      const restaurant = await Restaurant.create(name, password, mode, {phoneNumber});
+      try {
+        await restaurant.addOrUpdateHour(null, openTime, closeTime);
+      } catch (error) {
+        return done();
+      }
+
+      assert(false);
+      done();
     });
   });
 });

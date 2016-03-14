@@ -30,17 +30,29 @@ describe('Restaurant', () => {
         });
     });
 
-    it('should not insert a restaurant category with null name', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(restaurant => restaurant.insertCategory(null))
-        .then(() => {
-          assert(false);
-          done();
-        })
-        .catch(() => {
-          assert(true);
-          done();
-        });
+    it('should not insert a restaurant category with null name', async done => {
+      const restaurant = Restaurant.create(name, password, mode, {phoneNumber});
+      try {
+        await restaurant.insertCategory(null);
+      } catch (error) {
+        return done();
+      }
+
+      assert(false);
+      done();
+    });
+
+    it('should not insert duplicate categories', async done => {
+      const restaurant = await Restaurant.create(name, password, mode, {phoneNumber});
+      await restaurant.insertCategory(category);
+      try {
+        await restaurant.insertCategory(category);
+      } catch (error) {
+        return done();
+      }
+
+      assert(false);
+      done();
     });
   });
 

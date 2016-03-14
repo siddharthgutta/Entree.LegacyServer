@@ -1,3 +1,4 @@
+import _ from 'underscore';
 import models from './index.es6';
 
 export default function (sequelize, DataTypes) {
@@ -36,11 +37,7 @@ export default function (sequelize, DataTypes) {
 
         /* Since we are finding sizes by name length of oldSizes should only be max 1
         *   (e.g.) there should not be multiple 'Large' sizes per menuItem */
-        if (oldSizes.length >= 1) {
-          for (let i = 0; i < oldSizes.length; i++) {
-            await oldSizes[i].destroy();
-          }
-        }
+        _.each(oldSizes, async size => await size.destroy());
 
         const newSize = await models.Size.create({name, addPrice});
         await this.addSize(newSize);
@@ -54,11 +51,7 @@ export default function (sequelize, DataTypes) {
 
         /* Since we are finding mods by name, length of itemMods should only be max 1
         *   (e.g.) there should not be multiple 'Extra Cheese' mods per menuItem */
-        if (itemMods.length >= 1) {
-          for (let i = 0; i < itemMods.length; i++) {
-            await itemMods[i].destroy();
-          }
-        }
+        _.each(itemMods, async itemMod => await itemMod.destroy());
 
         const newItemMod = await models.ItemMod.create({name, addPrice});
         await this.addItemMod(newItemMod);

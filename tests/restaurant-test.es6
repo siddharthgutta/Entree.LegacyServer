@@ -105,15 +105,14 @@ describe('Restaurant', () => {
 
   describe('#destroy()', () => {
     it('should delete from the database correctly', done => {
+      let id;
       Restaurant.create(name, password, mode, {phoneNumber})
-                .then(result => {
-                  Restaurant.destroy(result.id)
-                            .then(() => {
-                              Restaurant.findOne(result.id)
-                                        .then(() => {
-                                          done();
-                                        });
-                            });
+                .then(result => id = result.id)
+                .then(() => Restaurant.destroy(id))
+                .then(() => Restaurant.findOne(id))
+                .then(restaurant => {
+                  assert.equal(restaurant, null);
+                  done();
                 });
     });
 

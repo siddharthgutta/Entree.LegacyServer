@@ -58,17 +58,23 @@ export function signup(phoneNumber, overrideGreeting) {
                                        console.tag('controller', 'signup')
                                               .log(`New user was ${created ? 'created' : 'found'} & ` +
                                                    `${created ? 'full' : 'partial'} welcome message.`);
-
                                        // TODO @jadesym @jesse move getGreeting into chatbot. then ask chatbot
                                        // what to say and send that to the client.
                                        // TODO @jadesym lets get this into async/await if you get some downtime
 
                                        // FIXME disabling chatState insertion for ensuring texts are sent out
                                        // TODO this is temporary only. @jesse a more permanent solution?
-                                       user.insertChatState(chatStates.start, t);
-                                       // .then(() => resolve(response))
-                                       // .catch(err => reject(err));
-                                       resolve(response);
+                                       if (created) {
+                                         user.insertChatState(chatStates.start, t)
+                                           .then(() => resolve(response))
+                                           .catch(err => {
+                                             console.tag('api', 'user', 'signup', 'chatstate')
+                                               .error(`Unable to create chat state for user. Error: ${err}`);
+                                             reject(err);
+                                           });
+                                       } else {
+                                         resolve(response);
+                                       }
                                      })
                                      .catch(error => {
                                        console.tag('controller', 'signup', 'sms')

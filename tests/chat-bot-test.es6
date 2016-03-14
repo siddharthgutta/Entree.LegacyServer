@@ -37,7 +37,7 @@ describe('ChatBot', () => {
     await restaurant.upsertLocation(address, city, addrState, zipcode);
     await restaurant.addOrUpdateHour(dayOfTheWeek, openTime, closeTime);
 
-    const category = await restaurant.insertCategory('Entrees');
+    const category = await restaurant.insertCategory('Entree');
     await category.insertMenuItem(menuItemName, description, basePrice);
 
     const menuItem = (await category.findMenuItems())[0];
@@ -67,21 +67,21 @@ describe('ChatBot', () => {
     assert.equal(chatState.state, state);
   }
 
-  async function checkCtx(restName, itemName) {
+  async function checkContext(restName, itemName) {
     const user = await User.findOneByPhoneNumber(phoneNumber);
     const chatState = await user.findChatState();
-    const restCtx = await chatState.findRestaurantCtx();
-    const menuItemCtx = await chatState.findMenuItemCtx();
+    const restContext = await chatState.findRestaurantContext();
+    const menuItemContext = await chatState.findMenuItemContext();
     if (restName) {
-      assert.equal(restCtx.name, restaurantName);
+      assert.equal(restContext.name, restaurantName);
     } else {
-      assert.equal(restCtx, null);
+      assert.equal(restContext, null);
     }
 
     if (itemName) {
-      assert.equal(menuItemCtx.name, itemName);
+      assert.equal(menuItemContext.name, itemName);
     } else {
-      assert.equal(menuItemCtx, null);
+      assert.equal(menuItemContext, null);
     }
   }
 
@@ -104,31 +104,31 @@ describe('ChatBot', () => {
         .then(() => done());
     });
 
-    it('should not change state using the \"help\" command', async done => {
-      await bot.updateState(phoneNumber, 'help');
+    it('should not change state using the \"/help\" command', async done => {
+      await bot.updateState(phoneNumber, '/help');
       await checkState(chatStates.start);
-      await checkCtx(null, null);
+      await checkContext(null, null);
       done();
     });
 
     it('should not change state using the \"@<restaurant> info\" command', async done => {
       await bot.updateState(phoneNumber, `@${restaurantName} info`);
       await checkState(chatStates.start);
-      await checkCtx(null, null);
+      await checkContext(null, null);
       done();
     });
 
     it('should change to the restaurant state after typing \"restaurants\"', async done => {
       await bot.updateState(phoneNumber, `restaurants`);
       await checkState(chatStates.restaurants);
-      await checkCtx(null, null);
+      await checkContext(null, null);
       done();
     });
 
     it('should change to the categories state after typing \"@<restaurant> menu\"', async done => {
       await bot.updateState(phoneNumber, `@${restaurantName} menu`);
       await checkState(chatStates.categories);
-      await checkCtx(restaurantName, null);
+      await checkContext(restaurantName, null);
 
       done();
     });
@@ -136,16 +136,16 @@ describe('ChatBot', () => {
     it('should change to the items state after typing \"@<restaurant>\"', async done => {
       await bot.updateState(phoneNumber, `@${restaurantName}`);
       await checkState(chatStates.items);
-      await checkCtx(restaurantName, null);
+      await checkContext(restaurantName, null);
 
       done();
     });
 
     it('should not checkout with an empty cart', async done => {
       const result = await bot.updateState(phoneNumber, 'checkout');
-      assert.equal(result, 'You can\'t checkout with an empty cart');
+      assert.equal(result, 'You can\'t checkout with an empty cart. Try typing \"restaurants\" to explore a menu');
       await checkState(chatStates.start);
-      await checkCtx(null, null);
+      await checkContext(null, null);
 
       done();
     });
@@ -162,7 +162,7 @@ describe('ChatBot', () => {
     it('should change to items state when selecting a restaurant', async done => {
       await bot.updateState(phoneNumber, '0');
       await checkState(chatStates.items);
-      await checkCtx(restaurantName, null);
+      await checkContext(restaurantName, null);
 
       done();
     });
@@ -189,36 +189,36 @@ describe('ChatBot', () => {
     it('should change to items state when selecting a category', async done => {
       await bot.updateState(phoneNumber, '0');
       await checkState(chatStates.items);
-      await checkCtx(restaurantName, null);
+      await checkContext(restaurantName, null);
 
       done();
     });
 
-    it('should not change states using the help command', async done => {
-      await bot.updateState(phoneNumber, 'help');
+    it('should not change states using the /help command', async done => {
+      await bot.updateState(phoneNumber, '/help');
       await checkState(chatStates.categories);
-      await checkCtx(restaurantName, null);
+      await checkContext(restaurantName, null);
       done();
     });
 
-    it('should not change states using the info command', async done => {
-      await bot.updateState(phoneNumber, 'info');
+    it('should not change states using the /info command', async done => {
+      await bot.updateState(phoneNumber, '/info');
       await checkState(chatStates.categories);
-      await checkCtx(restaurantName, null);
+      await checkContext(restaurantName, null);
       done();
     });
 
     it('should switch to the categories state using menu command', async done => {
       await bot.updateState(phoneNumber, 'menu');
       await checkState(chatStates.categories);
-      await checkCtx(restaurantName, null);
+      await checkContext(restaurantName, null);
       done();
     });
 
     it('should stay in the same state using clear command', async done => {
       await bot.updateState(phoneNumber, 'clear');
       await checkState(chatStates.categories);
-      await checkCtx(restaurantName, null);
+      await checkContext(restaurantName, null);
       done();
     });
   });
@@ -234,7 +234,7 @@ describe('ChatBot', () => {
     it('should change to size state if there is a size', async done => {
       await bot.updateState(phoneNumber, '0');
       await checkState(chatStates.size);
-      await checkCtx(restaurantName, menuItemName);
+      await checkContext(restaurantName, menuItemName);
 
       done();
     });
@@ -244,7 +244,7 @@ describe('ChatBot', () => {
       await bot.updateState(phoneNumber, '0');
 
       await checkState(chatStates.mods);
-      await checkCtx(restaurantName, menuItemName);
+      await checkContext(restaurantName, menuItemName);
 
       done();
     });
@@ -255,29 +255,36 @@ describe('ChatBot', () => {
 
       await bot.updateState(phoneNumber, '0');
       await checkState(chatStates.cart);
-      await checkCtx(restaurantName, null);
+      await checkContext(restaurantName, null);
 
       done();
     });
 
-    it('should not change states using the help command', async done => {
-      await bot.updateState(phoneNumber, 'help');
+    it('should not change states using the /help command', async done => {
+      await bot.updateState(phoneNumber, '/help');
       await checkState(chatStates.items);
-      await checkCtx(restaurantName, null);
+      await checkContext(restaurantName, null);
       done();
     });
 
-    it('should not change states using the info command', async done => {
-      await bot.updateState(phoneNumber, 'info');
+    it('should not change states using the /info command', async done => {
+      await bot.updateState(phoneNumber, '/info');
       await checkState(chatStates.items);
-      await checkCtx(restaurantName, null);
+      await checkContext(restaurantName, null);
       done();
     });
 
     it('should switch to the categories state using menu command', async done => {
       await bot.updateState(phoneNumber, 'menu');
       await checkState(chatStates.categories);
-      await checkCtx(restaurantName, null);
+      await checkContext(restaurantName, null);
+      done();
+    });
+
+    it('should go back to the items state given a <category>', async done => {
+      await bot.updateState(phoneNumber, 'entree');
+      await checkState(chatStates.items);
+      await checkContext(restaurantName, null);
       done();
     });
   });
@@ -294,7 +301,7 @@ describe('ChatBot', () => {
     it('should change to mod state if there are item mods', async done => {
       await bot.updateState(phoneNumber, '0');
       await checkState(chatStates.mods);
-      await checkCtx(restaurantName, menuItemName);
+      await checkContext(restaurantName, menuItemName);
 
       done();
     });
@@ -304,16 +311,16 @@ describe('ChatBot', () => {
 
       await bot.updateState(phoneNumber, '0');
       await checkState(chatStates.cart);
-      await checkCtx(restaurantName, null);
+      await checkContext(restaurantName, null);
 
       done();
     });
 
     it('should stay in the same state using the menu command. Menu is not allowed', async done => {
       const result = await bot.updateState(phoneNumber, 'menu');
-      assert.equal(result, 'Please finish ordering your item before doing that');
+      assert.equal(result, 'Please finish selecting your item before doing that');
       await checkState(chatStates.size);
-      await checkCtx(restaurantName, menuItemName);
+      await checkContext(restaurantName, menuItemName);
       done();
     });
   });
@@ -331,25 +338,76 @@ describe('ChatBot', () => {
     it('should change state to the cart state after selecting a mod', async done => {
       await bot.updateState(phoneNumber, '0');
       await checkState(chatStates.cart);
-      await checkCtx(restaurantName, null);
+      await checkContext(restaurantName, null);
 
       done();
     });
 
     it('should stay in the same state using the menu command. Menu is not allowed', async done => {
       const result = await bot.updateState(phoneNumber, 'menu');
-      assert.equal(result, 'Please finish ordering your item before doing that');
+      assert.equal(result, 'Please finish selecting your item before doing that');
       await checkState(chatStates.mods);
-      await checkCtx(restaurantName, menuItemName);
+      await checkContext(restaurantName, menuItemName);
       done();
     });
   });
 
+  describe('#updateState() from the cart state', () => {
+    beforeEach(done => {
+      User.create(phoneNumber, name, email)
+        .then(user => user.insertChatState(chatStates.start))
+        .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
+        .then(() => bot.updateState(phoneNumber, '0'))
+        .then(() => bot.updateState(phoneNumber, '0'))
+        .then(() => bot.updateState(phoneNumber, '0'))
+        .then(() => done());
+    });
+
+    it('should change to the items state when given <category> command', async done => {
+      await bot.updateState(phoneNumber, 'entree');
+      await checkState(chatStates.items);
+      await checkContext(restaurantName, null);
+      done();
+    });
+
+    it('should not change states using the /info command', async done => {
+      await bot.updateState(phoneNumber, '/info');
+      await checkState(chatStates.cart);
+      await checkContext(restaurantName, null);
+      done();
+    });
+
+    it('should switch to the categories state using menu command', async done => {
+      await bot.updateState(phoneNumber, 'menu');
+      await checkState(chatStates.categories);
+      await checkContext(restaurantName, null);
+      done();
+    });
+
+    it('should not change states using the /help command', async done => {
+      await bot.updateState(phoneNumber, '/help');
+      await checkState(chatStates.cart);
+      await checkContext(restaurantName, null);
+      done();
+    });
+  });
+
+
   describe('#_isContextual()', () => {
-    it('should determine the correct commands to be context commands', done => {
-      assert.equal(bot._isContextual('checkout'), true);
-      assert.equal(bot._isContextual('menu'), true);
-      assert.equal(bot._isContextual('info'), true);
+    beforeEach(done => {
+      User.create(phoneNumber, name, email)
+        .then(user => user.insertChatState(chatStates.start))
+        .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
+        .then(() => done());
+    });
+
+    it('should determine the correct commands to be context commands', async done => {
+      const user = await User.findOneByPhoneNumber(phoneNumber);
+      const chatState = await user.findChatState();
+      assert.equal(await bot._isContextual(chatState, 'checkout'), true);
+      assert.equal(await bot._isContextual(chatState, 'menu'), true);
+      assert.equal(await bot._isContextual(chatState, '/info'), true);
+      assert.equal(await bot._isContextual(chatState, 'entree'), true);
       done();
     });
   });
@@ -358,7 +416,7 @@ describe('ChatBot', () => {
     it('should determine the correct commands to be stateless commands', done => {
       assert.equal(bot._isStateless('restaurants'), true);
       assert.equal(bot._isStateless('clear'), true);
-      assert.equal(bot._isStateless('help'), true);
+      assert.equal(bot._isStateless('/help'), true);
       assert.equal(bot._isStateless('@name'), true);
       assert.equal(bot._isStateless('@name menu'), true);
       assert.equal(bot._isStateless('@name info'), true);

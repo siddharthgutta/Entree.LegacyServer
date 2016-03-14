@@ -5,8 +5,11 @@ import * as Category from '../../api/category.es6';
 import * as MenuItem from '../../api/menuItem.es6';
 import * as Size from '../../api/size.es6';
 import * as ItemMod from '../../api/itemMod.es6';
+import Promise from 'bluebird';
+import _ from 'underscore';
 
-const userError = 'Sorry, we don\'t recognize that command. Try something else.';
+/* Disabling lint rule since it doesn't make sense */
+/* eslint-disable babel/generator-star-spacing */
 
 /* Chat states for this default bot implementation */
 export const chatStates = {
@@ -18,6 +21,65 @@ export const chatStates = {
   mods: 'Mods',
   cart: 'Cart',
   cardInfo: 'CardInfo'
+};
+
+const response = {
+  /* Returned when there is a user error */
+  userError: 'Sorry, we don\'t recognize that command. Please try again.',
+
+  /* Returned when user tries to execute invalid command when ordering an item */
+  finishItem: 'Please finish selecting your item before doing that',
+
+  /* Returned when user checks out with empty cart */
+  invalidCheckout: 'You can\'t checkout with an empty cart. Try typing \"restaurants\" to explore a menu',
+
+  cartClear: 'Your cart has been cleared. Type \"menu\" to view the menu or \"restaurants\" for more restaurants',
+
+  /* I/O formatting for transition to various states */
+  restaurant: {
+    header: '',
+    footer: 'Type \"more\" for more restaurants or type a number to select a restaurant',
+    dataFormat: (i, data) => `${i}: ${data[i].name}`
+  },
+
+  categories: {
+    header: '',
+    footer: 'Type a number to select a category',
+    dataFormat: (i, data) => `${i}) ${data[i].name}`
+  },
+
+  items: {
+    header: `Here are items from `,
+    footer: 'Type a number to select an item, or type \"menu\" to see the entire menu',
+    dataFormat: (i, data) => `${i}) ${data[i].name} - $${data[i].basePrice / 100}`
+  },
+
+  size: {
+    header: 'Here are the available sizes',
+    footer: 'Type in a number to select a size',
+    dataFormat: (i, data) => `${i}: ${data[i].name} +$${data[i].addPrice / 100}`
+  },
+
+  mods: {
+    header: 'Here are the available item modifications',
+    footer: 'Type your desired modifications separated by a comma (e.g. 0 or 0,2,1) or \"none\"',
+    dataFormat: (i, data) => `${i}: ${data[i].name} +$${data[i].addPrice / 100}`
+  },
+
+  cart: {
+    header: 'Here is your item cart',
+    footer: 'Type \"checkout\" to pay, \"menu\" to browse the menu, ' +
+    'or \"clear\" to clear your entire cart',
+    dataFormat: (i, data) => `${i}: ${data[i].name} - $${data[i].price / 100}`
+  },
+
+  help: 'Here are a list of valid commands:\n' +
+    '\"restaurants\" - list restaurants\n' +
+    '\"@<name>\" - browse restaurant\n' +
+    '\"@<name> menu\" - view menu\n' +
+    '\"@<name> info\" - view info\n' +
+    '\"help\" - this command\n\n' +
+    'For example, type \"@homeslice info\" for information about homeslice'
 };
 
 export default class DefaultChatBot extends ChatBotInterface {
@@ -35,31 +97,30 @@ export default class DefaultChatBot extends ChatBotInterface {
    */
   async updateState(phoneNumber, input) {
     console.tag('chatbot').log({phoneNumber, input});
-
-    input = input.trim().toLowerCase();
-    /* Sanitize user input */
+    input = input.trim().toLowerCase(); /* Sanitize user input */
 
     const user = await User.findOneByPhoneNumber(phoneNumber);
     const chatState = await user.findChatState();
 
     console.tag('chatbot').log({user: user.toJSON(), chatState: chatState.toJSON()});
+    console.tag('chatbot').log({state: chatState.state});
 
     /* No access to contextual or stateless commands when ordering an item.
      * The user must finish selecting size and mods on item */
-    const itemCtx = await chatState.findMenuItemCtx();
-    if ((this._isContextual(input) || this._isStateless(input)) && itemCtx) {
-      return 'Please finish ordering your item before doing that';
+    const itemContext = await chatState.findMenuItemContext();
+    const isContextual = await this._isContextual(chatState, input);
+    const isStateless = this._isStateless(input);
+    if ((isContextual || isStateless) && itemContext) {
+      return response.finishItem;
     }
 
-    if (this._isStateless(input)) {
+    if (isStateless) {
       return await this._statelessTransition(chatState, input);
     }
 
-    if (this._isContextual(input)) {
+    if (isContextual) {
       return await this._contextTransitions(chatState, input);
     }
-
-    console.tag('chatbot').log({state: chatState.state});
 
     /**
      * Intercepting for direct commands
@@ -76,9 +137,6 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
 
     switch (chatState.state) {
-      /* The start state does not have any stateful commands */
-      case chatStates.start:
-        return this._handleHelp();
       case chatStates.restaurants:
         return await this._restaurantTransition(chatState, input);
       case chatStates.categories:
@@ -107,41 +165,41 @@ export default class DefaultChatBot extends ChatBotInterface {
       case /^more$/.test(input):
         return await this._handleMore(chatState);
       case /^\d$/.test(input):
-        return await this._handleRestaurantSelect(chatState, input);
+        return await this._handleSelectRestaurant(chatState, input);
       default:
-        return userError;
+        return response.userError;
     }
   }
 
   async _handleMore(chatState) {
+    /* TODO - pagination for finding more. Should not show all restaurants */
     const restaurants = await Restaurant.findAll();
     return await this._genOutput(
       chatState,
-      '',
-      '\nType a number to select a restaurant',
+      response.restaurant.header,
+      response.restaurant.footer,
       restaurants,
-      (i, data) => `${i}: ${data[i].name}\n`);
+      response.restaurant.dataFormat);
   }
 
-  async _handleRestaurantSelect(chatState, input) {
-    const value = await this._translateInputKey(chatState, input);
-    if (!value) {
-      return userError;
+  async _handleSelectRestaurant(chatState, input) {
+    const restaurantId = await this._translateInputKey(chatState, input);
+    if (!restaurantId) {
+      return response.userError;
     }
 
-    const restaurant = await Restaurant.findOne(value);
+    const restaurant = await Restaurant.findOne(restaurantId);
     const category = await restaurant.findCategories();
     const menuItems = await category[0].findMenuItems();
     await chatState.updateState(chatStates.items);
-    await chatState.setRestaurantCtx(restaurant);
+    await chatState.setRestaurantContext(restaurant);
     return await this._genOutput(
       chatState,
-      'Here are the recommended item \n\n',
-      '\nType a number to select an item, or type \"menu\" to see the entire menu',
+      `${response.items.header} ${restaurant.name}`,
+      response.items.footer,
       menuItems,
-      (i, data) => `${i}) ${data[i].name} - $${data[i].basePrice / 100}\n`);
+      response.items.dataFormat);
   }
-
 
   /**
    * Handles transitions from the categories state
@@ -152,29 +210,29 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @private
    */
   async _categoriesTransition(chatState, input) {
-    switch (true) {
-      case /^\d$/.test(input):
-        return await this._handleCategorySelect(chatState, input);
-      default:
-        return userError;
+    if (/^\d$/.test(input)) {
+      return await this._handleSelectCategory(chatState, input);
     }
+
+    return response.userError;
   }
 
-  async _handleCategorySelect(chatState, input) {
-    const value = await this._translateInputKey(chatState, input);
-    if (!value) {
-      return userError;
+  async _handleSelectCategory(chatState, input) {
+    const categoryId = await this._translateInputKey(chatState, input);
+    if (!categoryId) {
+      return response.userError;
     }
 
-    const category = await Category.findOne(value);
+    const restaurant = await chatState.findRestaurantContext();
+    const category = await Category.findOne(categoryId);
     const menuItems = await category.findMenuItems();
     await chatState.updateState(chatStates.items);
     return await this._genOutput(
       chatState,
-      '',
-      '\nType a number to select an item, or type \"menu\" to see the entire menu',
+      `${response.items.header} ${restaurant.name}`,
+      response.items.footer,
       menuItems,
-      (i, data) => `${i}) ${data[i].name} - $${data[i].basePrice / 100}\n`);
+      response.items.dataFormat);
   }
 
   /**
@@ -186,41 +244,43 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @private
    */
   async _itemsTransition(chatState, input) {
-    if (/^\d$/.test(input) === false) {
-      return userError;
+    if (!(/^\d$/.test(input))) {
+      return response.userError;
     }
 
-    const value = await this._translateInputKey(chatState, input);
-    if (!value) {
-      return userError;
+    const menuItemId = await this._translateInputKey(chatState, input);
+    if (!menuItemId) {
+      return response.userError;
     }
 
-    const menuItem = await MenuItem.findOne(value);
+    const menuItem = await MenuItem.findOne(menuItemId);
     const sizes = await menuItem.findSizes();
     const itemMods = await menuItem.findItemMods();
 
     await chatState.insertOrderItem(menuItem.name, menuItem.basePrice);
 
+    /* Go to sizes state if the item requires size, or the mods state if there are mods and
+    * no sizes, or straight to cart if there are no mods and no sizes */
     if (sizes.length > 0) {
       await chatState.updateState(chatStates.size);
-      await chatState.setMenuItemCtx(menuItem);
+      await chatState.setMenuItemContext(menuItem);
 
       return await this._genOutput(
         chatState,
-        'Here are the available sizes\n\n',
-        '\nType in a number to select a size',
+        response.size.header,
+        response.size.footer,
         sizes,
-        (i, data) => `${i}: ${data[i].name} - +$${data[i].addPrice / 100}\n`);
+        response.size.dataFormat);
     } else if (itemMods.length > 0) {
       await chatState.updateState(chatStates.mods);
-      await chatState.setMenuItemCtx(menuItem);
+      await chatState.setMenuItemContext(menuItem);
 
       return await this._genOutput(
         chatState,
-        'Here are the available item modifications\n\n',
-        '\nType your desired modifications separated by a comma (e.g. 0 or 0,2,1)',
+        response.mods.header,
+        response.mods.footer,
         itemMods,
-        (i, data) => `${i}: ${data[i].name} - +$${data[i].addPrice / 100}\n`);
+        response.mods.dataFormat);
     }
 
     return await this._transitionToCart(chatState);
@@ -236,32 +296,32 @@ export default class DefaultChatBot extends ChatBotInterface {
    */
   async _sizeTransition(chatState, input) {
     if (/^\d$/.test(input) === false) {
-      return userError;
+      return response.userError;
     }
 
     const value = await this._translateInputKey(chatState, input);
     if (!value) {
-      return userError;
+      return response.userError;
     }
 
     const orderItem = await chatState.findLastOrderItem();
     const size = await Size.findOne(value);
 
-    orderItem.name += ` ${size.name}`;
+    orderItem.name = `${size.name} ${orderItem.name}`;
     orderItem.price += size.addPrice;
     await orderItem.save();
 
-    const menuItem = await chatState.findMenuItemCtx();
+    const menuItem = await chatState.findMenuItemContext();
     const itemMods = await menuItem.findItemMods();
     if (itemMods.length > 0) {
       await chatState.updateState(chatStates.mods);
-      await chatState.setMenuItemCtx(menuItem);
+      await chatState.setMenuItemContext(menuItem);
       return await this._genOutput(
         chatState,
-        'Here are the available item modifications\n\n',
-        '\nType your desired modifications separated by a comma (e.g. 0 or 0,2,1)',
+        response.mods.header,
+        response.mods.footer,
         itemMods,
-        (i, data) => `${i}: ${data[i].name} - +$${data[i].addPrice / 100}\n`);
+        response.mods.dataFormat);
     }
 
     return await this._transitionToCart(chatState);
@@ -276,38 +336,55 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @private
    */
   async _modsTransition(chatState, input) {
-    const orderItem = await chatState.findLastOrderItem();
-    const mods = input.split(',');
-    for (let i = 0; i < mods.length; i++) { // eslint-disable-line
-      if (/^\d$/.test(mods[i]) === false) {
-        return userError;
-      }
-
-      const value = await this._translateInputKey(chatState, mods[i]);
-      if (!value) {
-        return userError;
-      }
-
-      const itemMod = await ItemMod.findOne(value);
-      orderItem.name += ` ${itemMod.name}`;
-      orderItem.price += itemMod.addPrice;
+    if (input === 'none') {
+      return await this._transitionToCart(chatState);
     }
 
-    await orderItem.save();
-    return await this._transitionToCart(chatState);
+    return this._handleMods(chatState, input);
   }
 
-  /**
-   * Handles transitions from the cart state
-   *
-   * @param {Object} chatState: user chat state
-   * @param {String} input: the user input
-   * @returns {String}: output of the state transition
-   * @private
-   */
-  async _cartTransition(chatState, input) {
-    /* All cart state commands are contextual or stateless */
-    throw (Error('Not implemented', chatState, input));
+  async _handleMods(chatState, input) {
+    const orderItem = await chatState.findLastOrderItem();
+    const mods = input.split(',');
+    if (mods.length > 0) {
+      orderItem.name += ' with';
+    }
+
+    /* Check if user entered comma separated digits */
+    if (!mods.every(mod => /^\d$/.test(mod))) {
+      return response.userError;
+    }
+
+    for (let i = 0; i < mods.length; i++) {
+      try {
+        mods[i] = await this._translateInputKey(chatState, mods[i]);
+      } catch (err) {
+        throw new TraceError(`ChatState id ${chatState.id} - Failed to translate user input`, err);
+      }
+    }
+
+    if (!mods.every(modId => modId !== null)) {
+      return response.userError;
+    }
+
+    await Promise.map(mods, async modId => {
+      try {
+        const itemMod = await ItemMod.findOne(modId); // eslint-disable-line
+        orderItem.name += ` ${itemMod.name},`;
+        orderItem.price += itemMod.addPrice;
+      } catch (err) {
+        throw new TraceError(`ChatState id ${chatState.id} - Failed to update order item with mods`, err);
+      }
+    });
+
+    /* Remove the trailing comma */
+    orderItem.name = orderItem.name.slice(0, -1);
+    try {
+      await orderItem.save();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to save order item`, err);
+    }
+    return await this._transitionToCart(chatState);
   }
 
   /**
@@ -324,53 +401,82 @@ export default class DefaultChatBot extends ChatBotInterface {
         return await this._handleCheckout(chatState);
       case /^menu$/.test(input):
         return await this._handleContextMenu(chatState);
-      case /^info$/.test(input):
+      case /^\/info$/.test(input):
         return await this._handleContextInfo(chatState);
+      case /^[a-zA-Z]+$/.test(input):
+        return await this._handleCategory(chatState, input);
       default:
-        return null;
+        throw (Error('Called context transition when command was not contextual'));
     }
   }
 
   /**
    * Checks if the input is a contextual command
    *
+   * @param {Object} chatState: user chat state
    * @param {String} input: user input
    * @returns {boolean}: true if contextual and false otherwise
    * @private
    */
-  _isContextual(input) {
+  async _isContextual(chatState, input) {
+    let isCategory = false;
+    const restContext = await chatState.findRestaurantContext();
+    if (restContext) {
+      const categories = await restContext.findCategories();
+      isCategory = _.find(categories, cat => cat.name.toLowerCase() === input) !== undefined;
+    }
+
     return /^checkout$/.test(input)
       || /^menu$/.test(input)
-      || /^info$/.test(input);
+      || /^\/info$/.test(input)
+      || isCategory;
+  }
+
+  async _handleCategory(chatState, input) {
+    const restContext = await chatState.findRestaurantContext();
+    const categories = await restContext.findCategories();
+    const category = categories.filter(cat => cat.name.toLowerCase() === input)[0]; // TODO - Reccomendations
+    const menuItems = await category.findMenuItems();
+    await chatState.updateState(chatStates.items);
+
+    return await this._genOutput(
+      chatState,
+      `${response.items.header} ${restContext.name}`,
+      response.items.footer,
+      menuItems,
+      response.items.dataFormat);
   }
 
   async _handleCheckout(chatState) {
     const orderItems = await chatState.findOrderItems();
     if (orderItems.length === 0) {
-      return 'You can\'t checkout with an empty cart';
+      return response.invalidCheckout;
     }
 
     let output = '';
     let total = 0;
     for (let i = 0; i < orderItems.length; i++) {
-      output += orderItems[i].name;
+      output += `${orderItems[i].name}, `;
       total += orderItems[i].price;
     }
 
     await chatState.clearOrderItems();
     await chatState.updateState(chatStates.start);
     /* TODO -- transfer order items over to permanent order object
-     * what should I return for the payment processing? */
-    return `Your order of ${output.slice(0, -1)} for a total of $${total / 100} has been placed`;
+    * what should I return for the payment processing? */
+
+    /* Slice to remove trailing comma and whitespcae */
+    return `Your order of ${output.slice(0, -2)} for a total of $${total / 100} has been placed.` +
+      'We will text you when it\'s ready.';
   }
 
   async _handleContextMenu(chatState) {
-    const restaurant = await chatState.findRestaurantCtx();
+    const restaurant = await chatState.findRestaurantContext();
     return await this._handleAtRestaurantMenu(chatState, restaurant.name);
   }
 
   async _handleContextInfo(chatState) {
-    const restaurant = await chatState.findRestaurantCtx();
+    const restaurant = await chatState.findRestaurantContext();
     return await this._handleAtRestaurantInfo(restaurant.name);
   }
 
@@ -386,7 +492,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       || /^@[^ ]+$/.test(input)
       || /^@[^ ]+\ menu$/.test(input)
       || /^@.+\ info$/.test(input)
-      || /^help$/.test(input)
+      || /^\/help$/.test(input)
       || /^clear$/.test(input);
   }
 
@@ -410,16 +516,11 @@ export default class DefaultChatBot extends ChatBotInterface {
         return await this._handleAtRestaurantMenu(chatState, input.split(' ')[0].substr(1));
       case /^@.+\ info$/.test(input):
         return await this._handleAtRestaurantInfo(input.split(' ')[0].substr(1));
-      case /^help$/.test(input):
+      case /^\/help$/.test(input):
         return await this._handleHelp();
       default:
-        return null;
+        throw (Error('Called stateless transition when command was not stateless'));
     }
-  }
-
-  async _handleClear(chatState) {
-    await chatState.clearOrderItems();
-    return 'Your cart is cleared';
   }
 
   /**
@@ -434,10 +535,10 @@ export default class DefaultChatBot extends ChatBotInterface {
     const restaurants = await Restaurant.findAll(); // TODO - Replace this with curation of recommended restaurants
     return await this._genOutput(
       chatState,
-      'Try these restaurants!\n\n',
-      '\nType \"more\" for more restaurants or type a number to select a restaurant',
+      response.restaurant.header,
+      response.restaurant.footer,
       restaurants,
-      (i, data) => `${i}) ${data[i].name}\n`);
+      response.restaurant.dataFormat);
   }
 
   /**
@@ -450,16 +551,21 @@ export default class DefaultChatBot extends ChatBotInterface {
    */
   async _handleAtRestaurant(chatState, input) {
     const restaurant = await Restaurant.findByName(input);
+    if (!restaurant) {
+      /* User typed in a restaurant name that doesn't exist */
+      return response.userError;
+    }
+
     const categories = await restaurant.findCategories();
     const menuItems = await categories[0].findMenuItems(); // TODO - curate items
     await chatState.updateState(chatStates.items);
-    await chatState.setRestaurantCtx(restaurant);
+    await chatState.setRestaurantContext(restaurant);
     return await this._genOutput(
       chatState,
-      'Try these items!\n\n',
-      '\nType a number to select a dish or type \"menu\" to see the entire menu',
+      response.items.header,
+      response.items.footer,
       menuItems,
-      (i, data) => `${i}) ${data[i].name} - $${data[i].basePrice / 100}\n`);
+      response.items.dataFormat);
   }
 
   /**
@@ -472,15 +578,20 @@ export default class DefaultChatBot extends ChatBotInterface {
    */
   async _handleAtRestaurantMenu(chatState, input) {
     const restaurant = await Restaurant.findByName(input);
+    if (!restaurant) {
+      /* User typed in a restaurant name that doesn't exist */
+      return response.userError;
+    }
+
     const categories = await restaurant.findCategories();
     await chatState.updateState(chatStates.categories);
-    await chatState.setRestaurantCtx(restaurant);
+    await chatState.setRestaurantContext(restaurant);
     return await this._genOutput(
       chatState,
-      'Here are the menu categories\n\n',
-      '\nType a number to select a category',
+      response.categories.header,
+      response.categories.footer,
       categories,
-      (i, data) => `${i}) ${data[i].name}\n`);
+      response.categories.dataFormat);
   }
 
   /**
@@ -491,10 +602,16 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @private
    */
   async _handleAtRestaurantInfo(input) {
-    let output = '';
     const restaurant = await Restaurant.findByName(input);
+    if (!restaurant) {
+      /* User typed in a restaurant name that doesn't exist */
+      return response.userError;
+    }
+
+    let output = `Info for ${restaurant.name}\n\n`;
+
     const location = await restaurant.findLocation();
-    output += `Location: ${location.address} ${location.city}, ${location.state} ${location.zipcode}\n\n`;
+    output += `Location: ${location.address} ${location.city}, ${location.state} ${location.zipcode}\n`;
 
     output += 'Hours:\n';
     const hours = await restaurant.findHours();
@@ -512,43 +629,36 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @private
    */
   async _handleHelp() {
-    return 'Here are a list of valid commands:\n' +
-      '\"restaurants\" - browse restaurants' +
-      '\"@<name>\" - browse specific restaurant' +
-      '\"@<name> menu\" - browse menu of specific restaurant' +
-      '\"@<name> info\" - browse info of specific restaurant' +
-      '\"help\" - this command' +
-      'For example, type \"@homeslice info\" for information about homeslice';
+    return response.help;
   }
 
   async _handleClear(chatState) {
     await chatState.clearOrderItems();
-    return 'Your cart has been cleared';
+    return response.cartClear;
   }
 
   async _genOutput(chatState, header, footer, data, dataFunc) {
     await chatState.clearCommandMaps();
-    let output = header;
+    let output = `${header}\n\n`;
 
     for (let i = 0; i < data.length; i++) {
-      await chatState.insertCommandMap(i, data[i].id);
-      output += dataFunc(i, data);
+      await chatState.insertCommandMap(i, data[i].id); // eslint-disable-line
+      output += `${dataFunc(i, data)}\n`;
     }
 
-    return output + footer;
+    return `${output}\n${footer}`;
   }
 
   async _transitionToCart(chatState) {
     const orderItems = await chatState.findOrderItems();
     await chatState.updateState(chatStates.cart);
-    await chatState.clearMenuItemCtx();
+    await chatState.clearMenuItemContext();
     return await this._genOutput(
       chatState,
-      'Here is your item cart\n',
-      'Type \"checkout\" to complete your order, \"menu\" to keep browsing, ' +
-      'or \"undo\" to remove the last item',
+      response.cart.header,
+      response.cart.footer,
       orderItems,
-      (i, data) => `${i}: ${data[i].name} - $${data[i].price / 100}\n`);
+      response.cart.dataFormat);
   }
 
   async _translateInputKey(chatState, input) {
