@@ -9,7 +9,7 @@ import Promise from 'bluebird';
 import _ from 'underscore';
 
 /* Disabling lint rule since it doesn't make sense */
-/* eslint-disable babel/generator-star-spacing */
+/* eslint-disable babel/generator-star-spacing,one-var */
 
 /* Chat states for this default bot implementation */
 export const chatStates = {
@@ -93,23 +93,32 @@ export default class DefaultChatBot extends ChatBotInterface {
    *
    * @param {String} phoneNumber: phoneNumber's state to update
    * @param {String} input: the user input
-   * @returns {String}: the output of the state transition
+   * @returns {String}: the output of the chat bot
    */
   async updateState(phoneNumber, input) {
-    console.tag('chatbot').log({phoneNumber, input});
     input = input.trim().toLowerCase(); /* Sanitize user input */
 
-    const user = await User.findOneByPhoneNumber(phoneNumber);
-    const chatState = await user.findChatState();
-
-    console.tag('chatbot').log({user: user.toJSON(), chatState: chatState.toJSON()});
-    console.tag('chatbot').log({state: chatState.state});
+    let user, chatState;
+    try {
+      user = await User.findOneByPhoneNumber(phoneNumber);
+      chatState = await user.findChatState();
+    } catch (err) {
+      throw new TraceError(`Could not find user ChatState info for user ${phoneNumber}`, err);
+    }
 
     /* No access to contextual or stateless commands when ordering an item.
      * The user must finish selecting size and mods on item */
-    const itemContext = await chatState.findMenuItemContext();
-    const isContextual = await this._isContextual(chatState, input);
-    const isStateless = this._isStateless(input);
+
+    let itemContext, isContextual, isStateless;
+    try {
+      itemContext = await chatState.findMenuItemContext();
+      isContextual = await this._isContextual(chatState, input);
+      isStateless = this._isStateless(input);
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} ` +
+        `- Failed to determine if command is contextual or stateless for user ${phoneNumber}`, err);
+    }
+
     if ((isContextual || isStateless) && itemContext) {
       return response.finishItem;
     }
@@ -148,7 +157,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       case chatStates.mods:
         return await this._modsTransition(chatState, input);
       default:
-        throw (Error('User is in invalid state'));
+        throw new TraceError(`ChatState id ${chatState.id} - User is in invalid state`);
     }
   }
 
@@ -157,7 +166,7 @@ export default class DefaultChatBot extends ChatBotInterface {
    *
    * @param {Object} chatState: user chat state
    * @param {String} input: the user input
-   * @returns {String}: output of the state transition
+   * @returns {String}: output of the chat bot
    * @private
    */
   async _restaurantTransition(chatState, input) {
@@ -188,17 +197,28 @@ export default class DefaultChatBot extends ChatBotInterface {
       return response.userError;
     }
 
-    const restaurant = await Restaurant.findOne(restaurantId);
-    const category = await restaurant.findCategories();
-    const menuItems = await category[0].findMenuItems();
-    await chatState.updateState(chatStates.items);
-    await chatState.setRestaurantContext(restaurant);
-    return await this._genOutput(
-      chatState,
-      `${response.items.header} ${restaurant.name}`,
-      response.items.footer,
-      menuItems,
-      response.items.dataFormat);
+    let restaurant, category, menuItems;
+    try {
+      restaurant = await Restaurant.findOne(restaurantId);
+      category = await restaurant.findCategories();
+      menuItems = await category[0].findMenuItems();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} ` +
+        `- Failed to find restaurant data when selecting a restaurant`, err);
+    }
+
+    try {
+      await chatState.updateState(chatStates.items);
+      await chatState.setRestaurantContext(restaurant);
+      return await this._genOutput(
+        chatState,
+        `${response.items.header} ${restaurant.name}`,
+        response.items.footer,
+        menuItems,
+        response.items.dataFormat);
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chat bot metadata`, err);
+    }
   }
 
   /**
@@ -206,7 +226,7 @@ export default class DefaultChatBot extends ChatBotInterface {
    *
    * @param {Object} chatState: user chat state
    * @param {String} input: the user input
-   * @returns {String}: output of the state transition
+   * @returns {String}: output of the chat bot
    * @private
    */
   async _categoriesTransition(chatState, input) {
@@ -223,16 +243,27 @@ export default class DefaultChatBot extends ChatBotInterface {
       return response.userError;
     }
 
-    const restaurant = await chatState.findRestaurantContext();
-    const category = await Category.findOne(categoryId);
-    const menuItems = await category.findMenuItems();
-    await chatState.updateState(chatStates.items);
-    return await this._genOutput(
-      chatState,
-      `${response.items.header} ${restaurant.name}`,
-      response.items.footer,
-      menuItems,
-      response.items.dataFormat);
+    let restaurant, category, menuItems;
+    try {
+      restaurant = await chatState.findRestaurantContext();
+      category = await Category.findOne(categoryId);
+      menuItems = await category.findMenuItems();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id}` +
+        ` - Failed to get restaurant data when selecting a category`, err);
+    }
+
+    try {
+      await chatState.updateState(chatStates.items);
+      return await this._genOutput(
+        chatState,
+        `${response.items.header} ${restaurant.name}`,
+        response.items.footer,
+        menuItems,
+        response.items.dataFormat);
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chat bot metadata`, err);
+    }
   }
 
   /**
@@ -240,7 +271,7 @@ export default class DefaultChatBot extends ChatBotInterface {
    *
    * @param {Object} chatState: user chat state
    * @param {String} input: the user input
-   * @returns {String}: output of the state transition
+   * @returns {String}: output of the chat bot
    * @private
    */
   async _itemsTransition(chatState, input) {
@@ -253,37 +284,54 @@ export default class DefaultChatBot extends ChatBotInterface {
       return response.userError;
     }
 
-    const menuItem = await MenuItem.findOne(menuItemId);
-    const sizes = await menuItem.findSizes();
-    const itemMods = await menuItem.findItemMods();
+    let menuItem, sizes, itemMods;
+    try {
+      menuItem = await MenuItem.findOne(menuItemId);
+      sizes = await menuItem.findSizes();
+      itemMods = await menuItem.findItemMods();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to get menu data when selecting an item`, err);
+    }
 
-    await chatState.insertOrderItem(menuItem.name, menuItem.basePrice);
+    try {
+      await chatState.insertOrderItem(menuItem.name, menuItem.basePrice);
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to create a new order item`, err);
+    }
 
     /* Go to sizes state if the item requires size, or the mods state if there are mods and
     * no sizes, or straight to cart if there are no mods and no sizes */
     if (sizes.length > 0) {
-      await chatState.updateState(chatStates.size);
-      await chatState.setMenuItemContext(menuItem);
+      try {
+        await chatState.updateState(chatStates.size);
+        await chatState.setMenuItemContext(menuItem);
 
-      return await this._genOutput(
-        chatState,
-        response.size.header,
-        response.size.footer,
-        sizes,
-        response.size.dataFormat);
+        return await this._genOutput(
+          chatState,
+          response.size.header,
+          response.size.footer,
+          sizes,
+          response.size.dataFormat);
+      } catch (err) {
+        throw new TraceError(`ChatState id ${chatState.id} - Failed to update chat bot metadata`, err);
+      }
     } else if (itemMods.length > 0) {
-      await chatState.updateState(chatStates.mods);
-      await chatState.setMenuItemContext(menuItem);
+      try {
+        await chatState.updateState(chatStates.mods);
+        await chatState.setMenuItemContext(menuItem);
 
-      return await this._genOutput(
-        chatState,
-        response.mods.header,
-        response.mods.footer,
-        itemMods,
-        response.mods.dataFormat);
+        return await this._genOutput(
+          chatState,
+          response.mods.header,
+          response.mods.footer,
+          itemMods,
+          response.mods.dataFormat);
+      } catch (err) {
+        throw new TraceError(`ChatState id ${chatState.id} - Failed to update chat bot metadata`, err);
+      }
+    } else {
+      return await this._transitionToCart(chatState);
     }
-
-    return await this._transitionToCart(chatState);
   }
 
   /**
@@ -291,7 +339,7 @@ export default class DefaultChatBot extends ChatBotInterface {
    *
    * @param {Object} chatState: user chat state
    * @param {String} input: the user input
-   * @returns {String}: output of the state transition
+   * @returns {String}: output of the chat bot
    * @private
    */
   async _sizeTransition(chatState, input) {
@@ -304,27 +352,47 @@ export default class DefaultChatBot extends ChatBotInterface {
       return response.userError;
     }
 
-    const orderItem = await chatState.findLastOrderItem();
-    const size = await Size.findOne(value);
+    let orderItem, size;
+    try {
+      orderItem = await chatState.findLastOrderItem();
+      size = await Size.findOne(value);
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to find item data when selecting a size`, err);
+    }
 
     orderItem.name = `${size.name} ${orderItem.name}`;
     orderItem.price += size.addPrice;
-    await orderItem.save();
 
-    const menuItem = await chatState.findMenuItemContext();
-    const itemMods = await menuItem.findItemMods();
-    if (itemMods.length > 0) {
-      await chatState.updateState(chatStates.mods);
-      await chatState.setMenuItemContext(menuItem);
-      return await this._genOutput(
-        chatState,
-        response.mods.header,
-        response.mods.footer,
-        itemMods,
-        response.mods.dataFormat);
+    try {
+      await orderItem.save();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update order item`, err);
     }
 
-    return await this._transitionToCart(chatState);
+    let menuItem, itemMods;
+    try {
+      menuItem = await chatState.findMenuItemContext();
+      itemMods = await menuItem.findItemMods();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to find item mod data`, err);
+    }
+
+    if (itemMods.length > 0) {
+      try {
+        await chatState.updateState(chatStates.mods);
+        await chatState.setMenuItemContext(menuItem);
+        return await this._genOutput(
+          chatState,
+          response.mods.header,
+          response.mods.footer,
+          itemMods,
+          response.mods.dataFormat);
+      } catch (err) {
+        throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot metadata`, err);
+      }
+    } else {
+      return await this._transitionToCart(chatState);
+    }
   }
 
   /**
@@ -332,7 +400,7 @@ export default class DefaultChatBot extends ChatBotInterface {
    *
    * @param {Object} chatState: user chat state
    * @param {String} input: the user input
-   * @returns {String}: output of the state transition
+   * @returns {String}: output of the chat bot
    * @private
    */
   async _modsTransition(chatState, input) {
@@ -344,7 +412,13 @@ export default class DefaultChatBot extends ChatBotInterface {
   }
 
   async _handleMods(chatState, input) {
-    const orderItem = await chatState.findLastOrderItem();
+    let orderItem;
+    try {
+      orderItem = await chatState.findLastOrderItem();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to find last order item`, err);
+    }
+
     const mods = input.split(',');
     if (mods.length > 0) {
       orderItem.name += ' with';
@@ -381,10 +455,10 @@ export default class DefaultChatBot extends ChatBotInterface {
     orderItem.name = orderItem.name.slice(0, -1);
     try {
       await orderItem.save();
+      return await this._transitionToCart(chatState);
     } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to save order item`, err);
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot metadata`, err);
     }
-    return await this._transitionToCart(chatState);
   }
 
   /**
@@ -392,7 +466,7 @@ export default class DefaultChatBot extends ChatBotInterface {
    *
    * @param {Object} chatState: chat state object for this transition
    * @param {String} input: user input
-   * @returns {String}: returns the state transition output
+   * @returns {String}: returns the chat bot output
    * @private
    */
   async _contextTransitions(chatState, input) {
@@ -406,7 +480,8 @@ export default class DefaultChatBot extends ChatBotInterface {
       case /^[a-zA-Z]+$/.test(input):
         return await this._handleCategory(chatState, input);
       default:
-        throw (Error('Called context transition when command was not contextual'));
+        throw new TraceError(`ChatState id ${chatState.id}  ` +
+          `- Called context transition when command was not contextual`);
     }
   }
 
@@ -420,10 +495,14 @@ export default class DefaultChatBot extends ChatBotInterface {
    */
   async _isContextual(chatState, input) {
     let isCategory = false;
-    const restContext = await chatState.findRestaurantContext();
-    if (restContext) {
-      const categories = await restContext.findCategories();
-      isCategory = _.find(categories, cat => cat.name.toLowerCase() === input) !== undefined;
+    try {
+      const restContext = await chatState.findRestaurantContext();
+      if (restContext) {
+        const categories = await restContext.findCategories();
+        isCategory = _.find(categories, cat => cat.name.toLowerCase() === input) !== undefined;
+      }
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to determine if user selected a category`, err);
     }
 
     return /^checkout$/.test(input)
@@ -433,22 +512,36 @@ export default class DefaultChatBot extends ChatBotInterface {
   }
 
   async _handleCategory(chatState, input) {
-    const restContext = await chatState.findRestaurantContext();
-    const categories = await restContext.findCategories();
-    const category = categories.filter(cat => cat.name.toLowerCase() === input)[0]; // TODO - Reccomendations
-    const menuItems = await category.findMenuItems();
-    await chatState.updateState(chatStates.items);
-
-    return await this._genOutput(
-      chatState,
-      `${response.items.header} ${restContext.name}`,
-      response.items.footer,
-      menuItems,
-      response.items.dataFormat);
+    let restContext, categories, category, menuItems;
+    try {
+      restContext = await chatState.findRestaurantContext();
+      categories = await restContext.findCategories();
+      category = categories.filter(cat => cat.name.toLowerCase() === input)[0];
+      menuItems = await category.findMenuItems();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to get restaurant data`, err);
+    }
+    try {
+      await chatState.updateState(chatStates.items);
+      return await this._genOutput(
+        chatState,
+        `${response.items.header} ${restContext.name}`,
+        response.items.footer,
+        menuItems,
+        response.items.dataFormat);
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot metadata`, err);
+    }
   }
 
   async _handleCheckout(chatState) {
-    const orderItems = await chatState.findOrderItems();
+    let orderItems;
+    try {
+      orderItems = await chatState.findOrderItems();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to find order items`, err);
+    }
+
     if (orderItems.length === 0) {
       return response.invalidCheckout;
     }
@@ -471,12 +564,23 @@ export default class DefaultChatBot extends ChatBotInterface {
   }
 
   async _handleContextMenu(chatState) {
-    const restaurant = await chatState.findRestaurantContext();
+    let restaurant;
+    try {
+      restaurant = await chatState.findRestaurantContext();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to find restaurant`, err);
+    }
     return await this._handleAtRestaurantMenu(chatState, restaurant.name);
   }
 
   async _handleContextInfo(chatState) {
-    const restaurant = await chatState.findRestaurantContext();
+    let restaurant;
+    try {
+      restaurant = await chatState.findRestaurantContext();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to find restaurant`, err);
+    }
+
     return await this._handleAtRestaurantInfo(restaurant.name);
   }
 
@@ -501,7 +605,7 @@ export default class DefaultChatBot extends ChatBotInterface {
    *
    * @param {Object} chatState: current chat state object for the user
    * @param {String} input: the user input
-   * @returns {String}: output of the state transition
+   * @returns {String}: output of the chat bot
    * @private
    */
   async _statelessTransition(chatState, input) {
@@ -515,34 +619,39 @@ export default class DefaultChatBot extends ChatBotInterface {
       case /^@[^ ]+\ menu$/.test(input):
         return await this._handleAtRestaurantMenu(chatState, input.split(' ')[0].substr(1));
       case /^@.+\ info$/.test(input):
-        return await this._handleAtRestaurantInfo(input.split(' ')[0].substr(1));
+        return await this._handleAtRestaurantInfo(chatState, input.split(' ')[0].substr(1));
       case /^\/help$/.test(input):
         return await this._handleHelp();
       default:
-        throw (Error('Called stateless transition when command was not stateless'));
+        throw new TraceError(`ChatState id ${chatState.id} ` +
+          `- Called stateless transition when command was not stateless`);
     }
   }
 
   /**
-   * Handles state transition of "restaurant" command
+   * Handles chat bot of "restaurant" command
    *
    * @param {Object} chatState: input chat state object
    * @returns {String}: output of the transition
    * @private
    */
   async _handleRestaurant(chatState) {
-    await chatState.updateState(chatStates.restaurants);
-    const restaurants = await Restaurant.findAll(); // TODO - Replace this with curation of recommended restaurants
-    return await this._genOutput(
-      chatState,
-      response.restaurant.header,
-      response.restaurant.footer,
-      restaurants,
-      response.restaurant.dataFormat);
+    try {
+      await chatState.updateState(chatStates.restaurants);
+      const restaurants = await Restaurant.findAll(); // TODO - Replace this with curation of recommended restaurants
+      return await this._genOutput(
+        chatState,
+        response.restaurant.header,
+        response.restaurant.footer,
+        restaurants,
+        response.restaurant.dataFormat);
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot metadata`, err);
+    }
   }
 
   /**
-   * Handles state transition of "@<restaurant>" command
+   * Handles chat bot of "@<restaurant>" command
    *
    * @param {Object} chatState: input chat state object
    * @param {String} input: user input restaurant name
@@ -550,26 +659,36 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @private
    */
   async _handleAtRestaurant(chatState, input) {
-    const restaurant = await Restaurant.findByName(input);
-    if (!restaurant) {
-      /* User typed in a restaurant name that doesn't exist */
-      return response.userError;
+    let restaurant, categories, menuItems;
+    try {
+      restaurant = await Restaurant.findByName(input);
+      if (!restaurant) {
+        /* User typed in a restaurant name that doesn't exist */
+        return response.userError;
+      }
+
+      categories = await restaurant.findCategories();
+      menuItems = await categories[0].findMenuItems(); // TODO - curate items
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to get restaurant data`, err);
     }
 
-    const categories = await restaurant.findCategories();
-    const menuItems = await categories[0].findMenuItems(); // TODO - curate items
-    await chatState.updateState(chatStates.items);
-    await chatState.setRestaurantContext(restaurant);
-    return await this._genOutput(
-      chatState,
-      response.items.header,
-      response.items.footer,
-      menuItems,
-      response.items.dataFormat);
+    try {
+      await chatState.updateState(chatStates.items);
+      await chatState.setRestaurantContext(restaurant);
+      return await this._genOutput(
+        chatState,
+        response.items.header,
+        response.items.footer,
+        menuItems,
+        response.items.dataFormat);
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot metadata`, err);
+    }
   }
 
   /**
-   * Handles state transition of "@<restaurant> menu" command
+   * Handles chat bot of "@<restaurant> menu" command
    *
    * @param {Object} chatState: input chat state object
    * @param {String} input: user input restaurant name
@@ -577,44 +696,57 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @private
    */
   async _handleAtRestaurantMenu(chatState, input) {
-    const restaurant = await Restaurant.findByName(input);
-    if (!restaurant) {
-      /* User typed in a restaurant name that doesn't exist */
-      return response.userError;
-    }
+    let restaurant, categories;
+    try {
+      restaurant = await Restaurant.findByName(input);
+      if (!restaurant) {
+        /* User typed in a restaurant name that doesn't exist */
+        return response.userError;
+      }
 
-    const categories = await restaurant.findCategories();
-    await chatState.updateState(chatStates.categories);
-    await chatState.setRestaurantContext(restaurant);
-    return await this._genOutput(
-      chatState,
-      response.categories.header,
-      response.categories.footer,
-      categories,
-      response.categories.dataFormat);
+      categories = await restaurant.findCategories();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to get restaurant menu data`, err);
+    }
+    try {
+      await chatState.updateState(chatStates.categories);
+      await chatState.setRestaurantContext(restaurant);
+      return await this._genOutput(
+        chatState,
+        response.categories.header,
+        response.categories.footer,
+        categories,
+        response.categories.dataFormat);
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot metadata`, err);
+    }
   }
 
   /**
-   * Handles state transition of "@<restaurant> info" command
+   * Handles chat bot of "@<restaurant> info" command
    *
+   * @param {Object} chatState: chatState object
    * @param {String} input: user input restaurant name
    * @returns {String}: output of the transition
    * @private
    */
-  async _handleAtRestaurantInfo(input) {
-    const restaurant = await Restaurant.findByName(input);
-    if (!restaurant) {
-      /* User typed in a restaurant name that doesn't exist */
-      return response.userError;
+  async _handleAtRestaurantInfo(chatState, input) {
+    let restaurant, location, hours;
+    try {
+      restaurant = await Restaurant.findByName(input);
+      if (!restaurant) {
+        /* User typed in a restaurant name that doesn't exist */
+        return response.userError;
+      }
+      location = await restaurant.findLocation();
+      hours = await restaurant.findHours();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to get restaurant info`, err);
     }
 
     let output = `Info for ${restaurant.name}\n\n`;
-
-    const location = await restaurant.findLocation();
     output += `Location: ${location.address} ${location.city}, ${location.state} ${location.zipcode}\n`;
-
     output += 'Hours:\n';
-    const hours = await restaurant.findHours();
     for (let i = 0; i < hours.length; i++) { // eslint-disable-line
       output += `${hours[i].dayOfTheWeek} - ${hours[i].openTime} to ${hours[i].closeTime}\n`;
     }
@@ -623,7 +755,7 @@ export default class DefaultChatBot extends ChatBotInterface {
   }
 
   /**
-   * Handles state transition of "help" command
+   * Handles chat bot of "help" command
    *
    * @returns {String}: help the user
    * @private
@@ -633,41 +765,62 @@ export default class DefaultChatBot extends ChatBotInterface {
   }
 
   async _handleClear(chatState) {
-    await chatState.clearOrderItems();
+    try {
+      await chatState.clearOrderItems();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to clear item cart`, err);
+    }
     return response.cartClear;
   }
 
   async _genOutput(chatState, header, footer, data, dataFunc) {
-    await chatState.clearCommandMaps();
-    let output = `${header}\n\n`;
+    try {
+      await chatState.clearCommandMaps();
+      let output = `${header}\n\n`;
 
-    for (let i = 0; i < data.length; i++) {
-      await chatState.insertCommandMap(i, data[i].id); // eslint-disable-line
-      output += `${dataFunc(i, data)}\n`;
+      for (let i = 0; i < data.length; i++) {
+        await chatState.insertCommandMap(i, data[i].id); // eslint-disable-line
+        output += `${dataFunc(i, data)}\n`;
+      }
+      return `${output}\n${footer}`;
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to generate state transition output`, err);
     }
-
-    return `${output}\n${footer}`;
   }
 
   async _transitionToCart(chatState) {
-    const orderItems = await chatState.findOrderItems();
-    await chatState.updateState(chatStates.cart);
-    await chatState.clearMenuItemContext();
-    return await this._genOutput(
-      chatState,
-      response.cart.header,
-      response.cart.footer,
-      orderItems,
-      response.cart.dataFormat);
+    let orderItems;
+    try {
+      orderItems = await chatState.findOrderItems();
+    } catch (err) {
+      throw new TraceError('Failed to find order items when user typed checkout', err);
+    }
+
+    try {
+      await chatState.updateState(chatStates.cart);
+      await chatState.clearMenuItemContext();
+      return await this._genOutput(
+        chatState,
+        response.cart.header,
+        response.cart.footer,
+        orderItems,
+        response.cart.dataFormat);
+    } catch (err) {
+      throw new TraceError('Failed to update chat bot metadata', err);
+    }
   }
 
   async _translateInputKey(chatState, input) {
-    const key = parseInt(input, 10);
-    const commandMaps = await chatState.findCommandMaps();
-    for (let i = 0; i < commandMaps.length; i++) {
-      if (commandMaps[i].key === key) {
-        return commandMaps[i].value;
+    try {
+      const key = parseInt(input, 10);
+      const commandMaps = await chatState.findCommandMaps();
+      for (let i = 0; i < commandMaps.length; i++) {
+        if (commandMaps[i].key === key) {
+          return commandMaps[i].value;
+        }
       }
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to translate user input key`);
     }
 
     return null;
