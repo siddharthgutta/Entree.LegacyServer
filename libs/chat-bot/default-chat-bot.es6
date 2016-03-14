@@ -5,6 +5,7 @@ import * as Category from '../../api/category.es6';
 import * as MenuItem from '../../api/menuItem.es6';
 import * as Size from '../../api/size.es6';
 import * as ItemMod from '../../api/itemMod.es6';
+import Promise from 'bluebird';
 import _ from 'underscore';
 
 /* Disabling lint rule since it doesn't make sense */
@@ -22,7 +23,7 @@ export const chatStates = {
   cardInfo: 'CardInfo'
 };
 
-const meta = {
+const response = {
   /* Returned when there is a user error */
   userError: 'Sorry, we don\'t recognize that command. Please try again.',
 
@@ -110,7 +111,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     const isContextual = await this._isContextual(chatState, input);
     const isStateless = this._isStateless(input);
     if ((isContextual || isStateless) && itemContext) {
-      return meta.finishItem;
+      return response.finishItem;
     }
 
     if (isStateless) {
@@ -166,7 +167,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       case /^\d$/.test(input):
         return await this._handleSelectRestaurant(chatState, input);
       default:
-        return meta.userError;
+        return response.userError;
     }
   }
 
@@ -175,16 +176,16 @@ export default class DefaultChatBot extends ChatBotInterface {
     const restaurants = await Restaurant.findAll();
     return await this._genOutput(
       chatState,
-      meta.restaurant.header,
-      meta.restaurant.footer,
+      response.restaurant.header,
+      response.restaurant.footer,
       restaurants,
-      meta.restaurant.dataFormat);
+      response.restaurant.dataFormat);
   }
 
   async _handleSelectRestaurant(chatState, input) {
     const restaurantId = await this._translateInputKey(chatState, input);
     if (!restaurantId) {
-      return meta.userError;
+      return response.userError;
     }
 
     const restaurant = await Restaurant.findOne(restaurantId);
@@ -194,10 +195,10 @@ export default class DefaultChatBot extends ChatBotInterface {
     await chatState.setRestaurantContext(restaurant);
     return await this._genOutput(
       chatState,
-      `${meta.items.header} ${restaurant.name}`,
-      meta.items.footer,
+      `${response.items.header} ${restaurant.name}`,
+      response.items.footer,
       menuItems,
-      meta.items.dataFormat);
+      response.items.dataFormat);
   }
 
   /**
@@ -213,13 +214,13 @@ export default class DefaultChatBot extends ChatBotInterface {
       return await this._handleSelectCategory(chatState, input);
     }
 
-    return meta.userError;
+    return response.userError;
   }
 
   async _handleSelectCategory(chatState, input) {
     const categoryId = await this._translateInputKey(chatState, input);
     if (!categoryId) {
-      return meta.userError;
+      return response.userError;
     }
 
     const restaurant = await chatState.findRestaurantContext();
@@ -228,10 +229,10 @@ export default class DefaultChatBot extends ChatBotInterface {
     await chatState.updateState(chatStates.items);
     return await this._genOutput(
       chatState,
-      `${meta.items.header} ${restaurant.name}`,
-      meta.items.footer,
+      `${response.items.header} ${restaurant.name}`,
+      response.items.footer,
       menuItems,
-      meta.items.dataFormat);
+      response.items.dataFormat);
   }
 
   /**
@@ -244,12 +245,12 @@ export default class DefaultChatBot extends ChatBotInterface {
    */
   async _itemsTransition(chatState, input) {
     if (!(/^\d$/.test(input))) {
-      return meta.userError;
+      return response.userError;
     }
 
     const menuItemId = await this._translateInputKey(chatState, input);
     if (!menuItemId) {
-      return meta.userError;
+      return response.userError;
     }
 
     const menuItem = await MenuItem.findOne(menuItemId);
@@ -266,20 +267,20 @@ export default class DefaultChatBot extends ChatBotInterface {
 
       return await this._genOutput(
         chatState,
-        meta.size.header,
-        meta.size.footer,
+        response.size.header,
+        response.size.footer,
         sizes,
-        meta.size.dataFormat);
+        response.size.dataFormat);
     } else if (itemMods.length > 0) {
       await chatState.updateState(chatStates.mods);
       await chatState.setMenuItemContext(menuItem);
 
       return await this._genOutput(
         chatState,
-        meta.mods.header,
-        meta.mods.footer,
+        response.mods.header,
+        response.mods.footer,
         itemMods,
-        meta.mods.dataFormat);
+        response.mods.dataFormat);
     }
 
     return await this._transitionToCart(chatState);
@@ -295,12 +296,12 @@ export default class DefaultChatBot extends ChatBotInterface {
    */
   async _sizeTransition(chatState, input) {
     if (/^\d$/.test(input) === false) {
-      return meta.userError;
+      return response.userError;
     }
 
     const value = await this._translateInputKey(chatState, input);
     if (!value) {
-      return meta.userError;
+      return response.userError;
     }
 
     const orderItem = await chatState.findLastOrderItem();
@@ -317,10 +318,10 @@ export default class DefaultChatBot extends ChatBotInterface {
       await chatState.setMenuItemContext(menuItem);
       return await this._genOutput(
         chatState,
-        meta.mods.header,
-        meta.mods.footer,
+        response.mods.header,
+        response.mods.footer,
         itemMods,
-        meta.mods.dataFormat);
+        response.mods.dataFormat);
     }
 
     return await this._transitionToCart(chatState);
@@ -351,24 +352,38 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     /* Check if user entered comma separated digits */
     if (!mods.every(mod => /^\d$/.test(mod))) {
-      return meta.userError;
+      return response.userError;
     }
 
-    /* Check that all keys have valid modId mappings */
-    const modIds = _.each(mods, async mod => await this._translateInputKey(chatState, mod));
-    if (!modIds.every(modId => modId !== null)) {
-      return meta.userError;
+    for (let i = 0; i < mods.length; i++) {
+      try {
+        mods[i] = await this._translateInputKey(chatState, mods[i]);
+      } catch (err) {
+        throw new TraceError(`ChatState id ${chatState.id} - Failed to translate user input`, err);
+      }
     }
 
-    _.each(modIds, async modId => {
-      const itemMod = await ItemMod.findOne(modId); // eslint-disable-line
-      orderItem.name += ` ${itemMod.name},`;
-      orderItem.price += itemMod.addPrice;
+    if (!mods.every(modId => modId !== null)) {
+      return response.userError;
+    }
+
+    await Promise.map(mods, async modId => {
+      try {
+        const itemMod = await ItemMod.findOne(modId); // eslint-disable-line
+        orderItem.name += ` ${itemMod.name},`;
+        orderItem.price += itemMod.addPrice;
+      } catch (err) {
+        throw new TraceError(`ChatState id ${chatState.id} - Failed to update order item with mods`, err);
+      }
     });
 
     /* Remove the trailing comma */
     orderItem.name = orderItem.name.slice(0, -1);
-    await orderItem.save();
+    try {
+      await orderItem.save();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to save order item`, err);
+    }
     return await this._transitionToCart(chatState);
   }
 
@@ -408,8 +423,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     const restContext = await chatState.findRestaurantContext();
     if (restContext) {
       const categories = await restContext.findCategories();
-      const filtered = categories.filter(cat => cat.name.toLowerCase() === input);
-      isCategory = filtered.length > 0;
+      isCategory = _.find(categories, cat => cat.name.toLowerCase() === input) !== undefined;
     }
 
     return /^checkout$/.test(input)
@@ -421,22 +435,22 @@ export default class DefaultChatBot extends ChatBotInterface {
   async _handleCategory(chatState, input) {
     const restContext = await chatState.findRestaurantContext();
     const categories = await restContext.findCategories();
-    const category = categories.filter(cat => cat.name.toLowerCase() === input)[0];
+    const category = categories.filter(cat => cat.name.toLowerCase() === input)[0]; // TODO - Reccomendations
     const menuItems = await category.findMenuItems();
     await chatState.updateState(chatStates.items);
 
     return await this._genOutput(
       chatState,
-      `${meta.items.header} ${restContext.name}`,
-      meta.items.footer,
+      `${response.items.header} ${restContext.name}`,
+      response.items.footer,
       menuItems,
-      meta.items.dataFormat);
+      response.items.dataFormat);
   }
 
   async _handleCheckout(chatState) {
     const orderItems = await chatState.findOrderItems();
     if (orderItems.length === 0) {
-      return meta.invalidCheckout;
+      return response.invalidCheckout;
     }
 
     let output = '';
@@ -521,10 +535,10 @@ export default class DefaultChatBot extends ChatBotInterface {
     const restaurants = await Restaurant.findAll(); // TODO - Replace this with curation of recommended restaurants
     return await this._genOutput(
       chatState,
-      meta.restaurant.header,
-      meta.restaurant.footer,
+      response.restaurant.header,
+      response.restaurant.footer,
       restaurants,
-      meta.restaurant.dataFormat);
+      response.restaurant.dataFormat);
   }
 
   /**
@@ -539,7 +553,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     const restaurant = await Restaurant.findByName(input);
     if (!restaurant) {
       /* User typed in a restaurant name that doesn't exist */
-      return meta.userError;
+      return response.userError;
     }
 
     const categories = await restaurant.findCategories();
@@ -548,10 +562,10 @@ export default class DefaultChatBot extends ChatBotInterface {
     await chatState.setRestaurantContext(restaurant);
     return await this._genOutput(
       chatState,
-      meta.items.header,
-      meta.items.footer,
+      response.items.header,
+      response.items.footer,
       menuItems,
-      meta.items.dataFormat);
+      response.items.dataFormat);
   }
 
   /**
@@ -566,7 +580,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     const restaurant = await Restaurant.findByName(input);
     if (!restaurant) {
       /* User typed in a restaurant name that doesn't exist */
-      return meta.userError;
+      return response.userError;
     }
 
     const categories = await restaurant.findCategories();
@@ -574,10 +588,10 @@ export default class DefaultChatBot extends ChatBotInterface {
     await chatState.setRestaurantContext(restaurant);
     return await this._genOutput(
       chatState,
-      meta.categories.header,
-      meta.categories.footer,
+      response.categories.header,
+      response.categories.footer,
       categories,
-      meta.categories.dataFormat);
+      response.categories.dataFormat);
   }
 
   /**
@@ -591,7 +605,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     const restaurant = await Restaurant.findByName(input);
     if (!restaurant) {
       /* User typed in a restaurant name that doesn't exist */
-      return meta.userError;
+      return response.userError;
     }
 
     let output = `Info for ${restaurant.name}\n\n`;
@@ -615,12 +629,12 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @private
    */
   async _handleHelp() {
-    return meta.help;
+    return response.help;
   }
 
   async _handleClear(chatState) {
     await chatState.clearOrderItems();
-    return meta.cartClear;
+    return response.cartClear;
   }
 
   async _genOutput(chatState, header, footer, data, dataFunc) {
@@ -641,10 +655,10 @@ export default class DefaultChatBot extends ChatBotInterface {
     await chatState.clearMenuItemContext();
     return await this._genOutput(
       chatState,
-      meta.cart.header,
-      meta.cart.footer,
+      response.cart.header,
+      response.cart.footer,
       orderItems,
-      meta.cart.dataFormat);
+      response.cart.dataFormat);
   }
 
   async _translateInputKey(chatState, input) {
