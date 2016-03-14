@@ -158,7 +158,7 @@ export function initRouter() {
       res.status(200).send('Webhook Success');
     } catch (err) {
       console.tag(logTags).error(err);
-      res.status(500).send('Webhook Failed.');
+      res.status(500).send('Webhook Failed');
     }
   });
   return route;
