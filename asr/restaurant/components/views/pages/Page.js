@@ -3,8 +3,9 @@ import Dispatcher from '../../../dispatchers/Dispatcher';
 import _ from 'underscore';
 
 class OrderFocus extends Influx.Component {
-
   componentDidMount() {
+    super.componentDidMount();
+
     this.renderHeader();
     this._registerModals();
   }
@@ -32,6 +33,8 @@ class OrderFocus extends Influx.Component {
   }
 
   componentWillUnmount() {
+    super.componentWillUnmount();
+
     this._unregisterModals();
   }
 

@@ -87,8 +87,8 @@ export async function findOneAndUpdateStatus(id, status, {prepTime, message, tra
   console.tag('api', 'orders').log({attributes, previousStatus, status, id});
 
   try {
-    const [rows] = await Order.update(attributes, {where: {id, status: {$in: previousStatus}}, logging: true});
-    if (!rows) {
+    const [affectedRows] = await Order.update(attributes, {where: {id, status: {$in: previousStatus}}, logging: true});
+    if (!affectedRows) {
       throw new Error('Order state not in valid state');
     }
   } catch (e) {
@@ -96,4 +96,26 @@ export async function findOneAndUpdateStatus(id, status, {prepTime, message, tra
   }
 
   return findOne(id);
+}
+
+export async function findParentRestaurant(id) {
+  const {Order} = models;
+  const order = await Order.findOne({where: {id}});
+
+  if (!order) {
+    throw Error(`Could not find order by id(${id})`);
+  }
+
+  return await order.getRestaurant();
+}
+
+export async function calculateTotal(id) {
+  const {Order} = models;
+  const order = await Order.findOne({where: {id}});
+
+  if (!order) {
+    throw Error(`Could not find order by id(${id})`);
+  }
+
+  return _.reduce(await order.getItems(), (memo, item) => memo + item.price, 0);
 }

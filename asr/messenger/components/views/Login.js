@@ -44,6 +44,8 @@ class Chat extends Influx.Component {
   }
 
   componentDidMount() {
+    super.componentDidMount();
+
     this._handleConnection(this.state.status);
   }
 

@@ -1,6 +1,8 @@
 import chalk from 'chalk';
 import {SourceMapConsumer} from 'source-map';
 import fs from 'fs';
+import path from 'path';
+import BaseTraceError from 'trace-error';
 
 // falsey check; null | undefined
 export function isNullOrUndefined(a) {
@@ -26,73 +28,30 @@ export function deprecate(func, message = 'No deprecation warning!') {
   return func();
 }
 
-export class TraceError extends Error {
-  constructor(message, ...causes) {
-    super(message);
-
-    const stack = Object.getOwnPropertyDescriptor(this, 'stack');
-
-    Object.defineProperty(this, 'stack', {
-      get: () => {
-        const stacktrace = stack.get.call(this);
-        let causeStacktrace = '';
-
-        for (const cause of causes) {
-          if (cause.sourceStack) { // trigger lookup
-            causeStacktrace += `\n${cause.sourceStack}`;
-          } else if (cause instanceof Error) {
-            causeStacktrace += `\n${cause.stack}`;
-          } else {
-            try {
-              const json = JSON.stringify(cause, null, 2);
-              causeStacktrace += `\n${json.split('\n').join('\n    ')}`;
-            } catch (e) {
-              causeStacktrace += `\n${cause}`;
-              // ignore
-            }
-          }
-        }
-
-        causeStacktrace = causeStacktrace.split('\n').join('\n    ');
-
-        return stacktrace + causeStacktrace;
-      }
-    });
-
-    // access first error
-    Object.defineProperty(this, 'cause', {value: () => causes[0], enumerable: false, writable: false});
-
-    // untested; access cause stack with error.causes()
-    Object.defineProperty(this, 'causes', {value: () => causes, enumerable: false, writable: false});
-  }
-
-  code(code) {
-    this.code = code;
-  }
-
-  toObject() {
-    return this.toJSON();
+export class TraceError extends BaseTraceError {
+  toJSON() {
+    const stack = this.stack;
+    return {TraceError: stack.substring(stack.indexOf(':') + 2)};
   }
 }
 
 export function useSourceOnError() {
   /* eslint-disable no-extend-native */
-  // TODO fix @jadesym?
+  BaseTraceError.globalStackProperty = 'sourceStack';
+
   Object.defineProperty(Error.prototype, 'sourceStack', {
-    enumerable: false,
-    configurable: false,
+    configurable: true,
     get: function lookupSource() {
-      const stack = this.stack;
-      return stack.replace(/\((.*\.compiled\.js):([0-9]+?):([0-9]+?)\)/g, (matched, source, line, column) => {
+      return this.stack.replace(/\((.*\.compiled\.js):([0-9]+?):([0-9]+?)\)/g, (matched, source, line, column) => {
         try {
           const sourcemap = fs.readFileSync(`${source}.map`, 'utf8');
           const consumer = new SourceMapConsumer(sourcemap);
-          const origin = consumer.originalPositionFor({line, column});
+          const origin = consumer.originalPositionFor({line: Number(line), column: Number(column)});
           if (!origin.line) {
             return matched;
           }
 
-          return `(${origin.source}:${origin.line}:${origin.column})`;
+          return `(${path.dirname(matched)}/${origin.source}:${origin.line}:${origin.column})`;
         } catch (e) {
           return matched;
         }

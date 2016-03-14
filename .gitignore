@@ -70,5 +70,3 @@ cordova/plugins/
 Android/bin/
 Android/gen/
 Android/assets/
-
-package.noDevDeps.json

@@ -36,7 +36,8 @@ describe('User', () => {
           phoneNumber: '5555555555',
           firstName: 'Jesse',
           lastName: 'Mao',
-          email: 'kfu@gmail.com'
+          email: 'kfu@gmail.com',
+          payment_method_nonce: 'fake-valid-nonce'
         }
       });
 
@@ -53,7 +54,8 @@ describe('User', () => {
         body: {
           phoneNumber: null,
           firstName: null,
-          email: null
+          email: null,
+          payment_method_nonce: 'fake-valid-nonce'
         }
       });
 

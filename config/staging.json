@@ -37,12 +37,12 @@
   "MySQL": {
     "username": "root",
     "password": "123456",
-    "database": "entree_test",
+    "database": "entree",
     "clearOnStart": true,
     "host": "127.0.0.1",
     "dialect": "mysql",
     "logging": false,
-    "revision": false
+    "revision": "test"
   },
   "MongoDb": {
     "clearOnStart": true,

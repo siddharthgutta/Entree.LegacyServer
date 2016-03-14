@@ -1,7 +1,7 @@
 import React from 'react';
 import Influx from 'react-influx';
 import ReactDOM from 'react-dom';
-import {apply, ifcat, onClick} from '../../../../libs/utils';
+import {apply, ifcat, onClick, pre} from '../../../../libs/utils';
 
 class TabbedPane extends Influx.Component {
 
@@ -36,7 +36,7 @@ class TabbedPane extends Influx.Component {
       next.classList.add('selected');
 
       apply(ReactDOM.findDOMNode(this.refs.pane),
-          {transform: `translate3d(-${index / this.props.tabs.length * 100}%, 0, 0)`});
+            pre({transform: `translate3d(-${index / this.props.tabs.length * 100}%, 0, 0)`}));
 
       this.active = tab;
 
@@ -52,12 +52,14 @@ class TabbedPane extends Influx.Component {
 
   componentWillReceiveProps(nextProps) {
     if (Array.isArray(nextProps.tabs) && nextProps.tabs.length
-        && nextProps.tabs.indexOf(this.active) === -1) {
+      && nextProps.tabs.indexOf(this.active) === -1) {
       this.active = nextProps.tabs[0];
     }
   }
 
   componentDidMount() {
+    super.componentDidMount();
+
     this._showTab(this.active);
   }
 
@@ -68,27 +70,28 @@ class TabbedPane extends Influx.Component {
   render() {
     const count = this.props.tabs.length;
     const children = this.props.tabs.map(tab =>
-        <div key={tab} ref={tab}
-             style={{height: '100%', display: 'inline-block', verticalAlign: 'top',
+                                           <div key={tab} ref={tab}
+                                                style={{height: '100%', display: 'inline-block', verticalAlign: 'top',
              width: `${(1 / count * 100)}%`, overflow: 'hidden', position: 'relative'}}>
-          {this.state[tab] ? this.props[tab] : null}</div>
+                                             {this.state[tab] ? this.props[tab] : null}</div>
     );
 
     const tabs = this.props.tabs.map(tab =>
-        <div key={tab} {...onClick(() => this._showTab(tab))} className={ifcat('tab', {box: this.props.spread})}
-             ref={`button${tab}`}>{tab}</div>
+                                       <div key={tab} {...onClick(() => this._showTab(tab))}
+                                            className={ifcat('tab', {box: this.props.spread})}
+                                            ref={`button${tab}`}>{tab}</div>
     );
 
     const style = {...this.props.style, ...{position: 'relative', overflow: 'hidden'}};
 
     return (
-        <div className='full flex vertical'>
-          <div className={ifcat('tabs', {'spread flex': this.props.spread})}>{tabs}</div>
-          <div className='full' style={style}>
-            <div className='full-abs animate' ref='pane'
-                 style={{width: `${count * 100}%`}}>{children}</div>
-          </div>
+      <div className='full flex vertical'>
+        <div className={ifcat('tabs', {'spread flex': this.props.spread})}>{tabs}</div>
+        <div className='full' style={style}>
+          <div className='full-abs animate' ref='pane'
+               style={{width: `${count * 100}%`}}>{children}</div>
         </div>
+      </div>
     );
   }
 }

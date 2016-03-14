@@ -6,7 +6,15 @@ import {_disconnect as disconnectPubSub} from '../api/controllers/notification.e
 
 initErrorHandling();
 
-const console = initScribe(true, false, false, {inspector: {colors: false, callsite: false, pre: false, tags: false}});
+const console = initScribe(true, false, false, {
+  inspector: {
+    colors: false,
+    callsite: false,
+    pre: false,
+    tags: false
+  }
+});
+
 console.persistent('tags', []);
 global.TEST = path.basename(stack()[7].getFileName());
 
@@ -14,7 +22,8 @@ const port = config.get('Server.port');
 global.SERVER_URL = `https://localhost:${port}`;
 
 export async function clearDatabase() {
-  if (config.get('MySQL.database') === 'entree_test' && config.get('MongoDb.database') === 'entree_test') {
+  if (`${config.get('MySQL.database')}_${config.get('MySQL.revision')}` === 'entree_test'
+    && config.get('MongoDb.database') === 'entree_test') {
     return await initDatabase(true); // init clears the db depending on the config
   }
 
@@ -23,6 +32,13 @@ export async function clearDatabase() {
 
 export {disconnectDatabase};
 
-before(() => initDatabase());
+before(async () => initDatabase()); // auto connect since most tests atm are model stressed
 after(() => disconnectPubSub());
-after(() => disconnectDatabase()); // ensure the connections are closed
+
+after(async () => {
+  try {
+    await disconnectDatabase(); // auto disconnect databases since they automatically connect
+  } catch (e) {
+    // ignore
+  }
+}); // ensure the connections are closed

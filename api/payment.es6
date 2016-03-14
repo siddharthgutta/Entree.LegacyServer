@@ -24,7 +24,7 @@ const logTags = ['api', 'payment'];
  * @type {Braintree}
  */
 const bt = new Braintree(productionOrSandbox, braintreeCreds.merchantId,
-    braintreeCreds.publicKey, braintreeCreds.privateKey, braintreeCreds.masterMerchantAccountId);
+  braintreeCreds.publicKey, braintreeCreds.privateKey, braintreeCreds.masterMerchantAccountId);
 
 /**
  * Gives the Braintree Sandbox Gateway for testing
@@ -262,9 +262,9 @@ export async function paymentWithToken(userId, restaurantId, paymentMethodToken,
   try {
     const amountString = (amount / 100).toString();
     const serviceFeeString = (bt.calculateServiceFee(amount, restaurant.percentageFee,
-      restaurant.transactionFee) / 100).toString();
+                                                     restaurant.transactionFee) / 100).toString();
     const result = await makePayment(amountString, restaurant.merchantId, restaurant.name,
-      paymentMethodToken, customerId, serviceFeeString);
+                                     paymentMethodToken, customerId, serviceFeeString);
     return result;
   } catch (transactionError) {
     throw transactionError;

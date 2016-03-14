@@ -6,6 +6,7 @@ import keyMirror from 'keymirror';
 // @formatter:off
 export const SocketEvents = keyMirror({
   RESTAURANT_STATUS: null,
+  RESTAURANT_UPDATED: null,
   NEW_ORDER: null,
   ORDER_UPDATE: null,
   USER_PROFILE_UPDATED: null,

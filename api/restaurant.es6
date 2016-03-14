@@ -15,32 +15,15 @@ export {Mode};
  * @param {Object} attributes : Restaurant phone number is optional
  * @returns {Promise}: Returns the Restaurant object
  */
-// TODO @jesse please send back a JSON via toJSON
-export async function create(name, password, mode = Mode.REGULAR, attributes = {phoneNumber: null,
-  merchantApproved: null, merchantId: null}) {
+export async function create(name, password, mode = Mode.REGULAR, attributes = {
+  phoneNumber: null,
+  merchantApproved: null,
+  merchantId: null
+}) {
   try {
     return (await models.Restaurant.create({name, password, mode, ...attributes}));
   } catch (e) {
     throw new TraceError('Could not create restaurant', e, ...(e.errors || []));
-  }
-}
-
-/**
- * Update a restaurant attributes
- *
- * @param {Number} id: primary key of restaurant
- * @param {Object} attributes : Attributes to update
- * @returns {Promise}: Returns the Restaurant object
- */
-export async function update(id, attributes) {
-  try {
-    return await models.Restaurant.update(
-      attributes, {
-        where: {id}
-      }
-    );
-  } catch (e) {
-    throw new TraceError('Could not update restaurant', e);
   }
 }
 
@@ -75,9 +58,6 @@ export function destroy(id) {
   return models.Restaurant.destroy({where: {id}});
 }
 
-// TODO @jesse we need to normalize the response objects from api/*.es6 files. I need simple objects not db bound
-// instances
-
 /**
  * Find a restaurant by id
  *
@@ -102,7 +82,7 @@ export const MetaData = {
  * Find a restaurant by id (with order information)
  *
  * @param {Number} id: primary key of restaurant
- * @param {Symbol} metadata: how much information you want
+ * @param {Symbol|String} metadata: how much information you want
  * @returns {Promise}: Returns the Restaurant object
  */
 // TODO @jesse can you make a versatile findOne
@@ -252,6 +232,7 @@ export function findByName(name) {
 
 /**
  * Finds all restauarnts
+ *
  * @param {number} id: id of restaurant
  * @returns {Promise}: A list of all restaurants
  */
@@ -265,19 +246,41 @@ export function getLocation(id) {
   });
 }
 
+
+/**
+ * Get all restaurants
+ *
+ * @returns {Promise<Array<Restaurant>>}: A list of all restaurnts
+ */
 export function findAll() {
   return models.Restaurant.findAll();
 }
 
 
-export async function setEnabled(id, enabled) {
-  const {Restaurant} = models;
-
+/**
+ * Update a restaurant attributes
+ *
+ * @param {Number} id: primary key of restaurant
+ * @param {Object} attributes : Attributes to update
+ * @returns {Promise}: Returns the Restaurant object
+ */
+export async function update(id, attributes) {
   try {
-    await Restaurant.update({enabled}, {where: {id}});
+    const restaurant = await models.Restaurant.findOne({where: {id}});
+    return await restaurant.update(attributes);
   } catch (e) {
-    throw new TraceError('Could not toggle enabled', e);
+    throw new TraceError('Could not update restaurant', e);
   }
+}
 
-  return findOne(id);
+
+/**
+ * Set whether the restaurant is accepting orders
+ *
+ * @param {Number} id: primary key of restaurant
+ * @param {boolean} enabled : accepting orders
+ * @returns {Promise}: Returns the Restaurant object
+ */
+export async function setEnabled(id, enabled) {
+  return await update(id, {enabled});
 }

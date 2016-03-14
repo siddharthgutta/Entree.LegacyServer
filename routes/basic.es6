@@ -8,7 +8,6 @@ const convert = new Convert();
 const route = new Router();
 const clientConfig = JSON.stringify(config.get('Client'));
 
-
 route.get('/', (req, res) => res.render('registration', {
   config: clientConfig,
   title: 'Entrée · Order Ahead With SMS',
@@ -16,30 +15,11 @@ route.get('/', (req, res) => res.render('registration', {
   get recommendations on where to eat, and find delicious deals`
 }));
 
-
-route.get('/restaurant', (req, res) => res.render('restaurant', {
-  config: clientConfig,
-  title: 'Entrée · Restaurant'
-}));
-
-
-route.get('/profile', (req, res) => res.render('profile', {
-  config: clientConfig,
-  title: 'Entrée · Profile'
-}));
-
-
-// TEST hook
-route.post('/appinfo', (req, res) => {
-  res.json({pid: Runtime.pid});
-});
-
-
-route.get('/messenger', (req, res) => res.render('messenger', {
-  config: clientConfig,
-  title: 'Entrée · Messenger'
-}));
-
+route.get('/restaurant', (req, res) => res.render('restaurant', {config: clientConfig, title: 'Entrée · Restaurant'}));
+route.get('/profile', (req, res) => res.render('profile', {config: clientConfig, title: 'Entrée · Profile'}));
+route.get('/menu', (req, res) => res.render('menu', {config: clientConfig, title: 'Entrée · Menu'}));
+route.post('/appinfo', (req, res) => res.json({pid: Runtime.pid}));
+route.get('/messenger', (req, res) => res.render('messenger', {config: clientConfig, title: 'Entrée · Messenger'}));
 
 route.get('/tests', (req, res) => {
   let capture = '';

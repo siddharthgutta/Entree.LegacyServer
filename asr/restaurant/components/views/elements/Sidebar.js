@@ -1,7 +1,9 @@
 import React from 'react';
 import Influx from 'react-influx';
 import {onClick} from '../../../../libs/utils';
-import OrderStore from '../../../stores/OrderStore';
+import Dispatcher from '../../../dispatchers/Dispatcher';
+import OrderStore, {Status} from '../../../stores/OrderStore';
+import Checkbox from '../general/Checkbox';
 
 class Sidebar extends Influx.Component {
   constructor(context, props) {
@@ -12,7 +14,8 @@ class Sidebar extends Influx.Component {
 
   getListeners() {
     return [
-      [OrderStore, OrderStore.Events.RESTAURANT_UPDATED, this._onOrderStoreRestaurantUpdated]
+      [OrderStore, OrderStore.Events.RESTAURANT_UPDATED, this._onOrderStoreRestaurantUpdated],
+      [Dispatcher, Dispatcher.Events.CONNECTION_STATUS, this._onDispatcherConnectionStatus]
     ];
   }
 
@@ -20,45 +23,64 @@ class Sidebar extends Influx.Component {
     this.setState({restaurant});
   }
 
-  componentDidMount() {
-    OrderStore.fetchRestaurantInfo();
+  _onDispatcherConnectionStatus(status) {
+    if (status === Status.CONNECTED) {
+      OrderStore.fetchRestaurantInfo();
+    }
+  }
+
+  async _handleToggle(enabled) {
+    const restaurant = this.state.restaurant;
+    restaurant.enabled = enabled;
+    this.setState({restaurant});
+
+    const _restaurant = await OrderStore.setRestaurantEnabled(enabled);
+    restaurant.enabled = _restaurant.enabled;
+    this.setState({restaurant});
   }
 
   render() {
     const {restaurant} = this.state;
+    const summary = restaurant.Order ? restaurant.Orders[0] : {};
 
     // TODO the Orders key is an array??
     return (
       <div className='sidebar flex vertical' style={{width: 300, height: '100%'}}>
-        <div className='flex center vertical' style={{height: 200, minHeight: 200, width: '100%'}}>
+        <div className='flex center vertical' style={{height: 150, minHeight: 150, width: '100%'}}>
           <div className='full blur' style={{position: 'absolute', backgroundImage: 'url(images/pluckers.jpg)',
             height: 400, width: '100%', top: 0, opacity: 0.5, zIndex: 0}}/>
           <div className='profile' style={{backgroundImage: 'url(images/pluckers.jpg)',
-            backgroundSize: 'cover', width: 120, height: 120, borderRadius: 120, zIndex: 2}}/>
+            backgroundSize: 'cover', width: 90, height: 90, borderRadius: '100%', zIndex: 2}}/>
         </div>
         <div className='title'>{restaurant.name}</div>
         <div className='subtitle'>Austin, TX</div>
-        { restaurant.Orders && restaurant.Orders[0] ?
-          <div className='flex median' style={{minHeight: 80, marginTop: 20}}>
-            <div className='box flex center vertical'
-                 style={{borderRight: '1px solid rgba(255, 255, 255, 0.1)'}}>
-              <div className='value'>
-                <div className='bubble light icon dollar'/>
-                {restaurant.Orders[0].netPrice.toFixed(2)}
-              </div>
-              <div className='desc'>MONTH INCOME</div>
+        <div className='flex median' style={{minHeight: 80, marginTop: 20}}>
+          <div className='box flex center vertical'
+               style={{borderRight: '1px solid rgba(255, 255, 255, 0.1)'}}>
+            <div className='value'>
+              <div className='bubble light icon dollar'/>
+              {(Number(summary.netPrice) || 0).toFixed(2)}
             </div>
-            <div className='box flex center vertical'>
-              <div className='value'>{restaurant.Orders[0].netCount}</div>
-              <div className='desc'>MONTH ORDERS</div>
+            <div className='desc'>MONTH INCOME</div>
+          </div>
+          <div className='box flex center vertical'>
+            <div className='value'>{summary.netCount || 0}</div>
+            <div className='desc'>MONTH ORDERS</div>
+          </div>
+        </div>
+        <div className='full scroll scroll-y'>
+          <div className='flex'
+               style={{padding: 20, lineHeight: '21px', background: 'rgba(255, 255, 255, 0.07)',
+               borderTop: '1px solid rgba(255, 255, 255, 0.1)', borderBottom: '1px solid rgba(255, 255, 255, 0.1)'}}>
+            <div className='box accept-label'>Accept new orders</div>
+            <div className='box'>
+              <Checkbox checked={restaurant.enabled} toggle
+                        onChange={e => this._handleToggle(e.target.checked)}/>
             </div>
           </div>
-          : null}
-        <div className='full scroll scroll-y'>
-          <div className='item'>HOME</div>
           <div className='item selected' {...onClick(() => this.context.history.push('/orders'))}>ORDERS</div>
-          <div className='item'>ACCOUNT</div>
-          <div className='item'>SIGN OUT</div>
+          <div className='item' style={{marginBottom: 10}}>DECLINED</div>
+          <div className='big-button' {...onClick(() => OrderStore.logout())}>SIGN OUT</div>
         </div>
       </div>
     );

@@ -20,18 +20,25 @@ export function create(phoneNumber, {firstName, lastName, email}) {
 }
 
 /**
+ * Find a user by id
+ *
+ * @param {string} userId: User id
+ * @returns {Promise}: Returns the user object
+ */
+export function findOne(userId) {
+  return models.User.findOne({where: {id: userId}});
+}
+
+/**
  * Update a user attributes
  *
  * @param {string} phoneNumber: User phone number
  * @param {Object} attributes: Attributes to update
  * @returns {Promise}: Returns the user object
  */
-export function updateByPhoneNumber(phoneNumber, attributes) {
-  return models.User.update(
-    attributes, {
-      where: {phoneNumber}
-    }
-  );
+export async function updateByPhoneNumber(phoneNumber, attributes) {
+  const user = await models.User.findOne({where: {phoneNumber}});
+  return user.update(attributes);
 }
 
 /**
@@ -41,10 +48,9 @@ export function updateByPhoneNumber(phoneNumber, attributes) {
  * @param {Object} attributes: Attributes to update
  * @returns {Promise}: Returns the user object
  */
-export function update(id, attributes) {
-  return models.User.update(
-    attributes, {where: {id}}
-  );
+export async function update(id, attributes) {
+  const user = await models.User.findOne({where: {id}});
+  return user.update(attributes);
 }
 
 /**
@@ -67,15 +73,6 @@ export function findOneByPhoneNumber(phoneNumber) {
   return models.User.findOne({where: {phoneNumber}});
 }
 
-/**
- * Find a user by id
- *
- * @param {string} userId: User id
- * @returns {Promise}: Returns the user object
- */
-export function findOne(userId) {
-  return models.User.findOne({where: {id: userId}});
-}
 
 /**
  * Create a secret id for a user

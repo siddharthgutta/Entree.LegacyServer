@@ -1,6 +1,7 @@
 import ChatBotInterface from './chat-bot-interface.es6';
 import * as Restaurant from '../../api/restaurant.es6';
-import * as User from '../../api/user.es6';
+import * as User from '../../api/controllers/user.es6';
+import * as Order from '../../api/controllers/order.es6';
 import * as Category from '../../api/category.es6';
 import * as MenuItem from '../../api/menuItem.es6';
 import * as Size from '../../api/size.es6';
@@ -75,12 +76,12 @@ const response = {
   },
 
   help: 'Here are a list of valid commands:\n' +
-    '\"restaurants\" - list restaurants\n' +
-    '\"@<name>\" - browse restaurant\n' +
-    '\"@<name> menu\" - view menu\n' +
-    '\"@<name> info\" - view info\n' +
-    '\"help\" - this command\n\n' +
-    'For example, type \"@homeslice info\" for information about homeslice'
+  '\"restaurants\" - list restaurants\n' +
+  '\"@<name>\" - browse restaurant\n' +
+  '\"@<name> menu\" - view menu\n' +
+  '\"@<name> info\" - view info\n' +
+  '\"help\" - this command\n\n' +
+  'For example, type \"@homeslice info\" for information about homeslice'
 };
 
 export default class DefaultChatBot extends ChatBotInterface {
@@ -97,11 +98,12 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @returns {String}: the output of the chat bot
    */
   async updateState(phoneNumber, input) {
-    input = input.trim().toLowerCase(); /* Sanitize user input */
+    input = input.trim().toLowerCase();
+    /* Sanitize user input */
 
     let user, chatState;
     try {
-      user = await User.findOneByPhoneNumber(phoneNumber);
+      user = await User.UserModel.findOneByPhoneNumber(phoneNumber);
       chatState = await user.findChatState();
     } catch (err) {
       throw new TraceError(`Could not find user ChatState info for user ${phoneNumber}`, err);
@@ -130,20 +132,6 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     if (isContextual) {
       return await this._contextTransitions(chatState, input);
-    }
-
-    /**
-     * Intercepting for direct commands
-     * NOTE this is some shit code! only for demo
-     */
-    if (input.indexOf('@') === 0) {
-      const restaurant = /@(.)*?\s/g.exec(input)[0].trim();
-      const items = input.replace(restaurant, '').trim().split(',').map(a => {
-        const [, quantity, name] = /([0-9])+?(.*)?/g.exec(a);
-        return {quantity: Number(quantity), name};
-      });
-
-      return {response: 'We are ordering it for you', restaurant: restaurant.replace('@', ''), order: {items}};
     }
 
     switch (chatState.state) {
@@ -301,7 +289,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
 
     /* Go to sizes state if the item requires size, or the mods state if there are mods and
-    * no sizes, or straight to cart if there are no mods and no sizes */
+     * no sizes, or straight to cart if there are no mods and no sizes */
     if (sizes.length > 0) {
       try {
         await chatState.updateState(chatStates.size);
@@ -554,20 +542,34 @@ export default class DefaultChatBot extends ChatBotInterface {
       total += orderItems[i].price;
     }
 
-    /* TODO -- transfer order items over to permanent order object
-    * what should I return for the payment processing? */
+
+    const restaurant = await chatState.findRestaurantContext();
     const user = await chatState.findUser();
+
+    // transform for order to support orders
+    const items = orderItems.map(({name, price}) => ({name, price, quantity: 1}));
+    const order = await Order.createOrder(user.id, restaurant.id, items);
+    const {id: orderId} = order;
+
+    await chatState.setOrderContext(order);
+
+    /* TODO -- transfer order items over to permanent order object
+     * what should I return for the payment processing? */
     let defaultPayment;
     try {
       defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
     } catch (defaultPaymentError) {
       console.tag('chatbot').log('No default payment found. Sending user to signup2.');
-      // TODO @bluejamesbond @jesse respond with secret link for signup2
+      const secret = await User.requestProfileEdit(user.id);
+      const url = await User.resolveProfileEditAddress(secret);
+
+      // TODO @jesse handle state transitions as needed!
+      return `To complete your order and pay, please go to ${url}`;
     }
 
     try {
-      const restaurant = chatState.findRestaurantContext();
-      await Payment.paymentWithToken(user.id, restaurant.id, defaultPayment, total);
+      const {id: transactionId} = await Payment.paymentWithToken(user.id, restaurant.id, defaultPayment, total);
+      await Order.setOrderStatus(orderId, Order.Status.RECEIVED_PAYMENT, {transactionId});
     } catch (paymentWithTokenError) {
       console.tag('chatbot').error('Payment failed although customer default payment exists', paymentWithTokenError);
       throw new TraceError('Payment failed although customer default payment exists', paymentWithTokenError);

@@ -25,8 +25,9 @@ passport.use('local', new LocalStrategy({
   }
 
   try {
-    restaurant = await Restaurant.RestaurantModel.findOne(id);
+    restaurant = await Restaurant.RestaurantModel.findByName(id);
   } catch (e) {
+    console.error(e);
     return next(e);
   }
 
@@ -106,6 +107,11 @@ export async function isAuthenticated(req, res, next) {
   }
 
   res.fail('Not authenticated', null, 400);
+}
+
+
+export function deauthenticate(token) {
+  Session.invalidate(token);
 }
 
 

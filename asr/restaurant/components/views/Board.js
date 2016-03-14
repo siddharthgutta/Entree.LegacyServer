@@ -4,12 +4,17 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import Header from './elements/Header';
 import ModalManager from './modals/ModalManager';
 import Dispatcher from '../../dispatchers/Dispatcher';
+import {Status} from '../../stores/OrderStore';
 import Sidebar from './elements/Sidebar';
 import {findDOMNode} from 'react-dom';
-import {apply, onClick} from '../../../libs/utils';
+import {apply, onClick, pre} from '../../../libs/utils';
 
 class Board extends Influx.Component {
-  static propTypes = {children: React.PropTypes.node, location: React.PropTypes.object};
+  static propTypes = {
+    children: React.PropTypes.node,
+    location: React.PropTypes.object,
+    history: React.PropTypes.object
+  };
 
   constructor(context, props) {
     super(context, props);
@@ -32,18 +37,30 @@ class Board extends Influx.Component {
 
   getListeners() {
     return [
-      [Dispatcher, Dispatcher.Events.MENU_VISIBILITY, this._setMenuVisibility]
+      [Dispatcher, Dispatcher.Events.MENU_VISIBILITY, this._setMenuVisibility],
+      [Dispatcher, Dispatcher.Events.CONNECTION_STATUS, this._handleConnectionStatus]
     ];
+  }
+
+  _handleConnectionStatus(status) {
+    const {history} = this.props;
+
+    if (Status.DISCONNECTED === status) {
+      history.push('/');
+      return this._setMenuVisibility(false);
+    }
   }
 
   _setMenuVisibility(visible) {
     const sidebar = findDOMNode(this.refs.sidebar);
     const node = findDOMNode(this);
 
-    if (visible) {
-      apply(node, {transform: `translate3d(${sidebar.offsetWidth}px, 0, 0)`});
+    if (visible === true) {
+      apply(node, pre({transform: `translate3d(${sidebar.offsetWidth}px, 0, 0)`}));
+    } else if (visible === false) {
+      apply(node, pre({transform: `translate3d(0, 0, 0)`}));
     } else {
-      apply(node, {transform: `translate3d(0, 0, 0)`});
+      return this._setMenuVisibility(!this.menuActive);
     }
 
     clearTimeout(this.timeout);
@@ -58,17 +75,17 @@ class Board extends Influx.Component {
 
   render() {
     return (
-      <div className='full animate-transform flex vertical' {...onClick(() => this._handleMenuCollapse())}>
+      <div className='full animate-transform flex vertical'>
         <Sidebar ref='sidebar'/>
         <Header />
         <ModalManager />
-        <div className='full'>
+        <div className='full' style={{overflow: 'hidden'}} {...onClick(() => this._handleMenuCollapse())}>
           <ReactCSSTransitionGroup
             component='div'
             className='full-abs board'
             transitionName='board'
-            transitionEnterTimeout={500}
-            transitionLeaveTimeout={500}>
+            transitionEnterTimeout={333}
+            transitionLeaveTimeout={333}>
             {React.cloneElement(this.props.children, {
               key: this.props.location.pathname
             })}

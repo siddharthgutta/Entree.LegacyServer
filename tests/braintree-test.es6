@@ -87,7 +87,7 @@ describe('Braintree', () => {
         await Braintree.registerPaymentForUser(userId, validNonce);
         const defaultPayment = await Braintree.getCustomerDefaultPayment(userId);
         const transaction = await Braintree.paymentWithToken(userId, restaurantId,
-          defaultPayment.token, authorizedAmount);
+                                                             defaultPayment.token, authorizedAmount);
         assert.deepEqual((authorizedAmount / 100), parseFloat(transaction.amount));
         assert.deepEqual((calculateServiceFee(authorizedAmount) / 100), parseFloat(transaction.serviceFeeAmount));
         assert.deepEqual('submitted_for_settlement', transaction.status);
@@ -99,13 +99,13 @@ describe('Braintree', () => {
           await Braintree.registerPaymentForUser(userId, validNonce);
           const defaultPayment = await Braintree.getCustomerDefaultPayment(userId);
           await Braintree.paymentWithToken(userId, restaurantId,
-            defaultPayment.token, processorDeclinedAmount);
+                                           defaultPayment.token, processorDeclinedAmount);
           assert(false);
         } catch (err) {
           const transaction = err;
           assert.deepEqual((processorDeclinedAmount / 100), parseFloat(transaction.amount));
           assert.deepEqual((calculateServiceFee(processorDeclinedAmount) / 100),
-            parseFloat(transaction.serviceFeeAmount));
+                           parseFloat(transaction.serviceFeeAmount));
           assert.deepEqual('failed', transaction.status);
           assert.deepEqual(processorDeclinedAmount / 100, parseFloat(transaction.processorResponseCode));
           done();
@@ -117,12 +117,12 @@ describe('Braintree', () => {
           await Braintree.registerPaymentForUser(userId, validNonce);
           const defaultPayment = await Braintree.getCustomerDefaultPayment(userId);
           await Braintree.paymentWithToken(userId, restaurantId,
-            defaultPayment.token, gatewayRejectedAmount);
+                                           defaultPayment.token, gatewayRejectedAmount);
         } catch (err) {
           const transaction = err;
           assert.deepEqual((gatewayRejectedAmount / 100), parseFloat(transaction.amount));
           assert.deepEqual((calculateServiceFee(gatewayRejectedAmount) / 100),
-            parseFloat(transaction.serviceFeeAmount));
+                           parseFloat(transaction.serviceFeeAmount));
           assert.deepEqual('gateway_rejected', transaction.status);
           done();
         }
@@ -224,7 +224,7 @@ describe('Braintree', () => {
             await Braintree.registerPaymentForUser(userId, nonce);
             const defaultPayment = await Braintree.getCustomerDefaultPayment(userId);
             const transaction = await Braintree.paymentWithToken(userId, restaurantId,
-              defaultPayment.token, authorizedAmount);
+                                                                 defaultPayment.token, authorizedAmount);
             assert.deepEqual((authorizedAmount / 100), parseFloat(transaction.amount));
             assert.deepEqual((calculateServiceFee(authorizedAmount) / 100), parseFloat(transaction.serviceFeeAmount));
             assert.deepEqual('submitted_for_settlement', transaction.status);
@@ -246,7 +246,7 @@ describe('Braintree', () => {
             await Braintree.registerPaymentForUser(userId2, nonce);
             const defaultPayment = await Braintree.getCustomerDefaultPayment(userId2);
             const transaction = await Braintree.paymentWithToken(userId2, restaurantId,
-              defaultPayment.token, authorizedAmount);
+                                                                 defaultPayment.token, authorizedAmount);
             assert.deepEqual(transaction.creditCard.cardType, cardType, 'Transaction Card Type Incorrect');
             assert.deepEqual((authorizedAmount / 100), parseFloat(transaction.amount));
             assert.deepEqual((calculateServiceFee(authorizedAmount) / 100), parseFloat(transaction.serviceFeeAmount));
@@ -263,7 +263,7 @@ describe('Braintree', () => {
           await Braintree.registerPaymentForUser(userId, ccNonces.valid[0].nonce);
           const defaultPayment = await Braintree.getCustomerDefaultPayment(userId);
           const transaction = await Braintree.paymentWithToken(userId, restaurantId,
-            defaultPayment.token, authorizedAmount);
+                                                               defaultPayment.token, authorizedAmount);
           assert.deepEqual((authorizedAmount / 100), parseFloat(transaction.amount));
           assert.deepEqual((calculateServiceFee(authorizedAmount) / 100), parseFloat(transaction.serviceFeeAmount));
           assert.deepEqual('submitted_for_settlement', transaction.status);
@@ -300,20 +300,14 @@ describe('Braintree', () => {
       routingNumber: '071101307'
     };
 
-    let restaurantId;
-    before(async done => {
-      // Restaurant Fields
-      const name = 'TestRestaurant2';
-      const password = '1234';
-      const mode = Restaurant.Mode.REGULAR;
-      const percentageFee = 5;
-      const transactionFee = 30;
-
-      restaurantId = (await Restaurant.create(name, password, mode, {percentageFee, transactionFee})).get().id;
-      done();
-    });
+    const name = 'TestRestaurant2';
+    const password = '1234';
+    const mode = Restaurant.Mode.REGULAR;
+    const percentageFee = 5;
+    const transactionFee = 30;
 
     it('creating declined merchant account should fail', async done => {
+      const restaurantId = (await Restaurant.create(name, password, mode, {percentageFee, transactionFee})).get().id;
       const individual = createIndividual(false);
       try {
         const merchantAccount = await Braintree.registerRestaurantWithPaymentSystem(
@@ -322,12 +316,13 @@ describe('Braintree', () => {
         assert.deepEqual(merchantAccount.subMerchantAccount, true);
         done();
       } catch (createMerchantErr) {
-        assert(false);
+        assert(false, createMerchantErr);
         done();
       }
     });
 
     it('creating approved merchant account should succeed', async done => {
+      const restaurantId = (await Restaurant.create(name, password, mode, {percentageFee, transactionFee})).get().id;
       const individual = createIndividual(true);
       const merchantAccount = await Braintree.registerRestaurantWithPaymentSystem(
         restaurantId, individual, {}, funding);
@@ -342,9 +337,9 @@ describe('Braintree', () => {
 
     it('should fail when not send signature or payload', done => {
       server
-        .post(`/braintree/webhooks`)
-        .send({})
-        .expect(500, done);
+      .post(`/braintree/webhooks`)
+      .send({})
+      .expect(500, done);
     });
 
     it('should fail with subscription since not implemented yet', async done => {

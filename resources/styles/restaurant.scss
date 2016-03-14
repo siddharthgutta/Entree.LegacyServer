@@ -3,6 +3,7 @@
 @import "shared/base";
 @import "shared/scroll";
 @import "shared/layouts";
+@import "shared/checkbox";
 @import "shared/tabs";
 
 body {
@@ -532,7 +533,7 @@ a {
 .board-enter {
   position: absolute;
 
-  transition-duration: .3s;
+  transition-duration: 333ms;
   transition-property: transform, opacity;
   transition-timing-function: ease-in-out;
   transform: translate3d(100%, 0, 0);
@@ -752,7 +753,7 @@ a {
     }
     &.selected {
       background: rgba(0, 0, 0, 0.47);
-      box-shadow: inset 6px 0 0 #FFC107;
+      box-shadow: inset -6px 0 0 #FFC107;
     }
   }
   .bubble {
@@ -793,7 +794,7 @@ a {
 }
 
 .animate-transform {
-  transition: transform .3s ease-in-out;
+  transition: transform 333ms ease-in-out;
 }
 
 .blur {
@@ -865,4 +866,26 @@ a {
   40%, 60% {
     transform: translate3d(4px, 0, 0);
   }
+}
+
+.accept-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+  width: 100%;
+  font-weight: bold;
+}
+
+.big-button {
+  background: #FF5722;
+  font-size: 14px;
+  border-radius: 5px;
+  padding: 15px;
+  width: 90%;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 auto;
+  cursor: pointer;
 }
