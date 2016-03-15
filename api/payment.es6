@@ -141,7 +141,6 @@ export function initRouter() {
     const btSignature = req.body.bt_signature;
     const btPayload = req.body.bt_payload;
     try {
-      console.log(btSignature, btPayload);
       if (!btSignature || !btPayload) {
         throw new TraceError('Empty Braintree Signature/Payload');
       }
