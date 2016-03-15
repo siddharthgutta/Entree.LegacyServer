@@ -27,6 +27,9 @@ export default function (sequelize, DataTypes) {
       }
     },
     instanceMethods: {
+      findUser: async function() { // eslint-disable-line
+        return await this.getUser();
+      },
       insertCommandMap: async function (key, value) { // eslint-disable-line
         const commandMap = await models.CommandMap.create({key, value});
         await this.addCommandMap(commandMap);
