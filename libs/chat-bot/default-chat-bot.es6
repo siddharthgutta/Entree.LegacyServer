@@ -5,6 +5,7 @@ import * as Category from '../../api/category.es6';
 import * as MenuItem from '../../api/menuItem.es6';
 import * as Size from '../../api/size.es6';
 import * as ItemMod from '../../api/itemMod.es6';
+import * as Payment from '../../api/payment.es6';
 import Promise from 'bluebird';
 import _ from 'underscore';
 
@@ -460,14 +461,30 @@ export default class DefaultChatBot extends ChatBotInterface {
       total += orderItems[i].price;
     }
 
-    await chatState.clearOrderItems();
-    await chatState.updateState(chatStates.start);
     /* TODO -- transfer order items over to permanent order object
     * what should I return for the payment processing? */
+    const user = await chatState.findUser();
+    let defaultPayment;
+    try {
+      defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
+    } catch (defaultPaymentError) {
+      console.tag('chatbot').log('No default payment found. Sending user to signup2.');
+      // TODO @bluejamesbond @jesse respond with secret link for signup2
+    }
 
+    try {
+      const restaurant = chatState.findRestaurantContext();
+      await Payment.paymentWithToken(user.id, restaurant.id, defaultPayment, total);
+    } catch (paymentWithTokenError) {
+      console.tag('chatbot').error('Payment failed although customer default payment exists', paymentWithTokenError);
+      throw new TraceError('Payment failed although customer default payment exists', paymentWithTokenError);
+    }
+
+    await chatState.clearOrderItems();
+    await chatState.updateState(chatStates.start);
     /* Slice to remove trailing comma and whitespcae */
-    return `Your order of ${output.slice(0, -2)} for a total of $${total / 100} has been placed.` +
-      'We will text you when it\'s ready.';
+    return `Your order using ${defaultPayment.cardType} - ${defaultPayment.last4} has been sent to the restaurant. ` +
+      `We'll text you once it's confirmed by the restaurant`;
   }
 
   async _handleContextMenu(chatState) {
