@@ -61,8 +61,11 @@ export default function (sequelize, DataTypes) {
         return await this.getMenuItem();
       },
       updateState: async function (state) { // eslint-disable-line
+        const tmpState = this.state;
         this.state = state;
         await this.save();
+
+        console.log(`ChatState id ${this.id} updated from ${tmpState} to ${state}`);
         return this;
       },
       insertOrderItem: async function(name, price) { // eslint-disable-line
