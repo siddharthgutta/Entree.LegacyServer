@@ -141,6 +141,10 @@ export function initRouter() {
     const btSignature = req.body.bt_signature;
     const btPayload = req.body.bt_payload;
     try {
+      if (!btSignature || !btPayload) {
+        throw new TraceError('Empty Braintree Signature/Payload');
+      }
+
       try {
         // Check if production webhook
         const {kind, result} = await parse(braintreeSlackbot, btSignature, btPayload, true);
