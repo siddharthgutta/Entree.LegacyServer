@@ -1,1 +1,1 @@
-export {default as DefaultChatBot, chatStates} from './default-chat-bot.es6';
+export {default as DefaultChatBot, chatStates, response} from './default-chat-bot.es6';
