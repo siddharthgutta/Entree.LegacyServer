@@ -1,4 +1,4 @@
-import {clearDatabase, disconnectDatabase} from './test-init.es6';
+import './test-init.es6';
 import * as User from '../api/controllers/user.es6';
 import fetch from '../libs/fetch.es6';
 import assert from 'assert';
@@ -7,9 +7,6 @@ const phone = '7135011837';
 let secret;
 
 const {SERVER_URL} = global;
-
-before(async () => await clearDatabase());
-after(() => disconnectDatabase());
 
 describe('User', () => {
   it('should create a user', async () => {

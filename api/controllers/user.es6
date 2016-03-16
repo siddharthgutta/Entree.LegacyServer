@@ -6,9 +6,6 @@ import config from 'config';
 import {hostname} from '../../libs/runtime.es6';
 import {chatStates} from '../../libs/chat-bot/index.es6';
 
-// FIXME @jesse: why are the raw db connections used here?
-const {User: _User, sequelize: Sequelize} = User.connection;
-
 /**
  * Gets the greeting message to be sent on signup, can return signup or greeting message
  *
@@ -45,6 +42,9 @@ function getGreeting(name, firstTime) {
  * @returns {Promise}: Returns the user object.
  */
 export function signup(phoneNumber, overrideGreeting) {
+  // FIXME @jesse: why are the raw db connections used here?
+  const {User: _User, sequelize: Sequelize} = User.connection;
+
   return new Promise((outerResolve, outerReject) => {
     Sequelize.transaction(t =>
                             new Promise((resolve, reject) => {
@@ -66,12 +66,12 @@ export function signup(phoneNumber, overrideGreeting) {
                                        // TODO this is temporary only. @jesse a more permanent solution?
                                        if (created) {
                                          user.insertChatState(chatStates.start, t)
-                                           .then(() => resolve(response))
-                                           .catch(err => {
-                                             console.tag('api', 'user', 'signup', 'chatstate')
-                                               .error(`Unable to create chat state for user. Error: ${err}`);
-                                             reject(err);
-                                           });
+                                             .then(() => resolve(response))
+                                             .catch(err => {
+                                               console.tag('api', 'user', 'signup', 'chatstate')
+                                                      .error(`Unable to create chat state for user. Error: ${err}`);
+                                               reject(err);
+                                             });
                                        } else {
                                          resolve(response);
                                        }

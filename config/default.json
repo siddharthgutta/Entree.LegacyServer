@@ -100,10 +100,13 @@
     "password": "123456",
     "database": "entree",
     "host": "127.0.0.1",
+    "clearOnStart": false,
     "dialect": "mysql",
-    "logging": true
+    "logging": true,
+    "revision": "r1"
   },
   "MongoDb": {
+    "clearOnStart": false,
     "username": "root",
     "password": "123456",
     "database": "entree",

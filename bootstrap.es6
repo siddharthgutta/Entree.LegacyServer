@@ -2,6 +2,8 @@ import Scribe from 'scribe-js';
 import config from 'config';
 import extend from 'extend';
 import {TraceError} from './libs/utils.es6';
+import {init as initMongo, close as closeMongo} from './models/mongo/index.es6';
+import {init as initSQL, close as closeSQL} from './models/mysql/index.es6';
 import Promise from 'bluebird';
 
 export function initErrorHandling() {
@@ -74,6 +76,27 @@ export function initScribe(override = true, mongo = true, socket = true, opts = 
   }
 
   return scribeConsole;
+}
+
+export async function initDatabase(forceClear) {
+  let clearSQL = config.get('MySQL.clearOnStart');
+  let clearMongo = config.get('MongoDb.clearOnStart');
+
+  if (forceClear === false) {
+    clearMongo = false;
+    clearSQL = false;
+  } else if (forceClear === true) {
+    clearSQL = true;
+    clearMongo = true;
+  }
+
+  await initSQL(clearSQL);
+  await initMongo(clearMongo);
+}
+
+export async function disconnectDatabase() {
+  await closeSQL();
+  await closeMongo();
 }
 
 export function initServer() {
