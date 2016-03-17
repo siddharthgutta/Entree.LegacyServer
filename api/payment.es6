@@ -12,31 +12,26 @@ import Promise from 'bluebird';
 import braintree from 'braintree';
 import {Router} from 'express';
 import bodyParser from 'body-parser';
+import * as Runtime from '../libs/runtime.es6';
 
-const productionCreds = config.get('Braintree.production');
-const sandboxCreds = config.get('Braintree.sandbox');
+// Braintree Config credentials for Production or Sandbox
+const productionOrSandbox = Runtime.isProduction();
+const braintreeCreds = config.get(`Braintree.${productionOrSandbox ? 'production' : 'sandbox'}`);
 const logTags = ['api', 'payment'];
 
 /**
- * Payment strategy for Production
+ * Payment strategy for Production or Sandbox
  * @type {Braintree}
  */
-const productionBraintree = new Braintree(true, productionCreds.merchantId,
-  productionCreds.publicKey, productionCreds.privateKey, productionCreds.masterMerchantAccountId);
-/**
- * Payment strategy for Sandbox
- * @type {Braintree}
- */
-const sandboxBraintree = new Braintree(false, sandboxCreds.merchantId,
-  sandboxCreds.publicKey, sandboxCreds.privateKey, sandboxCreds.masterMerchantAccountId);
+const bt = new Braintree(productionOrSandbox, braintreeCreds.merchantId,
+    braintreeCreds.publicKey, braintreeCreds.privateKey, braintreeCreds.masterMerchantAccountId);
 
 /**
  * Gives the Braintree Sandbox Gateway for testing
  *
- * @returns {Braintree.gateway} braintree sandbox gateway
+ * @returns {Braintree.gateway} braintree gateway
  */
-export function getGateway(production = false) {
-  const bt = production ? productionBraintree : sandboxBraintree;
+export function getGateway() {
   return bt.gateway;
 }
 
@@ -46,19 +41,18 @@ export function getGateway(production = false) {
  * @param {Slack} slackbot: Slack Bot Object to emit
  * @param {String} btSignature: braintree signature
  * @param {String} btPayload: braintree payload
- * @param {Boolean} production: whether or not production or sandbox
  * @returns {Promise} message promise or error
  */
-export function parse(slackbot, btSignature, btPayload, production = false, test = false) {
+export function parse(slackbot, btSignature, btPayload, test = false) {
   return new Promise((resolve, reject) => {
-    getGateway(production).webhookNotification.parse(btSignature, btPayload, (err, webhookNotification) => {
+    getGateway().webhookNotification.parse(btSignature, btPayload, (err, webhookNotification) => {
       if (err) reject(new TraceError('Webhook Notification Parsing Error - [Probably Incorrect Gateway]'));
       else {
         let color = '#764FA5';
         const fields = [];
         let msg = `~~~~~THIS IS ${test ? '' : 'NOT'} A TEST~~~~~`;
-        msg += production ? `Production\n` : `Sandbox\nTimeStamp: ${webhookNotification.timestamp}\n`;
-        fields.push(Slack.generateField('Environment', production ? `Production` : `Sandbox`));
+        msg += productionOrSandbox ? `Production\n` : `Sandbox\nTimeStamp: ${webhookNotification.timestamp}\n`;
+        fields.push(Slack.generateField('Environment', productionOrSandbox ? `Production` : `Sandbox`));
 
         switch (webhookNotification.kind) {
           case braintree.WebhookNotification.Kind.SubMerchantAccountApproved:
@@ -145,15 +139,9 @@ export function initRouter() {
         throw new TraceError('Empty Braintree Signature/Payload');
       }
 
-      try {
-        // Check if production webhook
-        const {kind, result} = await parse(braintreeSlackbot, btSignature, btPayload, true);
-        await handleParseResult(kind, result);
-      } catch (productionError) {
-        // Check if sandbox webhook
-        const {kind, result} = await parse(braintreeSlackbot, btSignature, btPayload, false);
-        await handleParseResult(kind, result);
-      }
+      // Parse webhook
+      const {kind, result} = await parse(braintreeSlackbot, btSignature, btPayload);
+      await handleParseResult(kind, result);
       res.status(200).send('Webhook Success');
     } catch (err) {
       console.tag(logTags).error(err);
@@ -166,11 +154,9 @@ export function initRouter() {
 /**
  * Generate Client Token to pass to the client browser
  *
- * @param {Boolean} production: production/sandbox braintree
  * @returns {Promise}: generated client token or error
  */
-export async function generateClientToken(production = true) {
-  const bt = production ? productionBraintree : sandboxBraintree;
+export async function generateClientToken() {
   try {
     return await bt.generateClientToken();
   } catch (err) {
@@ -187,11 +173,9 @@ export async function generateClientToken(production = true) {
  * @param {String} paymentMethodToken: token gotten for a specific payment method
  * @param {String} customerId: customer Id from braintree
  * @param {String} serviceFee: string amount service fee that we take
- * @param {Boolean} production: production/sandbox braintree
  * @returns {Promise}: returns the transaction object if successful, error if not
  */
-async function makePayment(amount, merchantId, name, paymentMethodToken, customerId, serviceFee, production = true) {
-  const bt = production ? productionBraintree : sandboxBraintree;
+async function makePayment(amount, merchantId, name, paymentMethodToken, customerId, serviceFee) {
   const result = await bt.transaction(amount, merchantId, name, paymentMethodToken, customerId, serviceFee);
   if (!result.success && !result.errors.deepErrors()) {
     console.tag(logTags).error(`Validation Errors on makePayment`);
@@ -212,11 +196,9 @@ async function makePayment(amount, merchantId, name, paymentMethodToken, custome
  *
  * @param {String} userId: id of the user
  * @param {String} paymentMethodNonce: nonce from client browser
- * @param {Boolean} production: production/sandbox braintree
  * @returns {Promise}: result of the transaction or error
  */
-export async function registerPaymentForUser(userId, paymentMethodNonce, production = true) {
-  const bt = production ? productionBraintree : sandboxBraintree;
+export async function registerPaymentForUser(userId, paymentMethodNonce) {
   let customerResult;
   let user;
   try {
@@ -255,11 +237,9 @@ export async function registerPaymentForUser(userId, paymentMethodNonce, product
  * @param {String} restaurantId: restaurant ID from db
  * @param {String} paymentMethodToken: payment method token from braintree after calling getDefaultPayment
  * @param {Number} amount: total amount of order in cents $1.00 -> 100
- * @param {Boolean} production: production/sandbox braintree
  * @returns {Promise}: result of the transaction or error
  */
-export async function paymentWithToken(userId, restaurantId, paymentMethodToken, amount, production = true) {
-  const bt = production ? productionBraintree : sandboxBraintree;
+export async function paymentWithToken(userId, restaurantId, paymentMethodToken, amount) {
   let user;
   try {
     user = await User.findOne(userId);
@@ -284,7 +264,7 @@ export async function paymentWithToken(userId, restaurantId, paymentMethodToken,
     const serviceFeeString = (bt.calculateServiceFee(amount, restaurant.percentageFee,
       restaurant.transactionFee) / 100).toString();
     const result = await makePayment(amountString, restaurant.merchantId, restaurant.name,
-      paymentMethodToken, customerId, serviceFeeString, production);
+      paymentMethodToken, customerId, serviceFeeString);
     return result;
   } catch (transactionError) {
     throw transactionError;
@@ -295,11 +275,9 @@ export async function paymentWithToken(userId, restaurantId, paymentMethodToken,
  * Gets default payment method in braintree for specific user
  *
  * @param {Number} userId: id of the user
- * @param {Boolean} production: production/sandbox braintree
  * @returns {Object}: object containing cardType, last4 digits, and paymentMethodToken is they exist
  */
-export async function getCustomerDefaultPayment(userId, production = true) {
-  const bt = production ? productionBraintree : sandboxBraintree;
+export async function getCustomerDefaultPayment(userId) {
   let customer;
   try {
     customer = await User.findOne(userId);
@@ -332,12 +310,9 @@ export async function getCustomerDefaultPayment(userId, production = true) {
  * @param {Object} individual: object containing the individual business owner's information
  * @param {Object} business: object contained the business itself's information
  * @param {Object} funding: object containing necessary funding information
- * @param {Boolean} production: production/sandbox braintree
  * @returns {Promise}: promise containing resulting merchant account object
  */
-export async function registerRestaurantWithPaymentSystem(restaurantId, individual, business,
-                                                          funding, production = true) {
-  const bt = production ? productionBraintree : sandboxBraintree;
+export async function registerRestaurantWithPaymentSystem(restaurantId, individual, business, funding) {
   let merchantAccount;
   try {
     merchantAccount = await bt.createMerchant(individual, business, funding);
