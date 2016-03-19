@@ -5,6 +5,12 @@
 import slack from '@slack/client';
 import NotifierStrategy from './strategy.es6';
 import _ from 'underscore';
+import * as Runtime from '../../libs/runtime.es6';
+import config from 'config';
+
+const port = config.get('Server.port');
+const branchName = config.get('AppBranch');
+const branchPort = `${branchName} - ${port}`;
 
 export default class Slack extends NotifierStrategy {
   /**
@@ -46,8 +52,11 @@ export default class Slack extends NotifierStrategy {
    * @returns {{attachments: *[]}}: data object for slack
    */
   static generateData(fallback, color, fields, test) {
-    const attachmentList = [{fallback, mrkdwn_in: ['pretext'], pretext: test ?
-      'TEST DATA' : '_*REAL BRAINTREE DATA*_', color, fields}];
+    const productionSandboxPretext = Runtime.isProduction() ?
+      `_*PRODUCTION RESTAURANT:${branchPort}*_` : `_*SANDBOX RESTAURANT:${branchPort}*_`;
+    const attachmentList = [{fallback, mrkdwn_in: ['pretext'],
+      pretext: test ? `TEST DATA:${branchPort}` : productionSandboxPretext,
+      color, fields}];
     // API Requires using JSON.stringify here
     // SLACK GITHUB ISSUE
     // https://github.com/slackhq/node-slack-client/issues/172

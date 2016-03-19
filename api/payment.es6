@@ -13,6 +13,8 @@ import braintree from 'braintree';
 import {Router} from 'express';
 import bodyParser from 'body-parser';
 import * as Runtime from '../libs/runtime.es6';
+import selectn from 'selectn';
+import {isEmpty} from '../libs/utils.es6';
 
 // Braintree Config credentials for Production or Sandbox
 const productionOrSandbox = Runtime.isProduction();
@@ -45,7 +47,7 @@ export function getGateway() {
  */
 export function parse(slackbot, btSignature, btPayload, test = false) {
   return new Promise((resolve, reject) => {
-    getGateway().webhookNotification.parse(btSignature, btPayload, (err, webhookNotification) => {
+    getGateway().webhookNotification.parse(btSignature, btPayload, async (err, webhookNotification) => {
       if (err) reject(new TraceError('Webhook Notification Parsing Error - [Probably Incorrect Gateway]'));
       else {
         let color = '#764FA5';
@@ -57,9 +59,11 @@ export function parse(slackbot, btSignature, btPayload, test = false) {
         switch (webhookNotification.kind) {
           case braintree.WebhookNotification.Kind.SubMerchantAccountApproved:
             color = test ? color : 'good';
+            const dbaName = selectn('business.dbaName', webhookNotification.merchantAccount);
             fields.push(Slack.generateField('Merchant Account', `Approved`));
             fields.push(Slack.generateField('Merchant Status', `${webhookNotification.merchantAccount.status}`));
             fields.push(Slack.generateField('Merchant ID', `${webhookNotification.merchantAccount.id}`));
+            fields.push(Slack.generateField('Merchant Name', isEmpty(dbaName) ? 'Unnamed' : dbaName));
             msg += `Merchant Account: Approved\nStatus: ${webhookNotification.merchantAccount.status}\n`
               + `Merchant Id: ${webhookNotification.merchantAccount.id}`;
             resolve({kind: webhookNotification.kind, result: webhookNotification.merchantAccount});
