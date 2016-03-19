@@ -22,6 +22,7 @@ export default function (sequelize, DataTypes) {
           onDelete: 'CASCADE'
         });
 
+        // @jlmao is this supposed to be here?
         MenuItem.hasMany(db.Size, {
           onDelete: 'CASCADE'
         });
