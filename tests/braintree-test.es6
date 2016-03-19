@@ -349,9 +349,9 @@ describe('Braintree', () => {
           'myId'
         );
         await Braintree.parse(slackbot, sampleNotification.bt_signature, sampleNotification.bt_payload, true);
-        assert(false);
-      } catch (err) {
         done();
+      } catch (err) {
+        assert(false, err);
       }
     });
 
@@ -364,7 +364,7 @@ describe('Braintree', () => {
         await Braintree.parse(slackbot, sampleNotification.bt_signature, sampleNotification.bt_payload, true);
         done();
       } catch (err) {
-        assert(false);
+        assert(false, err);
       }
     });
 
@@ -375,9 +375,9 @@ describe('Braintree', () => {
           'myId'
         );
         await Braintree.parse(slackbot, sampleNotification.bt_signature, sampleNotification.bt_payload, true);
-        assert(false);
-      } catch (err) {
         done();
+      } catch (err) {
+        assert(false, err);
       }
     });
   });
