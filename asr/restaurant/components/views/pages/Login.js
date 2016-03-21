@@ -2,7 +2,6 @@ import React from 'react';
 import Dispatcher from '../../../dispatchers/Dispatcher';
 import OrderStore, {Status} from '../../../stores/OrderStore';
 import {onClick} from '../../../../libs/utils';
-import {findDOMNode} from 'react-dom';
 import Page from './Page';
 
 class Login extends Page {
@@ -63,7 +62,7 @@ class Login extends Page {
   }
 
   _shake() {
-    const wrapper = findDOMNode(this.refs.wrapper);
+    const wrapper = this.refs.wrapper;
     wrapper.classList.remove('animate-shake');
 
     try {

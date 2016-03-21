@@ -10,7 +10,7 @@ const database = mysqlConfig.revision ? `${mysqlConfig.database}_${mysqlConfig.r
 const sequelize = new Sequelize(database, mysqlConfig.username, mysqlConfig.password, {...mysqlConfig, database});
 
 export async function close() {
-  sequelize.close();
+  return sequelize.close(); // promise?
 }
 
 export async function init(clearAll = false) {
@@ -38,16 +38,20 @@ export async function init(clearAll = false) {
     db.Sequelize = Sequelize;
 
     if (clearAll) {
-      await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+      await sequelize.query('SET UNIQUE_CHECKS = 0;');
+      await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
+      await sequelize.query(`SET SQL_MODE = 'traditional';`);
     }
 
     await sequelize.sync({force: clearAll});
 
     if (clearAll) {
-      await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
+      await sequelize.query(`SET SQL_MODE = '';`);
+      await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
+      await sequelize.query('SET UNIQUE_CHECKS = 1;');
     }
   } catch (e) {
-    await console.error(new TraceError(`No database! Have you migrated to ${database}?`, e));
+    await console.error(new TraceError(`Start error. Have you created/migrated to ${database}?`, e));
     process.exit(1);
   }
 }

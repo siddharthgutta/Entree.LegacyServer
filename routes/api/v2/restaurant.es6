@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import authenticate, {isAuthenticated} from './authenticate.es6';
+import authenticate, {isAuthenticated, deauthenticate} from './authenticate.es6';
 import * as Order from '../../../api/controllers/order.es6';
 import * as Restaurant from '../../../api/controllers/restaurant.es6';
 import * as Notification from '../../../api/controllers/notification.es6';
@@ -12,11 +12,11 @@ router.post('/login', authenticate, (req, res) => {
   res.ok({token}).debug('Signed in');
 });
 
-router.post('/logout', authenticate, (req, res) => {
+router.post('/logout', isAuthenticated, (req, res) => {
   const {id, token} = req.user;
+  deauthenticate(token);
   Notification.removeSocket(id, token);
   req.logout();
-
   res.ok(null, 'Success').debug('Signed out');
 });
 
@@ -77,11 +77,9 @@ router.post('/order/:id/status', isAuthenticated, async(req, res) => {
   const {id} = req.params;
   const {status, prepTime, message} = req.body;
 
-  // TODO verify the restaurant! check if GOD
-  console.log('SUPPPP', status, prepTime);
   try {
     const order = await Order.setOrderStatus(id, status, {prepTime, message}, true);
-    res.ok(order, `Order status is now ${order.status}`);
+    res.ok({order}, `Order status is now ${order.status}`);
   } catch (e) {
     res.fail(`Failed to set status of order: ${e.message}`).debug(e);
   }
@@ -93,9 +91,9 @@ router.post('/enabled', isAuthenticated, async(req, res) => {
 
   try {
     const restaurant = await Restaurant.setEnabled(id, enabled);
-    res.ok(restaurant, `Status is now ${restaurant.enabled}`);
+    res.ok({restaurant}, `Enabled is now ${restaurant.enabled}`);
   } catch (e) {
-    res.fail(`Failed to set state: ${e.message}`).debug(e);
+    res.fail(`Failed to set enabled: ${e.message}`).debug(e);
   }
 });
 

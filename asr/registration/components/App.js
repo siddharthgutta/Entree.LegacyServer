@@ -102,6 +102,8 @@ class App extends Influx.Component {
   }
 
   componentDidMount() {
+    super.componentDidMount();
+
     setTimeout(() => {
       const iphone = findDOMNode(this.refs.mobile);
       const brand = findDOMNode(this.refs.brand);

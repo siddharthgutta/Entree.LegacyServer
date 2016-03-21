@@ -1,7 +1,7 @@
 import Scribe from 'scribe-js';
 import config from 'config';
 import extend from 'extend';
-import {TraceError} from './libs/utils.es6';
+import {TraceError, useSourceOnError} from './libs/utils.es6';
 import {init as initMongo, close as closeMongo} from './models/mongo/index.es6';
 import {init as initSQL, close as closeSQL} from './models/mysql/index.es6';
 import Promise from 'bluebird';
@@ -10,8 +10,9 @@ export function initErrorHandling() {
   // Promise.suppressUnhandledRejections();
   Promise.config({longStackTraces: false});
 
-  // useSourceOnError();
   global.TraceError = TraceError;
+
+  useSourceOnError();
 }
 
 export function initScribe(override = true, mongo = true, socket = true, opts = {}, ...exposers) {

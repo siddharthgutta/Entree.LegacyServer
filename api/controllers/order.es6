@@ -1,5 +1,6 @@
 import * as Order from '../order.es6';
 import * as Notification from './notification.es6';
+import {isEmpty} from '../../libs/utils.es6';
 import Emitter, {Events} from '../events/index.es6';
 import {Status} from '../order.es6';
 
@@ -19,7 +20,7 @@ export async function setOrderStatus(id, status, {prepTime, message, transaction
   }
 
   if (status === Status.ACCEPTED) {
-    if (!prepTime) {
+    if (!(prepTime > 0)) { // typecheck performed at model level
       throw Error('Preparation time is required for accepting an order!');
     }
   } else {
@@ -27,7 +28,7 @@ export async function setOrderStatus(id, status, {prepTime, message, transaction
   }
 
   if (status === Status.DECLINED) {
-    if (!message) {
+    if (isEmpty(message)) {
       throw Error('Message is required for accepting an order!');
     }
   } else {
@@ -35,7 +36,7 @@ export async function setOrderStatus(id, status, {prepTime, message, transaction
   }
 
   if (status === Status.RECEIVED_PAYMENT) {
-    if (!transactionId) {
+    if (isEmpty(transactionId)) {
       throw Error('TransactionID is required for received payment!');
     }
   } else {
@@ -101,6 +102,22 @@ export async function getOrder(orderId) {
     return (await Order.findOne(orderId));
   } catch (e) {
     throw new TraceError(`Could not find order for ${orderId}`, e);
+  }
+}
+
+export async function getOrderTotalById(orderId) {
+  try {
+    return await Order.calculateTotal(orderId);
+  } catch (e) {
+    throw new TraceError('Could not calculate total', e);
+  }
+}
+
+export async function getRestaurantFromOrder(orderId) {
+  try {
+    return await Order.findParentRestaurant(orderId);
+  } catch (e) {
+    throw new TraceError('Could not find parent restaurant', e);
   }
 }
 

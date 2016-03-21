@@ -37,6 +37,7 @@
     "sslCa": "./keys/www.textentree.com.chain.crt",
     "hostnames": [
       "textentree.com",
+      "www.textentree.com",
       "127.0.0.1",
       "0.0.0.0"
     ]

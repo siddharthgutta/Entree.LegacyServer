@@ -2,19 +2,10 @@ import Emitter, {Events} from '../events/index.es6';
 import {DefaultChatBot} from '../../libs/chat-bot/index.es6';
 import {sendSMS} from './sms.es6';
 import * as Order from './order.es6';
-import * as Restaurant from './restaurant.es6';
 import * as User from './user.es6';
-import Chance from 'chance';
+import * as Payment from '../payment.es6';
 
-const chance = new Chance();
 const chatBot = new DefaultChatBot();
-
-const waitlistText = ['We are almost ready. You have been added to our waitlist, and',
-  'we\'ll text you when we launch!'].join(' ');
-
-const silentSignupText = ['We know you\'re hungry! Entree lets you text to order ahead, pre-pay, and skip',
-  'the line at the best food',
-  'trucks around you. We are launching during SXSW and will notify you when we’re ready!'].join(' ');
 
 /**
  * Dispatcher to handle system events
@@ -28,75 +19,58 @@ const silentSignupText = ['We know you\'re hungry! Entree lets you text to order
 Emitter.on(Events.TEXT_RECEIVED, async text => {
   console.tag('api', 'sms', 'processReceive').log('Processing text', text.id, text);
 
-  if (false) {
-    try {
-      const response = await chatBot.updateState(text.from, text.body);
-      if (typeof response === 'object') {
-        const items = response.order.items.map(item => {
-          item.price = chance.floating({min: 0, max: 10, fixed: 2});
-          return item;
-        });
+  try {
+    const response = await chatBot.updateState(text.from, text.body);
+    await sendSMS(text.from, response);
+  } catch (err) {
+    console.tag('dispatcher', 'TEXT_RECEIVED').error(err);
 
-        const user = await User.UserModel.findOneByPhoneNumber(text.from);
-        const restaurant = await Restaurant.RestaurantModel.findByName(response.restaurant);
-        const order = await Order.createOrder(user.id, restaurant.id, items);
-
-        setTimeout(() => {
-          Order.setOrderStatus(order.id, Order.Status.RECEIVED_PAYMENT, {transactionId: 0});
-        }, 5000);
-
-        await sendSMS(text.from, response.response);
-      } else if (response) {
-        await sendSMS(text.from, response);
-      } else {
-        throw Error('Not passing in a text?');
-      }
-    } catch (err) {
-      console.error(err);
-
-      /* Best way to handle errors? */
-      await sendSMS(text.from, 'Something went wrong');
-    }
-  } else {
-    try {
-      // check if user exists
-      const user = await User.UserModel.findOneByPhoneNumber(text.from);
-      if (!user) {
-        throw Error('User not in db. Try signing them up');
-      }
-    } catch (e) {
-      try {
-        // if user doesn't exist try to sign them up (which will send a text)
-        return await User.signup(text.from, silentSignupText);
-      } catch (ee) {
-        // if that fails go to default fallback message
-        console.error(ee);
-      }
-    }
-
-    await sendSMS(text.from, waitlistText);
+    /* Best way to handle errors? */
+    await sendSMS(text.from, 'Sorry, we had problem on our side. If you are still having problems, contact us at' +
+                  ' team@textentree.com');
   }
 });
 
 /**
  * Make an order if a process is done
  */
-Emitter.on(Events.USER_PAYMENT_REGISTERED, async user => {
-  console.log(user);
-  // TODO @jadesym: payment module emits the global event once payment for a user is confirmed
-  // TODO @jesse: check if user associated with payment has any orders; send texts accordingly
-  // TODO         then, create order via. Order.create function
-  // TODO @jadesym: process payment for order; Order.getCost() function coming soon
-  // TODO @jadesym: once payment goes through set Order.setStatus(Order.Status.<SELECT_ONE>)
+Emitter.on(Events.USER_PAYMENT_REGISTERED, async ({id: userId}) => {
+  const user = await User.UserModel.findOne(userId);
+
+  try {
+    const chatState = await user.findChatState();
+    const order = await chatState.findOrderContext();
+
+    if (order) {
+      const {id: orderId} = order;
+      const {id: restaurantId} = await Order.getRestaurantFromOrder(orderId);
+      const {token} = await Payment.getCustomerDefaultPayment(userId);
+      const price = await Order.getOrderTotalById(orderId);
+
+      try {
+        const {id: transactionId} = await Payment.paymentWithToken(userId, restaurantId, token, price); // eslint-disable-line
+        await Order.setOrderStatus(orderId, Order.Status.RECEIVED_PAYMENT, {transactionId});
+      } catch (e) {
+        const err = new TraceError(`Payment failed; user(${userId}) -> restaurant(${restaurantId})`, e);
+        console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);
+        // TODO send the request link again
+        sendSMS(user.phoneNumber, `There was a problem with your credit card: ${e.message}`); // FIXME temp
+      }
+    }
+  } catch (e) {
+    const err = new TraceError(`Could not process order`, e);
+    console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);
+    sendSMS(user.phoneNumber, 'There was a problem locating your last order. Can you please try again?');
+  }
 });
 
 Emitter.on(Events.UPDATED_ORDER, async order => {
   // TODO @jesse move this to chatbot
   const message = {
-    [Order.Status.RECEIVED_PAYMENT]: `Hey, your order just got sent. Hang tight!`,
-    [Order.Status.ACCEPTED]: `Hey, your order just got accepted :). It will be ready in ${order.prepTime} mins`,
-    [Order.Status.DECLINED]: `Hey, your order just got declined :(. ${order.message}`,
-    [Order.Status.COMPLETED]: `Hey, your order is ready!`
+    [Order.Status.RECEIVED_PAYMENT]: `Your order just got sent. Hang tight!`,
+    [Order.Status.ACCEPTED]: `Your order just got accepted :). It will be ready in ${order.prepTime} mins`,
+    [Order.Status.DECLINED]: `Your order just got declined :(. ${order.message}`,
+    [Order.Status.COMPLETED]: `Your order is ready!`
   };
 
   const text = message[order.status];

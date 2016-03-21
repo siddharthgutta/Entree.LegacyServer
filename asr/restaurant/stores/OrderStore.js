@@ -94,6 +94,19 @@ class OrderStore extends Influx.Store {
     return restaurant;
   }
 
+  // TODO extract UserStore, RestaurantStore
+  async setRestaurantEnabled(enabled) {
+    const {body: {data: {restaurant}}} =
+      await fetch(`${SERVER_URL}/api/v2/restaurant/enabled`, {
+        method: 'post',
+        body: {token: this.data.token, enabled}
+      });
+
+    this.emit(Events.RESTAURANT_UPDATED, restaurant);
+
+    return restaurant;
+  }
+
   async setOrderStatus(id, status, {prepTime, message}) {
     const {body: {data: {order}}} =
       await fetch(`${SERVER_URL}/api/v2/restaurant/order/${id}/status`, {
@@ -118,10 +131,6 @@ class OrderStore extends Influx.Store {
     this.emit(Events.ORDER_UPDATED, order);
 
     return order;
-  }
-
-  off(type, listener) {
-    return super.removeListener(type, listener);
   }
 
   _setConnectionStatus(status) {
@@ -208,6 +217,24 @@ class OrderStore extends Influx.Store {
         }
       }
     }
+  }
+
+  async logout() {
+    const {token} = this.data;
+
+    this.data.token = null;
+
+    localStorage.removeItem('token');
+
+    if (token) {
+      try {
+        await fetch(`${SERVER_URL}/api/v2/restaurant/logout`, {method: 'post', body: {token}});
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    return this._setConnectionStatus(Status.DISCONNECTED, 'Logged out');
   }
 
   async _fetchOrders(token) {

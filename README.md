@@ -59,6 +59,13 @@ source ~/.bashrc
 nvm install 5.7.0
 echo "5.7.0" > ~/.nvmrc
 
+# shell init
+cd; cd -
+
+# open ports < 1024 for non-sudo
+killall node
+sudo setcap 'cap_net_bind_service=+ep' `which node`
+
 # node global
 npm install pm2 -g
 npm install eslint@1.10.3 -g
@@ -101,6 +108,10 @@ git config --global credential.helper store
 mkdir -p Github && cd Github
 git clone https://github.com/siddharthgutta/Entree.Server && cd Entree.Server
 npm install
+
+# you can delete this folder:
+
+# run database init scripts
 ```
 
 ### Third Party Libraries/References:

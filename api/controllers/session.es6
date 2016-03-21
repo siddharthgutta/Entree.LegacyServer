@@ -19,6 +19,14 @@ export async function isValid(token) {
   }
 }
 
+export async function invalidate(token) {
+  try {
+    await AuthToken.destroy(token);
+  } catch (e) {
+    console.tag('session', 'invalidate').error(e);
+  }
+}
+
 export async function renew(restaurantId, token) {
   console.tag('session', 'renew').log({restaurantId, token});
 

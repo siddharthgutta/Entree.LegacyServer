@@ -16,6 +16,7 @@ class App extends Influx.Component {
       <Router history={browserHistory}>
         <Route path='/' component={Board}>
           <IndexRoute component={Login}/>
+          <Route path='login' component={Login}/>
           <Route path='orders' component={OrderHistory}/>
           <Route path='order/:id' component={OrderFocus}/>
         </Route>

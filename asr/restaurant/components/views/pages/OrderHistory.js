@@ -38,7 +38,7 @@ class OrderHistory extends Page {
     Dispatcher.emit(Dispatcher.Events.REQUEST_HEADER, 'Order', 'History', {
       style: {minHeight: 55, borderBottom: 'none'},
       leftIcon: 'evil-icon menu',
-      onLeftClick: () => Dispatcher.emit(Dispatcher.Events.MENU_VISIBILITY, true)
+      onLeftClick: () => Dispatcher.emit(Dispatcher.Events.MENU_VISIBILITY)
     });
   }
 

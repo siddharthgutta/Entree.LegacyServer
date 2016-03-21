@@ -1,0 +1,117 @@
+@import "shared/reset";
+@import "shared/fonts";
+@import "shared/base";
+@import "shared/scroll";
+@import "shared/layouts";
+@import "shared/tabs";
+@import "shared/messenger";
+
+body {
+  font-family: 'Proxima Nova', "Helvetica", "Helvetic Neue", "Open Sans", sans-serif;
+  overflow: hidden;
+}
+
+#app {
+  overflow: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.item {
+  font-size: 11px;
+  padding: 0 5px;
+  color: #999;
+  margin-bottom: 0;
+  line-height: 17px;
+  &.selected {
+    color: #333;
+  }
+}
+
+.tag {
+  font-weight: bold;
+  margin-right: 5px;
+  text-transform: uppercase;
+  position: relative;
+  /* padding: 1px 5px; */
+  /* background: #1CDE8D; */
+  color: #11DA8A;
+  /* font-size: 9px; */
+  border-radius: 2px;
+}
+
+.name, .description, .cost {
+  margin-right: 5px;
+}
+
+.name, .cost {
+  color: #555;
+  font-weight: bold;
+}
+
+.cost {
+  &:before {
+    content: '$';
+  }
+}
+
+.name {
+  text-transform: capitalize;
+  &:first-letter {
+    text-transform: uppercase;
+  }
+}
+
+.description {
+  position: relative;
+  top: -3px;
+  display: inline-block;
+  line-height: 13px;
+  padding-bottom: 5px;
+  color: #777;
+}
+
+.arrow {
+  font-size: 15px;
+  margin-left: 18px;
+  margin-top: 7px;
+  position: relative;
+  top: 4px;
+  margin-right: 10px;
+}
+
+@import 'shared/form-modal';
+
+.input {
+  display: inline-block;
+  width: auto;
+  font-weight: normal;
+  margin-right: 10px;
+  padding: 2px 5px;
+  font-size: 10px;
+  margin-bottom: 0;
+}
+
+button {
+  padding: 7px;
+  background: red;
+  border: none;
+  border-radius: 5px;
+  width: 50px;
+  height: 20px;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  line-height: 0;
+  padding: 0;
+  background: transparent;
+  /* border: 1px solid #DDD; */
+  /* background: #5D5D5D; */
+  color: #AAA;
+  font-weight: bold;
+  font-size: 17px;
+  text-align: left;
+}
