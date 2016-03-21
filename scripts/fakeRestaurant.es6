@@ -28,5 +28,5 @@ Restaurant.create('Jesse\'s Rice Palace', 'abcdefg', 'REGULAR', {phoneNumber: '1
                       });
 
             restaurant.upsertLocation(address, city, addrState, zipcode);
-            restaurant.addOrUpdateHour(dayOfTheWeek, openTime, closeTime);
+            restaurant.addHour(dayOfTheWeek, openTime, closeTime);
           });

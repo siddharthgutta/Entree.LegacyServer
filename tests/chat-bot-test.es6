@@ -40,7 +40,7 @@ describe('ChatBot', () => {
   async function setupRestaurant() {
     const restaurant = await Restaurant.create(restaurantName, password, mode, {phoneNumber});
     await restaurant.upsertLocation(address, city, addrState, zipcode);
-    await restaurant.addOrUpdateHour(dayOfTheWeek, openTime, closeTime);
+    await restaurant.addHour(dayOfTheWeek, openTime, closeTime);
 
     const category = await restaurant.insertCategory('Entree');
     await category.insertMenuItem(menuItemName, description, basePrice);

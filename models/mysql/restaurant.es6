@@ -1,7 +1,6 @@
 import {Mode} from '../constants/restaurant.es6';
 export {Mode};
 import models from './index.es6';
-import _ from 'underscore';
 
 export default function (sequelize, DataTypes) {
   const Restaurant = sequelize.define('Restaurant', {
@@ -109,12 +108,8 @@ export default function (sequelize, DataTypes) {
       findLocation: async function () { // eslint-disable-line
         return await this.getLocation();
       },
-      addOrUpdateHour: async function (dayOfTheWeek, openTime, closeTime) { // eslint-disable-line
-        const oldHours = await this.getRestaurantHours({where: {dayOfTheWeek}});
-
-        /* Since we are finding hours by name length of oldHours should only be max 1
-         *   (e.g.) there should not be multiple 'Tuesday' restaurant hours per restaurant */
-        _.each(oldHours, async oldHour => await oldHour.destroy());
+      addHour: async function (dayOfTheWeek, openTime, closeTime) { // eslint-disable-line
+        /* TODO - Add checking for case of overlapping restaurant hours */
 
         const newHour = await models.RestaurantHour.create({dayOfTheWeek, openTime, closeTime});
         await this.addRestaurantHour(newHour);
