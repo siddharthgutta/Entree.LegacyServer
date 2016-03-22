@@ -1,5 +1,5 @@
-import _ from 'underscore';
 import models from './index.es6';
+import Promise from 'bluebird';
 
 export default function (sequelize, DataTypes) {
   const MenuItem = sequelize.define('MenuItem', {
@@ -32,28 +32,15 @@ export default function (sequelize, DataTypes) {
       }
     },
     instanceMethods: {
-      upsertSize: async function (name, addPrice) { // eslint-disable-line
-        const oldSizes = await this.getSizes({where: {name}});
-
-        /* Since we are finding sizes by name length of oldSizes should only be max 1
-        *   (e.g.) there should not be multiple 'Large' sizes per menuItem */
-        _.each(oldSizes, async size => await size.destroy());
-
-        const newSize = await models.Size.create({name, addPrice});
-        await this.addSize(newSize);
-        return newSize;
-      },
-      findSizes: async function () { // eslint-disable-line
-        return await this.getSizes();
-      },
-      upsertItemMod: async function (name, addPrice) { // eslint-disable-line
+      upsertItemMod: async function (name, min, max) { // eslint-disable-line
+        // TODO add error logging later @jlmao
         const itemMods = await this.getItemMods({where: {name}});
 
         /* Since we are finding mods by name, length of itemMods should only be max 1
         *   (e.g.) there should not be multiple 'Extra Cheese' mods per menuItem */
-        _.each(itemMods, async itemMod => await itemMod.destroy());
+        await Promise.map(itemMods, async itemMod => await itemMod.destroy());
 
-        const newItemMod = await models.ItemMod.create({name, addPrice});
+        const newItemMod = await models.ItemMod.create({name, min, max});
         await this.addItemMod(newItemMod);
         return newItemMod;
       },

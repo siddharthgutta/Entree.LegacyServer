@@ -25,6 +25,7 @@ export default function (sequelize, DataTypes) {
         ChatState.belongsTo(db.Restaurant);
         ChatState.belongsTo(db.MenuItem);
         ChatState.belongsTo(db.Order);
+        ChatState.belongsTo(db.ItemMod);
       }
     },
     instanceMethods: {
@@ -66,6 +67,12 @@ export default function (sequelize, DataTypes) {
       },
       clearOrderContext: async function () { // eslint-disable-line
         await this.setOrder(null);
+      },
+      setItemModContext: async function (itemMod) { // eslint-disable-line
+        await this.setItemMod(itemMod);
+      },
+      findItemModContext: async function () { // eslint-disable-line
+        return await this.getItemMod();
       },
       findMenuItemContext: async function () { // eslint-disable-line
         return await this.getMenuItem();

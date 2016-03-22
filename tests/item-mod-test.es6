@@ -16,16 +16,12 @@ describe('ItemMod', () => {
   const description = 'Yummy!';
   const basePrice = 500;
 
-  const itemModName = 'Xtra Chz';
-  const addPrice = 100;
-
-  beforeEach(done => {
-    clearDatabase()
-      .then(() => Restaurant.create(name, password, mode, {phoneNumber}))
-      .then(restaurant => restaurant.insertCategory(categoryName))
-      .then(category => category.insertMenuItem(itemName, description, basePrice))
-      .then(_menuItem => globalMenuItem = _menuItem)
-      .then(() => done());
+  beforeEach(async done => {
+    await clearDatabase();
+    const restaurant = await Restaurant.create(name, password, mode, {phoneNumber});
+    const category = await restaurant.insertCategory(categoryName);
+    globalMenuItem = await category.insertMenuItem(itemName, description, basePrice);
+    done();
   });
 
   after(() => disconnectDatabase());
@@ -35,53 +31,56 @@ describe('ItemMod', () => {
   }
 
   describe('#upsertItemMod()', () => {
-    it('should insert item mode correctly', done => {
-      globalMenuItem.upsertItemMod(itemModName, addPrice)
-        .then(size => {
-          assert.equal(size.name, itemModName);
-          assert.equal(size.addPrice, addPrice);
-          done();
-        });
+    it('should insert item mod correctly with min less than max', async () => {
+      const itemMod = await globalMenuItem.upsertItemMod('Sizes', 0, 1);
+      assert.equal(itemMod.name, 'Sizes');
+      assert.equal(itemMod.min, 0);
+      assert.equal(itemMod.max, 1);
     });
 
-    it('should not insert a size with null name', done => {
-      globalMenuItem.upsertItemMod(null, addPrice)
-        .then(() => {
-          assert(false);
-          done();
-        })
-        .catch(() => {
-          assert(true);
-          done();
-        });
+    it('should insert item mod correctly with min equal to max', async () => {
+      const itemMod = await globalMenuItem.upsertItemMod('Sizes', 1, 1);
+      assert.equal(itemMod.name, 'Sizes');
+      assert.equal(itemMod.min, 1);
+      assert.equal(itemMod.max, 1);
     });
 
-    it('should not insert a size with null addPrice', done => {
-      globalMenuItem.upsertItemMod(itemModName, null)
-        .then(() => {
-          assert(false);
-          done();
-        })
-        .catch(() => {
-          assert(true);
-          done();
-        });
+    it('should not insert item mod with max less than 1', async () => {
+      try {
+        assert.throws(async () => await globalMenuItem.upsertItemMod('Sizes', 0, 0));
+        assert(false);
+      } catch (err) {/* Success */}
+    });
+
+    it('should not insert item mod with min less than 0', async () => {
+      try {
+        await globalMenuItem.upsertItemMod('Sizes', -1, 1);
+        assert(false);
+      } catch (err) {/* Success */}
+    });
+
+    it('should not insert item mod with max less than min', async () => {
+      try {
+        await globalMenuItem.upsertItemMod('Sizes', 2, 1);
+        assert(false);
+      } catch (err) {/* Success */}
     });
   });
 
   describe('#findItemMods()', () => {
-    it('should find sizes correctly', done => {
-      globalMenuItem.upsertItemMod(itemModName, addPrice)
-        .then(() => globalMenuItem.upsertItemMod('Xtra Mayo', addPrice))
-        .then(() => globalMenuItem.findItemMods())
-        .then(result => {
-          assert.equal(result.length, 2);
-          assert.equal(result[0].name, itemModName);
-          assert.equal(result[0].addPrice, addPrice);
-          assert.equal(result[1].name, 'Xtra Mayo');
-          assert.equal(result[1].addPrice, addPrice);
-          done();
-        });
+    it('should find item mods correctly', async () => {
+      await globalMenuItem.upsertItemMod('Sizes', 1, 1);
+      await globalMenuItem.upsertItemMod('Meats', 0, 2);
+
+      const result = await globalMenuItem.findItemMods();
+      assert.equal(result.length, 2);
+      assert.equal(result[0].name, 'Sizes');
+      assert.equal(result[0].min, 1);
+      assert.equal(result[0].max, 1);
+
+      assert.equal(result[1].name, 'Meats');
+      assert.equal(result[1].min, 0);
+      assert.equal(result[1].max, 2);
     });
   });
 });

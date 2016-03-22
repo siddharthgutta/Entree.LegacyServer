@@ -1,6 +1,6 @@
 import assert from 'assert';
 import {clearDatabase, disconnectDatabase} from './test-init.es6';
-import {DefaultChatBot, chatStates} from '../libs/chat-bot/index.es6';
+import {DefaultChatBot, chatStates, response} from '../libs/chat-bot/index.es6';
 import * as User from '../api/user.es6';
 import * as Restaurant from '../api/restaurant.es6';
 
@@ -28,10 +28,15 @@ describe('ChatBot', () => {
   const description = 'Delicious noodles';
   const basePrice = 500;
 
-  const size = 'Small';
-  const mod = 'Extra Mayo';
+  const itemModName = 'Size';
+  const min = 1;
+  const max = 1;
+
+  const modName = 'Large';
   const addPrice = 100;
 
+  /* Creates a restaurant that has location, restaurant hours, a single category that has a single menu item
+   * which has two modifications */
   async function setupRestaurant() {
     const restaurant = await Restaurant.create(restaurantName, password, mode, {phoneNumber});
     await restaurant.upsertLocation(address, city, addrState, zipcode);
@@ -41,24 +46,21 @@ describe('ChatBot', () => {
     await category.insertMenuItem(menuItemName, description, basePrice);
 
     const menuItem = (await category.findMenuItems())[0];
-    await menuItem.upsertSize(size, addPrice);
-    await menuItem.upsertItemMod(mod, addPrice);
+    let itemMod = await menuItem.upsertItemMod(itemModName, min, max);
+    await itemMod.upsertMod(modName, addPrice);
+
+    itemMod = await menuItem.upsertItemMod(`${itemModName}_2`, min, max);
+    await itemMod.upsertMod(modName, addPrice);
   }
 
+  /* Destroys both modifications for the menu item */
   async function destroyMods() {
     const restaurant = await Restaurant.findByName(restaurantName);
     const categories = await restaurant.findCategories();
     const menuItems = await categories[0].findMenuItems(0);
     const itemMods = await menuItems[0].findItemMods();
     await itemMods[0].destroy();
-  }
-
-  async function destroySize() {
-    const restaurant = await Restaurant.findByName(restaurantName);
-    const categories = await restaurant.findCategories();
-    const menuItems = await categories[0].findMenuItems(0);
-    const sizes = await menuItems[0].findSizes();
-    await sizes[0].destroy();
+    await itemMods[1].destroy();
   }
 
   async function checkState(state) {
@@ -73,12 +75,14 @@ describe('ChatBot', () => {
     const restContext = await chatState.findRestaurantContext();
     const menuItemContext = await chatState.findMenuItemContext();
     if (restName) {
+      assert.notEqual(restContext, null);
       assert.equal(restContext.name, restaurantName);
     } else {
       assert.equal(restContext, null);
     }
 
     if (itemName) {
+      assert.notEqual(menuItemContext, null);
       assert.equal(menuItemContext.name, itemName);
     } else {
       assert.equal(menuItemContext, null);
@@ -141,12 +145,45 @@ describe('ChatBot', () => {
       done();
     });
 
-    it('should not checkout with an empty cart', async done => {
+    it('should not checkout while not in restaurant context', async done => {
       const result = await bot.updateState(phoneNumber, 'checkout');
-      assert.equal(result, 'You can\'t checkout with an empty cart. Try typing \"restaurants\" to explore a menu');
+      assert.equal(result, response.invalidContext);
       await checkState(chatStates.start);
       await checkContext(null, null);
 
+      done();
+    });
+
+    it('should respond to the user with an error given an invalid command', async done => {
+      const result = await bot.updateState(phoneNumber, 'not a command');
+      assert.equal(result, response.userError);
+      await checkState(chatStates.start);
+      await checkContext(null, null);
+
+      done();
+    });
+
+    it('should not be able to use /info context command while not in restaurant context', async done => {
+      const result = await bot.updateState(phoneNumber, '/info');
+      assert.equal(result, response.invalidContext);
+      await checkState(chatStates.start);
+      await checkContext(null, null);
+      done();
+    });
+
+    it('should not be able to use \"menu\" context command while not in restaurant context', async done => {
+      const result = await bot.updateState(phoneNumber, 'menu');
+      assert.equal(result, response.invalidContext);
+      await checkState(chatStates.start);
+      await checkContext(null, null);
+      done();
+    });
+
+    it('should not be able to use <category> context command while not in restaurant context', async done => {
+      const result = await bot.updateState(phoneNumber, 'Entree');
+      assert.equal(result, response.userError);
+      await checkState(chatStates.start);
+      await checkContext(null, null);
       done();
     });
   });
@@ -176,6 +213,15 @@ describe('ChatBot', () => {
           done();
         });
     });
+
+    it('should respond to the user with an error given an invalid command', async done => {
+      const result = await bot.updateState(phoneNumber, 'not a command');
+      assert.equal(result, response.userError);
+      await checkState(chatStates.restaurants);
+      await checkContext(null, null);
+
+      done();
+    });
   });
 
   describe('#updateState() from the categories state', () => {
@@ -191,13 +237,6 @@ describe('ChatBot', () => {
       await checkState(chatStates.items);
       await checkContext(restaurantName, null);
 
-      done();
-    });
-
-    it('should not change states using the /help command', async done => {
-      await bot.updateState(phoneNumber, '/help');
-      await checkState(chatStates.categories);
-      await checkContext(restaurantName, null);
       done();
     });
 
@@ -221,6 +260,31 @@ describe('ChatBot', () => {
       await checkContext(restaurantName, null);
       done();
     });
+
+    it('should respond to the user with an error given an invalid command', async done => {
+      const result = await bot.updateState(phoneNumber, 'not a command');
+      assert.equal(result, response.userError);
+      await checkState(chatStates.categories);
+      await checkContext(restaurantName, null);
+
+      done();
+    });
+
+    it('should go back to the items state given a <category>', async done => {
+      await bot.updateState(phoneNumber, 'Entree');
+      await checkState(chatStates.items);
+      await checkContext(restaurantName, null);
+      done();
+    });
+
+    it('should not checkout with empty cart', async done => {
+      const result = await bot.updateState(phoneNumber, 'checkout');
+      assert.equal(result, response.invalidCheckout);
+      await checkState(chatStates.categories);
+      await checkContext(restaurantName, null);
+
+      done();
+    });
   });
 
   describe('#updateState() from the items state', () => {
@@ -231,16 +295,7 @@ describe('ChatBot', () => {
         .then(() => done());
     });
 
-    it('should change to size state if there is a size', async done => {
-      await bot.updateState(phoneNumber, '0');
-      await checkState(chatStates.size);
-      await checkContext(restaurantName, menuItemName);
-
-      done();
-    });
-
-    it('item select should change to mod state if no size and there are mods', async done => {
-      await destroySize();
+    it('should change to mods state if there is a mod', async done => {
       await bot.updateState(phoneNumber, '0');
 
       await checkState(chatStates.mods);
@@ -251,26 +306,11 @@ describe('ChatBot', () => {
 
     it('item select should change to cart state if no size and there are mods', async done => {
       await destroyMods();
-      await destroySize();
 
       await bot.updateState(phoneNumber, '0');
       await checkState(chatStates.cart);
       await checkContext(restaurantName, null);
 
-      done();
-    });
-
-    it('should not change states using the /help command', async done => {
-      await bot.updateState(phoneNumber, '/help');
-      await checkState(chatStates.items);
-      await checkContext(restaurantName, null);
-      done();
-    });
-
-    it('should not change states using the /info command', async done => {
-      await bot.updateState(phoneNumber, '/info');
-      await checkState(chatStates.items);
-      await checkContext(restaurantName, null);
       done();
     });
 
@@ -287,40 +327,13 @@ describe('ChatBot', () => {
       await checkContext(restaurantName, null);
       done();
     });
-  });
 
-  describe('#updateState() from the size state', () => {
-    beforeEach(done => {
-      User.create(phoneNumber, name, email)
-        .then(user => user.insertChatState(chatStates.start))
-        .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
-        .then(() => bot.updateState(phoneNumber, '0'))
-        .then(() => done());
-    });
-
-    it('should change to mod state if there are item mods', async done => {
-      await bot.updateState(phoneNumber, '0');
-      await checkState(chatStates.mods);
-      await checkContext(restaurantName, menuItemName);
-
-      done();
-    });
-
-    it('should change to cart state if there are no mods', async done => {
-      await destroyMods();
-
-      await bot.updateState(phoneNumber, '0');
-      await checkState(chatStates.cart);
+    it('should not checkout with empty cart', async done => {
+      const result = await bot.updateState(phoneNumber, 'checkout');
+      assert.equal(result, response.invalidCheckout);
+      await checkState(chatStates.items);
       await checkContext(restaurantName, null);
 
-      done();
-    });
-
-    it('should stay in the same state using the menu command. Menu is not allowed', async done => {
-      const result = await bot.updateState(phoneNumber, 'menu');
-      assert.equal(result, 'Please finish selecting your item before doing that');
-      await checkState(chatStates.size);
-      await checkContext(restaurantName, menuItemName);
       done();
     });
   });
@@ -331,11 +344,11 @@ describe('ChatBot', () => {
         .then(user => user.insertChatState(chatStates.start))
         .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
         .then(() => bot.updateState(phoneNumber, '0'))
-        .then(() => bot.updateState(phoneNumber, '0'))
         .then(() => done());
     });
 
-    it('should change state to the cart state after selecting a mod', async done => {
+    it('should change state to the cart state after selecting mods', async done => {
+      await bot.updateState(phoneNumber, '0');
       await bot.updateState(phoneNumber, '0');
       await checkState(chatStates.cart);
       await checkContext(restaurantName, null);
@@ -343,11 +356,37 @@ describe('ChatBot', () => {
       done();
     });
 
-    it('should stay in the same state using the menu command. Menu is not allowed', async done => {
+    it('should not allow menu command while selecting item mods', async done => {
       const result = await bot.updateState(phoneNumber, 'menu');
-      assert.equal(result, 'Please finish selecting your item before doing that');
+      assert.equal(result, response.finishItem);
       await checkState(chatStates.mods);
       await checkContext(restaurantName, menuItemName);
+      done();
+    });
+
+    it('should not allow <category> command while selecting item mods', async done => {
+      const result = await bot.updateState(phoneNumber, 'entree');
+      assert.equal(result, response.finishItem);
+      await checkState(chatStates.mods);
+      await checkContext(restaurantName, menuItemName);
+      done();
+    });
+
+
+    it('should not allow /info command when selecting item mods', async done => {
+      const result = await bot.updateState(phoneNumber, 'entree');
+      assert.equal(result, response.finishItem);
+      await checkState(chatStates.mods);
+      await checkContext(restaurantName, menuItemName);
+      done();
+    });
+
+    it('should not checkout while selecting item mods', async done => {
+      const result = await bot.updateState(phoneNumber, 'checkout');
+      assert.equal(result, response.finishItem);
+      await checkState(chatStates.mods);
+      await checkContext(restaurantName, menuItemName);
+
       done();
     });
   });
@@ -361,6 +400,11 @@ describe('ChatBot', () => {
         .then(() => bot.updateState(phoneNumber, '0'))
         .then(() => bot.updateState(phoneNumber, '0'))
         .then(() => done());
+    });
+
+    it('should have cleared the item context', async done => {
+      await checkContext(restaurantName, null);
+      done();
     });
 
     it('should change to the items state when given <category> command', async done => {
