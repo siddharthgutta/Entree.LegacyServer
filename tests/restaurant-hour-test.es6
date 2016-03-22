@@ -59,4 +59,19 @@ describe('Restaurant', () => {
       done();
     });
   });
+
+  describe('#removeHours()', () => {
+    it('should remove restaurant hours correctly', async done => {
+      const restaurant = await Restaurant.create(name, password, mode, {phoneNumber});
+      await restaurant.addHour(dayOfTheWeek, openTime, closeTime);
+      let result = await restaurant.findHours();
+      assert.equal(result.length, 1);
+
+      await restaurant.removeHours(dayOfTheWeek);
+      result = await restaurant.findHours();
+      assert.equal(result.length, 0);
+
+      done();
+    });
+  });
 });

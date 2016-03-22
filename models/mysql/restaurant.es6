@@ -1,6 +1,7 @@
 import {Mode} from '../constants/restaurant.es6';
 export {Mode};
 import models from './index.es6';
+import Promise from 'bluebird';
 
 export default function (sequelize, DataTypes) {
   const Restaurant = sequelize.define('Restaurant', {
@@ -114,6 +115,13 @@ export default function (sequelize, DataTypes) {
         const newHour = await models.RestaurantHour.create({dayOfTheWeek, openTime, closeTime});
         await this.addRestaurantHour(newHour);
         return newHour;
+      },
+      removeHours: async function (dayOfTheWeek) { // eslint-disable-line
+        const hours = await this.getRestaurantHours({where: {dayOfTheWeek}});
+
+        await Promise.map(hours, async hour => {
+          await hour.destroy();
+        });
       },
       findHours: async function () { // eslint-disable-line
         return await this.getRestaurantHours();
