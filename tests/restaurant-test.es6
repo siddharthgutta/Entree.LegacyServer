@@ -133,7 +133,7 @@ describe('Restaurant', () => {
       let restaurant;
       Restaurant.create(name, password, mode, {phoneNumber})
                 .then(_restaurant => restaurant = _restaurant)
-                .then(() => restaurant.addOrUpdateHour(dayOfTheWeek, openTime, closeTime))
+                .then(() => restaurant.addHour(dayOfTheWeek, openTime, closeTime))
                 .then(() => Restaurant.destroy(restaurant.id))
                 .then(() => RestaurantHour.findAll())
                 .then(result => {

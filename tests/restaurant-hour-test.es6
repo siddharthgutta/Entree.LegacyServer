@@ -22,10 +22,10 @@ describe('Restaurant', () => {
     console.log('true');
   }
 
-  describe('#addOrUpdateHours()', () => {
+  describe('#addHours()', () => {
     it('should add and query restaurant hours for a restaurant correctly', done => {
       Restaurant.create(name, password, mode, {phoneNumber})
-        .then(restaurant => restaurant.addOrUpdateHour(dayOfTheWeek, openTime, closeTime))
+        .then(restaurant => restaurant.addHour(dayOfTheWeek, openTime, closeTime))
         .then(hour => {
           assert.equal(hour.dayOfTheWeek, dayOfTheWeek);
           assert.equal(hour.openTime, openTime);
@@ -34,28 +34,12 @@ describe('Restaurant', () => {
         });
     });
 
-    it('should update and query restaurant hours for a restaurant correctly', done => {
-      let restaurant;
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(_restaurant => restaurant = _restaurant)
-        .then(() => restaurant.addOrUpdateHour(dayOfTheWeek, openTime, closeTime))
-        .then(() => restaurant.addOrUpdateHour(dayOfTheWeek, '22:22:22', '33:33:33'))
-        .then(() => restaurant.findHours())
-        .then(hours => {
-          assert.equal(hours.length, 1);
-          assert.equal(hours[0].dayOfTheWeek, dayOfTheWeek);
-          assert.equal(hours[0].openTime, '22:22:22');
-          assert.equal(hours[0].closeTime, '33:33:33');
-          done();
-        });
-    });
-
     it('should support multiple days of the week', done => {
       let restaurant;
       Restaurant.create(name, password, mode, {phoneNumber})
         .then(_restaurant => restaurant = _restaurant)
-        .then(() => restaurant.addOrUpdateHour(dayOfTheWeek, openTime, closeTime))
-        .then(() => restaurant.addOrUpdateHour('Tuesday', openTime, closeTime))
+        .then(() => restaurant.addHour(dayOfTheWeek, openTime, closeTime))
+        .then(() => restaurant.addHour('Tuesday', openTime, closeTime))
         .then(() => restaurant.findHours())
         .then(hours => {
           assert.equal(hours.length, 2);
@@ -66,12 +50,27 @@ describe('Restaurant', () => {
     it('should not create a restaurant hour with null day of the week', async done => {
       const restaurant = await Restaurant.create(name, password, mode, {phoneNumber});
       try {
-        await restaurant.addOrUpdateHour(null, openTime, closeTime);
+        await restaurant.addHour(null, openTime, closeTime);
       } catch (error) {
         return done();
       }
 
       assert(false);
+      done();
+    });
+  });
+
+  describe('#removeHours()', () => {
+    it('should remove restaurant hours correctly', async done => {
+      const restaurant = await Restaurant.create(name, password, mode, {phoneNumber});
+      await restaurant.addHour(dayOfTheWeek, openTime, closeTime);
+      let result = await restaurant.findHours();
+      assert.equal(result.length, 1);
+
+      await restaurant.removeHours(dayOfTheWeek);
+      result = await restaurant.findHours();
+      assert.equal(result.length, 0);
+
       done();
     });
   });
