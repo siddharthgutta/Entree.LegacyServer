@@ -73,15 +73,15 @@ export function parse(slackbot, btSignature, btPayload, test = false) {
             fields.push(Slack.generateField('Merchant Account', `Declined`));
             fields.push(Slack.generateField('Reason Declined', `${webhookNotification.message}`));
             msg += `Merchant Account: Declined\nReason: ${webhookNotification.message}`;
-            reject(new TraceError(webhookNotification.message, {kind: webhookNotification.kind,
-              errors: webhookNotification.errors}));
+            resolve({message: webhookNotification.message, kind: webhookNotification.kind,
+              errors: webhookNotification.errors});
             break;
           default:
             color = test ? color : '#3aa3e3';
             msg += `Notification Type: ${webhookNotification.kind}`;
             fields.push(Slack.generateField('Notification Type', `${webhookNotification.kind}`));
-            reject(new TraceError('Not Implemented Error', {kind: webhookNotification.kind,
-              result: webhookNotification}));
+            resolve({error: 'Not Implemented Error', kind: webhookNotification.kind,
+              result: webhookNotification});
             break;
         }
 
@@ -105,10 +105,10 @@ export function parse(slackbot, btSignature, btPayload, test = false) {
  */
 async function handleParseResult(kind, result) {
   try {
-    const merchantId = result.id;
-    const restaurantId = (await Restaurant.findByMerchantId(merchantId)).id;
     switch (kind) {
       case braintree.WebhookNotification.Kind.SubMerchantAccountApproved:
+        const merchantId = result.id;
+        const restaurantId = (await Restaurant.findByMerchantId(merchantId)).get().id;
         Restaurant.update(restaurantId, {merchantApproved: true});
         break;
       default:
