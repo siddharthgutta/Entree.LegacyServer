@@ -195,6 +195,12 @@ module.exports = grunt => {
       'cordova-build': {
         command: 'npm run cordova-build'
       }
+    },
+    concurrent: {
+      clean: ['clean:build', 'clean:compiled'],
+      build: ['filetransform:babel', 'sass:dist', 'imagemin', 'browserify:dist', 'jade:dist'],
+      'build:production': ['compile', 'sass:dist', 'imagemin', ['browserify:dist', 'uglify:dist'], 'jade:dist'],
+      watch: ['browserify:dev', ['sass:dev', 'watch:sass']]
     }
   };
 
@@ -211,27 +217,15 @@ module.exports = grunt => {
   ]);
 
   grunt.registerTask('build', [
-    'clean:build',
-    'clean:compiled',
-    'filetransform:babel',
+    'concurrent:clean',
     'copy:dist',
-    'sass:dist',
-    'postcss:dist',
-    'browserify:dist',
-    'jade:dist',
+    'concurrent:build',
     'cordova'
   ]);
 
   grunt.registerTask('production', [
-    'clean:compiled',
-    'filetransform:babel',
     'copy:dist',
-    'sass:dist',
-    'imagemin',
-    'postcss:dist',
-    'browserify:dist',
-    'uglify:dist',
-    'jade:dist',
+    'concurrent:build:production',
     'cordova'
   ]);
 
