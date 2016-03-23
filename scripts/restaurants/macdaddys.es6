@@ -24,7 +24,10 @@ const city = 'Austin';
 const addrState = 'TX';
 const zipcode = '78705';
 
-const restaurantName = 'Mac Daddy\'s';
+const percentageFee = 3.5;
+const transactionFee = 30;
+
+const restaurantName = 'macdaddys';
 const restaurantPass = 'mac&cheese';
 
 const hours = [
@@ -184,6 +187,7 @@ async function importMenu() {
   try {
     const restaurant = await Restaurant.create(restaurantName, restaurantPass, Mode.REGULAR);
     restaurantId = restaurant.id;
+    await Restaurant.update(restaurantId, {percentageFee, transactionFee});
     await Promise.each(menu, async menuCategory => {
       const category = await restaurant.insertCategory(menuCategory.category);
       await Promise.each(menuCategory.items, async menuItem => {
@@ -204,7 +208,7 @@ async function importMenu() {
     });
     await restaurant.upsertLocation(address, city, addrState, zipcode);
     await Promise.each(hours, async ({day, open, close}) => {
-      await restaurant.addOrUpdateHour(day, open, close);
+      await restaurant.addHour(day, open, close);
     });
   } catch (err) {
     throw new TraceError('Failed to import menu', err);
