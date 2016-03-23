@@ -35,9 +35,9 @@ export const response = {
   finishItem: 'Please finish selecting your item before doing that',
 
   /* Returned when user checks out with empty cart */
-  invalidCheckout: 'You can\'t checkout with an empty cart. Try typing \"restaurants\" to explore a menu',
+  invalidCheckout: 'You can\'t checkout with an empty cart. Try typing \"/r\" to explore a menu',
 
-  cartClear: 'Your cart has been cleared. Type \"menu\" to view the menu or \"restaurants\" for more restaurants',
+  cartClear: 'Your cart has been cleared. Type \"menu\" to view the menu or \"/r\" for more restaurants',
 
   /* I/O formatting for transition to various states */
   restaurant: {
@@ -71,11 +71,11 @@ export const response = {
   },
 
   help: 'Here are a list of valid commands:\n' +
-  '\"restaurants\" - list restaurants\n' +
+  '\"/r\" - list restaurants\n' +
   '\"@<name>\" - browse restaurant\n' +
   '\"@<name> menu\" - view menu\n' +
   '\"@<name> info\" - view info\n' +
-  '\"help\" - this command\n\n' +
+  '\"/help\" - this command\n\n' +
   'For example, type \"@homeslice info\" for information about homeslice'
 };
 
@@ -250,6 +250,21 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
   }
 
+  _genModFooter(itemMod) {
+    if (itemMod.min === 0) {
+      return `Select up to ${itemMod.max} options by typing in comma separated values (e.g. 0 or 0,2,1) or` +
+        ` \"none\"`;
+    }
+
+    if (itemMod.min < itemMod.max) {
+      return `Select at least ${itemMod.min} and up to ${itemMod.max} options by typing in comma` +
+        ` separated values (e.g. 0 or 0,2,1)`;
+    }
+
+    return `Select exactly ${itemMod.max} ${itemMod.max > 1 ? 'options' : 'option'} by typing in` +
+      ` ${itemMod.max > 1 ? 'comma separated values (e.g. 1,2,4)' : 'a number'}`;
+  }
+
   /**
    * Handles transitions from the items state
    *
@@ -294,16 +309,7 @@ export default class DefaultChatBot extends ChatBotInterface {
         throw new TraceError(`ChatState id ${chatState.id} - Failed to get item mod data when selecting an item`, err);
       }
 
-      let footer;
-      if (firstItemMod.min === 0) {
-        footer = `Select up to ${firstItemMod.max} options by typing in comma separated values (e.g. 0 or 0,2,1) or` +
-          ` \"none\"`;
-      } else if (firstItemMod.min < firstItemMod.max) {
-        footer = `Select at least ${firstItemMod.min} and up to ${firstItemMod.max} options by typing in comma` +
-          ` separated values (e.g. 0 or 0,2,1)`;
-      } else {
-        footer = `Select exactly ${firstItemMod.max} options by in comma separated values (e.g. 0 or 0,2,1)`;
-      }
+      const footer = this._genModFooter(firstItemMod);
 
       try {
         await chatState.updateState(chatStates.mods);
@@ -387,14 +393,22 @@ export default class DefaultChatBot extends ChatBotInterface {
     await Promise.map(mods, async modId => {
       try {
         const mod = await Mod.findOne(modId); // eslint-disable-line
-        nameMods.push(mod.name);
+        // TODO - Find a better way to do this
+        if (mod.name === 'Small' || mod.name === 'Medium' || mod.name === 'Large') {
+          orderItem.name = `${mod.name} ${orderItem.name}`;
+        } else {
+          nameMods.push(mod.name);
+        }
         orderItem.price += mod.addPrice;
       } catch (err) {
         throw new TraceError(`ChatState id ${chatState.id} - Failed to update order item with mods`, err);
       }
     });
 
-    orderItem.name += ` with ${nameMods.join(', ')}`;
+    if (orderItem.name.indexOf('with') === -1) {
+      orderItem.name += ' with';
+    }
+    orderItem.name += ` ${nameMods.join(', ')}`;
 
     try {
       await orderItem.save();
@@ -427,11 +441,13 @@ export default class DefaultChatBot extends ChatBotInterface {
     await chatState.setItemModContext(nextItemMod);
     const mods = await nextItemMod.findMods();
 
+    const footer = this._genModFooter(nextItemMod);
+
     /* Note that we don't update the state here since we have more mods to process */
     return await this._genOutput(
       chatState,
       response.mods.header,
-      response.mods.footer,
+      footer,
       mods,
       response.mods.dataFormat);
   }
@@ -594,7 +610,7 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @private
    */
   _isStateless(input) {
-    return /^restaurants$/.test(input)
+    return /^\/r$/.test(input)
       || /^@[^ ]+$/.test(input)
       || /^@[^ ]+\ menu$/.test(input)
       || /^@.+\ info$/.test(input)
@@ -612,7 +628,7 @@ export default class DefaultChatBot extends ChatBotInterface {
    */
   async _statelessTransition(chatState, input) {
     switch (true) {
-      case /^restaurants$/.test(input):
+      case /^\/r$/.test(input):
         return await this._handleRestaurant(chatState);
       case /^clear$/.test(input):
         return await this._handleClear(chatState);

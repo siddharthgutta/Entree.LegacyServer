@@ -5,7 +5,7 @@
 export default function (sequelize, DataTypes) {
   const Mod = sequelize.define('Mod', {
     name: {
-      type: DataTypes.STRING(16), // eslint-disable-line new-cap,babel/new-cap
+      type: DataTypes.STRING(64), // eslint-disable-line new-cap,babel/new-cap
       allowNull: false
     },
     addPrice: {

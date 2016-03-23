@@ -1,7 +1,7 @@
 export default function (sequelize, DataTypes) {
   const Size = sequelize.define('Size', {
     name: {
-      type: DataTypes.STRING(12), // eslint-disable-line
+      type: DataTypes.STRING(16), // eslint-disable-line
       allowNull: false
     },
     addPrice: {

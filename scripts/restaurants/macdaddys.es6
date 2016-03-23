@@ -211,6 +211,7 @@ async function importMenu() {
       await restaurant.addHour(day, open, close);
     });
   } catch (err) {
+    console.log(err);
     throw new TraceError('Failed to import menu', err);
   }
 }
