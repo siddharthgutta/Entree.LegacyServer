@@ -42,13 +42,13 @@ export const response = {
   /* I/O formatting for transition to various states */
   restaurant: {
     header: '',
-    footer: 'Type \"more\" for more restaurants or type a number to select a restaurant',
+    footer: 'Select the number of a restaurant.',
     dataFormat: (i, data) => `${i}: ${data[i].name}`
   },
 
   categories: {
     header: '',
-    footer: 'Type a number to select a category',
+    footer: 'Select a number to see a category',
     dataFormat: (i, data) => `${i}) ${data[i].name}`
   },
 
@@ -64,7 +64,7 @@ export const response = {
   },
 
   cart: {
-    header: 'Here is your item cart',
+    header: 'Here is your cart',
     footer: 'Type \"checkout\" to pay, \"menu\" to browse the menu, ' +
     'or \"clear\" to clear your entire cart',
     dataFormat: (i, data) => `${i}: ${data[i].name} - $${data[i].price / 100}`

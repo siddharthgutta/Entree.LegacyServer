@@ -15,16 +15,16 @@ import {chatStates} from '../../libs/chat-bot/index.es6';
  */
 function getGreeting(name, firstTime) {
   if (firstTime) {
-    return `Hi, Entrée here. I can help you order ahead at your favorite restaurants. ` +
-      `Type in /r to see where I work. Type in /help at any point if you need help.`;
+    return `Hi, Entrée here. I can help you order ahead, pre-pay, and skip the line at the best food trucks ` +
+      `and restaurants around you! Type in /r to see where I work. You can also type /help at any time for help.`;
   }
   if (name) {
-    return `Welcome back ${name}! I'm here to help you order ahead at your favorite restaurants. ` +
-      'Type in /r to see where I work. Type in /help at any point if you need help.';
+    return `Welcome back ${name}! I can help you order ahead, pre-pay, and skip the line at the best food trucks ` +
+      `and restaurants around you! Type in /r to see where I work. You can also type /help at any time for help.`;
   }
 
-  return `Welcome back! I can help you order ahead at your favorite restaurants. ` +
-  `Type in /r to see where I work. Type in /help at any point if you need help.`;
+  return `Welcome back! I can help you order ahead, pre-pay, and skip the line at the best food trucks and ` +
+    `restaurants around you! Type in /r to see where I work. You can also type /help at any time for help.`;
 }
 
 /**
