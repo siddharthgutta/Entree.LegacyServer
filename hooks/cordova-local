@@ -1,3 +1,4 @@
 #!/usr/bin/env sh
 export NODE_ENV=development
-grunt build || true
+grunt build --force || true
+grunt cordova --force

@@ -107,7 +107,7 @@ sms.on(Twilio.RECEIVED, async text => {
     // TODO export DEVELOPER_NUMBER=+1<your_number>
     // put that into .bashrc or .bash_profile
     if (!forceAllNumbersWithRemote && text.from !== config.get('DeveloperNumber')) {
-      console.tag('api', 'sms', 'ignored-text', {text});
+      console.tag('api', 'sms', 'ignored-text').log({text});
       return;
     }
   }

@@ -2,11 +2,11 @@
   "Client": {
     "Server": {
       "protocol": "https",
+      "hostname": "ENTERPRISE_APP_HOSTNAME",
       "port": {
         "__name": "BRANCHOFF_PORT",
         "__format": "json"
-      },
-      "hostname": "localhost"
+      }
     }
   },
   "UseRemoteSocketServer": {

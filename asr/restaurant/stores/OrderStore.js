@@ -57,8 +57,16 @@ class OrderStore extends Influx.Store {
 
   getDispatcherListeners() {
     return [
-      [Dispatcher, Dispatcher.Events.LOGIN, this._login]
+      [Dispatcher, Dispatcher.Events.LOGIN, this._login],
+      [Dispatcher, Dispatcher.Events.FEEDBACK, this._sendFeedback]
     ];
+  }
+
+  async _sendFeedback(content) {
+    await fetch(`${SERVER_URL}/api/v2/restaurant/feedback`, {
+      method: 'post',
+      body: {content}
+    });
   }
 
   _notify(title, text) {

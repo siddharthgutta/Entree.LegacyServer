@@ -11,8 +11,7 @@
       "socket-master": 2999,
       "socket-test": 2997,
       "socket-shared": 2996,
-      "orders2": 3030,
-      "cordova": 3031
+      "dev": 3030
     }
   },
   "env": {
@@ -21,7 +20,12 @@
       "SOCKET_SERVER_HOSTNAME": "127.0.0.1",
       "SOCKET_SERVER_EXT_HOSTNAME": "textentree.com",
       "SOCKET_SERVER_USE_REMOTE": false,
-      "SOCKET_SERVER_PORT": 2997
+      "SOCKET_SERVER_PORT": 2997,
+      "SSH_OSX_USERNAME": "mkurian",
+      "SSH_OSX_HOSTNAME": "0.tcp.ngrok.io",
+      "SSH_OSX_PORT": "18127",
+      "SSH_OSX_PASSWORD": "teehee",
+      "ENTERPRISE_APP_HOSTNAME": "www.textentree.com"
     },
     "mode": {
       "manual": {
@@ -30,7 +34,8 @@
         "HTTPS_SSL_KEY": "./keys/localhost.key",
         "HTTPS_SSL_CERTIFICATE": "./keys/localhost.crt",
         "HTTPS_SSL_CA": "./keys/localhost.crt",
-        "SOCKET_SERVER_USE_REMOTE": true
+        "SOCKET_SERVER_USE_REMOTE": true,
+        "ENTERPRISE_APP_HOSTNAME": "localhost"
       },
       "stage": {
         "NODE_ENV": "staging",
@@ -51,7 +56,8 @@
       },
       "master#release": {
         "NODE_ENV": "production",
-        "SOCKET_SERVER_PORT": 2998
+        "SOCKET_SERVER_PORT": 2998,
+        "ENTERPRISE_APP_HOSTNAME": "textentree.com"
       }
     }
   },

@@ -1,3 +1,4 @@
 #!/usr/bin/env sh
 export NODE_ENV=production
-grunt production || true
+grunt production --force || true
+grunt cordova --force

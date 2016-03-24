@@ -50,7 +50,7 @@ brew install libpng
 
 # general env setup
 sudo apt-get update
-sudo apt-get -y install git build-essential git ruby libpam0g-dev debconf-utils automake libtool libpng-dev libkrb5-dev
+sudo apt-get -y install git build-essential git ruby libpam0g-dev debconf-utils automake libtool libpng-dev libkrb5-dev sshpass zip unzip
 sudo gem install sass
 
 # node via. nvm

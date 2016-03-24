@@ -1,0 +1,32 @@
+#!/usr/bin/env sh
+
+grunt cordova-prepare --force || true
+
+username=${SSH_OSX_USERNAME}
+hostname=${SSH_OSX_HOSTNAME}
+port=${SSH_OSX_PORT}
+password=${SSH_OSX_PASSWORD}
+dir=$RANDOM
+
+rm -rf ../cordova/build/ || true
+mkdir -p ../cordova/build/
+zip -r ${dir}.zip ../cordova # TODO fix relative path issue
+sshpass -p ${password} scp -o StrictHostKeyChecking=no -P ${port} ${dir}.zip ${username}@${hostname}:~/Github/builds/
+sshpass -p ${password} ssh -o StrictHostKeyChecking=no -p ${port} ${username}@${hostname} "
+        unzip -oq ~/Github/builds/${dir}.zip -d ~/Github/builds/${dir}"
+sshpass -p ${password} ssh -o StrictHostKeyChecking=no -p ${port} ${username}@${hostname} "
+        bash -c \"source ~/.bash_profile
+        security unlock-keychain -p ${password} ~/Library/Keychains/login.keychain
+        cd ~/Github/builds/${dir}/cordova
+        cordova prepare
+        cordova prepare ios
+        cordova prepare android
+        cordova build android
+        cordova build ios --device\""
+sshpass -p ${password} scp -o StrictHostKeyChecking=no -P ${port} ${username}@${hostname}:~/Github/builds/${dir}/cordova/platforms/android/build/outputs/apk/android-debug.apk ../cordova/build/Entree.apk
+sshpass -p ${password} scp -o StrictHostKeyChecking=no -P ${port} ${username}@${hostname}:~/Github/builds/${dir}/cordova/platforms/ios/build/device/Entree.ipa ../cordova/build/Entree.ipa
+rm ${dir}.zip
+
+# # clean up remote: enable once this process is ready
+# ssh -p ${port} ${username}@${hostname} "rm ~/Github/builds/${dir}.zip"
+# ssh -p ${port} ${username}@${hostname} "rm -rf ~/Github/builds/${dir}"

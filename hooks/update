@@ -27,7 +27,12 @@ npm --no-color --no-spin --loglevel=error --cache-min 9999999 install --producti
 ## BUILD SYSTEM
 ###############
 
-grunt production --force --no-color --verbose || true
+if  [[ ${1} != *"stage"* ]]
+then
+grunt production --force --no-color || true
+else
+grunt build --force --no-color || true
+fi
 
 ## APP RELEASES
 ################
@@ -35,8 +40,15 @@ grunt production --force --no-color --verbose || true
 message=$(git log -1 --pretty=%B)
 branch=$(git symbolic-ref --short HEAD)
 
-if [[ ${message} == *"release"* || ${message} == *"RELEASE"* ]] && [[ ${1} != *"stage"* ]]
+if [[ ${message} == *"--release"* ]] && [[ ${1} != *"stage"* ]]
 then
+
+grunt cordova-prepare --force
+
+## BUILD ON MAC
+################
+. ./cordova-ec2-build
+
 # push ios release
 ios_raw=$(curl https://api.tryouts.io/v1/applications/NCKHE4E1/releases/ \
     -F "build=@../cordova/build/Entree.ipa" \
@@ -47,7 +59,7 @@ ios_raw=$(curl https://api.tryouts.io/v1/applications/NCKHE4E1/releases/ \
 
 # push android release
 android_raw=$(curl https://api.tryouts.io/v1/applications/6A6cacUG/releases/ \
-    -F "build=@../cordova/build/android-debug.apk" \
+    -F "build=@../cordova/build/Entree.apk" \
     -F "notes=$message" \
     -F "notify=1" \
     -F "status=2" \

@@ -62,11 +62,11 @@ xcuserdata
 public/
 www/
 
-cordova/hooks/
-cordova/www/
-cordova/platforms/
-cordova/plugins/
+# Mac
+.DS_Store
 
-Android/bin/
-Android/gen/
-Android/assets/
+cordova/build
+cordova/platforms
+cordova/plugins
+cordova/www
+# iOS
