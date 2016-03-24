@@ -1,38 +1,30 @@
 #!/usr/bin/env sh
 
+## NPM SETUP
+############
+
+# remove caches
+rm -rf /tmp/npm-*
+
+# create shared node_modules folder if it doesn't exist
+mkdir -p ../../node_modules
+
+# remove node_modules
+if [[ -L "../node_modules" && -d "../node_modules" ]]
+then
+    unlink ../node_modules || true
+else
+    rm -rf ../node_modules || true
+fi
+
+ln -s ../node_modules ../node_modules # relative location
+
 npm set progress=false
 
 # for default npm installer
 npm --no-color --no-spin --loglevel=error --cache-min 9999999 install --production
 
-grunt production --no-color --verbose || true
+## BUILD SYSTEM
+###############
 
-message=$(git log -1 --pretty=%B)
-branch=$(git symbolic-ref --short HEAD)
-
-if [[ ${message} == *"release"* || ${message} == *"RELEASE"* ]] && [[ ${1} != *"stage"* ]]
-then
-# push ios release
-ios_raw=$(curl https://api.tryouts.io/v1/applications/NCKHE4E1/releases/ \
-    -F "build=@./cordova/build/Entree.ipa" \
-    -F "notes=$message" \
-    -F "notify=1" \
-    -F "status=2" \
-    -H "Authorization: b0fbf0eb2c9fded09aefdcf2eeff759c:73da365b26d0ff39f865f285012538fa69d8405e")
-
-# push android release
-android_raw=$(curl https://api.tryouts.io/v1/applications/6A6cacUG/releases/ \
-    -F "build=@./cordova/build/android-debug.apk" \
-    -F "notes=$message" \
-    -F "notify=1" \
-    -F "status=2" \
-    -H "Authorization: b0fbf0eb2c9fded09aefdcf2eeff759c:73da365b26d0ff39f865f285012538fa69d8405e")
-
-ios_url=$(echo ${ios_raw} | sed 's/.*"download_url": "\(.*\)", "size".*/\1/p')
-android_url=$(echo ${android_raw} | sed 's/.*"download_url": "\(.*\)", "size".*/\1/p')
-
-payload=$(echo "{\"channel\":\"#continous3\",\"text\":\"*$branch*\n\`\`\`$message\`\`\`\n*iOS*\n$ios_url\n*Android*\n$android_url\"}")
-
-curl -X POST -H 'Content-type: application/json' --data "$payload" https://hooks.slack.com/services/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
-
-fi
+grunt production --force --no-color --verbose || true

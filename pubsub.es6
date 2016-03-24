@@ -1,4 +1,4 @@
-import * as PubSub from 'node-pubsub';
+import * as PubSub from 'cluster-pubsub';
 import config from 'config';
 
 const debug = true;

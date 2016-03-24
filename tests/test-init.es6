@@ -1,7 +1,7 @@
 import path from 'path';
 import stack from 'callsite';
 import config from 'config';
-import * as PubSub from 'node-pubsub';
+import * as PubSub from 'cluster-pubsub';
 
 global.TEST = path.basename(stack()[7].getFileName());
 
