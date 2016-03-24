@@ -11,7 +11,7 @@ const admins = config.get('Admins');
 const forceLocalStrategy = false;
 // Flipping this to false means it will ignore all messages
 // if the text is not sent from the DEVELOPER_NUMBER
-const forceAllNumbersWithRemote = false; // FIXME temp solution
+const forceAllNumbersWithRemote = false;
 
 /**
  * Purpose of this API is to handle everything SMS. All incoming and sent
