@@ -34,7 +34,12 @@ export async function init(clearAll = false) {
       }
     }
 
-    /* TODO - Need to fix this */
+    /* TODO - Need to fix this
+    * Why this is required - Our api/ files that abstract the database should return pure JSON objects (Matthew
+    * understands the reasoning behind this the best). The problem is that when you call toJSON(), it strips away
+    * all of the attributes that Sequelize uses for its operations. Defining the resolve() method allows us to go
+    * from a plain JSON object back to the object defined by sequelize
+    * */
     const _toJSON = SequelizeClass.prototype.toJSON;
     SequelizeClass.prototype.toJSON = function () {
       const _obj = _toJSON.call(this);

@@ -562,7 +562,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       restaurant = await chatState.findRestaurantContext();
       user = await chatState.findUser();
     } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to find order information`, err);
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to find user or restaurant for an order`, err);
     }
 
     // transform for order to support orders
