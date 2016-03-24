@@ -35,9 +35,9 @@ export const response = {
   finishItem: 'Please finish selecting your item before doing that',
 
   /* Returned when user checks out with empty cart */
-  invalidCheckout: 'You can\'t checkout with an empty cart. Try typing \"restaurants\" to explore a menu',
+  invalidCheckout: 'You can\'t checkout with an empty cart. Try typing \"/r\" to see restaurants to choose from',
 
-  cartClear: 'Your cart has been cleared. Type \"menu\" to view the menu or \"restaurants\" for more restaurants',
+  cartClear: 'Your cart has been cleared. Type \"menu\" to view the menu or \"/r\" for more restaurants',
 
   /* I/O formatting for transition to various states */
   restaurant: {
@@ -71,11 +71,11 @@ export const response = {
   },
 
   help: 'Here are a list of valid commands:\n' +
-  '\"restaurants\" - list restaurants\n' +
+  '\"/r\" - list restaurants\n' +
   '\"@<name>\" - browse restaurant\n' +
   '\"@<name> menu\" - view menu\n' +
   '\"@<name> info\" - view info\n' +
-  '\"help\" - this command\n\n' +
+  '\"/help\" - this command\n\n' +
   'For example, type \"@homeslice info\" for information about homeslice'
 };
 
@@ -250,6 +250,21 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
   }
 
+  _genModFooter(itemMod) {
+    if (itemMod.min === 0) {
+      return `Select up to ${itemMod.max} options by typing in comma separated values (e.g. 0 or 0,2,1) or` +
+        ` \"none\"`;
+    }
+
+    if (itemMod.min < itemMod.max) {
+      return `Select at least ${itemMod.min} and up to ${itemMod.max} options by typing in comma` +
+        ` separated values (e.g. 0 or 0,2,1)`;
+    }
+
+    return `Select exactly ${itemMod.max} ${itemMod.max > 1 ? 'options' : 'option'} by typing in` +
+      ` ${itemMod.max > 1 ? 'comma separated values (e.g. 1,2,4)' : 'a number'}`;
+  }
+
   /**
    * Handles transitions from the items state
    *
@@ -294,16 +309,7 @@ export default class DefaultChatBot extends ChatBotInterface {
         throw new TraceError(`ChatState id ${chatState.id} - Failed to get item mod data when selecting an item`, err);
       }
 
-      let footer;
-      if (firstItemMod.min === 0) {
-        footer = `Select up to ${firstItemMod.max} options by typing in comma separated values (e.g. 0 or 0,2,1) or` +
-          ` \"none\"`;
-      } else if (firstItemMod.min < firstItemMod.max) {
-        footer = `Select at least ${firstItemMod.min} and up to ${firstItemMod.max} options by typing in comma` +
-          ` separated values (e.g. 0 or 0,2,1)`;
-      } else {
-        footer = `Select exactly ${firstItemMod.max} options by in comma separated values (e.g. 0 or 0,2,1)`;
-      }
+      const footer = this._genModFooter(firstItemMod);
 
       try {
         await chatState.updateState(chatStates.mods);
@@ -387,14 +393,24 @@ export default class DefaultChatBot extends ChatBotInterface {
     await Promise.map(mods, async modId => {
       try {
         const mod = await Mod.findOne(modId); // eslint-disable-line
-        nameMods.push(mod.name);
+        // TODO - Find a better way to do this
+        const _itemMod = await mod.findItemMod();
+        if (_itemMod.name === 'Size') {
+          orderItem.name = `${mod.name} ${orderItem.name}`;
+        } else {
+          nameMods.push(mod.name);
+        }
         orderItem.price += mod.addPrice;
       } catch (err) {
         throw new TraceError(`ChatState id ${chatState.id} - Failed to update order item with mods`, err);
       }
     });
 
-    orderItem.name += ` with ${nameMods.join(', ')}`;
+    if (orderItem.name.indexOf('with') === -1 && nameMods.length > 0) {
+      orderItem.name += ' with';
+    }
+
+    orderItem.name += ` ${nameMods.join(', ')}`;
 
     try {
       await orderItem.save();
@@ -427,11 +443,13 @@ export default class DefaultChatBot extends ChatBotInterface {
     await chatState.setItemModContext(nextItemMod);
     const mods = await nextItemMod.findMods();
 
+    const footer = this._genModFooter(nextItemMod);
+
     /* Note that we don't update the state here since we have more mods to process */
     return await this._genOutput(
       chatState,
       response.mods.header,
-      response.mods.footer,
+      footer,
       mods,
       response.mods.dataFormat);
   }
@@ -539,15 +557,24 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
 
 
-    const restaurant = await chatState.findRestaurantContext();
-    const user = await chatState.findUser();
+    let restaurant, user;
+    try {
+      restaurant = await chatState.findRestaurantContext();
+      user = await chatState.findUser();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to find user or restaurant for an order`, err);
+    }
 
     // transform for order to support orders
     const items = orderItems.map(({name, price}) => ({name, price, quantity: 1}));
-    const order = await Order.createOrder(user.id, restaurant.id, items);
-    const {id: orderId} = order;
+    let order;
 
-    await chatState.setOrderContext(order);
+    try {
+      order = await Order.createOrder(user.id, restaurant.id, items);
+      await chatState.setOrderContext(order.resolve());
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to create order and set the context`, err);
+    }
 
     /* TODO -- transfer order items over to permanent order object
      * what should I return for the payment processing? */
@@ -557,7 +584,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     } catch (defaultPaymentError) {
       console.tag('chatbot').log('No default payment found. Sending user to signup2.');
       const secret = await User.requestProfileEdit(user.id);
-      const url = await User.resolveProfileEditAddress(secret);
+      const url = await User.resolveProfileEditAddress(secret.secret);
 
       // TODO @jesse handle state transitions as needed!
       return `To complete your order and pay, please go to ${url}`;
@@ -565,14 +592,18 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     try {
       const {id: transactionId} = await Payment.paymentWithToken(user.id, restaurant.id, defaultPayment, total);
-      await Order.setOrderStatus(orderId, Order.Status.RECEIVED_PAYMENT, {transactionId});
+      await Order.setOrderStatus(order.id, Order.Status.RECEIVED_PAYMENT, {transactionId});
     } catch (paymentWithTokenError) {
       console.tag('chatbot').error('Payment failed although customer default payment exists', paymentWithTokenError);
       throw new TraceError('Payment failed although customer default payment exists', paymentWithTokenError);
     }
 
-    await chatState.clearOrderItems();
-    await chatState.updateState(chatStates.start);
+    try {
+      await chatState.clearOrderItems();
+      await chatState.updateState(chatStates.start);
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chat bot metadata`, err);
+    }
     /* Slice to remove trailing comma and whitespcae */
     return `Your order using ${defaultPayment.cardType} - ${defaultPayment.last4} has been sent to the restaurant. ` +
       `We'll text you once it's confirmed by the restaurant`;
@@ -594,7 +625,7 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @private
    */
   _isStateless(input) {
-    return /^restaurants$/.test(input)
+    return /^\/r$/.test(input)
       || /^@[^ ]+$/.test(input)
       || /^@[^ ]+\ menu$/.test(input)
       || /^@.+\ info$/.test(input)
@@ -612,7 +643,7 @@ export default class DefaultChatBot extends ChatBotInterface {
    */
   async _statelessTransition(chatState, input) {
     switch (true) {
-      case /^restaurants$/.test(input):
+      case /^\/r$/.test(input):
         return await this._handleRestaurant(chatState);
       case /^clear$/.test(input):
         return await this._handleClear(chatState);

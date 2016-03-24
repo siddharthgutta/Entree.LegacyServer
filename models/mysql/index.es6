@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import Sequelize from 'sequelize';
 import config from 'config';
+import SequelizeClass from 'sequelize/lib/instance';
 
 const db = Object.create(null);
 const mysqlConfig = config.get('MySQL');
@@ -32,6 +33,28 @@ export async function init(clearAll = false) {
         db[modelName].associate(db);
       }
     }
+
+    /* TODO - Need to fix this
+    * Why this is required - Our api/ files that abstract the database should return pure JSON objects (Matthew
+    * understands the reasoning behind this the best). The problem is that when you call toJSON(), it strips away
+    * all of the attributes that Sequelize uses for its operations. Defining the resolve() method allows us to go
+    * from a plain JSON object back to the object defined by sequelize
+    * */
+    const _toJSON = SequelizeClass.prototype.toJSON;
+    SequelizeClass.prototype.toJSON = function () {
+      const _obj = _toJSON.call(this);
+      Object.defineProperty(_obj, 'resolve', {
+        configurable: true,
+        value: () => this,
+        enumerable: false
+      });
+
+      return _obj;
+    };
+
+    SequelizeClass.prototype.resolve = function () {
+      return this;
+    };
 
     db.sequelize = sequelize;
     db.transact = sequelize.transaction.bind(sequelize); // using shortname for scope fix in eslint

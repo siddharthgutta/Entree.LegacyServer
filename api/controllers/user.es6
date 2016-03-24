@@ -14,23 +14,17 @@ import {chatStates} from '../../libs/chat-bot/index.es6';
  * @returns {string}: Returns greeting message
  */
 function getGreeting(name, firstTime) {
-  if (false) {
-    if (firstTime && name) {
-      return `Hi ${name}, Entrée here. I can help you order ahead at your favorite restaurants. ' +
-      'Type in /r to see where I work. Type in /help at any point if you need help.`;
-    } else if (firstTime && !name) {
-      return 'Entrée helps you order ahead and cut the line at the best food trucks around you. ' +
-        'We are currently in closed beta but will notify you as soon as we launch!';
-    } else if (!firstTime && name) {
-      return `Welcome back ${name}! I'm here to help you order ahead at your favorite restaurants. ` +
-        'Type in /r to see where I work. Type in /help at any point if you need help.';
-    }
-    return 'Entrée helps you order ahead and cut the line at the best food trucks around you. ' +
-      'We are currently in closed beta but will notify you as soon as we launch!';
+  if (firstTime) {
+    return `Hi, Entrée here. I can help you order ahead at your favorite restaurants. ` +
+      `Type in /r to see where I work. Type in /help at any point if you need help.`;
+  }
+  if (name) {
+    return `Welcome back ${name}! I'm here to help you order ahead at your favorite restaurants. ` +
+      'Type in /r to see where I work. Type in /help at any point if you need help.';
   }
 
-  return ['Thanks for signing up! Entree lets you text to order ahead, pre-pay, and skip the line at the best food',
-    'trucks around you. We are launching during SXSW and will notify you when we’re ready!'].join(' ');
+  return `Welcome back! I can help you order ahead at your favorite restaurants. ` +
+  `Type in /r to see where I work. Type in /help at any point if you need help.`;
 }
 
 /**

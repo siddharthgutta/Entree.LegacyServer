@@ -1,6 +1,8 @@
 import assert from 'assert';
 import {clearDatabase, disconnectDatabase} from './test-init.es6';
 import * as User from '../api/user.es6';
+import * as Order from '../api/controllers/order.es6';
+import * as Restaurant from '../api/controllers/restaurant.es6';
 
 beforeEach(done => {
   clearDatabase()
@@ -163,6 +165,34 @@ describe('ChatState', () => {
             assert.equal(result.length, 0);
             done();
           });
+    });
+  });
+
+  describe('#setOrderContext()', () => {
+    it('should set the order context correctly', async () => {
+      const restaurant = await Restaurant.RestaurantModel.create('Rest1', 'test', Restaurant.RestaurantModel.Mode.GOD);
+      const user = await User.create(phoneNumber, name, email);
+      const chatState = await user.insertChatState(state);
+      const order1 = await Order.createOrder(user.id, restaurant.id, [
+        {
+          name: 'Democrat',
+          price: 6.50,
+          quantity: 1,
+          description: 'good drink'
+        }, {
+          name: 'Republican',
+          price: 7.38,
+          quantity: 2,
+          description: 'great drink'
+        }, {
+          name: 'Fountain Drink',
+          price: 1.05,
+          quantity: 2,
+          description: 'great drink'
+        }
+      ]);
+
+      await chatState.setOrderContext(order1.resolve());
     });
   });
 });

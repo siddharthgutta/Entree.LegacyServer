@@ -122,8 +122,8 @@ describe('ChatBot', () => {
       done();
     });
 
-    it('should change to the restaurant state after typing \"restaurants\"', async done => {
-      await bot.updateState(phoneNumber, `restaurants`);
+    it('should change to the restaurant state after typing \"/r\"', async done => {
+      await bot.updateState(phoneNumber, `/r`);
       await checkState(chatStates.restaurants);
       await checkContext(null, null);
       done();
@@ -192,7 +192,7 @@ describe('ChatBot', () => {
     beforeEach(done => {
       User.create(phoneNumber, name, email)
         .then(user => user.insertChatState(chatStates.start))
-        .then(() => bot.updateState(phoneNumber, 'restaurants'))
+        .then(() => bot.updateState(phoneNumber, '/r'))
         .then(() => done());
     });
 
@@ -317,6 +317,13 @@ describe('ChatBot', () => {
     it('should switch to the categories state using menu command', async done => {
       await bot.updateState(phoneNumber, 'menu');
       await checkState(chatStates.categories);
+      await checkContext(restaurantName, null);
+      done();
+    });
+
+    it('should not change states using the /info command', async done => {
+      await bot.updateState(phoneNumber, '/info');
+      await checkState(chatStates.items);
       await checkContext(restaurantName, null);
       done();
     });
@@ -458,7 +465,7 @@ describe('ChatBot', () => {
 
   describe('#_isStateless()', () => {
     it('should determine the correct commands to be stateless commands', done => {
-      assert.equal(bot._isStateless('restaurants'), true);
+      assert.equal(bot._isStateless('/r'), true);
       assert.equal(bot._isStateless('clear'), true);
       assert.equal(bot._isStateless('/help'), true);
       assert.equal(bot._isStateless('@name'), true);
