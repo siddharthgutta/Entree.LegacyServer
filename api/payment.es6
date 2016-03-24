@@ -104,19 +104,22 @@ export function parse(slackbot, btSignature, btPayload, test = false) {
  * @returns {Promise}: result of parsing the message
  */
 async function handleParseResult(kind, result) {
-  try {
-    switch (kind) {
-      case braintree.WebhookNotification.Kind.SubMerchantAccountApproved:
-        const merchantId = result.id;
-        const restaurantId = (await Restaurant.findByMerchantId(merchantId)).get().id;
-        Restaurant.update(restaurantId, {merchantApproved: true});
-        break;
-      default:
-        // Future Implementations of other Parse Result cases here
-        break;
-    }
-  } catch (err) {
-    throw new TraceError('Could not Parse Result', err);
+  switch (kind) {
+    case braintree.WebhookNotification.Kind.SubMerchantAccountApproved:
+      // Requiring an existing restaurant for a merchantId if in production mode
+      if (productionOrSandbox) {
+        try {
+          const merchantId = result.id;
+          const restaurantId = (await Restaurant.findByMerchantId(merchantId)).get().id;
+          await Restaurant.update(restaurantId, {merchantApproved: true});
+        } catch (err) {
+          throw new TraceError('Could not update merchant to be approved by merchantId', err);
+        }
+      }
+      break;
+    default:
+      // Future Implementations of other Parse Result cases here
+      break;
   }
 }
 
