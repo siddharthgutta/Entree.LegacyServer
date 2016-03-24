@@ -43,31 +43,31 @@ export const response = {
   restaurant: {
     header: '',
     footer: 'Select the number of a restaurant.',
-    dataFormat: (i, data) => `${i}: ${data[i].name}`
+    dataFormat: (i, data) => `${i + 1}: ${data[i].name}`
   },
 
   categories: {
     header: '',
     footer: 'Select a number to see a category',
-    dataFormat: (i, data) => `${i}) ${data[i].name}`
+    dataFormat: (i, data) => `${i + 1}) ${data[i].name}`
   },
 
   items: {
     header: `Here are items from `,
     footer: 'Type a number to select an item, or type \"menu\" to see the entire menu',
-    dataFormat: (i, data) => `${i}) ${data[i].name} - $${data[i].basePrice / 100}`
+    dataFormat: (i, data) => `${i + 1}) ${data[i].name} - $${data[i].basePrice / 100}`
   },
 
   mods: {
     header: 'Here are the available item modifications',
-    dataFormat: (i, data) => `${i}: ${data[i].name} +$${data[i].addPrice / 100}`
+    dataFormat: (i, data) => `${i + 1}: ${data[i].name} +$${data[i].addPrice / 100}`
   },
 
   cart: {
     header: 'Here is your cart',
     footer: 'Type \"checkout\" to pay, \"menu\" to browse the menu, ' +
     'or \"clear\" to clear your entire cart',
-    dataFormat: (i, data) => `${i}: ${data[i].name} - $${data[i].price / 100}`
+    dataFormat: (i, data) => `${i + 1}: ${data[i].name} - $${data[i].price / 100}`
   },
 
   help: 'Here is a list of commands:\n' +
@@ -252,13 +252,13 @@ export default class DefaultChatBot extends ChatBotInterface {
 
   _genModFooter(itemMod) {
     if (itemMod.min === 0) {
-      return `Select up to ${itemMod.max} options by typing in comma separated values (e.g. 0 or 0,2,1) or` +
+      return `Select up to ${itemMod.max} options by typing in comma separated values (e.g. 1 or 1,3,2) or` +
         ` \"none\"`;
     }
 
     if (itemMod.min < itemMod.max) {
       return `Select at least ${itemMod.min} and up to ${itemMod.max} options by typing in comma` +
-        ` separated values (e.g. 0 or 0,2,1)`;
+        ` separated values (e.g. 1 or 1,3,2)`;
     }
 
     return `Select exactly ${itemMod.max} ${itemMod.max > 1 ? 'options' : 'option'} by typing in` +
@@ -812,7 +812,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       let output = `${header}\n\n`;
 
       for (let i = 0; i < data.length; i++) {
-        await chatState.insertCommandMap(i, data[i].id); // eslint-disable-line
+        await chatState.insertCommandMap(i + 1, data[i].id); // eslint-disable-line
         output += `${dataFunc(i, data)}\n`;
       }
       return `${output}\n${footer}`;
