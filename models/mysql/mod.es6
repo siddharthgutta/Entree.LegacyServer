@@ -16,6 +16,11 @@ export default function (sequelize, DataTypes) {
       }
     }
   }, {
+    instanceMethods: {
+      findItemMod: async function () { // eslint-disable-line
+        return await this.getItemMod();
+      }
+    },
     classMethods: {
       associate: db => {
         Mod.belongsTo(db.ItemMod, {

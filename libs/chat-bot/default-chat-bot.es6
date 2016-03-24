@@ -35,7 +35,7 @@ export const response = {
   finishItem: 'Please finish selecting your item before doing that',
 
   /* Returned when user checks out with empty cart */
-  invalidCheckout: 'You can\'t checkout with an empty cart. Try typing \"/r\" to explore a menu',
+  invalidCheckout: 'You can\'t checkout with an empty cart. Try typing \"/r\" to see restaurants to choose from',
 
   cartClear: 'Your cart has been cleared. Type \"menu\" to view the menu or \"/r\" for more restaurants',
 
@@ -394,7 +394,8 @@ export default class DefaultChatBot extends ChatBotInterface {
       try {
         const mod = await Mod.findOne(modId); // eslint-disable-line
         // TODO - Find a better way to do this
-        if (mod.name === 'Small' || mod.name === 'Medium' || mod.name === 'Large') {
+        const itemMod = await mod.findItemMod();
+        if (itemMod.name === 'Size') {
           orderItem.name = `${mod.name} ${orderItem.name}`;
         } else {
           nameMods.push(mod.name);
@@ -405,9 +406,10 @@ export default class DefaultChatBot extends ChatBotInterface {
       }
     });
 
-    if (orderItem.name.indexOf('with') === -1) {
+    if (orderItem.name.indexOf('with') === -1 && nameMods.length > 0) {
       orderItem.name += ' with';
     }
+
     orderItem.name += ` ${nameMods.join(', ')}`;
 
     try {
@@ -555,15 +557,24 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
 
 
-    const restaurant = await chatState.findRestaurantContext();
-    const user = await chatState.findUser();
+    let restaurant, user;
+    try {
+      restaurant = await chatState.findRestaurantContext();
+      user = await chatState.findUser();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to find order information`, err);
+    }
 
     // transform for order to support orders
     const items = orderItems.map(({name, price}) => ({name, price, quantity: 1}));
-    const order = await Order.createOrder(user.id, restaurant.id, items);
-    const {id: orderId} = order;
-
-    await chatState.setOrderContext(order);
+    let order;
+    try {
+      order = await Order.createOrder(user.id, restaurant.id, items);
+      const {id: orderId} = order;
+      await chatState.setOrderContext(order);
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to create order and set the context`, err);
+    }
 
     /* TODO -- transfer order items over to permanent order object
      * what should I return for the payment processing? */
@@ -587,8 +598,12 @@ export default class DefaultChatBot extends ChatBotInterface {
       throw new TraceError('Payment failed although customer default payment exists', paymentWithTokenError);
     }
 
-    await chatState.clearOrderItems();
-    await chatState.updateState(chatStates.start);
+    try {
+      await chatState.clearOrderItems();
+      await chatState.updateState(chatStates.start);
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chat bot metadata`, err);
+    }
     /* Slice to remove trailing comma and whitespcae */
     return `Your order using ${defaultPayment.cardType} - ${defaultPayment.last4} has been sent to the restaurant. ` +
       `We'll text you once it's confirmed by the restaurant`;
