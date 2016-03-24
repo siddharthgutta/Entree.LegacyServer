@@ -197,7 +197,7 @@ describe('ChatBot', () => {
     });
 
     it('should change to items state when selecting a restaurant', async done => {
-      await bot.updateState(phoneNumber, '0');
+      await bot.updateState(phoneNumber, '1');
       await checkState(chatStates.items);
       await checkContext(restaurantName, null);
 
@@ -233,7 +233,7 @@ describe('ChatBot', () => {
     });
 
     it('should change to items state when selecting a category', async done => {
-      await bot.updateState(phoneNumber, '0');
+      await bot.updateState(phoneNumber, '1');
       await checkState(chatStates.items);
       await checkContext(restaurantName, null);
 
@@ -296,7 +296,7 @@ describe('ChatBot', () => {
     });
 
     it('should change to mods state if there is a mod', async done => {
-      await bot.updateState(phoneNumber, '0');
+      await bot.updateState(phoneNumber, '1');
 
       await checkState(chatStates.mods);
       await checkContext(restaurantName, menuItemName);
@@ -307,7 +307,7 @@ describe('ChatBot', () => {
     it('item select should change to cart state if no size and there are mods', async done => {
       await destroyMods();
 
-      await bot.updateState(phoneNumber, '0');
+      await bot.updateState(phoneNumber, '1');
       await checkState(chatStates.cart);
       await checkContext(restaurantName, null);
 
@@ -350,13 +350,13 @@ describe('ChatBot', () => {
       User.create(phoneNumber, name, email)
         .then(user => user.insertChatState(chatStates.start))
         .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
-        .then(() => bot.updateState(phoneNumber, '0'))
+        .then(() => bot.updateState(phoneNumber, '1'))
         .then(() => done());
     });
 
     it('should change state to the cart state after selecting mods', async done => {
-      await bot.updateState(phoneNumber, '0');
-      await bot.updateState(phoneNumber, '0');
+      await bot.updateState(phoneNumber, '1');
+      await bot.updateState(phoneNumber, '1');
       await checkState(chatStates.cart);
       await checkContext(restaurantName, null);
 
@@ -403,9 +403,9 @@ describe('ChatBot', () => {
       User.create(phoneNumber, name, email)
         .then(user => user.insertChatState(chatStates.start))
         .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
-        .then(() => bot.updateState(phoneNumber, '0'))
-        .then(() => bot.updateState(phoneNumber, '0'))
-        .then(() => bot.updateState(phoneNumber, '0'))
+        .then(() => bot.updateState(phoneNumber, '1'))
+        .then(() => bot.updateState(phoneNumber, '1'))
+        .then(() => bot.updateState(phoneNumber, '1'))
         .then(() => done());
     });
 
