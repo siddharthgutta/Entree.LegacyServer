@@ -41,7 +41,7 @@ export const response = {
 
   /* I/O formatting for transition to various states */
   restaurant: {
-    header: '',
+    header: 'Here are the restaurants we work at.',
     footer: 'Select the number of a restaurant.',
     dataFormat: (i, data) => `${i}: ${data[i].name}`
   },
