@@ -61,8 +61,6 @@ async function processReceive(text) {
   const success = !!status;
 
   try {
-    // TODO Core logic here, we can extract to a core engine class
-    // TODO @jesse restaurant number before processing it?
     // we need to store messages for sure
     // if message.create fails, we know that another instance
     await Message.create(phoneNumber, 0, content, date, id, twilioNumber, sentByUser, success);

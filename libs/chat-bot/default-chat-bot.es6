@@ -99,6 +99,12 @@ export default class DefaultChatBot extends ChatBotInterface {
     let user, chatState;
     try {
       user = await User.UserModel.findOneByPhoneNumber(phoneNumber);
+      if (!user) {
+        await User.signup(phoneNumber);
+
+        /* TODO @Jadesym - Move signup into chatbot. User.signup() will text the user the initial message */
+        return null;
+      }
       chatState = await user.findChatState();
     } catch (err) {
       throw new TraceError(`Could not find user ChatState info for user ${phoneNumber}`, err);
