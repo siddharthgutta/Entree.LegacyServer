@@ -21,7 +21,11 @@ Emitter.on(Events.TEXT_RECEIVED, async text => {
 
   try {
     const response = await chatBot.updateState(text.from, text.body);
-    await sendSMS(text.from, response);
+
+    /* TODO @Jadesym - move into chatbot. Only reason response is null is if the user isn't signed up*/
+    if (response) {
+      await sendSMS(text.from, response);
+    }
   } catch (err) {
     console.tag('dispatcher', 'TEXT_RECEIVED').error(err);
 
