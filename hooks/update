@@ -1,11 +1,36 @@
 #!/usr/bin/env sh
 
+## NPM SETUP
+############
+
+# remove caches
+rm -rf /tmp/npm-*
+
+# create shared node_modules folder if it doesn't exist
+mkdir -p ../../node_modules
+
+# remove node_modules
+if [[ -L "../node_modules" && -d "../node_modules" ]]
+then
+    unlink ../node_modules || true
+else
+    rm -rf ../node_modules || true
+fi
+
+ln -s ../node_modules ../node_modules # relative location
+
 npm set progress=false
 
 # for default npm installer
 npm --no-color --no-spin --loglevel=error --cache-min 9999999 install --production
 
+## BUILD SYSTEM
+###############
+
 grunt production --force --no-color --verbose || true
+
+## APP RELEASES
+################
 
 message=$(git log -1 --pretty=%B)
 branch=$(git symbolic-ref --short HEAD)

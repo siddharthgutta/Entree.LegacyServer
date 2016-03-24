@@ -1,4 +1,4 @@
-import {Slave} from 'node-pubsub';
+import {Slave} from 'cluster-pubsub';
 import config from 'config';
 import * as Runtime from '../runtime.es6';
 import Promise from 'bluebird';
