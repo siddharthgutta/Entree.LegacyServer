@@ -70,13 +70,13 @@ export const response = {
     dataFormat: (i, data) => `${i}: ${data[i].name} - $${data[i].price / 100}`
   },
 
-  help: 'Here are a list of valid commands:\n' +
-  '\"/r\" - list restaurants\n' +
-  '\"@<name>\" - browse restaurant\n' +
-  '\"@<name> menu\" - view menu\n' +
-  '\"@<name> info\" - view info\n' +
-  '\"/help\" - this command\n\n' +
-  'For example, type \"@homeslice info\" for information about homeslice'
+  help: 'Here is a list of commands:\n' +
+  '\"/r\" - lists restaurants\n' +
+  '\"@<restaurant name>\" - view restaurant\n' +
+  '\"@<restaurant name> menu\" - view menu\n' +
+  '\"@<restaurant name> info\" - view hours and restaurant information\n' +
+  '\"/help\" - view list of valid commands\n\n' +
+  'For example, type \"@macdaddys info\" for information about macdaddys'
 };
 
 export default class DefaultChatBot extends ChatBotInterface {
