@@ -89,7 +89,7 @@ const menu = [
         name: 'Sautéed Jalapeno',
         price: 100
       }, {
-        name: 'Extra Panko Crush',
+        name: 'Extra Panko Crust',
         price: 100
       }, {
         name: 'Zucchini',
@@ -160,7 +160,7 @@ const merchant = {
   individual: {
     firstName: Runtime.isProduction() ? 'Christoph' : braintree.Test.MerchantAccountTest.Approve,
     lastName: 'Terrell',
-    email: '	papastoph@hotmail.com',
+    email: 'papastoph@hotmail.com',
     phone: '4698792973',
     dateOfBirth: '1975-05-08',
     address: {

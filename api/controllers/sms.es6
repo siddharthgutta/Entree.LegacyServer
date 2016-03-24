@@ -9,7 +9,9 @@ import Emitter, {Events} from '../events/index.es6';
 
 const admins = config.get('Admins');
 const forceLocalStrategy = false;
-const forceAllNumbersWithRemote = true; // FIXME temp solution
+// Flipping this to false means it will ignore all messages
+// if the text is not sent from the DEVELOPER_NUMBER
+const forceAllNumbersWithRemote = false; // FIXME temp solution
 
 /**
  * Purpose of this API is to handle everything SMS. All incoming and sent
