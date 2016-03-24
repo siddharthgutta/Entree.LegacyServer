@@ -394,8 +394,8 @@ export default class DefaultChatBot extends ChatBotInterface {
       try {
         const mod = await Mod.findOne(modId); // eslint-disable-line
         // TODO - Find a better way to do this
-        const itemMod = await mod.findItemMod();
-        if (itemMod.name === 'Size') {
+        const _itemMod = await mod.findItemMod();
+        if (_itemMod.name === 'Size') {
           orderItem.name = `${mod.name} ${orderItem.name}`;
         } else {
           nameMods.push(mod.name);
@@ -568,10 +568,10 @@ export default class DefaultChatBot extends ChatBotInterface {
     // transform for order to support orders
     const items = orderItems.map(({name, price}) => ({name, price, quantity: 1}));
     let order;
+
     try {
       order = await Order.createOrder(user.id, restaurant.id, items);
-      const {id: orderId} = order;
-      await chatState.setOrderContext(order);
+      await chatState.setOrderContext(order.resolve());
     } catch (err) {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to create order and set the context`, err);
     }
@@ -584,7 +584,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     } catch (defaultPaymentError) {
       console.tag('chatbot').log('No default payment found. Sending user to signup2.');
       const secret = await User.requestProfileEdit(user.id);
-      const url = await User.resolveProfileEditAddress(secret);
+      const url = await User.resolveProfileEditAddress(secret.secret);
 
       // TODO @jesse handle state transitions as needed!
       return `To complete your order and pay, please go to ${url}`;
@@ -592,7 +592,7 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     try {
       const {id: transactionId} = await Payment.paymentWithToken(user.id, restaurant.id, defaultPayment, total);
-      await Order.setOrderStatus(orderId, Order.Status.RECEIVED_PAYMENT, {transactionId});
+      await Order.setOrderStatus(order.id, Order.Status.RECEIVED_PAYMENT, {transactionId});
     } catch (paymentWithTokenError) {
       console.tag('chatbot').error('Payment failed although customer default payment exists', paymentWithTokenError);
       throw new TraceError('Payment failed although customer default payment exists', paymentWithTokenError);

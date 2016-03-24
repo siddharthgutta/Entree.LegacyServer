@@ -72,7 +72,7 @@ export async function safelyCreate(userId, restaurantId, items) {
     return _order;
   });
 
-  return findOne(order.id);
+  return await findOne(order.id);
 }
 
 export async function findOneAndUpdateStatus(id, status, {prepTime, message, transactionId}) {
@@ -95,7 +95,7 @@ export async function findOneAndUpdateStatus(id, status, {prepTime, message, tra
     throw new TraceError('Could not update order status', e);
   }
 
-  return findOne(id);
+  return await findOne(id);
 }
 
 export async function findParentRestaurant(id) {
