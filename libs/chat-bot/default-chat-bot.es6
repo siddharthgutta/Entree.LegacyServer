@@ -64,8 +64,8 @@ export const response = {
 
   cart: {
     header: 'Here is your cart',
-    footer: 'Type \"checkout\" to pay, \"menu\" to browse the menu, ' +
-    'or \"clear\" to clear your entire cart',
+    footer: 'Type \"/checkout\" to finish and pay, \"/menu\" to browse the menu, ' +
+    'or \"/clear\" to clear your entire cart',
     dataFormat: (i, data) => `${i + 1}) ${data[i].name} - $${data[i].price / 100}`
   },
 
