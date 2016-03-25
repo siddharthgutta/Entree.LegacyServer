@@ -71,7 +71,7 @@ class OrderStore extends Influx.Store {
 
   _notify(title, text) {
     if (window.cordova) {
-      const sound = window.device.platform === 'Android' ? 'file://sound.mp3' : 'file://beep.caf';
+      const sound = window.device.platform === 'Android' ? 'audio/bell.mp3' : 'file://beep.caf';
       const notification = {
         id: Date.now(),
         title,

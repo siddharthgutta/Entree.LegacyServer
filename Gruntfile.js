@@ -140,6 +140,7 @@ module.exports = grunt => {
           {expand: true, cwd: 'resources/root', src: ['**/*'], dest: 'public/'},
           {expand: true, cwd: 'resources/fonts', src: ['**/*'], dest: 'public/fonts'},
           {expand: true, cwd: 'resources/images', src: ['**/*'], dest: 'public/images'},
+          {expand: true, cwd: 'resources/audio', src: ['**/*'], dest: 'public/audio'},
           {expand: true, cwd: 'resources/videos', src: ['**/*'], dest: 'public/videos'},
           {expand: true, cwd: 'resources/scripts', src: ['**/*'], dest: 'public/scripts'}
         ]
