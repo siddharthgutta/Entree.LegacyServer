@@ -54,7 +54,7 @@ export const response = {
 
   items: {
     header: `Here are items from `,
-    footer: 'Type a number to select an item, or type \"/menu\" to see the entire menu',
+    footer: 'Pick a number for an item you want or type \"/menu\" to see the full menu',
     dataFormat: (i, data) => `${i + 1}) ${data[i].name} - $${data[i].basePrice / 100}`
   },
 
