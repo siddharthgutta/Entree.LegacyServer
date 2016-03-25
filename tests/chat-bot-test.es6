@@ -428,8 +428,15 @@ describe('ChatBot', () => {
       done();
     });
 
-    it('should not switch to the categories state using /menu command', async done => {
+    it('should switch to the categories state using /menu command', async done => {
       await bot.updateState(phoneNumber, '/menu');
+      await checkState(chatStates.categories);
+      await checkContext(restaurantName, null);
+      done();
+    });
+
+    it('should not switch to the categories state using /rcommand', async done => {
+      await bot.updateState(phoneNumber, '/r');
       await checkState(chatStates.cart);
       await checkContext(restaurantName, null);
       done();

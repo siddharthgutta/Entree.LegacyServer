@@ -202,7 +202,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       await chatState.setRestaurantContext(restaurant);
       return await this._genOutput(
         chatState,
-        `${response.items.header} ${restaurant.name}`,
+        `Here are ${category[0].name} options from ${restaurant.name}`,
         response.items.footer,
         menuItems,
         response.items.dataFormat);
@@ -558,7 +558,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       await chatState.updateState(chatStates.items);
       return await this._genOutput(
         chatState,
-        `${response.items.header} ${restContext.name}`,
+        `Here are ${category.name} options from ${restContext.name}`,
         response.items.footer,
         menuItems,
         response.items.dataFormat);
@@ -640,7 +640,7 @@ export default class DefaultChatBot extends ChatBotInterface {
   }
 
   async _handleContextMenu(chatState, restContext) {
-    return await this._handleAtRestaurantMenu(chatState, restContext.name);
+    return await this._handleAtRestaurantMenu(chatState, restContext.name, true);
   }
 
   async _handleContextInfo(chatState, restaurant) {
@@ -680,7 +680,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       case /^@[^ ]+$/.test(input):
         return await this._handleAtRestaurant(chatState, input.substr(1));
       case /^@[^ ]+\ menu$/.test(input):
-        return await this._handleAtRestaurantMenu(chatState, input.split(' ')[0].substr(1));
+        return await this._handleAtRestaurantMenu(chatState, input.split(' ')[0].substr(1), false);
       case /^@.+\ info$/.test(input):
         return await this._handleAtRestaurantInfo(chatState, input.split(' ')[0].substr(1));
       case /^\/help$/.test(input):
@@ -765,12 +765,14 @@ export default class DefaultChatBot extends ChatBotInterface {
    *
    * @param {Object} chatState: input chat state object
    * @param {String} restaurantName: user input restaurant name
+   * @param {Boolean} isContextual: determines if the call to this function is by "menu" contextual command
    * @returns {String}: output of the transition
    * @private
    */
-  async _handleAtRestaurantMenu(chatState, restaurantName) {
+  async _handleAtRestaurantMenu(chatState, restaurantName, isContextual) {
+    // TODO - @jesse Refactor this function to a separate function
     const invalidTransition = await this._checkTransition(chatState);
-    if (invalidTransition) {
+    if (!isContextual && invalidTransition) {
       return invalidTransition;
     }
 
