@@ -54,9 +54,9 @@ export const response = {
   },
 
   items: {
-    header: `Here are items from `,
     footer: 'Pick a number for an item you want or type \"/menu\" to see the full menu',
-    dataFormat: (i, data) => `${i + 1}) ${data[i].name} - $${(data[i].basePrice / 100).toFixed(2)}`
+    dataFormat: (i, data) => `${i + 1}) ${data[i].name}: $${(data[i].basePrice / 100).toFixed(2)}\n` +
+      `--  ${data[i].description.toLowerCase()} `
   },
 
   mods: {
@@ -247,7 +247,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       await chatState.updateState(chatStates.items);
       return await this._genOutput(
         chatState,
-        `${response.items.header} ${restaurant.name}`,
+        `Here are ${category.name} options from ${restaurant.name}`,
         response.items.footer,
         menuItems,
         response.items.dataFormat);
@@ -751,7 +751,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       await chatState.setRestaurantContext(restaurant);
       return await this._genOutput(
         chatState,
-        response.items.header,
+        `Here are ${categories[0].name} options from ${restaurant.name}`,
         response.items.footer,
         menuItems,
         response.items.dataFormat);
