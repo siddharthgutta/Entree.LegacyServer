@@ -142,6 +142,54 @@ const hours = [
 
 const menu = [
   {
+    category: 'Wraps',
+    items: [
+      {
+        name: 'Gyro Wrap',
+        description: 'lamb, lettuce, tomatoes',
+        basePrice: 700,
+        modTypes: [
+          {
+            name: 'Add-ons',
+            mods: [
+              itemMods[6], itemMods[7], itemMods[2], itemMods[4], itemMods[3]
+            ],
+            min: 0,
+            max: 5
+          }
+        ]
+      }, {
+        name: 'Chicken Wrap',
+        description: 'chicken, lettuce, tomatoes',
+        basePrice: 700,
+        modTypes: [
+          {
+            name: 'Add-ons',
+            mods: [
+              itemMods[6], itemMods[7], itemMods[2], itemMods[4]
+            ],
+            min: 0,
+            max: 4
+          }
+        ]
+      }, {
+        name: 'Falafel Wrap',
+        description: 'falafel, lettuce',
+        basePrice: 700,
+        modTypes: [
+          {
+            name: 'Add-ons',
+            mods: [
+              itemMods[6], itemMods[7], itemMods[2], itemMods[5]
+            ],
+            min: 0,
+            max: 4
+          }
+        ]
+      }
+    ]
+  },
+  {
     category: 'Sides & Appetizers',
     items: [
       {
@@ -240,54 +288,6 @@ const menu = [
             mods: [itemMods[1]],
             min: 0,
             max: 1
-          }
-        ]
-      }
-    ]
-  },
-  {
-    category: 'Wraps',
-    items: [
-      {
-        name: 'Gyro Wrap',
-        description: 'lamb, lettuce, tomatoes',
-        basePrice: 700,
-        modTypes: [
-          {
-            name: 'Add-ons',
-            mods: [
-              itemMods[6], itemMods[7], itemMods[2], itemMods[4], itemMods[3]
-            ],
-            min: 0,
-            max: 5
-          }
-        ]
-      }, {
-        name: 'Chicken Wrap',
-        description: 'chicken, lettuce, tomatoes',
-        basePrice: 700,
-        modTypes: [
-          {
-            name: 'Add-ons',
-            mods: [
-              itemMods[6], itemMods[7], itemMods[2], itemMods[4]
-            ],
-            min: 0,
-            max: 4
-          }
-        ]
-      }, {
-        name: 'Falafel Wrap',
-        description: 'falafel, lettuce',
-        basePrice: 700,
-        modTypes: [
-          {
-            name: 'Add-ons',
-            mods: [
-              itemMods[6], itemMods[7], itemMods[2], itemMods[5]
-            ],
-            min: 0,
-            max: 4
           }
         ]
       }

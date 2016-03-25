@@ -59,8 +59,7 @@ export const response = {
   },
 
   mods: {
-    header: 'Here are the available item modifications',
-    dataFormat: (i, data) => `${i + 1}: ${data[i].name} +$${data[i].addPrice / 100}`
+    dataFormat: (i, data) => `${i}: ${data[i].name} +$${data[i].addPrice / 100}`
   },
 
   cart: {
@@ -256,10 +255,25 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
   }
 
+  /**
+   * Generates the header for the mod states using the current item mod and the current order item being modified
+   *
+   * @param {ItemMod} itemMod: current item mod that the user is making a choice on
+   * @param {OrderItem} orderItem: current order being modified
+   * @returns {String} header string for response message
+   * @private
+   */
+  _genModHeader(itemMod, orderItem) {
+    if (itemMod.max === 1) {
+      return `Select a ${itemMod.name.toLowerCase()} for (${orderItem.name} - $${orderItem.price / 100})`;
+    }
+    return `Would you like any ${itemMod.name.toLowerCase()} for (${orderItem.name} - $${orderItem.price / 100})?`;
+  }
+
   _genModFooter(itemMod) {
     if (itemMod.min === 0) {
       return `Select up to ${itemMod.max} options by typing in comma separated values (e.g. 1 or 1,3,2) or` +
-        ` \"none\"`;
+        ` \"no\"`;
     }
 
     if (itemMod.min < itemMod.max) {
@@ -317,13 +331,17 @@ export default class DefaultChatBot extends ChatBotInterface {
 
       const footer = this._genModFooter(firstItemMod);
 
+      // Generates the header from the current item mod and current order item being modified
+      const orderItem = await chatState.findLastOrderItem();
+      const header = this._genModHeader(firstItemMod, orderItem);
+
       try {
         await chatState.updateState(chatStates.mods);
         await chatState.setMenuItemContext(menuItem);
         await chatState.setItemModContext(firstItemMod);
         return await this._genOutput(
           chatState,
-          response.mods.header,
+          header,
           footer,
           mods,
           response.mods.dataFormat);
@@ -344,9 +362,9 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @private
    */
   async _modsTransition(chatState, input) {
-    if (input === 'none') {
+    if (input === 'no') {
       const itemMod = await chatState.findItemModContext();
-      /* User is not allowed to enter none unless min is 0 */
+      /* User is not allowed to enter no unless min is 0 */
       if (itemMod.min !== 0) {
         return `You are required to select at least ${itemMod.min} options. Please try again.`;
       }
@@ -451,10 +469,14 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     const footer = this._genModFooter(nextItemMod);
 
+    // Generates the header from the current item mod and current order item being modified
+    const orderItem = await chatState.findLastOrderItem();
+    const header = this._genModHeader(nextItemMod, orderItem);
+
     /* Note that we don't update the state here since we have more mods to process */
     return await this._genOutput(
       chatState,
-      response.mods.header,
+      header,
       footer,
       mods,
       response.mods.dataFormat);
