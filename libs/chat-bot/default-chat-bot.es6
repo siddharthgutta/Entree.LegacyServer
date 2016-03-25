@@ -9,6 +9,7 @@ import * as Mod from '../../api/mod.es6';
 import Promise from 'bluebird';
 import _ from 'underscore';
 import * as Utils from '../utils.es6';
+import moment from 'moment';
 
 /* Disabling lint rule since it doesn't make sense */
 /* eslint-disable babel/generator-star-spacing,one-var */
@@ -509,7 +510,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       case /^\/menu$/.test(input):
         return await this._handleContextMenu(chatState, restaurant);
       case /^\/info$/.test(input):
-        return await this._handleContextInfo(restaurant);
+        return await this._handleContextInfo(chatState, restaurant);
       case /^[a-zA-Z]+$/.test(input):
         return await this._handleCategory(chatState, input, restaurant);
       default:
@@ -642,8 +643,8 @@ export default class DefaultChatBot extends ChatBotInterface {
     return await this._handleAtRestaurantMenu(chatState, restContext.name);
   }
 
-  async _handleContextInfo(restContext) {
-    return await this._handleAtRestaurantInfo(restContext.name);
+  async _handleContextInfo(chatState, restaurant) {
+    return await this._getRestaurantInfo(chatState, restaurant);
   }
 
   /**
@@ -721,11 +722,11 @@ export default class DefaultChatBot extends ChatBotInterface {
    * Handles chat bot of "@<restaurant>" command
    *
    * @param {Object} chatState: input chat state object
-   * @param {String} input: user input restaurant name
+   * @param {String} restaurantName: user input restaurant name
    * @returns {String}: output of the transition
    * @private
    */
-  async _handleAtRestaurant(chatState, input) {
+  async _handleAtRestaurant(chatState, restaurantName) {
     const invalidTransition = await this._checkTransition(chatState);
     if (invalidTransition) {
       return invalidTransition;
@@ -733,7 +734,7 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     let restaurant, categories, menuItems;
     try {
-      restaurant = await Restaurant.findByName(input);
+      restaurant = await Restaurant.findByName(restaurantName);
       if (!restaurant) {
         /* User typed in a restaurant name that doesn't exist */
         return response.userError;
@@ -763,11 +764,11 @@ export default class DefaultChatBot extends ChatBotInterface {
    * Handles chat bot of "@<restaurant> menu" command
    *
    * @param {Object} chatState: input chat state object
-   * @param {String} input: user input restaurant name
+   * @param {String} restaurantName: user input restaurant name
    * @returns {String}: output of the transition
    * @private
    */
-  async _handleAtRestaurantMenu(chatState, input) {
+  async _handleAtRestaurantMenu(chatState, restaurantName) {
     const invalidTransition = await this._checkTransition(chatState);
     if (invalidTransition) {
       return invalidTransition;
@@ -775,7 +776,7 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     let restaurant, categories;
     try {
-      restaurant = await Restaurant.findByName(input);
+      restaurant = await Restaurant.findByName(restaurantName);
       if (!restaurant) {
         /* User typed in a restaurant name that doesn't exist */
         return response.userError;
@@ -803,32 +804,23 @@ export default class DefaultChatBot extends ChatBotInterface {
    * Handles chat bot of "@<restaurant> info" command
    *
    * @param {Object} chatState: chatState object
-   * @param {String} input: user input restaurant name
+   * @param {String} restaurantName: user input restaurant name
    * @returns {String}: output of the transition
    * @private
    */
-  async _handleAtRestaurantInfo(chatState, input) {
-    let restaurant, location, hours;
+  async _handleAtRestaurantInfo(chatState, restaurantName) {
+    let restaurant;
     try {
-      restaurant = await Restaurant.findByName(input);
+      restaurant = await Restaurant.findByName(restaurantName);
       if (!restaurant) {
         /* User typed in a restaurant name that doesn't exist */
         return response.userError;
       }
-      location = await restaurant.findLocation();
-      hours = await restaurant.findHours();
     } catch (err) {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to get restaurant info`, err);
     }
 
-    let output = `Info for ${restaurant.name}\n\n`;
-    output += `Location: ${location.address} ${location.city}, ${location.state} ${location.zipcode}\n`;
-    output += 'Hours:\n';
-    for (let i = 0; i < hours.length; i++) { // eslint-disable-line
-      output += `${hours[i].dayOfTheWeek} - ${hours[i].openTime} to ${hours[i].closeTime}\n`;
-    }
-
-    return output;
+    return await this._getRestaurantInfo(chatState, restaurant);
   }
 
   /**
@@ -839,6 +831,28 @@ export default class DefaultChatBot extends ChatBotInterface {
    */
   async _handleHelp() {
     return response.help;
+  }
+
+  async _getRestaurantInfo(chatState, restaurant) {
+    let location, hours;
+    try {
+      location = await restaurant.findLocation();
+      hours = await restaurant.findHours();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to get restaurant info`, err);
+    }
+
+    let output = `Information for ${restaurant.name}\n\n`;
+    output += `Location:\n${location.address}\n${location.city}, ${location.state} ${location.zipcode}\n\n`;
+    output += 'Hours:\n';
+    for (let i = 0; i < hours.length; i++) { // eslint-disable-line
+      const day = moment(hours[i].dayOfTheWeek, 'dddd').format('ddd');
+      const openTime = moment(hours[i].openTime, 'HH:mm:ss').format('h:mma');
+      const closeTime = moment(hours[i].closeTime, 'HH:mm:ss').format('h:mma');
+      output += `${day} - ${openTime} to ${closeTime}\n`;
+    }
+
+    return output;
   }
 
   async _handleClear(chatState) {
