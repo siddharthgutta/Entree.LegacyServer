@@ -691,13 +691,18 @@ export default class DefaultChatBot extends ChatBotInterface {
   }
 
   /**
-   * Handles chat bot of "restaurant" command
+   * Handles chat bot of "/r" command
    *
    * @param {Object} chatState: input chat state object
    * @returns {String}: output of the transition
    * @private
    */
   async _handleRestaurant(chatState) {
+    const invalidTransition = await this._checkTransition(chatState);
+    if (invalidTransition) {
+      return invalidTransition;
+    }
+
     try {
       await chatState.updateState(chatStates.restaurants);
       const restaurants = await Restaurant.findAll(); // TODO - Replace this with curation of recommended restaurants
@@ -721,6 +726,11 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @private
    */
   async _handleAtRestaurant(chatState, input) {
+    const invalidTransition = await this._checkTransition(chatState);
+    if (invalidTransition) {
+      return invalidTransition;
+    }
+
     let restaurant, categories, menuItems;
     try {
       restaurant = await Restaurant.findByName(input);
@@ -758,6 +768,11 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @private
    */
   async _handleAtRestaurantMenu(chatState, input) {
+    const invalidTransition = await this._checkTransition(chatState);
+    if (invalidTransition) {
+      return invalidTransition;
+    }
+
     let restaurant, categories;
     try {
       restaurant = await Restaurant.findByName(input);
@@ -883,6 +898,29 @@ export default class DefaultChatBot extends ChatBotInterface {
       }
     } catch (err) {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to translate user input key`);
+    }
+
+    return null;
+  }
+
+  async _checkTransition(chatState) {
+    let orderItems;
+    try {
+      orderItems = await chatState.findOrderItems();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to find order items`, err);
+    }
+
+    if (orderItems.length > 0) {
+      let restaurant;
+      try {
+        restaurant = await chatState.findRestaurantContext();
+      } catch (err) {
+        throw new TraceError(`ChatState id ${chatState.id} - Failed to find restaurant context`, err);
+      }
+
+      return `Please finish ordering with ${restaurant.name} or clear your cart by typing \"/clear\" before` +
+        ` browsing other restaurants`;
     }
 
     return null;
