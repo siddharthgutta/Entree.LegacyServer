@@ -277,7 +277,7 @@ describe('ChatBot', () => {
       done();
     });
 
-    it('should not /checkout with empty cart', async done => {
+    it('should not checkout with empty cart', async done => {
       const result = await bot.updateState(phoneNumber, '/checkout');
       assert.equal(result, response.invalidCheckout);
       await checkState(chatStates.categories);
@@ -335,7 +335,7 @@ describe('ChatBot', () => {
       done();
     });
 
-    it('should not /checkout with empty cart', async done => {
+    it('should not checkout with empty cart', async done => {
       const result = await bot.updateState(phoneNumber, '/checkout');
       assert.equal(result, response.invalidCheckout);
       await checkState(chatStates.items);
@@ -388,7 +388,7 @@ describe('ChatBot', () => {
       done();
     });
 
-    it('should not /checkout while selecting item mods', async done => {
+    it('should not checkout while selecting item mods', async done => {
       const result = await bot.updateState(phoneNumber, '/checkout');
       assert.equal(result, response.finishItem);
       await checkState(chatStates.mods);
@@ -409,7 +409,7 @@ describe('ChatBot', () => {
         .then(() => done());
     });
 
-    it('should have /cleared the item context', async done => {
+    it('should have cleared the item context', async done => {
       await checkContext(restaurantName, null);
       done();
     });
@@ -428,10 +428,26 @@ describe('ChatBot', () => {
       done();
     });
 
-    it('should switch to the categories state using /menu command', async done => {
+    it('should not switch to the categories state using /menu command', async done => {
       await bot.updateState(phoneNumber, '/menu');
-      await checkState(chatStates.categories);
+      await checkState(chatStates.cart);
       await checkContext(restaurantName, null);
+      done();
+    });
+
+    it('should not change to the categories state after typing \"@<restaurant> menu\"', async done => {
+      await bot.updateState(phoneNumber, `@${restaurantName} menu`);
+      await checkState(chatStates.cart);
+      await checkContext(restaurantName, null);
+
+      done();
+    });
+
+    it('should not change to the items state after typing \"@<restaurant>\"', async done => {
+      await bot.updateState(phoneNumber, `@${restaurantName}`);
+      await checkState(chatStates.cart);
+      await checkContext(restaurantName, null);
+
       done();
     });
 
