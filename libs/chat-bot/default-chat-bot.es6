@@ -55,18 +55,18 @@ export const response = {
   items: {
     header: `Here are items from `,
     footer: 'Pick a number for an item you want or type \"/menu\" to see the full menu',
-    dataFormat: (i, data) => `${i + 1}) ${data[i].name} - $${data[i].basePrice / 100}`
+    dataFormat: (i, data) => `${i + 1}) ${data[i].name} - $${(data[i].basePrice / 100).toFixed(2)}`
   },
 
   mods: {
-    dataFormat: (i, data) => `${i + 1}) ${data[i].name} +$${data[i].addPrice / 100}`
+    dataFormat: (i, data) => `${i + 1}) ${data[i].name} +$${(data[i].addPrice / 100).toFixed(2)}`
   },
 
   cart: {
     header: 'Here is your cart',
     footer: 'Type \"/checkout\" to finish and pay, \"/menu\" to browse the menu, ' +
     'or \"/clear\" to clear your entire cart',
-    dataFormat: (i, data) => `${i + 1}) ${data[i].name} - $${data[i].price / 100}`
+    dataFormat: (i, data) => `${i + 1}) ${data[i].name} - $${(data[i].price / 100).toFixed(2)}`
   },
 
   help: 'Here is a list of commands:\n' +
@@ -265,9 +265,9 @@ export default class DefaultChatBot extends ChatBotInterface {
    */
   _genModHeader(itemMod, orderItem) {
     if (itemMod.max === 1) {
-      return `Select a ${itemMod.name.toLowerCase()} for (${orderItem.name} - $${orderItem.price / 100})`;
+      return `Select a ${itemMod.name.toLowerCase()} for (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})`;
     }
-    return `Would you like any ${itemMod.name.toLowerCase()} for (${orderItem.name} - $${orderItem.price / 100})?`;
+    return `Would you like any ${itemMod.name.toLowerCase()} for (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})?`;
   }
 
   _genModFooter(itemMod) {
