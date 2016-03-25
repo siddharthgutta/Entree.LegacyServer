@@ -2,10 +2,10 @@
 
 grunt cordova-prepare --force || true
 
-username=${SSH_OSX_USERNAME}
-hostname=${SSH_OSX_HOSTNAME}
-port=${SSH_OSX_PORT}
-password=${SSH_OSX_PASSWORD}
+username=$SSH_OSX_USERNAME
+hostname=$SSH_OSX_HOSTNAME
+port=$SSH_OSX_PORT
+password=$SSH_OSX_PASSWORD
 dir=$RANDOM
 
 rm -rf ../cordova/build/ || true
@@ -28,5 +28,5 @@ sshpass -p ${password} scp -o StrictHostKeyChecking=no -P ${port} ${username}@${
 rm ${dir}.zip
 
 # # clean up remote: enable once this process is ready
-# ssh -p ${port} ${username}@${hostname} "rm ~/Github/builds/${dir}.zip"
-# ssh -p ${port} ${username}@${hostname} "rm -rf ~/Github/builds/${dir}"
+sshpass -p ${password} ssh -o StrictHostKeyChecking=no  -p ${port} ${username}@${hostname} "rm ~/Github/builds/${dir}.zip"
+sshpass -p ${password} ssh -o StrictHostKeyChecking=no  -p ${port} ${username}@${hostname} "rm -rf ~/Github/builds/${dir}"

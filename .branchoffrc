@@ -23,8 +23,8 @@
       "SOCKET_SERVER_PORT": 2997,
       "SSH_OSX_USERNAME": "mkurian",
       "SSH_OSX_HOSTNAME": "0.tcp.ngrok.io",
-      "SSH_OSX_PORT": "18127",
-      "SSH_OSX_PASSWORD": "teehee",
+      "SSH_OSX_PORT": "11168",
+      "SSH_OSX_PASSWORD": "Colgate123*",
       "ENTERPRISE_APP_HOSTNAME": "www.textentree.com"
     },
     "mode": {
