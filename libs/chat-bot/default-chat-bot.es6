@@ -43,7 +43,7 @@ export const response = {
   restaurant: {
     header: 'Here are the restaurants we work at.',
     footer: 'Select the number of a restaurant.',
-    dataFormat: (i, data) => `${i + 1}: ${data[i].name}`
+    dataFormat: (i, data) => `${i + 1}) ${data[i].name}`
   },
 
   categories: {
@@ -59,14 +59,14 @@ export const response = {
   },
 
   mods: {
-    dataFormat: (i, data) => `${i + 1}: ${data[i].name} +$${data[i].addPrice / 100}`
+    dataFormat: (i, data) => `${i + 1}) ${data[i].name} +$${data[i].addPrice / 100}`
   },
 
   cart: {
     header: 'Here is your cart',
-    footer: 'Type \"/checkout\" to pay, \"/menu\" to browse the menu, ' +
-    'or \"/clear\" to clear your entire cart',
-    dataFormat: (i, data) => `${i + 1}: ${data[i].name} - $${data[i].price / 100}`
+    footer: 'Type \"checkout\" to pay, \"menu\" to browse the menu, ' +
+    'or \"clear\" to clear your entire cart',
+    dataFormat: (i, data) => `${i + 1}) ${data[i].name} - $${data[i].price / 100}`
   },
 
   help: 'Here is a list of commands:\n' +
