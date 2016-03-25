@@ -37,7 +37,7 @@ export const response = {
   /* Returned when user checks out with empty cart */
   invalidCheckout: 'You can\'t checkout with an empty cart. Try typing \"/r\" to see restaurants to choose from',
 
-  cartClear: 'Your cart has been cleared. Type \"menu\" to view the menu or \"/r\" for more restaurants',
+  cartClear: 'Your cart has been cleared. Type \"/menu\" to view the menu or \"/r\" for more restaurants',
 
   /* I/O formatting for transition to various states */
   restaurant: {
@@ -54,7 +54,7 @@ export const response = {
 
   items: {
     header: `Here are items from `,
-    footer: 'Type a number to select an item, or type \"menu\" to see the entire menu',
+    footer: 'Type a number to select an item, or type \"/menu\" to see the entire menu',
     dataFormat: (i, data) => `${i + 1}) ${data[i].name} - $${data[i].basePrice / 100}`
   },
 
@@ -64,8 +64,8 @@ export const response = {
 
   cart: {
     header: 'Here is your cart',
-    footer: 'Type \"checkout\" to pay, \"menu\" to browse the menu, ' +
-    'or \"clear\" to clear your entire cart',
+    footer: 'Type \"/checkout\" to pay, \"/menu\" to browse the menu, ' +
+    'or \"/clear\" to clear your entire cart',
     dataFormat: (i, data) => `${i + 1}: ${data[i].name} - $${data[i].price / 100}`
   },
 
@@ -503,9 +503,9 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
 
     switch (true) {
-      case /^checkout$/.test(input):
+      case /^\/checkout$/.test(input):
         return await this._handleCheckout(chatState);
-      case /^menu$/.test(input):
+      case /^\/menu$/.test(input):
         return await this._handleContextMenu(chatState, restaurant);
       case /^\/info$/.test(input):
         return await this._handleContextInfo(restaurant);
@@ -537,8 +537,8 @@ export default class DefaultChatBot extends ChatBotInterface {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to determine if user selected a category`, err);
     }
 
-    return /^checkout$/.test(input)
-      || /^menu$/.test(input)
+    return /^\/checkout$/.test(input)
+      || /^\/menu$/.test(input)
       || /^\/info$/.test(input)
       || isCategory;
   }
@@ -658,7 +658,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       || /^@[^ ]+\ menu$/.test(input)
       || /^@.+\ info$/.test(input)
       || /^\/help$/.test(input)
-      || /^clear$/.test(input);
+      || /^\/clear$/.test(input);
   }
 
   /**
@@ -673,7 +673,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     switch (true) {
       case /^\/r$/.test(input):
         return await this._handleRestaurant(chatState);
-      case /^clear$/.test(input):
+      case /^\/clear$/.test(input):
         return await this._handleClear(chatState);
       case /^@[^ ]+$/.test(input):
         return await this._handleAtRestaurant(chatState, input.substr(1));
