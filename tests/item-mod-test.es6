@@ -47,7 +47,7 @@ describe('ItemMod', () => {
 
     it('should not insert item mod with max less than 1', async () => {
       try {
-        assert.throws(async () => await globalMenuItem.upsertItemMod('Sizes', 0, 0));
+        await globalMenuItem.upsertItemMod('Sizes', 0, 0);
         assert(false);
       } catch (err) {/* Success */}
     });
