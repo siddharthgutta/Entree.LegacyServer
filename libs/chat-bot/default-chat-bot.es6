@@ -59,7 +59,7 @@ export const response = {
   },
 
   mods: {
-    dataFormat: (i, data) => `${i}: ${data[i].name} +$${data[i].addPrice / 100}`
+    dataFormat: (i, data) => `${i + 1}: ${data[i].name} +$${data[i].addPrice / 100}`
   },
 
   cart: {
