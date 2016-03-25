@@ -88,7 +88,10 @@ export function parse(slackbot, btSignature, btPayload, test = false) {
         const data = Slack.generateData(msg, color, fields, test);
 
         // Temporary fix to prevent merchant spam
-        if (!test) {
+        // Making sandbox stop spamming #merchants completely
+        // NOTE: This means only production will fire slack notifications for webhooks
+        // When wanting to test webhooks for sandbox, remove '&& productionOrSandbox'
+        if (!test && productionOrSandbox) {
           slackbot.send(slackConfigs.channelId, data, '');
         }
       }
