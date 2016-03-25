@@ -114,19 +114,19 @@ const menu = [
     items: [
       {
         name: 'The Meltdown',
-        description: 'Roasted Garlic + Cayenne',
+        description: 'Roasted Garlic, Cayenne',
         basePrice: 350
       }, {
         name: 'The Spicy Pig',
-        description: 'Maple Bacon + Jalapeno',
+        description: 'Maple Bacon, Jalapeno',
         basePrice: 350
       }, {
         name: 'The Funky Chunky',
-        description: 'Hamburger + Onion',
+        description: 'Hamburger, Onion',
         basePrice: 350
       }, {
         name: 'The Vatican',
-        description: 'Sauteed Salami + Roasted Bell Peppers',
+        description: 'Sauteed Salami, Roasted Bell Peppers',
         basePrice: 350
       }, {
         name: 'The Garden',
