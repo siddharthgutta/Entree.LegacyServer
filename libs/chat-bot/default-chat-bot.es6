@@ -267,7 +267,8 @@ export default class DefaultChatBot extends ChatBotInterface {
     if (itemMod.max === 1) {
       return `Select a ${itemMod.name.toLowerCase()} for (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})`;
     }
-    return `Would you like any ${itemMod.name.toLowerCase()} for (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})?`;
+    return `Would you like any ${itemMod.name.toLowerCase()} for` +
+      ` (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})?`;
   }
 
   _genModFooter(itemMod) {
