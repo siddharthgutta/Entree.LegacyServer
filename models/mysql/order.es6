@@ -12,6 +12,11 @@ export default function (sequelize, {ENUM, INTEGER, STRING}) {
         len: [1, 36]
       }}
   }, {
+    instanceMethods: {
+      findUser: async function () { // eslint-disable-line
+        return await this.getUser();
+      }
+    },
     classMethods: {
       associate({Order, User, Restaurant, Item}) {
         Order.belongsTo(User, {onDelete: 'SET NULL'});

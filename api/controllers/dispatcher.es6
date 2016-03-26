@@ -1,5 +1,5 @@
 import Emitter, {Events} from '../events/index.es6';
-import {DefaultChatBot} from '../../libs/chat-bot/index.es6';
+import {DefaultChatBot, chatStates} from '../../libs/chat-bot/index.es6';
 import {sendSMS} from './sms.es6';
 import * as Order from './order.es6';
 import * as User from './user.es6';
@@ -76,6 +76,22 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
     [Order.Status.DECLINED]: `Your order just got declined :(. ${order.message}`,
     [Order.Status.COMPLETED]: `Your order is ready!`
   };
+
+  if (order.status === Order.Status.ACCEPTED) {
+    const user = await order.findUser();
+    const chatState = await user.findChatState();
+
+    await chatState.clearOrderItems();
+    await chatState.clearRestaurantContext();
+    await chatState.updateState(chatStates.start);
+  }
+
+  if (order.status === Order.Status.COMPLETED) {
+    const user = await order.findUser();
+    const chatState = await user.findChatState();
+
+    await chatState.clearOrderContext();
+  }
 
   const text = message[order.status];
 

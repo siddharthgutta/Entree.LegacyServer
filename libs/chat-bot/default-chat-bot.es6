@@ -606,8 +606,6 @@ export default class DefaultChatBot extends ChatBotInterface {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to create order and set the context`, err);
     }
 
-    /* TODO -- transfer order items over to permanent order object
-     * what should I return for the payment processing? */
     let defaultPayment;
     try {
       defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
@@ -616,7 +614,6 @@ export default class DefaultChatBot extends ChatBotInterface {
       const secret = await User.requestProfileEdit(user.id);
       const url = await User.resolveProfileEditAddress(secret.secret);
 
-      // TODO @jesse handle state transitions as needed!
       return `To complete your order and pay, please go to ${url}`;
     }
 
@@ -628,12 +625,6 @@ export default class DefaultChatBot extends ChatBotInterface {
       throw new TraceError('Payment failed although customer default payment exists', paymentWithTokenError);
     }
 
-    try {
-      await chatState.clearOrderItems();
-      await chatState.updateState(chatStates.start);
-    } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chat bot metadata`, err);
-    }
     /* Slice to remove trailing comma and whitespcae */
     return `Your order using ${defaultPayment.cardType} - ${defaultPayment.last4} has been sent to the restaurant. ` +
       `We'll text you once it's confirmed by the restaurant`;
