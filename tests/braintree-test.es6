@@ -13,6 +13,8 @@ import braintree from 'braintree';
 import config from 'config';
 import supertest from 'supertest';
 import Slack from '../libs/notifier/slack.es6';
+import fetch from '../libs/fetch.es6';
+const {SERVER_URL} = global;
 
 const slackConfigs = config.get('Slack.Braintree');
 
@@ -41,6 +43,22 @@ describe('Braintree', () => {
       assert(!isEmpty(clientToken2));
       assert.notEqual(clientToken1, clientToken2);
       done();
+    });
+
+    it('api/v2/user/client-token single', async () => {
+      const {body: {data: {clientToken}}} =
+        await fetch(`${SERVER_URL}/api/v2/user/client-token/`);
+      assert(!isEmpty(clientToken), 'Client Token is Empty');
+    });
+
+    it('api/v2/user/client-token multiple', async () => {
+      const {body: {data: {clientToken: clientToken1}}} =
+        await fetch(`${SERVER_URL}/api/v2/user/client-token/`);
+      const {body: {data: {clientToken: clientToken2}}} =
+        await fetch(`${SERVER_URL}/api/v2/user/client-token/`);
+      assert(!isEmpty(clientToken1), 'Client Token is Empty');
+      assert(!isEmpty(clientToken2), 'Client Token is Empty');
+      assert.notEqual(clientToken1, clientToken2, 'both client tokens should be not equal');
     });
   });
 
