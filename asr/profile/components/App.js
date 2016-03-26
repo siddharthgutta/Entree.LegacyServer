@@ -94,7 +94,7 @@ class App extends Influx.Component {
                   <input hidden data-braintree-name='cardholder_name' onChange={noop}
                          value={`${user.first || ''} ${user.last || ''}`}/>
                   <div className='label'>Card Number</div>
-                  <input data-braintree-name='number' placeholder='0000 0000 0000 0000'/>
+                  <input className='input' data-braintree-name='number' placeholder='0000 0000 0000 0000'/>
                   <div className='label'>CSV</div>
                   <input className='input' data-braintree-name='cvv' placeholder='123'/>
                   <div className='label'>Expiration</div>

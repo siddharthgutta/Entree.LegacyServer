@@ -223,8 +223,8 @@ module.exports = grunt => {
     },
     concurrent: {
       clean: ['clean:build', 'clean:compiled'],
-      build: ['filetransform:babel', 'sass:dist', 'imagemin', 'browserify:dist', 'jade:dist'],
-      'build-production': ['compile', 'sass:dist', 'imagemin', ['browserify:dist', 'uglify:dist'], 'jade:dist']
+      build: ['imagemin', 'browserify:dist', 'filetransform:babel', 'sass:dist', 'jade:dist'],
+      'build-production': ['imagemin', ['browserify:dist', 'uglify:dist'], 'compile', 'sass:dist', 'jade:dist']
     }
   };
 
