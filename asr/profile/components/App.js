@@ -1,7 +1,6 @@
 import React from 'react';
 import Influx from 'react-influx';
 import BrainTree from 'braintree-web';
-import config from '../../libs/config';
 import querystring from 'querystring';
 import fetch from '../../libs/fetch';
 
@@ -28,14 +27,10 @@ class App extends Influx.Component {
 
       this.setState({user, status: Status.OK});
 
-      // @bluejamesbond
-      // const {body: {data: {clientToken}}} =
-      //   await fetch(`/api/v2/user/client-token`);
+      const {body: {data: {clientToken}}} =
+        await fetch(`/api/v2/user/client-token`);
 
-      // Replace config.get('BrainTree.testClientToken')
-      // with clientToken
-
-      BrainTree.setup(config.get('BrainTree.testClientToken'), 'custom', {
+      BrainTree.setup(clientToken, 'custom', {
         id: 'payment-form'
       });
     } catch (e) {
