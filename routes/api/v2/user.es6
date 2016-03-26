@@ -23,6 +23,15 @@ router.post('/signup', async (req, res) => {
   }
 });
 
+router.get('/client-token', async (req, res) => {
+  try {
+    const clientToken = await Payment.generateClientToken();
+    res.ok({clientToken}, 'Sent client token!').debug(clientToken);
+  } catch (e) {
+    res.fail(`Could not get client token`, null, 500).debug(e);
+  }
+});
+
 const profile = router.route('/profile/:secret');
 
 profile.get(async (req, res) => {
