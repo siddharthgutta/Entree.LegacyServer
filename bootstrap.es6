@@ -16,9 +16,6 @@ export function initErrorHandling() {
 }
 
 export function initScribe(override = true, mongo = true, socket = true, opts = {}, ...exposers) {
-  console.log(`Scribe assuming you have mongo installed - ${mongo}!!!`);
-  console.log(`Scribe assuming you socket port open - ${socket}!!!`);
-
   const id = config.get('AppId');
   const port = config.get('Server.port');
   const env = config.get('NodeEnv');

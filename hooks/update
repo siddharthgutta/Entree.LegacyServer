@@ -22,7 +22,7 @@ ln -s ../node_modules ../node_modules # relative location
 npm set progress=false
 
 # for default npm installer
-npm --no-color --no-spin --loglevel=error --cache-min 9999999 install --production
+npm --no-color --no-spin --loglevel=error --cache-min 9999999 install --production --global-style
 
 ## BUILD SYSTEM
 ###############

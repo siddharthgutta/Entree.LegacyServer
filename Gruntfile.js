@@ -152,7 +152,7 @@ module.exports = grunt => {
       },
       builds: {
         files: {
-          'cordova/build/android-debug.apk': 'cordova/platforms/android/build/outputs/apk/Entree.apk',
+          'cordova/build/Entree.apk': 'cordova/platforms/android/build/outputs/apk/android-debug.apk',
           'cordova/build/Entree.ipa': 'cordova/platforms/ios/build/device/Entree.ipa'
         }
       }
@@ -196,6 +196,8 @@ module.exports = grunt => {
     shell: {
       'cordova-prepare': {
         command: ['cd cordova',
+          'mkdir -p www',
+          'mkdir -p platforms',
           'cordova platform add ios || true',
           'cordova platform add android || true',
           'cordova prepare',
