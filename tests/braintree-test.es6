@@ -66,9 +66,9 @@ describe('Braintree', () => {
       percentageFee = 5;
       transactionFee = 30;
 
-      userId = (await User.create(phoneNumber, {firstName, lastName})).get().id;
+      userId = (await User.create(phoneNumber, {firstName, lastName})).id;
       restaurantId = (await Restaurant.create(
-        name, password, mode, {percentageFee, transactionFee, merchantId})).get().id;
+        name, password, mode, {percentageFee, transactionFee, merchantId})).id;
 
       done();
     });
@@ -307,7 +307,7 @@ describe('Braintree', () => {
     const transactionFee = 30;
 
     it('creating declined merchant account should fail', async done => {
-      const restaurantId = (await Restaurant.create(name, password, mode, {percentageFee, transactionFee})).get().id;
+      const restaurantId = (await Restaurant.create(name, password, mode, {percentageFee, transactionFee})).id;
       const individual = createIndividual(false);
       try {
         const merchantAccount = await Braintree.registerRestaurantWithPaymentSystem(
@@ -322,7 +322,7 @@ describe('Braintree', () => {
     });
 
     it('creating approved merchant account should succeed', async done => {
-      const restaurantId = (await Restaurant.create(name, password, mode, {percentageFee, transactionFee})).get().id;
+      const restaurantId = (await Restaurant.create(name, password, mode, {percentageFee, transactionFee})).id;
       const individual = createIndividual(true);
       const merchantAccount = await Braintree.registerRestaurantWithPaymentSystem(
         restaurantId, individual, {}, funding);

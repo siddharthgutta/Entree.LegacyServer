@@ -6,4 +6,4 @@ export NODE_ENV=staging;
 export IS_RUNNING_TEST=true;
 
 set -e
-npm run test-ci ./tests/item-mod-test.compiled.js
+npm run test-ci ./tests/restaurant-test.compiled.js

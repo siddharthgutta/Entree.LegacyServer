@@ -24,150 +24,112 @@ describe('Location', () => {
     console.log('true');
   }
 
+  let restaurant;
+  beforeEach(async () => {
+    restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+  });
+
   describe('#upsertLocation()', () => {
-    it('should set the location of a restaurant if one does not exist', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(restaurant => restaurant.upsertLocation(address, city, state, zipcode))
-        .then(result => {
-          assert.equal(result.address, address);
-          assert.equal(result.city, city);
-          assert.equal(result.state, state);
-          assert.equal(result.zipcode, zipcode);
-          done();
-        });
+    it('should set the location of a restaurant if one does not exist', async () => {
+      const result = await restaurant.upsertLocation(address, city, state, zipcode);
+      assert.equal(result.address, address);
+      assert.equal(result.city, city);
+      assert.equal(result.state, state);
+      assert.equal(result.zipcode, zipcode);
     });
 
-    it('should replace an existing location correctly', done => {
-      let restaurant;
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(_restaurant => restaurant = _restaurant)
-        .then(() => restaurant.upsertLocation(address, city, state, zipcode))
-        .then(() => restaurant.upsertLocation('Main St', 'NewCity', 'AB', '09876'))
-        .then(() => restaurant.findLocation())
-        .then(result => {
-          assert.equal(result.address, 'Main St');
-          assert.equal(result.city, 'NewCity');
-          assert.equal(result.state, 'AB');
-          assert.equal(result.zipcode, '09876');
-          done();
-        });
+    it('should replace an existing location correctly', async () => {
+      await restaurant.upsertLocation(address, city, state, zipcode);
+      await restaurant.upsertLocation('Main St', 'NewCity', 'AB', '09876');
+      const result = await restaurant.findLocation();
+
+      assert.equal(result.address, 'Main St');
+      assert.equal(result.city, 'NewCity');
+      assert.equal(result.state, 'AB');
+      assert.equal(result.zipcode, '09876');
     });
 
-    it('should delete the old location when replacing', done => {
-      let restaurant;
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(_restaurant => restaurant = _restaurant)
-        .then(() => restaurant.upsertLocation(address, city, state, zipcode))
-        .then(() => restaurant.upsertLocation('Main St', 'NewCity', 'AB', '09876'))
-        .then(() => Location.findAll())
-        .then(result => {
-          assert.equal(result.length, 1);
-          done();
-        });
+    it('should delete the old location when replacing', async () => {
+      await restaurant.upsertLocation(address, city, state, zipcode);
+      await restaurant.upsertLocation('Main St', 'NewCity', 'AB', '09876');
+      const result = await Location.findAll();
+      assert.equal(result.length, 1);
     });
 
-    it('should not set a location with null address', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(restaurant => restaurant.upsertLocation(null, city, state, zipcode))
-        .then(() => {
-          assert(false);
-          done();
-        })
-        .catch(() => {
-          assert(true);
-          done();
-        });
+    it('should not set a location with null address', async () => {
+      try {
+        await restaurant.upsertLocation(null, city, state, zipcode);
+      } catch (err) {
+        return;
+      }
+
+      assert(false);
     });
 
-    it('should not set a location with null city', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(restaurant => restaurant.upsertLocation(address, null, state, zipcode))
-        .then(() => {
-          assert(false);
-          done();
-        })
-        .catch(() => {
-          assert(true);
-          done();
-        });
+    it('should not set a location with null city', async () => {
+      try {
+        await restaurant.upsertLocation(address, null, state, zipcode);
+      } catch (err) {
+        return;
+      }
+
+      assert(false);
     });
 
-    it('should not set a location with null state', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(restaurant => restaurant.upsertLocation(address, city, null, zipcode))
-        .then(() => {
-          assert(false);
-          done();
-        })
-        .catch(() => {
-          assert(true);
-          done();
-        });
+    it('should not set a location with null state', async () => {
+      try {
+        await restaurant.upsertLocation(address, city, null, zipcode);
+      } catch (err) {
+        return;
+      }
+
+      assert(false);
     });
 
-    it('should not set a location with null zipcode', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(restaurant => restaurant.upsertLocation(address, city, state, null))
-        .then(() => {
-          assert(false);
-          done();
-        })
-        .catch(() => {
-          assert(true);
-          done();
-        });
+    it('should not set a location with null zipcode', async () => {
+      try {
+        await restaurant.upsertLocation(address, city, state, null);
+      } catch (err) {
+        return;
+      }
+
+      assert(false);
     });
 
-    it('should not set a location with state code of length other than 2', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(restaurant => restaurant.upsertLocation(address, city, 'A', zipcode))
-        .then(() => {
-          assert(false);
-          done();
-        })
-        .catch(() => {
-          assert(true);
-          done();
-        });
+    it('should not set a location with state code of length other than 2', async () => {
+      try {
+        await restaurant.upsertLocation(address, city, 'A', zipcode);
+      } catch (err) {
+        return;
+      }
+
+      assert(false);
     });
 
-    it('should not set a location with zipcode of length other than 5', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(restaurant => restaurant.upsertLocation(address, city, state, '1234'))
-        .then(() => {
-          assert(false);
-          done();
-        })
-        .catch(() => {
-          assert(true);
-          done();
-        });
+    it('should not set a location with zipcode of length other than 5', async () => {
+      try {
+        await restaurant.upsertLocation(address, city, state, '1234');
+      } catch (err) {
+        return;
+      }
+
+      assert(false);
     });
   });
 
   describe('#findLocation()', () => {
-    it('should find the location if there is one set', done => {
-      let restaurant;
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(_restaurant => restaurant = _restaurant)
-        .then(() => restaurant.upsertLocation(address, city, state, zipcode))
-        .then(() => restaurant.findLocation())
-        .then(result => {
-          assert.equal(result.address, address);
-          assert.equal(result.city, city);
-          assert.equal(result.state, state);
-          assert.equal(result.zipcode, zipcode);
-          done();
-        });
+    it('should find the location if there is one set', async () => {
+      await restaurant.upsertLocation(address, city, state, zipcode);
+      const result = await restaurant.findLocation();
+      assert.equal(result.address, address);
+      assert.equal(result.city, city);
+      assert.equal(result.state, state);
+      assert.equal(result.zipcode, zipcode);
     });
 
-    it('should return null if none is set', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(restaurant => restaurant.findLocation())
-        .then(result => {
-          assert.equal(result, null);
-          done();
-        });
+    it('should return null if none is set', async () => {
+      const result = await restaurant.findLocation();
+      assert.equal(result, null);
     });
   });
 });
