@@ -21,13 +21,12 @@ describe('Mod', () => {
 
   let itemMod;
 
-  beforeEach(async done => {
+  beforeEach(async () => {
     await clearDatabase();
-    const restaurant = await Restaurant.create(name, password, mode, {phoneNumber});
+    const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
     const category = await restaurant.insertCategory(categoryName);
     const menuItem = await category.insertMenuItem(itemName, description, basePrice);
     itemMod = await menuItem.upsertItemMod(itemModName, min, max);
-    done();
   });
 
   after(() => disconnectDatabase());

@@ -21,7 +21,7 @@ export async function create(name, password, mode = Mode.REGULAR, attributes = {
   merchantId: null
 }) {
   try {
-    return (await models.Restaurant.create({name, password, mode, ...attributes}));
+    return (await models.Restaurant.create({name, password, mode, ...attributes})).toJSON();
   } catch (e) {
     throw new TraceError('Could not create restaurant', e, ...(e.errors || []));
   }
@@ -66,7 +66,7 @@ export function destroy(id) {
  */
 export async function findOne(id) {
   try {
-    return (await models.Restaurant.findOne({where: {id}}));
+    return (await models.Restaurant.findOne({where: {id}})).toJSON();
   } catch (e) {
     throw new TraceError('Could not find restaurant', e);
   }
@@ -120,7 +120,7 @@ export async function findOneWithMetaData(id, ...metadata) {
   }
 
   try {
-    return (await models.Restaurant.findOne(query));
+    return (await models.Restaurant.findOne(query)).toJSON();
   } catch (e) {
     throw new TraceError('Could not find restaurant', e);
   }
@@ -131,26 +131,9 @@ export async function findOneWithMetaData(id, ...metadata) {
  * @param {string} name: name of restaurant
  * @returns {Promise}: Returns the Restaurant object
  */
-export function findByName(name) {
-  return models.Restaurant.findOne({where: {name}});
+export async function findByName(name) {
+  return (await models.Restaurant.findOne({where: {name}})).toJSON();
 }
-
-/**
- * Finds all restauarnts
- *
- * @param {number} id: id of restaurant
- * @returns {Promise}: A list of all restaurants
- */
-export function getLocation(id) {
-  return new Promise(resolve => {
-    models.Restaurant
-          .findOne({where: {id}})
-          .then(restaurant => {
-            resolve(restaurant.getLocation());
-          });
-  });
-}
-
 
 /**
  * Get all restaurants
@@ -172,7 +155,7 @@ export function findAll() {
 export async function update(id, attributes) {
   try {
     const restaurant = await models.Restaurant.findOne({where: {id}});
-    return await restaurant.update(attributes);
+    return (await restaurant.update(attributes)).toJSON();
   } catch (e) {
     throw new TraceError('Could not update restaurant', e);
   }

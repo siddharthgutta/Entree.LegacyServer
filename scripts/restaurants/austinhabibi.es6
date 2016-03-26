@@ -400,7 +400,7 @@ let restaurantId;
 async function importMenu() {
   console.log('Importing Menu');
   try {
-    const restaurant = await Restaurant.create(restaurantName, restaurantPass, Mode.REGULAR);
+    const restaurant = (await Restaurant.create(restaurantName, restaurantPass, Mode.REGULAR)).resolve();
     restaurantId = restaurant.id;
     await Restaurant.update(restaurantId, {percentageFee, transactionFee});
     await Promise.each(menu, async menuCategory => {

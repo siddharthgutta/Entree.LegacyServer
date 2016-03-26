@@ -20,18 +20,18 @@ describe('Restaurant', () => {
     console.log('true');
   }
 
+  let restaurant;
+  beforeEach(async () => {
+    restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+  });
+
   describe('#insertCategory()', () => {
-    it('should insert a category for a restaurant correctly', done => {
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(restaurant => restaurant.insertCategory(category))
-        .then(result => {
-          assert.equal(result.name, category);
-          done();
-        });
+    it('should insert a category for a restaurant correctly', async () => {
+      const result = await restaurant.insertCategory(category);
+      assert.equal(result.name, category);
     });
 
     it('should not insert a restaurant category with null name', async done => {
-      const restaurant = Restaurant.create(name, password, mode, {phoneNumber});
       try {
         await restaurant.insertCategory(null);
       } catch (error) {
@@ -43,7 +43,6 @@ describe('Restaurant', () => {
     });
 
     it('should not insert duplicate categories', async done => {
-      const restaurant = await Restaurant.create(name, password, mode, {phoneNumber});
       await restaurant.insertCategory(category);
       try {
         await restaurant.insertCategory(category);
@@ -57,19 +56,14 @@ describe('Restaurant', () => {
   });
 
   describe('#findCategories()', () => {
-    it('should query categories for a restaurant correctly', done => {
-      let restaurant;
-      Restaurant.create(name, password, mode, {phoneNumber})
-        .then(_restaurant => restaurant = _restaurant)
-        .then(() => restaurant.insertCategory(category))
-        .then(() => restaurant.insertCategory('NewCategory'))
-        .then(() => restaurant.findCategories())
-        .then(result => {
-          assert.equal(result.length, 2);
-          assert.equal(result[0].name, category);
-          assert.equal(result[1].name, 'NewCategory');
-          done();
-        });
+    it('should query categories for a restaurant correctly', async () => {
+      await restaurant.insertCategory(category);
+      await restaurant.insertCategory('NewCategory');
+
+      const result = await restaurant.findCategories();
+      assert.equal(result.length, 2);
+      assert.equal(result[0].name, category);
+      assert.equal(result[1].name, 'NewCategory');
     });
   });
 });
