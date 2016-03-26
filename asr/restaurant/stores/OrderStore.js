@@ -47,7 +47,6 @@ class OrderStore extends Influx.Store {
           this.data.granted = granted;
         });
 
-        window.cordova.plugins.backgroundMode.enable();
         window.cordova.plugins.backgroundMode.setDefaults({text: 'Listening for orders'});
       }
     }, false);
@@ -86,7 +85,6 @@ class OrderStore extends Influx.Store {
   }
 
   getOrders(status) {
-    console.log(this.data.orders, status);
     return status ? this.data.orders.filter(order => order.status === status) : this.data.orders;
   }
 
@@ -224,6 +222,10 @@ class OrderStore extends Influx.Store {
           console.error(e);
         }
       }
+
+      if (window.cordova) {
+        window.cordova.plugins.backgroundMode.enable();
+      }
     }
   }
 
@@ -240,6 +242,15 @@ class OrderStore extends Influx.Store {
       } catch (e) {
         // ignore
       }
+    }
+
+    if (this.data.socket) {
+      this.data.socket.disconnect();
+      this.data.socket = null;
+    }
+
+    if (window.cordova) {
+      window.cordova.plugins.backgroundMode.disable();
     }
 
     return this._setConnectionStatus(Status.DISCONNECTED, 'Logged out');

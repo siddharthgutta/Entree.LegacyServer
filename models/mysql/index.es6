@@ -16,7 +16,7 @@ Sequelize.resolve = obj => {
   if (obj instanceof Instance) {
     return obj;
   } else if (!objectLookup.has(obj)) {
-    throw Error('Could not resolve Sequelize object from input. Deleted by GC?');
+    throw Error('Could not resolve Sequelize object from input. Is this an object returned by Sequelize?');
   }
 
   return objectLookup.get(obj);
@@ -46,12 +46,6 @@ export async function init(clearAll = false) {
       }
     }
 
-    /* TODO - Need to fix this
-     * Why this is required - Our api/ files that abstract the database should return pure JSON objects (Matthew
-     * understands the reasoning behind this the best). The problem is that when you call toJSON(), it strips away
-     * all of the attributes that Sequelize uses for its operations. Defining the resolve() method allows us to go
-     * from a plain JSON object back to the object defined by sequelize
-     * */
     const _get = Instance.prototype.get;
 
     Instance.prototype.get = function get(...args) {
@@ -63,7 +57,7 @@ export async function init(clearAll = false) {
       // deprecate
       Object.defineProperty(got, 'resolve', {
         configurable: true,
-        value: () => deprecate(() => Sequelize.resolve(got), 'Use Sequelize.resolve(object) instead; low-ass priority'),
+        value: () => deprecate(() => Sequelize.resolve(got), 'Use index.resolve(object) instead; low priority'),
         enumerable: false
       });
 
@@ -73,7 +67,7 @@ export async function init(clearAll = false) {
     };
 
     Instance.prototype.resolve = function resolve() {
-      return this;
+      return deprecate(() => this, 'Use index.resolve(object) instead; low priority');
     };
 
     sequelize.resolve = Sequelize.resolve;
