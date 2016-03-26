@@ -38,7 +38,7 @@ describe('ChatBot', () => {
   /* Creates a restaurant that has location, restaurant hours, a single category that has a single /menu item
    * which has two modifications */
   async function setupRestaurant() {
-    const restaurant = await Restaurant.create(restaurantName, password, mode, {phoneNumber});
+    const restaurant = (await Restaurant.create(restaurantName, password, mode, {phoneNumber})).resolve();
     await restaurant.upsertLocation(address, city, addrState, zipcode);
     await restaurant.addHour(dayOfTheWeek, openTime, closeTime);
 
@@ -55,7 +55,7 @@ describe('ChatBot', () => {
 
   /* Destroys both modifications for the /menu item */
   async function destroyMods() {
-    const restaurant = await Restaurant.findByName(restaurantName);
+    const restaurant = (await Restaurant.findByName(restaurantName)).resolve();
     const categories = await restaurant.findCategories();
     const menuItems = await categories[0].findMenuItems(0);
     const itemMods = await menuItems[0].findItemMods();

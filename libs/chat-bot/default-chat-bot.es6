@@ -189,7 +189,7 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     let restaurant, category, menuItems;
     try {
-      restaurant = await Restaurant.findOne(restaurantId);
+      restaurant = (await Restaurant.findOne(restaurantId)).resolve();
       category = await restaurant.findCategories();
       menuItems = await category[0].findMenuItems(); // TODO - Show the top items instead of the first category
     } catch (err) {
@@ -734,7 +734,7 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     let restaurant, categories, menuItems;
     try {
-      restaurant = await Restaurant.findByName(restaurantName);
+      restaurant = (await Restaurant.findByName(restaurantName)).resolve();
       if (!restaurant) {
         /* User typed in a restaurant name that doesn't exist */
         return response.userError;
@@ -778,7 +778,7 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     let restaurant, categories;
     try {
-      restaurant = await Restaurant.findByName(restaurantName);
+      restaurant = (await Restaurant.findByName(restaurantName)).resolve();
       if (!restaurant) {
         /* User typed in a restaurant name that doesn't exist */
         return response.userError;
@@ -813,7 +813,7 @@ export default class DefaultChatBot extends ChatBotInterface {
   async _handleAtRestaurantInfo(chatState, restaurantName) {
     let restaurant;
     try {
-      restaurant = await Restaurant.findByName(restaurantName);
+      restaurant = (await Restaurant.findByName(restaurantName)).resolve();
       if (!restaurant) {
         /* User typed in a restaurant name that doesn't exist */
         return response.userError;

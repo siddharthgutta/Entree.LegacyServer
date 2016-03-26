@@ -16,12 +16,10 @@ describe('MenuItem', () => {
   const description = 'Yummy!';
   const basePrice = 500;
 
-  beforeEach(done => {
-    clearDatabase()
-      .then(() => Restaurant.create(name, password, mode, {phoneNumber}))
-      .then(restaurant => restaurant.insertCategory(categoryName))
-      .then(_category => globalCategory = _category)
-      .then(() => done());
+  beforeEach(async () => {
+    await clearDatabase();
+    const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+    globalCategory = await restaurant.insertCategory(categoryName);
   });
 
   after(() => disconnectDatabase());

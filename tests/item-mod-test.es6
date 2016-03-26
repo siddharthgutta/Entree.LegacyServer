@@ -18,7 +18,7 @@ describe('ItemMod', () => {
 
   beforeEach(async done => {
     await clearDatabase();
-    const restaurant = await Restaurant.create(name, password, mode, {phoneNumber});
+    const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
     const category = await restaurant.insertCategory(categoryName);
     globalMenuItem = await category.insertMenuItem(itemName, description, basePrice);
     done();
@@ -48,22 +48,31 @@ describe('ItemMod', () => {
     it('should not insert item mod with max less than 1', async () => {
       try {
         await globalMenuItem.upsertItemMod('Sizes', 0, 0);
-        assert(false);
-      } catch (err) {/* Success */}
+      } catch (err) {
+        return;
+      }
+
+      assert(false);
     });
 
     it('should not insert item mod with min less than 0', async () => {
       try {
         await globalMenuItem.upsertItemMod('Sizes', -1, 1);
-        assert(false);
-      } catch (err) {/* Success */}
+      } catch (err) {
+        return;
+      }
+
+      assert(false);
     });
 
     it('should not insert item mod with max less than min', async () => {
       try {
         await globalMenuItem.upsertItemMod('Sizes', 2, 1);
-        assert(false);
-      } catch (err) {/* Success */}
+      } catch (err) {
+        return;
+      }
+
+      assert(false);
     });
   });
 

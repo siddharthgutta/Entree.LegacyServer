@@ -104,55 +104,40 @@ describe('Restaurant', () => {
   });
 
   describe('#destroy()', () => {
-    it('should delete from the database correctly', done => {
-      let id;
-      Restaurant.create(name, password, mode, {phoneNumber})
-                .then(result => id = result.id)
-                .then(() => Restaurant.destroy(id))
-                .then(() => Restaurant.findOne(id))
-                .then(restaurant => {
-                  assert.equal(restaurant, null);
-                  done();
-                });
+    it('should delete from the database correctly', async () => {
+      const restaurant = await Restaurant.create(name, password, mode, {phoneNumber});
+      await Restaurant.destroy(restaurant.id);
+      try {
+        await Restaurant.findOne(restaurant.id);
+      } catch (err) {
+        return;
+      }
+
+      assert(false);
     });
 
-    it('should cascade delete location when deleting restaurant', done => {
-      let restaurant;
-      Restaurant.create(name, password, mode, {phoneNumber})
-                .then(_restaurant => restaurant = _restaurant)
-                .then(() => restaurant.upsertLocation(address, city, state, zipcode))
-                .then(() => Restaurant.destroy(restaurant.id))
-                .then(() => Location.findAll())
-                .then(result => {
-                  assert.equal(result.length, 0);
-                  done();
-                });
+    it('should cascade delete location when deleting restaurant', async () => {
+      const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+      await restaurant.upsertLocation(address, city, state, zipcode);
+      await Restaurant.destroy(restaurant.id);
+      const result = await Location.findAll();
+      assert.equal(result.length, 0);
     });
 
-    it('should cascade delete restaurant hours when deleting restaurant', done => {
-      let restaurant;
-      Restaurant.create(name, password, mode, {phoneNumber})
-                .then(_restaurant => restaurant = _restaurant)
-                .then(() => restaurant.addHour(dayOfTheWeek, openTime, closeTime))
-                .then(() => Restaurant.destroy(restaurant.id))
-                .then(() => RestaurantHour.findAll())
-                .then(result => {
-                  assert.equal(result.length, 0);
-                  done();
-                });
+    it('should cascade delete restaurant hours when deleting restaurant', async () => {
+      const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+      await restaurant.addHour(dayOfTheWeek, openTime, closeTime);
+      await Restaurant.destroy(restaurant.id);
+      const result = await RestaurantHour.findAll();
+      assert.equal(result.length, 0);
     });
 
-    it('should cascade delete categories when deleting restaurant', done => {
-      let restaurant;
-      Restaurant.create(name, password, mode, {phoneNumber})
-                .then(_restaurant => restaurant = _restaurant)
-                .then(() => restaurant.insertCategory(category))
-                .then(() => Restaurant.destroy(restaurant.id))
-                .then(() => Category.findAll())
-                .then(result => {
-                  assert.equal(result.length, 0);
-                  done();
-                });
+    it('should cascade delete categories when deleting restaurant', async () => {
+      const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+      await restaurant.insertCategory(category);
+      await Restaurant.destroy(restaurant.id);
+      const result = await Category.findAll();
+      assert.equal(result.length, 0);
     });
   });
 });
