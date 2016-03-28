@@ -279,8 +279,8 @@ describe('ChatBot', () => {
 
     it('should not checkout with empty cart', async done => {
       const result = await bot.updateState(phoneNumber, '/checkout');
-      assert.equal(result, `We're still working on checkout right now. Checkout will be ready soon! Type /\"menu\" ` +
-        `to continue browsing the menu, or /\"clear\" to clear your entire cart and start over.`, 'Revert change' +
+      assert.equal(result, `We're still working on checkout right now. Checkout will be ready soon! Type \"/menu\" ` +
+        `to continue browsing the menu, or \"/clear\" to clear your entire cart and start over.`, 'Revert change' +
         'to test if pushing checkout to production!');
       // Uncomment this and remove the line above to push checkout to production
       /*
@@ -343,8 +343,8 @@ describe('ChatBot', () => {
 
     it('should not checkout with empty cart', async done => {
       const result = await bot.updateState(phoneNumber, '/checkout');
-      assert.equal(result, `We're still working on checkout right now. Checkout will be ready soon! Type /\"menu\" ` +
-        `to continue browsing the menu, or /\"clear\" to clear your entire cart and start over.`, 'Revert change' +
+      assert.equal(result, `We're still working on checkout right now. Checkout will be ready soon! Type \"/menu\" ` +
+        `to continue browsing the menu, or \"/clear\" to clear your entire cart and start over.`, 'Revert change' +
         'to test if pushing checkout to production!');
       // Uncomment this and remove the line above to push checkout to production
       /*

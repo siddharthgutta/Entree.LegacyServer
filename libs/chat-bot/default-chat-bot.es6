@@ -643,8 +643,8 @@ export default class DefaultChatBot extends ChatBotInterface {
       return `Your order using ${defaultPayment.cardType} - ${defaultPayment.last4} has been sent to the restaurant. ` +
         `We'll text you once it's confirmed by the restaurant`;
     }
-    return `We're still working on checkout right now. Checkout will be ready soon! Type /\"menu\" ` +
-      `to continue browsing the menu, or /\"clear\" to clear your entire cart and start over.`;
+    return `We're still working on checkout right now. Checkout will be ready soon! Type \"/menu\" ` +
+      `to continue browsing the menu, or \"/clear\" to clear your entire cart and start over.`;
   }
 
   async _handleContextMenu(chatState, restContext) {
