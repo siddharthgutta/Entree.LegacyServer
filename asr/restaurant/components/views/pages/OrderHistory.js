@@ -30,7 +30,7 @@ class OrderHistory extends Page {
 
   getModals() {
     return {
-      [Modals.FEEDBACK]: <Feedback />
+      [Modals.FEEDBACK]: <Feedback onSendFeedback={text => Dispatcher.emit(Dispatcher.Events.FEEDBACK, text)}/>
     };
   }
 

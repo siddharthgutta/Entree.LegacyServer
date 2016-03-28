@@ -47,7 +47,6 @@ class OrderStore extends Influx.Store {
           this.data.granted = granted;
         });
 
-        window.cordova.plugins.backgroundMode.enable();
         window.cordova.plugins.backgroundMode.setDefaults({text: 'Listening for orders'});
       }
     }, false);
@@ -57,13 +56,21 @@ class OrderStore extends Influx.Store {
 
   getDispatcherListeners() {
     return [
-      [Dispatcher, Dispatcher.Events.LOGIN, this._login]
+      [Dispatcher, Dispatcher.Events.LOGIN, this._login],
+      [Dispatcher, Dispatcher.Events.FEEDBACK, this._sendFeedback]
     ];
+  }
+
+  async _sendFeedback(content) {
+    await fetch(`${SERVER_URL}/api/v2/restaurant/feedback`, {
+      method: 'post',
+      body: {content}
+    });
   }
 
   _notify(title, text) {
     if (window.cordova) {
-      const sound = window.device.platform === 'Android' ? 'file://sound.mp3' : 'file://beep.caf';
+      const sound = window.device.platform === 'Android' ? 'audio/bell.mp3' : 'file://beep.caf';
       const notification = {
         id: Date.now(),
         title,
@@ -78,7 +85,6 @@ class OrderStore extends Influx.Store {
   }
 
   getOrders(status) {
-    console.log(this.data.orders, status);
     return status ? this.data.orders.filter(order => order.status === status) : this.data.orders;
   }
 
@@ -216,6 +222,10 @@ class OrderStore extends Influx.Store {
           console.error(e);
         }
       }
+
+      if (window.cordova) {
+        window.cordova.plugins.backgroundMode.enable();
+      }
     }
   }
 
@@ -232,6 +242,15 @@ class OrderStore extends Influx.Store {
       } catch (e) {
         // ignore
       }
+    }
+
+    if (this.data.socket) {
+      this.data.socket.disconnect();
+      this.data.socket = null;
+    }
+
+    if (window.cordova) {
+      window.cordova.plugins.backgroundMode.disable();
     }
 
     return this._setConnectionStatus(Status.DISCONNECTED, 'Logged out');

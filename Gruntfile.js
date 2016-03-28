@@ -140,6 +140,7 @@ module.exports = grunt => {
           {expand: true, cwd: 'resources/root', src: ['**/*'], dest: 'public/'},
           {expand: true, cwd: 'resources/fonts', src: ['**/*'], dest: 'public/fonts'},
           {expand: true, cwd: 'resources/images', src: ['**/*'], dest: 'public/images'},
+          {expand: true, cwd: 'resources/audio', src: ['**/*'], dest: 'public/audio'},
           {expand: true, cwd: 'resources/videos', src: ['**/*'], dest: 'public/videos'},
           {expand: true, cwd: 'resources/scripts', src: ['**/*'], dest: 'public/scripts'}
         ]
@@ -151,7 +152,7 @@ module.exports = grunt => {
       },
       builds: {
         files: {
-          'cordova/build/android-debug.apk': 'cordova/platforms/android/build/outputs/apk/android-debug.apk',
+          'cordova/build/Entree.apk': 'cordova/platforms/android/build/outputs/apk/android-debug.apk',
           'cordova/build/Entree.ipa': 'cordova/platforms/ios/build/device/Entree.ipa'
         }
       }
@@ -167,6 +168,7 @@ module.exports = grunt => {
     },
     clean: {
       build: ['public/', './package.noDevDeps.json'],
+      cordova: ['cordova/plugins', 'cordova/www', 'cordova/platforms'],
       compiled: ['./**/*.compiled.js', './**/*.compiled.js.map']
     },
     rename: {
@@ -192,14 +194,37 @@ module.exports = grunt => {
       }
     },
     shell: {
+      'cordova-prepare': {
+        command: ['cd cordova',
+          'mkdir -p www',
+          'mkdir -p platforms',
+          'cordova platform add ios || true',
+          'cordova platform add android || true',
+          'cordova prepare',
+          'cordova prepare ios',
+          'cordova prepare android',
+          `echo "${['@implementation NSURLRequest(DataController)',
+            '+ (BOOL)allowsAnyHTTPSCertificateForHost:(NSString *)host{return YES;}',
+            '@end'].join('\n')}" >> platforms/ios/Entree/Classes/AppDelegate.m`].join(' && '),
+        options: {
+          execOptions: {
+            maxBuffer: Number.MAX_SAFE_INTEGER
+          }
+        }
+      },
       'cordova-build': {
-        command: 'npm run cordova-build'
+        command: ['cd cordova', 'cordova build ios --device', 'cordova build android'].join(' && '),
+        options: {
+          execOptions: {
+            maxBuffer: Number.MAX_SAFE_INTEGER
+          }
+        }
       }
     },
     concurrent: {
       clean: ['clean:build', 'clean:compiled'],
-      build: ['filetransform:babel', 'sass:dist', 'imagemin', 'browserify:dist', 'jade:dist'],
-      'build:production': ['compile', 'sass:dist', 'imagemin', ['browserify:dist', 'uglify:dist'], 'jade:dist']
+      build: ['imagemin', 'browserify:dist', 'filetransform:babel', 'sass:dist', 'jade:dist'],
+      'build-production': ['imagemin', ['browserify:dist', 'uglify:dist'], 'compile', 'sass:dist', 'jade:dist']
     }
   };
 
@@ -218,21 +243,28 @@ module.exports = grunt => {
   grunt.registerTask('build', [
     'concurrent:clean',
     'copy:dist',
-    'concurrent:build',
-    'cordova'
+    'concurrent:build'
   ]);
 
   grunt.registerTask('production', [
     'copy:dist',
-    'concurrent:build:production',
-    'cordova'
+    'concurrent:build-production'
   ]);
 
   grunt.registerTask('cordova', [
+    'clean:cordova',
     'copy:cordova',
     'rename:dist',
+    'shell:cordova-prepare',
     'shell:cordova-build',
     'copy:builds'
+  ]);
+
+  grunt.registerTask('cordova-prepare', [
+    'clean:cordova',
+    'copy:cordova',
+    'rename:dist',
+    'shell:cordova-prepare'
   ]);
 
   grunt.registerTask('default', 'build');

@@ -94,7 +94,7 @@
     "superagent": "1.7.2",
     "supertest": "1.1.0",
     "trace-error": "0.0.6",
-    "twilio": "3.3.0-edge",
+    "twilio": "2.9.0",
     "underscore": "1.8.3",
     "url-parse": "1.0.5",
     "xml2js": "0.4.16"
@@ -117,7 +117,6 @@
     "bocl": "set -e; branch-off trigger cordova-local",
     "bocp": "set -e; branch-off trigger cordova-prod",
     "production": "grunt production",
-    "cordova-build": "cd cordova && cordova build ios --device && cordova build android",
     "cordova-emulate": "cd cordova && cordova emulate ios",
     "compile": "grunt compile",
     "validate": "npm ls"

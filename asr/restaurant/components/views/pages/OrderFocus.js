@@ -176,7 +176,7 @@ class OrderFocus extends Page {
             <div className='item flex' key={i}>
               <div className='box flex quantity center vertical'>{item.quantity || 1 }</div>
               <div className='box flex name center vertical'>{item.name}</div>
-              <div className='box flex cost center right vertical'>{`$${item.price.toFixed(2)}`}</div>
+              <div className='box flex cost center right vertical'>{`$${Number(item.price).toFixed(2)}`}</div>
             </div>
           ))}
         </div>

@@ -1,5 +1,6 @@
 import {Router} from 'express';
 import authenticate, {isAuthenticated, deauthenticate} from './authenticate.es6';
+import {broadcast} from '../../../api/controllers/sms.es6';
 import * as Order from '../../../api/controllers/order.es6';
 import * as Restaurant from '../../../api/controllers/restaurant.es6';
 import * as Notification from '../../../api/controllers/notification.es6';
@@ -95,6 +96,18 @@ router.post('/enabled', isAuthenticated, async(req, res) => {
   } catch (e) {
     res.fail(`Failed to set enabled: ${e.message}`).debug(e);
   }
+});
+
+router.post('/feedback', isAuthenticated, async(req, res) => {
+  const {content} = req.body;
+  const {id} = req.user;
+
+  if (typeof content === 'string') {
+    const restaurant = await Restaurant.getRestaurantWithMetaData(id);
+    broadcast(`${restaurant.name}: ${content}`);
+  }
+
+  res.ok();
 });
 
 export default router;

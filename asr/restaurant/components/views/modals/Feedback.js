@@ -4,16 +4,14 @@ import {onClick} from '../../../../libs/utils';
 class Feedback extends React.Component {
 
   static propTypes = {
-    onDecline: React.PropTypes.func.isRequired,
-    onCancel: React.PropTypes.func.isRequired,
+    onSendFeedback: React.PropTypes.func.isRequired,
     hide: React.PropTypes.func.isRequired,
     text: React.PropTypes.any,
     cost: React.PropTypes.any
   };
 
   static defaultProps = {
-    onDecline: Function,
-    onCancel: Function,
+    onSendFeedback: Function,
     hide: Function,
     text: '',
     cost: 0
@@ -28,32 +26,28 @@ class Feedback extends React.Component {
   }
 
   _handleDecline() {
-    const {onDecline, hide} = this.props;
+    const {onSendFeedback, hide} = this.props;
 
-    onDecline(this.state.message);
+    onSendFeedback(this.state.message);
     hide();
-  }
-
-  _setTime(time) {
-    this.setState({time: Math.abs(isNaN(time) ? 0 : Number(time))});
   }
 
   render() {
     return (
-        <div className='modal-box center'>
-          <div className='flex modal-header'>
-            <div className='box flex center vertical' style={{padding: 15}}>
-              <div className='desc'>FEEDBACK & CONCERNS</div>
-            </div>
-          </div>
-          <div className='body'>
-            <div className='desc bold normal' style={{marginBottom: 20}}>Let us know what you are thinking</div>
-            <textarea placeholder='Your message' value={this.state.message}
-                      onChange={e => this.setState({message: e.target.value})}/>
-            <div className='button teal' {...onClick(() => this._handleDecline())}>send feedback
-            </div>
+      <div className='modal-box center'>
+        <div className='flex modal-header'>
+          <div className='box flex center vertical' style={{padding: 15}}>
+            <div className='desc'>FEEDBACK & CONCERNS</div>
           </div>
         </div>
+        <div className='body'>
+          <div className='desc bold normal' style={{marginBottom: 20}}>Let us know what you are thinking</div>
+            <textarea placeholder='Your message' value={this.state.message}
+                      onChange={e => this.setState({message: e.target.value})}/>
+          <div className='button teal' {...onClick(() => this._handleDecline())}>send feedback
+          </div>
+        </div>
+      </div>
     );
   }
 }

@@ -63,7 +63,7 @@ class OrderTime extends React.Component {
           <div className='box flex center vertical' style={{padding: 15}}>
             <div className='value'>
               <div className='bubble icon dollar'/>
-              {this.props.cost}</div>
+              {Number(this.props.cost).toFixed(2)}</div>
             <div className='desc'>TOTAL COST</div>
           </div>
         </div>

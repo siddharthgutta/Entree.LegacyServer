@@ -9,7 +9,8 @@ const Events = keyMirror({
   REGISTER_MODAL: null,
   UNREGISTER_MODAL: null,
   MODAL_VISIBILITY: null,
-  MENU_VISIBILITY: null
+  MENU_VISIBILITY: null,
+  FEEDBACK: null
 });
 // @formatter:on
 
