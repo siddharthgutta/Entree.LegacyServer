@@ -80,13 +80,14 @@ describe('ChatState', () => {
         });
     });
 
-    it('should return null if there is no chat state', done => {
-      User.create(phoneNumber, name, email)
-        .then(user => user.findChatState())
-        .then(chatState => {
-          assert.equal(chatState, null);
-          done();
-        });
+    it('should return null if there is no chat state', async done => {
+      const user = await User.create(phoneNumber, name, email);
+      try {
+        await user.findChatState();
+        assert(false);
+      } catch (findChatStateErr) {
+        done();
+      }
     });
   });
 
