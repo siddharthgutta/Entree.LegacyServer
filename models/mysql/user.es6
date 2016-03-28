@@ -1,4 +1,5 @@
 import models from './index.es6';
+import {isEmpty} from '../../libs/utils.es6';
 
 export default function (sequelize, DataTypes) {
   const User = sequelize.define('User', {
@@ -57,7 +58,11 @@ export default function (sequelize, DataTypes) {
         return newChatState;
       },
       findChatState: async function () { // eslint-disable-line
-        return await this.getChatState();
+        const chatState = await this.getChatState();
+        if (isEmpty(chatState)) {
+          throw Error('Could not find chatState; empty chatState');
+        }
+        return chatState;
       }
     }
   });

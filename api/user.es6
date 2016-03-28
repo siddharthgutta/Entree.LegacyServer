@@ -7,6 +7,15 @@ import {UserSecret} from '../models/mongo/index.es6';
  */
 
 /**
+ * Returns an array of all users
+ *
+ * @returns {Array<Promise>}: array of users
+ */
+export function findAll() {
+  return models.User.findAll();
+}
+
+/**
  * Create a user
  *
  * @param {string} phoneNumber: user phone number
