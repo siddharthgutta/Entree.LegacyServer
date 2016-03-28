@@ -48,12 +48,15 @@ Emitter.on(Events.USER_PAYMENT_REGISTERED, async ({id: userId}) => {
     if (order) {
       const {id: orderId} = order;
       const {id: restaurantId} = await Order.getRestaurantFromOrder(orderId);
-      const {token} = await Payment.getCustomerDefaultPayment(userId);
+      const defaultPayment = await Payment.getCustomerDefaultPayment(userId);
       const price = await Order.getOrderTotalById(orderId);
 
       try {
-        const {id: transactionId} = await Payment.paymentWithToken(userId, restaurantId, token, price); // eslint-disable-line
+        const {id: transactionId} =
+          await Payment.paymentWithToken(userId, restaurantId, defaultPayment.token, price);
         await Order.setOrderStatus(orderId, Order.Status.RECEIVED_PAYMENT, {transactionId});
+        sendSMS(user.phoneNumber, `Your order using ${defaultPayment.cardType} - ${defaultPayment.last4} ` +
+          `has been sent to the restaurant. We'll text you once it's confirmed by the restaurant`);
       } catch (e) {
         const err = new TraceError(`Payment failed; user(${userId}) -> restaurant(${restaurantId})`, e);
         console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);

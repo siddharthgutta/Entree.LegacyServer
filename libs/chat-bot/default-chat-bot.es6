@@ -11,6 +11,9 @@ import _ from 'underscore';
 import * as Utils from '../utils.es6';
 import moment from 'moment';
 
+// Temporary Variable for turning of checkout in production
+const checkoutSwitch = false; // Flip to true to test checkout
+
 /* Disabling lint rule since it doesn't make sense */
 /* eslint-disable babel/generator-star-spacing,one-var */
 
@@ -568,66 +571,80 @@ export default class DefaultChatBot extends ChatBotInterface {
   }
 
   async _handleCheckout(chatState) {
-    let orderItems;
-    try {
-      orderItems = await chatState.findOrderItems();
-    } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to find order items`, err);
+    // Remove this if statement when we push checkout to production
+    if (checkoutSwitch) {
+      let orderItems;
+      try {
+        orderItems = await chatState.findOrderItems();
+      } catch (err) {
+        throw new TraceError(`ChatState id ${chatState.id} - Failed to find order items`, err);
+      }
+
+      if (orderItems.length === 0) {
+        return response.invalidCheckout;
+      }
+
+      let output = '';
+      let total = 0;
+      for (let i = 0; i < orderItems.length; i++) {
+        output += `${orderItems[i].name}, `;
+        total += orderItems[i].price;
+      }
+
+
+      let restaurant, user;
+      try {
+        restaurant = await chatState.findRestaurantContext();
+        user = await chatState.findUser();
+      } catch (err) {
+        throw new TraceError(`ChatState id ${chatState.id} - Failed to find user or restaurant for an order`, err);
+      }
+
+      // transform for order to support orders
+      const items = orderItems.map(({name, price}) => ({name, price, quantity: 1}));
+      let order;
+
+      try {
+        order = await Order.createOrder(user.id, restaurant.id, items);
+        await chatState.setOrderContext(order.resolve());
+      } catch (err) {
+        throw new TraceError(`ChatState id ${chatState.id} - Failed to create order and set the context`, err);
+      }
+
+      /* TODO -- transfer order items over to permanent order object
+       * what should I return for the payment processing? */
+      let defaultPayment;
+      try {
+        defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
+      } catch (defaultPaymentError) {
+        console.tag('chatbot').log('No default payment found. Sending user to signup2.');
+        const secret = await User.requestProfileEdit(user.id);
+        const url = await User.resolveProfileEditAddress(secret.secret);
+
+        // TODO @jesse handle state transitions as needed!
+        return `To complete your order and pay, please go to ${url}`;
+      }
+
+      try {
+        const {id: transactionId} = await Payment.paymentWithToken(user.id, restaurant.id, defaultPayment, total);
+        await Order.setOrderStatus(order.id, Order.Status.RECEIVED_PAYMENT, {transactionId});
+      } catch (paymentWithTokenError) {
+        console.tag('chatbot').error('Payment failed although customer default payment exists', paymentWithTokenError);
+        throw new TraceError('Payment failed although customer default payment exists', paymentWithTokenError);
+      }
+
+      try {
+        await chatState.clearOrderItems();
+        await chatState.updateState(chatStates.start);
+      } catch (err) {
+        throw new TraceError(`ChatState id ${chatState.id} - Failed to update chat bot metadata`, err);
+      }
+      /* Slice to remove trailing comma and whitespcae */
+      return `Your order using ${defaultPayment.cardType} - ${defaultPayment.last4} has been sent to the restaurant. ` +
+        `We'll text you once it's confirmed by the restaurant`;
     }
-
-    if (orderItems.length === 0) {
-      return response.invalidCheckout;
-    }
-
-    let output = '';
-    let total = 0;
-    for (let i = 0; i < orderItems.length; i++) {
-      output += `${orderItems[i].name}, `;
-      total += orderItems[i].price;
-    }
-
-
-    let restaurant, user;
-    try {
-      restaurant = await chatState.findRestaurantContext();
-      user = await chatState.findUser();
-    } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to find user or restaurant for an order`, err);
-    }
-
-    // transform for order to support orders
-    const items = orderItems.map(({name, price}) => ({name, price, quantity: 1}));
-    let order;
-
-    try {
-      order = await Order.createOrder(user.id, restaurant.id, items);
-      await chatState.setOrderContext(order.resolve());
-    } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to create order and set the context`, err);
-    }
-
-    let defaultPayment;
-    try {
-      defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
-    } catch (defaultPaymentError) {
-      console.tag('chatbot').log('No default payment found. Sending user to signup2.');
-      const secret = await User.requestProfileEdit(user.id);
-      const url = await User.resolveProfileEditAddress(secret.secret);
-
-      return `To complete your order and pay, please go to ${url}`;
-    }
-
-    try {
-      const {id: transactionId} = await Payment.paymentWithToken(user.id, restaurant.id, defaultPayment, total);
-      await Order.setOrderStatus(order.id, Order.Status.RECEIVED_PAYMENT, {transactionId});
-    } catch (paymentWithTokenError) {
-      console.tag('chatbot').error('Payment failed although customer default payment exists', paymentWithTokenError);
-      throw new TraceError('Payment failed although customer default payment exists', paymentWithTokenError);
-    }
-
-    /* Slice to remove trailing comma and whitespcae */
-    return `Your order using ${defaultPayment.cardType} - ${defaultPayment.last4} has been sent to the restaurant. ` +
-      `We'll text you once it's confirmed by the restaurant`;
+    return `We're still working on checkout right now. Checkout will be ready soon! Type \"menu\" ` +
+      `to continue browsing the menu, or \"clear\" to clear your entire cart and start over.`;
   }
 
   async _handleContextMenu(chatState, restContext) {
