@@ -57,7 +57,7 @@
   "UseRemoteSocketServer": false,
   "RemoteSocketServer": {
     "protocol": "http",
-    "hostname": "www.textentree.com",
+    "hostname": "staging.textentree.com",
     "port": 2996,
     "search": "?",
     "path": ""
