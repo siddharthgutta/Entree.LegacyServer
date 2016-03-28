@@ -28,12 +28,11 @@ if (!forceLocalStrategy && SocketServer instanceof RemoteSocketServer) {
   const devNumber = config.get('DeveloperNumber');
   console.tag('api', 'sms').info('using TwilioRemote; accepting only', devNumber);
 } else {
-  const fromNumber = config.get('Twilio.numbers')[0];
-  const productionCreds = config.get('Twilio.production');
+  const {sid, authToken, number} = config.get('Twilio.production');
 
-  sms = new Twilio(fromNumber, productionCreds.sid, productionCreds.authToken);
+  sms = new Twilio(number, sid, authToken);
 
-  console.tag('api', 'sms').info('using Twilio', fromNumber);
+  console.tag('api', 'sms').info('using Twilio', number);
 }
 
 /**

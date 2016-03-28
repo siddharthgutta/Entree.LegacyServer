@@ -6,4 +6,5 @@ export NODE_ENV=staging;
 export IS_RUNNING_TEST=true;
 
 set -e
+
 npm run test-ci ./tests/chat-bot-test.compiled.js
