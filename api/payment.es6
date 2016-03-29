@@ -187,13 +187,13 @@ export async function generateClientToken() {
  */
 async function makePayment(amount, merchantId, name, paymentMethodToken, customerId, serviceFee) {
   const result = await bt.transaction(amount, merchantId, name, paymentMethodToken, customerId, serviceFee);
-  if (!result.success && !result.errors.deepErrors()) {
+  if (!result.success && !isEmpty(result.errors) && !isEmpty(result.errors.deepErrors())) {
     console.tag(logTags).error(`Validation Errors on makePayment`);
     console.tag(logTags).error(result.errors.deepErrors());
     throw result.transaction;
   } else if (!result.success) {
     console.tag(logTags).error(`Failed to Execute Transaction on makePayment`);
-    console.tag(logTags).error(result.transaction.status);
+    console.tag(logTags).error(result.transaction);
     throw result.transaction;
   } else {
     return result.transaction;

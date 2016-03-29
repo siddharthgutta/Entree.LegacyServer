@@ -633,12 +633,6 @@ export default class DefaultChatBot extends ChatBotInterface {
         throw new TraceError('Payment failed although customer default payment exists', paymentWithTokenError);
       }
 
-      try {
-        await chatState.clearOrderItems();
-        await chatState.updateState(chatStates.start);
-      } catch (err) {
-        throw new TraceError(`ChatState id ${chatState.id} - Failed to update chat bot metadata`, err);
-      }
       /* Slice to remove trailing comma and whitespcae */
       return `Your order using ${defaultPayment.cardType} - ${defaultPayment.last4} has been sent to the restaurant. ` +
         `We'll text you once it's confirmed by the restaurant`;
