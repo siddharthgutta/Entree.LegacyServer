@@ -91,7 +91,7 @@ export function parse(slackbot, btSignature, btPayload, test = false) {
         // Making sandbox stop spamming #merchants completely
         // NOTE: This means only production will fire slack notifications for webhooks
         // When wanting to test webhooks for sandbox, remove '&& productionOrSandbox'
-        if (!test && productionOrSandbox) {
+        if (!test) {
           slackbot.send(slackConfigs.channelId, data, '');
         }
       }
