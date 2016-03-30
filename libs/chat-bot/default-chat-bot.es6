@@ -626,7 +626,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       }
 
       try {
-        const {id: transactionId} = await Payment.paymentWithToken(user.id, restaurant.id, defaultPayment, total);
+        const {id: transactionId} = await Payment.paymentWithToken(user.id, restaurant.id, defaultPayment.token, total);
         await Order.setOrderStatus(order.id, Order.Status.RECEIVED_PAYMENT, {transactionId});
       } catch (paymentWithTokenError) {
         console.tag('chatbot').error('Payment failed although customer default payment exists', paymentWithTokenError);
