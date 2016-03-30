@@ -81,7 +81,7 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
   };
 
   if (order.status === Order.Status.ACCEPTED) {
-    const user = await order.findUser();
+    const user = await User.UserModel.findOneByPhoneNumber(order.User.phoneNumber);
     const chatState = await user.findChatState();
 
     await chatState.clearOrderItems();
@@ -90,7 +90,7 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
   }
 
   if (order.status === Order.Status.COMPLETED) {
-    const user = await order.findUser();
+    const user = await User.UserModel.findOneByPhoneNumber(order.User.phoneNumber);
     const chatState = await user.findChatState();
 
     await chatState.clearOrderContext();
