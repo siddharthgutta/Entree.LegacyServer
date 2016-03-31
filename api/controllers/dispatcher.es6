@@ -1,6 +1,7 @@
 import Emitter, {Events} from '../events/index.es6';
 import {DefaultChatBot, chatStates} from '../../libs/chat-bot/index.es6';
 import {sendSMS} from './sms.es6';
+import {resolve} from '../../models/index.es6';
 import * as Order from './order.es6';
 import * as User from './user.es6';
 import * as Payment from '../payment.es6';
@@ -80,8 +81,10 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
     [Order.Status.COMPLETED]: `Your order is ready!`
   };
 
+  const orderObj = resolve(await Order.getOrder(order.id));
+  const user = await orderObj.findUser();
+
   if (order.status === Order.Status.ACCEPTED) {
-    const user = await order.findUser();
     const chatState = await user.findChatState();
 
     await chatState.clearOrderItems();
@@ -90,15 +93,13 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
   }
 
   if (order.status === Order.Status.COMPLETED) {
-    const user = await order.findUser();
     const chatState = await user.findChatState();
-
     await chatState.clearOrderContext();
   }
 
   const text = message[order.status];
 
   if (text) {
-    await sendSMS(order.User.phoneNumber, text);
+    await sendSMS(user.phoneNumber, text);
   }
 });
