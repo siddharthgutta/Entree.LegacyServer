@@ -144,6 +144,9 @@ export function findAll() {
   return models.Restaurant.findAll();
 }
 
+export async function findAllNotGod() {
+  return await models.Restaurant.findAll({where: {name: {$ne: 'entreegod'}}});
+}
 
 /**
  * Update a restaurant attributes
