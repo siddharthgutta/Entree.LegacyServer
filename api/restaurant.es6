@@ -144,8 +144,8 @@ export function findAll() {
   return models.Restaurant.findAll();
 }
 
-export async function findAllNotGod() {
-  return await models.Restaurant.findAll({where: {name: {$ne: 'entreegod'}}});
+export async function findAllRegular() {
+  return await models.Restaurant.findAll({where: {mode: Mode.REGULAR}});
 }
 
 /**

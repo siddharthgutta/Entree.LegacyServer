@@ -3,7 +3,7 @@ import models from './index.es6';
 export default function (sequelize, DataTypes) {
   const Category = sequelize.define('Category', {
     name: {
-      type: DataTypes.STRING(16), // eslint-disable-line new-cap,babel/new-cap
+      type: DataTypes.STRING(64), // eslint-disable-line new-cap,babel/new-cap
       allowNull: false
     }
   }, {
