@@ -17,7 +17,8 @@ class Order extends React.Component {
   _calculateCost() {
     const {order} = this.props;
 
-    return order.Items.reduce((memo, item) => item.price + memo, 0);
+    /* Divide by 100 since we process in cents */
+    return (order.Items.reduce((memo, item) => item.price + memo, 0)) / 100;
   }
 
   render() {
