@@ -172,7 +172,7 @@ export default class DefaultChatBot extends ChatBotInterface {
 
   async _handleMore(chatState) {
     /* TODO - pagination for finding more. Should not show all restaurants */
-    const restaurants = await Restaurant.findAllNotGod();
+    const restaurants = await Restaurant.findAllRegular();
     return await this._genOutput(
       chatState,
       response.restaurant.header,
@@ -697,7 +697,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     try {
       await chatState.updateState(chatStates.restaurants);
       // TODO - Replace this with curation of recommended restaurants
-      const restaurants = await Restaurant.findAllNotGod();
+      const restaurants = await Restaurant.findAllRegular();
       return await this._genOutput(
         chatState,
         response.restaurant.header,
