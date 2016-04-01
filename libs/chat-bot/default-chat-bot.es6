@@ -56,7 +56,7 @@ export const response = {
   items: {
     footer: 'Pick a number for an item you want or type \"/menu\" to see the full menu',
     dataFormat: (i, data) => `${i + 1}) ${data[i].name}: $${(data[i].basePrice / 100).toFixed(2)}\n` +
-      `--  ${data[i].description.toLowerCase()} `
+    `--  ${data[i].description.toLowerCase()} `
   },
 
   mods: {
@@ -146,7 +146,7 @@ export default class DefaultChatBot extends ChatBotInterface {
         return await this._modsTransition(chatState, input);
       default:
         /* If user isn't in above states and command was not stateless or contextual, then it was
-        * an invalid command */
+         * an invalid command */
         return response.userError;
     }
   }
@@ -320,7 +320,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
 
     /* Go to the mods state if there are mods and
-    * or straight to cart if there are no mods*/
+     * or straight to cart if there are no mods*/
     if (itemMods.length > 0) {
       let sortedItemMods, firstItemMod, mods;
       try {

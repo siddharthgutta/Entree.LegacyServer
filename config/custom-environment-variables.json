@@ -24,6 +24,13 @@
     "hostname": "SOCKET_SERVER_HOSTNAME",
     "extHostname": "SOCKET_SERVER_EXT_HOSTNAME"
   },
+  "Twilio": {
+    "production": {
+      "number": "TWILIO_NUMBER",
+      "sid": "TWILIO_SID",
+      "authToken": "TWILIO_AUTH"
+    }
+  },
   "Server": {
     "httpsRejectUnauthorized": {
       "__name": "HTTPS_REJECT_UNAUTHORIZED",

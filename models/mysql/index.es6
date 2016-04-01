@@ -57,7 +57,7 @@ export async function init(clearAll = false) {
       // deprecate
       Object.defineProperty(got, 'resolve', {
         configurable: true,
-        value: () => deprecate(() => Sequelize.resolve(got), 'Use index.resolve(object) instead; low priority'),
+        value: () => deprecate(() => Sequelize.resolve(got), 'Use index.resolve(object) instead'),
         enumerable: false
       });
 
@@ -67,7 +67,7 @@ export async function init(clearAll = false) {
     };
 
     Instance.prototype.resolve = function resolve() {
-      return deprecate(() => this, 'Use index.resolve(object) instead; low priority');
+      return deprecate(() => this, 'Use index.resolve(object) instead');
     };
 
     sequelize.resolve = Sequelize.resolve;

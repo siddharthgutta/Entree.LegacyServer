@@ -104,8 +104,8 @@ describe('ChatBot', () => {
   describe('#updateState() for stateless commands', () => {
     beforeEach(done => {
       User.create(phoneNumber, name, email)
-        .then(user => user.insertChatState(chatStates.start))
-        .then(() => done());
+          .then(user => user.insertChatState(chatStates.start))
+          .then(() => done());
     });
 
     it('should not change state using the \"/help\" command', async done => {
@@ -191,9 +191,9 @@ describe('ChatBot', () => {
   describe('#updateState() from the restaurants state', () => {
     beforeEach(done => {
       User.create(phoneNumber, name, email)
-        .then(user => user.insertChatState(chatStates.start))
-        .then(() => bot.updateState(phoneNumber, '/r'))
-        .then(() => done());
+          .then(user => user.insertChatState(chatStates.start))
+          .then(() => bot.updateState(phoneNumber, '/r'))
+          .then(() => done());
     });
 
     it('should change to items state when selecting a restaurant', async done => {
@@ -206,12 +206,12 @@ describe('ChatBot', () => {
 
     it('should stay the same state when asking for more restaurants', done => {
       bot.updateState(phoneNumber, 'more')
-        .then(() => User.findOneByPhoneNumber(phoneNumber))
-        .then(user => user.findChatState())
-        .then(chatState => {
-          assert.equal(chatState.state, chatStates.restaurants);
-          done();
-        });
+         .then(() => User.findOneByPhoneNumber(phoneNumber))
+         .then(user => user.findChatState())
+         .then(chatState => {
+           assert.equal(chatState.state, chatStates.restaurants);
+           done();
+         });
     });
 
     it('should respond to the user with an error given an invalid command', async done => {
@@ -227,9 +227,9 @@ describe('ChatBot', () => {
   describe('#updateState() from the categories state', () => {
     beforeEach(done => {
       User.create(phoneNumber, name, email)
-        .then(user => user.insertChatState(chatStates.start))
-        .then(() => bot.updateState(phoneNumber, `@${restaurantName} menu`))
-        .then(() => done());
+          .then(user => user.insertChatState(chatStates.start))
+          .then(() => bot.updateState(phoneNumber, `@${restaurantName} menu`))
+          .then(() => done());
     });
 
     it('should change to items state when selecting a category', async done => {
@@ -290,9 +290,9 @@ describe('ChatBot', () => {
   describe('#updateState() from the items state', () => {
     beforeEach(done => {
       User.create(phoneNumber, name, email)
-        .then(user => user.insertChatState(chatStates.start))
-        .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
-        .then(() => done());
+          .then(user => user.insertChatState(chatStates.start))
+          .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
+          .then(() => done());
     });
 
     it('should change to mods state if there is a mod', async done => {
@@ -348,10 +348,10 @@ describe('ChatBot', () => {
   describe('#updateState() from the mods state', () => {
     beforeEach(done => {
       User.create(phoneNumber, name, email)
-        .then(user => user.insertChatState(chatStates.start))
-        .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
-        .then(() => bot.updateState(phoneNumber, '1'))
-        .then(() => done());
+          .then(user => user.insertChatState(chatStates.start))
+          .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
+          .then(() => bot.updateState(phoneNumber, '1'))
+          .then(() => done());
     });
 
     it('should change state to the cart state after selecting mods', async done => {
@@ -401,12 +401,12 @@ describe('ChatBot', () => {
   describe('#updateState() from the cart state', () => {
     beforeEach(done => {
       User.create(phoneNumber, name, email)
-        .then(user => user.insertChatState(chatStates.start))
-        .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
-        .then(() => bot.updateState(phoneNumber, '1'))
-        .then(() => bot.updateState(phoneNumber, '1'))
-        .then(() => bot.updateState(phoneNumber, '1'))
-        .then(() => done());
+          .then(user => user.insertChatState(chatStates.start))
+          .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
+          .then(() => bot.updateState(phoneNumber, '1'))
+          .then(() => bot.updateState(phoneNumber, '1'))
+          .then(() => bot.updateState(phoneNumber, '1'))
+          .then(() => done());
     });
 
     it('should have cleared the item context', async done => {
@@ -470,9 +470,9 @@ describe('ChatBot', () => {
   describe('#_isContextual()', () => {
     beforeEach(done => {
       User.create(phoneNumber, name, email)
-        .then(user => user.insertChatState(chatStates.start))
-        .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
-        .then(() => done());
+          .then(user => user.insertChatState(chatStates.start))
+          .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
+          .then(() => done());
     });
 
     it('should determine the correct commands to be context commands', async done => {
