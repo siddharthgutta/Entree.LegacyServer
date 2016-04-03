@@ -100,7 +100,7 @@ class App extends Influx.Component {
                   <div className='label'>Expiration</div>
                   <input className='input' data-braintree-name='expiration_date' placeholder='MM/YY'/>
                 </div>
-                <button className='button' type='submit' style={{margin: 0}}>Save</button>
+                <button className='button' type='submit' style={{margin: 0}}>Submit</button>
               </form> :
               <div>
                 <div className='label' style={{textAlign: 'center'}}>Your session has expired</div>

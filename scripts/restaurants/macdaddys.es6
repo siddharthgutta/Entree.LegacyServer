@@ -199,7 +199,7 @@ async function importMenu() {
           });
         }
         if (!isEmpty(menuCategory.mods)) {
-          const itemMod = await item.upsertItemMod('Add-ons', 0, 4);
+          const itemMod = await item.upsertItemMod('Add-ons', 0, 5);
           await Promise.each(menuCategory.mods, async mod => {
             await itemMod.upsertMod(mod.name, mod.price);
           });

@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+# This script is for running the producer onboarding scripts
+# Run this with
+# branch-off trigger onboardProducer <release | manual> <script>
+
+# Ex:
+# branch-off trigger onboardProducer release scripts/restaurants/austinhabibi.compiled.js
+
+echo "Running script: ${2}"
+
+cd ../ && node ${2}

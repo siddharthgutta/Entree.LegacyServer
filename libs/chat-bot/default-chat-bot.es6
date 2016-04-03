@@ -29,6 +29,8 @@ export const response = {
   /* Returned when there is a user error */
   userError: 'Sorry, we don\'t recognize that command. Please try again.',
 
+  invalidRestaurant: 'Sorry, we don\'t recognize that restaurant. Please try again.',
+
   /* Returned when user tries to execute context command while not in restaurant context */
   invalidContext: 'Sorry that command isn`t available right now. Please try again',
 
@@ -42,7 +44,7 @@ export const response = {
 
   /* I/O formatting for transition to various states */
   restaurant: {
-    header: 'Here are the restaurants we work at.',
+    header: 'Here are our recommended food trucks.',
     footer: 'Select the number of a restaurant.',
     dataFormat: (i, data) => `${i + 1}) ${data[i].name}`
   },
@@ -274,17 +276,17 @@ export default class DefaultChatBot extends ChatBotInterface {
 
   _genModFooter(itemMod) {
     if (itemMod.min === 0) {
-      return `Select up to ${itemMod.max} options by typing in comma separated values (e.g. 1 or 1,3,2) or` +
-        ` \"no\"`;
+      return `Select up to ${itemMod.max} options by selecting a number or type \"no\" for none of the above. ` +
+        `If you want more than one, separate them with commas (e.g. 1,3,5).`;
     }
 
     if (itemMod.min < itemMod.max) {
       return `Select at least ${itemMod.min} and up to ${itemMod.max} options by typing in comma` +
-        ` separated values (e.g. 1 or 1,3,2)`;
+        ` separated numbers (e.g. 1 or 1,3,2).`;
     }
 
     return `Select exactly ${itemMod.max} ${itemMod.max > 1 ? 'options' : 'option'} by typing in` +
-      ` ${itemMod.max > 1 ? 'comma separated values (e.g. 1,2,4)' : 'a number'}`;
+      ` ${itemMod.max > 1 ? 'comma separated numbers (e.g. 1,2,4).' : 'a number.'}`;
   }
 
   /**
@@ -726,11 +728,11 @@ export default class DefaultChatBot extends ChatBotInterface {
     let restaurant, categories, menuItems;
     try {
       restaurant = (await Restaurant.findByName(restaurantName)).resolve();
-      if (!restaurant) {
-        /* User typed in a restaurant name that doesn't exist */
-        return response.userError;
-      }
+    } catch (err) {
+      return response.invalidRestaurant;
+    }
 
+    try {
       categories = await restaurant.findCategories();
       menuItems = await categories[0].findMenuItems(); // TODO - curate items
     } catch (err) {
