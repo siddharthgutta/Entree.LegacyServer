@@ -45,7 +45,7 @@ export const response = {
   /* I/O formatting for transition to various states */
   restaurant: {
     header: 'Here are our recommended food trucks.',
-    footer: 'Select the number of a restaurant.',
+    footer: 'Select the number of a restaurant or type \"/help\" at any time for help.',
     dataFormat: (i, data) => `${i + 1}) ${data[i].name}`
   },
 
