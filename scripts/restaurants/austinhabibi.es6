@@ -212,10 +212,10 @@ const menu = [
           {
             name: 'Add-ons',
             mods: [
-              itemMods[6], itemMods[7], itemMods[2], itemMods[5], itemMods[3]
+              itemMods[6], itemMods[2], itemMods[5], itemMods[3]
             ],
             min: 0,
-            max: 5
+            max: 4
           }
         ]
       }, {
