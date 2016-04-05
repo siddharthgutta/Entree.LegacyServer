@@ -27,7 +27,8 @@ const zipcode = '78703';
 const percentageFee = 5;
 const transactionFee = 30;
 
-const restaurantName = 'austinshabibi';
+const restaurantName = 'Austin\'s Habibi';
+const restaurantHandle = 'austinshabibi';
 const restaurantPass = 'greekwraps';
 
 // @jlmao @bluejamesbond
@@ -400,7 +401,8 @@ let restaurantId;
 async function importMenu() {
   console.log('Importing Menu');
   try {
-    const restaurant = (await Restaurant.create(restaurantName, restaurantPass, Mode.REGULAR)).resolve();
+    const restaurant = (await Restaurant.create(restaurantName,
+      restaurantHandle, restaurantPass, Mode.REGULAR)).resolve();
     restaurantId = restaurant.id;
     await Restaurant.update(restaurantId, {percentageFee, transactionFee});
     await Promise.each(menu, async menuCategory => {

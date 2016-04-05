@@ -13,6 +13,7 @@ after(() => disconnectDatabase());
 
 describe('Restaurant', () => {
   const name = 'TestRestaurant';
+  const handle = 'testrestaurant';
   const password = '1234';
   const phoneNumber = '1234567890';
   const mode = Restaurant.Mode.REGULAR;
@@ -36,7 +37,7 @@ describe('Restaurant', () => {
 
   describe('#create()', () => {
     it('should insert to and query from the database correctly', done => {
-      Restaurant.create(name, password, mode, {phoneNumber, merchantApproved, merchantId})
+      Restaurant.create(name, handle, password, mode, {phoneNumber, merchantApproved, merchantId})
                 .then(restaurant => {
                   assert.equal(restaurant.name, name);
                   assert.equal(restaurant.password, password);
@@ -50,7 +51,7 @@ describe('Restaurant', () => {
 
     it('should insert to and query from the database correctly' +
        'without optional params', done => {
-      Restaurant.create(name, password)
+      Restaurant.create(name, handle, password)
                 .then(restaurant => {
                   assert.equal(restaurant.name, name);
                   assert.equal(restaurant.password, password);
@@ -61,7 +62,7 @@ describe('Restaurant', () => {
 
     it('should not create Restaurants that have null name, null password, null mode' +
        'or phone number of length not 10', done => {
-      Restaurant.create(null, null, null, {phoneNumber: '123', merchantId: 'a'.repeat(33)})
+      Restaurant.create(null, null, null, null, {phoneNumber: '123', merchantId: 'a'.repeat(33)})
                 .then(() => {
                   assert(false);
                   done();
@@ -72,7 +73,7 @@ describe('Restaurant', () => {
     });
 
     it('should not create Restaurant with non numeric phone number', done => {
-      Restaurant.create(name, password, mode, {phoneNumber: 'abcdefghij'})
+      Restaurant.create(name, handle, password, mode, {phoneNumber: 'abcdefghij'})
                 .then(() => {
                   assert(false);
                   done();
@@ -86,7 +87,7 @@ describe('Restaurant', () => {
   describe('#update()', () => {
     it('should update and query from the database correctly', done => {
       let id;
-      Restaurant.create(name, password, mode, {phoneNumber})
+      Restaurant.create(name, handle, password, mode, {phoneNumber})
                 .then(result => id = result.id)
                 .then(() => Restaurant.update(id, {name: 'Rest', password: 'a', phoneNumber: '1234561234',
                   merchantId: true, merchantApproved: false}))
@@ -105,7 +106,7 @@ describe('Restaurant', () => {
 
   describe('#destroy()', () => {
     it('should delete from the database correctly', async () => {
-      const restaurant = await Restaurant.create(name, password, mode, {phoneNumber});
+      const restaurant = await Restaurant.create(name, handle, password, mode, {phoneNumber});
       await Restaurant.destroy(restaurant.id);
       try {
         await Restaurant.findOne(restaurant.id);
@@ -117,7 +118,7 @@ describe('Restaurant', () => {
     });
 
     it('should cascade delete location when deleting restaurant', async () => {
-      const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+      const restaurant = (await Restaurant.create(name, handle, password, mode, {phoneNumber})).resolve();
       await restaurant.upsertLocation(address, city, state, zipcode);
       await Restaurant.destroy(restaurant.id);
       const result = await Location.findAll();
@@ -125,7 +126,7 @@ describe('Restaurant', () => {
     });
 
     it('should cascade delete restaurant hours when deleting restaurant', async () => {
-      const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+      const restaurant = (await Restaurant.create(name, handle, password, mode, {phoneNumber})).resolve();
       await restaurant.addHour(dayOfTheWeek, openTime, closeTime);
       await Restaurant.destroy(restaurant.id);
       const result = await RestaurantHour.findAll();
@@ -133,7 +134,7 @@ describe('Restaurant', () => {
     });
 
     it('should cascade delete categories when deleting restaurant', async () => {
-      const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+      const restaurant = (await Restaurant.create(name, handle, password, mode, {phoneNumber})).resolve();
       await restaurant.insertCategory(category);
       await Restaurant.destroy(restaurant.id);
       const result = await Category.findAll();

@@ -11,6 +11,7 @@ after(() => disconnectDatabase());
 
 describe('Location', () => {
   const name = 'TestRestaurant';
+  const handle = 'testrestaurant';
   const password = '1234';
   const phoneNumber = '1234567890';
   const mode = Restaurant.Mode.REGULAR;
@@ -26,7 +27,7 @@ describe('Location', () => {
 
   let restaurant;
   beforeEach(async () => {
-    restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+    restaurant = (await Restaurant.create(name, handle, password, mode, {phoneNumber})).resolve();
   });
 
   describe('#upsertLocation()', () => {

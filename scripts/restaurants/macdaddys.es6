@@ -27,7 +27,8 @@ const zipcode = '78705';
 const percentageFee = 3.5;
 const transactionFee = 30;
 
-const restaurantName = 'macdaddys';
+const restaurantName = 'Mac Daddy\'s';
+const restaurantHandle = 'macdaddys';
 const restaurantPass = 'mac&cheese';
 
 const hours = [
@@ -185,7 +186,8 @@ let restaurantId;
 async function importMenu() {
   console.log('Importing Menu');
   try {
-    const restaurant = (await Restaurant.create(restaurantName, restaurantPass, Mode.REGULAR)).resolve();
+    const restaurant = (await Restaurant.create(restaurantName,
+      restaurantHandle, restaurantPass, Mode.REGULAR)).resolve();
     restaurantId = restaurant.id;
     await Restaurant.update(restaurantId, {percentageFee, transactionFee});
     await Promise.each(menu, async menuCategory => {

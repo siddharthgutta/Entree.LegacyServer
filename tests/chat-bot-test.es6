@@ -8,6 +8,7 @@ describe('ChatBot', () => {
   const bot = new DefaultChatBot();
 
   const restaurantName = 'TestRestaurant';
+  const restaurantHandle = 'testrestaurant';
   const password = '1234';
   const mode = Restaurant.Mode.REGULAR;
 
@@ -38,7 +39,8 @@ describe('ChatBot', () => {
   /* Creates a restaurant that has location, restaurant hours, a single category that has a single /menu item
    * which has two modifications */
   async function setupRestaurant() {
-    const restaurant = (await Restaurant.create(restaurantName, password, mode, {phoneNumber})).resolve();
+    const restaurant = (await Restaurant.create(restaurantName,
+      restaurantHandle, password, mode, {phoneNumber})).resolve();
     await restaurant.upsertLocation(address, city, addrState, zipcode);
     await restaurant.addHour(dayOfTheWeek, openTime, closeTime);
 

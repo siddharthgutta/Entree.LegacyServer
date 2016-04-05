@@ -29,7 +29,8 @@ async function url() {
 
 async function createTestRestaurant() {
   const name = chance.word();
-  return await Restaurant.RestaurantModel.create(name, 'test', Restaurant.RestaurantModel.Mode.GOD);
+  return await Restaurant.RestaurantModel.create(name,
+    name.replace(/[^0-9a-zA-Z]/g, '').toLowerCase(), 'test', Restaurant.RestaurantModel.Mode.GOD);
 }
 
 async function fetchToken(id, password) {
@@ -55,7 +56,8 @@ router.get('/generate/restaurant/:name*?', async (req, res) => {
   const name = req.params.name || chance.word();
   const {mode} = String(req.query.mode).toUpperCase() === Restaurant.RestaurantModel.Mode.GOD ?
     Restaurant.RestaurantModel.Mode.GOD : Restaurant.RestaurantModel.Mode.REGULAR;
-  const restaurant = await Restaurant.RestaurantModel.create(name, 'test', mode);
+  const restaurant = await Restaurant.RestaurantModel.create(name,
+    name.replace(/[^0-9a-zA-Z]/g, '').toLowerCase(), 'test', mode);
   const {id, password} = restaurant;
   const address = await url();
   const token = await fetchToken(id, password);

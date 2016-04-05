@@ -10,6 +10,7 @@ after(() => disconnectDatabase());
 
 describe('Restaurant', () => {
   const name = 'TestRestaurant';
+  const handle = 'testrestaurant';
   const password = '1234';
   const phoneNumber = '1234567890';
   const mode = Restaurant.Mode.REGULAR;
@@ -24,7 +25,7 @@ describe('Restaurant', () => {
 
   describe('#addHours()', () => {
     it('should add and query restaurant hours for a restaurant correctly', async () => {
-      const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+      const restaurant = (await Restaurant.create(name, handle, password, mode, {phoneNumber})).resolve();
       const hour = await restaurant.addHour(dayOfTheWeek, openTime, closeTime);
 
       assert.equal(hour.dayOfTheWeek, dayOfTheWeek);
@@ -33,7 +34,7 @@ describe('Restaurant', () => {
     });
 
     it('should support multiple days of the week', async () => {
-      const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+      const restaurant = (await Restaurant.create(name, handle, password, mode, {phoneNumber})).resolve();
       await restaurant.addHour(dayOfTheWeek, openTime, closeTime);
       await restaurant.addHour('Tuesday', openTime, closeTime);
 
@@ -42,7 +43,7 @@ describe('Restaurant', () => {
     });
 
     it('should not create a restaurant hour with null day of the week', async done => {
-      const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+      const restaurant = (await Restaurant.create(name, handle, password, mode, {phoneNumber})).resolve();
       try {
         await restaurant.addHour(null, openTime, closeTime);
       } catch (error) {
@@ -56,7 +57,7 @@ describe('Restaurant', () => {
 
   describe('#removeHours()', () => {
     it('should remove restaurant hours correctly', async done => {
-      const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+      const restaurant = (await Restaurant.create(name, handle, password, mode, {phoneNumber})).resolve();
       await restaurant.addHour(dayOfTheWeek, openTime, closeTime);
       let result = await restaurant.findHours();
       assert.equal(result.length, 1);

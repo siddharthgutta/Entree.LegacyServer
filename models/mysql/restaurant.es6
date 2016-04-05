@@ -10,6 +10,11 @@ export default function (sequelize, DataTypes) {
       unique: true,
       allowNull: false
     },
+    handle: {
+      type: DataTypes.STRING(25), // eslint-disable-line new-cap,babel/new-cap
+      unique: true,
+      allowNull: true // Switching back after this revision
+    },
     password: {
       type: DataTypes.STRING(64), // eslint-disable-line new-cap,babel/new-cap
       allowNull: false

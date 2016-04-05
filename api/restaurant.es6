@@ -11,18 +11,19 @@ export {Mode};
  * Create a restaurant
  *
  * @param {string} name : Name of restaurant
+ * @param {string} handle: Restaurant handle
  * @param {string} password: Password for restaurant login
  * @param {string} mode: mode of the restaurant
  * @param {Object} attributes : Restaurant phone number is optional
  * @returns {Promise}: Returns the Restaurant object
  */
-export async function create(name, password, mode = Mode.REGULAR, attributes = {
+export async function create(name, handle, password, mode = Mode.REGULAR, attributes = {
   phoneNumber: null,
   merchantApproved: null,
   merchantId: null
 }) {
   try {
-    return (await models.Restaurant.create({name, password, mode, ...attributes})).toJSON();
+    return (await models.Restaurant.create({name, handle, password, mode, ...attributes})).toJSON();
   } catch (e) {
     throw new TraceError('Could not create restaurant', e, ...(e.errors || []));
   }

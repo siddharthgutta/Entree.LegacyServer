@@ -11,8 +11,8 @@ let order2;
 
 describe('User', () => {
   it('should create a restaurant', async () => {
-    restaurant = (await Restaurant.RestaurantModel.create('Rest1', 'test', Restaurant.RestaurantModel.Mode.GOD))
-      .resolve();
+    restaurant = (await Restaurant.RestaurantModel.create('Rest1',
+      'rest1', 'test', Restaurant.RestaurantModel.Mode.GOD)).resolve();
   });
 
   it('should create a user', async () => {

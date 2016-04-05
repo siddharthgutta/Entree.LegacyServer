@@ -104,7 +104,7 @@
     "clearOnStart": false,
     "dialect": "mysql",
     "logging": true,
-    "revision": "r5"
+    "revision": "r6"
   },
   "MongoDb": {
     "clearOnStart": false,
