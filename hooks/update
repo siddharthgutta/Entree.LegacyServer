@@ -27,4 +27,4 @@ npm --no-color --no-spin --loglevel=error --cache-min 9999999 install --producti
 ## BUILD SYSTEM
 ###############
 
-grunt production --force --no-color --verbose || true
+grunt production --force --no-color || true
