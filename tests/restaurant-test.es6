@@ -40,6 +40,7 @@ describe('Restaurant', () => {
       Restaurant.create(name, handle, password, mode, {phoneNumber, merchantApproved, merchantId})
                 .then(restaurant => {
                   assert.equal(restaurant.name, name);
+                  assert.equal(restaurant.handle, handle);
                   assert.equal(restaurant.password, password);
                   assert.equal(restaurant.mode, mode);
                   assert.equal(restaurant.phoneNumber, phoneNumber);
@@ -54,6 +55,7 @@ describe('Restaurant', () => {
       Restaurant.create(name, handle, password)
                 .then(restaurant => {
                   assert.equal(restaurant.name, name);
+                  assert.equal(restaurant.handle, handle);
                   assert.equal(restaurant.password, password);
                   assert.equal(restaurant.mode, mode);
                   done();
@@ -67,7 +69,7 @@ describe('Restaurant', () => {
                   assert(false);
                   done();
                 }, err => {
-                  assert.equal(err.causes().length, 6);
+                  assert.equal(err.causes().length, 7);
                   done();
                 });
     });
@@ -89,11 +91,12 @@ describe('Restaurant', () => {
       let id;
       Restaurant.create(name, handle, password, mode, {phoneNumber})
                 .then(result => id = result.id)
-                .then(() => Restaurant.update(id, {name: 'Rest', password: 'a', phoneNumber: '1234561234',
-                  merchantId: true, merchantApproved: false}))
+                .then(() => Restaurant.update(id, {name: 'Rest', handle: 'rest', password: 'a',
+                  phoneNumber: '1234561234', merchantId: true, merchantApproved: false}))
                 .then(() => Restaurant.findOne(id))
                 .then(restaurant => {
                   assert.equal(restaurant.name, 'Rest');
+                  assert.equal(restaurant.handle, 'rest');
                   assert.equal(restaurant.password, 'a');
                   assert.equal(restaurant.mode, mode);
                   assert.equal(restaurant.phoneNumber, '1234561234');
@@ -101,6 +104,21 @@ describe('Restaurant', () => {
                   assert.equal(restaurant.merchantApproved, false);
                   done();
                 });
+    });
+  });
+
+  describe('#findByHandle()', () => {
+    it('should find restaurant by correct handle', done => {
+      Restaurant.create(name, handle, password, mode, {phoneNumber})
+        .then(() => Restaurant.findByHandle(handle))
+        .then(restaurant => {
+          assert.equal(restaurant.name, name);
+          assert.equal(restaurant.handle, handle);
+          assert.equal(restaurant.password, password);
+          assert.equal(restaurant.mode, mode);
+          assert.equal(restaurant.phoneNumber, phoneNumber);
+          done();
+        });
     });
   });
 

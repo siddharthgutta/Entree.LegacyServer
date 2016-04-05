@@ -139,6 +139,14 @@ export async function findByName(name) {
 }
 
 /**
+ * @param {string} handle: handle of restaurant
+ * @returns {Promise}: Returns the Restaurant object
+ */
+export async function findByHandle(handle) {
+  return (await models.Restaurant.findOne({where: {handle}})).toJSON();
+}
+
+/**
  * Get all restaurants
  *
  * @returns {Promise<Array<Restaurant>>}: A list of all restaurnts

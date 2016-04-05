@@ -29,7 +29,7 @@ export const response = {
   /* Returned when there is a user error */
   userError: 'Sorry, we don\'t recognize that command. Please try again.',
 
-  invalidRestaurant: 'Sorry, we don\'t recognize that restaurant. Please try again.',
+  invalidRestaurantHandle: 'Sorry, we don\'t recognize that restaurant handle. Please try again.',
 
   /* Returned when user tries to execute context command while not in restaurant context */
   invalidContext: 'Sorry that command isn`t available right now. Please try again',
@@ -46,7 +46,7 @@ export const response = {
   restaurant: {
     header: 'Here are our recommended food trucks.',
     footer: 'Select the number of a restaurant or type \"/help\" at any time for help.',
-    dataFormat: (i, data) => `${i + 1}) ${data[i].name}`
+    dataFormat: (i, data) => `${i + 1}) ${data[i].name}: @${data[i].handle}`
   },
 
   categories: {
@@ -638,7 +638,7 @@ export default class DefaultChatBot extends ChatBotInterface {
   }
 
   async _handleContextMenu(chatState, restContext) {
-    return await this._handleAtRestaurantMenu(chatState, restContext.name, true);
+    return await this._handleAtRestaurantMenu(chatState, restContext.handle, true);
   }
 
   async _handleContextInfo(chatState, restaurant) {
@@ -739,9 +739,10 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     let restaurant, categories, menuItems;
     try {
-      restaurant = (await Restaurant.findByName(restaurantName)).resolve();
+      restaurant = (await Restaurant.findByHandle(restaurantName)).resolve();
     } catch (err) {
-      return response.invalidRestaurant;
+      /* User typed in a restaurant handle that doesn't exist */
+      return response.invalidRestaurantHandle;
     }
 
     try {
@@ -783,12 +784,13 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     let restaurant, categories;
     try {
-      restaurant = (await Restaurant.findByName(restaurantName)).resolve();
-      if (!restaurant) {
-        /* User typed in a restaurant name that doesn't exist */
-        return response.userError;
-      }
+      restaurant = (await Restaurant.findByHandle(restaurantName)).resolve();
+    } catch (err) {
+      /* User typed in a restaurant handle that doesn't exist */
+      return response.invalidRestaurantHandle;
+    }
 
+    try {
       categories = await restaurant.findCategories();
     } catch (err) {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to get restaurant menu data`, err);
@@ -818,13 +820,9 @@ export default class DefaultChatBot extends ChatBotInterface {
   async _handleAtRestaurantInfo(chatState, restaurantName) {
     let restaurant;
     try {
-      restaurant = (await Restaurant.findByName(restaurantName)).resolve();
-      if (!restaurant) {
-        /* User typed in a restaurant name that doesn't exist */
-        return response.userError;
-      }
+      restaurant = (await Restaurant.findByHandle(restaurantName)).resolve();
     } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to get restaurant info`, err);
+      return response.invalidRestaurantHandle;
     }
 
     return await this._getRestaurantInfo(chatState, restaurant);

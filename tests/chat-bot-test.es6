@@ -1,5 +1,6 @@
 import assert from 'assert';
 import {clearDatabase, disconnectDatabase} from './test-init.es6';
+import {isEmpty} from '../libs/utils.es6';
 import {DefaultChatBot, chatStates, response} from '../libs/chat-bot/index.es6';
 import * as User from '../api/user.es6';
 import * as Restaurant from '../api/restaurant.es6';
@@ -7,7 +8,7 @@ import * as Restaurant from '../api/restaurant.es6';
 describe('ChatBot', () => {
   const bot = new DefaultChatBot();
 
-  const restaurantName = 'TestRestaurant';
+  const restaurantName = 'Test Restaurant';
   const restaurantHandle = 'testrestaurant';
   const password = '1234';
   const mode = Restaurant.Mode.REGULAR;
@@ -57,7 +58,7 @@ describe('ChatBot', () => {
 
   /* Destroys both modifications for the /menu item */
   async function destroyMods() {
-    const restaurant = (await Restaurant.findByName(restaurantName)).resolve();
+    const restaurant = (await Restaurant.findByHandle(restaurantHandle)).resolve();
     const categories = await restaurant.findCategories();
     const menuItems = await categories[0].findMenuItems(0);
     const itemMods = await menuItems[0].findItemMods();
@@ -110,6 +111,34 @@ describe('ChatBot', () => {
           .then(() => done());
     });
 
+    describe('incorrect restaurant name', () => {
+      it('should not change state using the \"@<restaurant> info\" command', async done => {
+        const updateStateResponse = await bot.updateState(phoneNumber, `@badhandle info`);
+        assert(!isEmpty(updateStateResponse));
+        await checkState(chatStates.start);
+        await checkContext(null, null);
+        done();
+      });
+
+      it('should not change state after typing \"@<restaurant> menu\"', async done => {
+        const updateStateResponse = await bot.updateState(phoneNumber, `@badhandle menu`);
+        assert(!isEmpty(updateStateResponse));
+        await checkState(chatStates.start);
+        await checkContext(null, null);
+
+        done();
+      });
+
+      it('should not change state after typing \"@<restaurant>\"', async done => {
+        const updateStateResponse = await bot.updateState(phoneNumber, `@badhandle`);
+        assert(!isEmpty(updateStateResponse));
+        await checkState(chatStates.start);
+        await checkContext(null, null);
+
+        done();
+      });
+    });
+
     it('should not change state using the \"/help\" command', async done => {
       await bot.updateState(phoneNumber, '/help');
       await checkState(chatStates.start);
@@ -118,7 +147,7 @@ describe('ChatBot', () => {
     });
 
     it('should not change state using the \"@<restaurant> info\" command', async done => {
-      await bot.updateState(phoneNumber, `@${restaurantName} info`);
+      await bot.updateState(phoneNumber, `@${restaurantHandle} info`);
       await checkState(chatStates.start);
       await checkContext(null, null);
       done();
@@ -132,7 +161,7 @@ describe('ChatBot', () => {
     });
 
     it('should change to the categories state after typing \"@<restaurant> menu\"', async done => {
-      await bot.updateState(phoneNumber, `@${restaurantName} menu`);
+      await bot.updateState(phoneNumber, `@${restaurantHandle} menu`);
       await checkState(chatStates.categories);
       await checkContext(restaurantName, null);
 
@@ -140,7 +169,7 @@ describe('ChatBot', () => {
     });
 
     it('should change to the items state after typing \"@<restaurant>\"', async done => {
-      await bot.updateState(phoneNumber, `@${restaurantName}`);
+      await bot.updateState(phoneNumber, `@${restaurantHandle}`);
       await checkState(chatStates.items);
       await checkContext(restaurantName, null);
 
@@ -230,7 +259,7 @@ describe('ChatBot', () => {
     beforeEach(done => {
       User.create(phoneNumber, name, email)
           .then(user => user.insertChatState(chatStates.start))
-          .then(() => bot.updateState(phoneNumber, `@${restaurantName} menu`))
+          .then(() => bot.updateState(phoneNumber, `@${restaurantHandle} menu`))
           .then(() => done());
     });
 
@@ -293,7 +322,7 @@ describe('ChatBot', () => {
     beforeEach(done => {
       User.create(phoneNumber, name, email)
           .then(user => user.insertChatState(chatStates.start))
-          .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
+          .then(() => bot.updateState(phoneNumber, `@${restaurantHandle}`))
           .then(() => done());
     });
 
@@ -351,7 +380,7 @@ describe('ChatBot', () => {
     beforeEach(done => {
       User.create(phoneNumber, name, email)
           .then(user => user.insertChatState(chatStates.start))
-          .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
+          .then(() => bot.updateState(phoneNumber, `@${restaurantHandle}`))
           .then(() => bot.updateState(phoneNumber, '1'))
           .then(() => done());
     });
@@ -404,7 +433,7 @@ describe('ChatBot', () => {
     beforeEach(done => {
       User.create(phoneNumber, name, email)
           .then(user => user.insertChatState(chatStates.start))
-          .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
+          .then(() => bot.updateState(phoneNumber, `@${restaurantHandle}`))
           .then(() => bot.updateState(phoneNumber, '1'))
           .then(() => bot.updateState(phoneNumber, '1'))
           .then(() => bot.updateState(phoneNumber, '1'))
@@ -445,7 +474,7 @@ describe('ChatBot', () => {
     });
 
     it('should not change to the categories state after typing \"@<restaurant> menu\"', async done => {
-      await bot.updateState(phoneNumber, `@${restaurantName} menu`);
+      await bot.updateState(phoneNumber, `@${restaurantHandle} menu`);
       await checkState(chatStates.cart);
       await checkContext(restaurantName, null);
 
@@ -453,7 +482,7 @@ describe('ChatBot', () => {
     });
 
     it('should not change to the items state after typing \"@<restaurant>\"', async done => {
-      await bot.updateState(phoneNumber, `@${restaurantName}`);
+      await bot.updateState(phoneNumber, `@${restaurantHandle}`);
       await checkState(chatStates.cart);
       await checkContext(restaurantName, null);
 
@@ -473,7 +502,7 @@ describe('ChatBot', () => {
     beforeEach(done => {
       User.create(phoneNumber, name, email)
           .then(user => user.insertChatState(chatStates.start))
-          .then(() => bot.updateState(phoneNumber, `@${restaurantName}`))
+          .then(() => bot.updateState(phoneNumber, `@${restaurantHandle}`))
           .then(() => done());
     });
 
