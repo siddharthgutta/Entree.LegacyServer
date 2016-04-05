@@ -12,6 +12,7 @@ export {Mode};
  *
  * @param {string} name : Name of restaurant
  * @param {string} password: Password for restaurant login
+ * @param {string} mode: mode of the restaurant
  * @param {Object} attributes : Restaurant phone number is optional
  * @returns {Promise}: Returns the Restaurant object
  */
@@ -30,11 +31,12 @@ export async function create(name, password, mode = Mode.REGULAR, attributes = {
 /**
  * Find restaurants by mode
  *
- * @param {String} mode : Mode of the restaurant
+ * @param {string} mode : Mode of the restaurant
+ * @param {Object} attributes: specific restaurant attributes to search by
  * @returns {Promise}: Returns the Restaurant objects
  */
-export function findByMode(mode) {
-  return models.Restaurant.findAll({where: {mode}});
+export function findByMode(mode = Mode.REGULAR, attributes = {enabled: true}) {
+  return models.Restaurant.findAll({where: {mode, ...attributes}});
 }
 
 /**
@@ -142,10 +144,6 @@ export async function findByName(name) {
  */
 export function findAll() {
   return models.Restaurant.findAll();
-}
-
-export async function findAllRegular() {
-  return await models.Restaurant.findAll({where: {mode: Mode.REGULAR}});
 }
 
 /**

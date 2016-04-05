@@ -174,7 +174,13 @@ export default class DefaultChatBot extends ChatBotInterface {
 
   async _handleMore(chatState) {
     /* TODO - pagination for finding more. Should not show all restaurants */
-    const restaurants = await Restaurant.findAllRegular();
+    let restaurants;
+    try {
+      restaurants = await Restaurant.findByMode();
+    } catch (err) {
+      throw new TraceError('Could not find regular enabled restaurants', err);
+    }
+
     return await this._genOutput(
       chatState,
       response.restaurant.header,
@@ -565,7 +571,7 @@ export default class DefaultChatBot extends ChatBotInterface {
         menuItems,
         response.items.dataFormat);
     } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot metadata`, err);
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot [_handleCategory]`, err);
     }
   }
 
@@ -696,10 +702,16 @@ export default class DefaultChatBot extends ChatBotInterface {
       return invalidTransition;
     }
 
+    let restaurants;
+    try {
+      restaurants = await Restaurant.findByMode();
+    } catch (err) {
+      throw new TraceError('Could not find regular enabled restaurants', err);
+    }
+
     try {
       await chatState.updateState(chatStates.restaurants);
       // TODO - Replace this with curation of recommended restaurants
-      const restaurants = await Restaurant.findAllRegular();
       return await this._genOutput(
         chatState,
         response.restaurant.header,
@@ -707,7 +719,7 @@ export default class DefaultChatBot extends ChatBotInterface {
         restaurants,
         response.restaurant.dataFormat);
     } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot metadata`, err);
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot [_handleRestaurant]`, err);
     }
   }
 
@@ -749,7 +761,7 @@ export default class DefaultChatBot extends ChatBotInterface {
         menuItems,
         response.items.dataFormat);
     } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot metadata`, err);
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot [_handleAtRestaurant]`, err);
     }
   }
 
@@ -791,7 +803,7 @@ export default class DefaultChatBot extends ChatBotInterface {
         categories,
         response.categories.dataFormat);
     } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot metadata`, err);
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot [_handleAtRestaurantMenu]`, err);
     }
   }
 

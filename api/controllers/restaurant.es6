@@ -14,7 +14,6 @@ export async function setEnabled(id, enabled) {
   return restaurant;
 }
 
-
 /**
  * Expose model
  */
