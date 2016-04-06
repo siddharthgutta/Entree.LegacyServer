@@ -109,6 +109,17 @@ export async function findParentRestaurant(id) {
   return (await order.getRestaurant()).toJSON();
 }
 
+export async function findUser(id) {
+  const {Order} = models;
+  const order = await Order.findOne({where: {id}});
+
+  if (!order) {
+    throw Error(`Could not find order by id(${id}) hence no user`);
+  }
+
+  return (await order.getUser()).toJSON();
+}
+
 export async function calculateTotal(id) {
   const {Order} = models;
   const order = await Order.findOne({where: {id}});

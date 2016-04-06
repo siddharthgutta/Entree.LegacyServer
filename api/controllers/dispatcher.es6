@@ -39,7 +39,7 @@ Emitter.on(Events.TEXT_RECEIVED, async text => {
 /**
  * Make an order if a process is done
  */
-Emitter.on(Events.USER_PAYMENT_REGISTERED, async ({id: userId}) => {
+Emitter.on(Events.USER_PAYMENT_REGISTERED, async({id: userId}) => {
   const user = await User.UserModel.findOne(userId);
 
   try {
@@ -57,12 +57,16 @@ Emitter.on(Events.USER_PAYMENT_REGISTERED, async ({id: userId}) => {
           await Payment.paymentWithToken(userId, restaurantId, defaultPayment.token, price);
         await Order.setOrderStatus(orderId, Order.Status.RECEIVED_PAYMENT, {transactionId});
         sendSMS(user.phoneNumber, `Your order using ${defaultPayment.cardType} - ${defaultPayment.last4} ` +
-          `has been sent to the restaurant. We'll text you once it's confirmed by the restaurant`);
+                `has been sent to the restaurant. We'll text you once it's confirmed by the restaurant`);
       } catch (e) {
         const err = new TraceError(`Payment failed; user(${userId}) -> restaurant(${restaurantId})`, e);
         console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);
-        // TODO send the request link again
-        sendSMS(user.phoneNumber, `There was a problem with your credit card: ${e.message}`); // FIXME temp
+        const secret = await User.requestProfileEdit(userId);
+        const profileUrl = await User.getUserProfile(secret);
+
+        // FIXME I am not sure what e.message will output @jadesym
+        sendSMS(user.phoneNumber, `The order could not be processed. There was a problem with your` +
+        ` credit card: ${e.message}. Please update your payment information at ${profileUrl}`);
       }
     }
   } catch (e) {

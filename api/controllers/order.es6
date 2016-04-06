@@ -121,6 +121,14 @@ export async function getRestaurantFromOrder(orderId) {
   }
 }
 
+export async function getUserFromOrder(orderId) {
+  try {
+    return await Order.findUser(orderId);
+  } catch (e) {
+    throw new TraceError('Could not find parent restaurant', e);
+  }
+}
+
 /**
  * Expose model
  */
