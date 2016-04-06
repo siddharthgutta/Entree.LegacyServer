@@ -85,7 +85,7 @@ export async function init(clearAll = false) {
     await sequelize.sync({force: clearAll});
 
     if (clearAll) {
-      await sequelize.query(`SET SQL_MODE = '';`);
+      await sequelize.query(`SET SQL_MODE = 'traditional';`); // FIXME not sure how to reset
       await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
       await sequelize.query('SET UNIQUE_CHECKS = 1;');
     }

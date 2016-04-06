@@ -1,6 +1,7 @@
 import React from 'react';
 import Influx from 'react-influx';
 import Dispatcher from '../../../dispatchers/Dispatcher';
+import OrderStore from '../../../stores/OrderStore';
 import {onClick} from '../../../../libs/utils';
 
 class Header extends Influx.Component {
@@ -14,14 +15,20 @@ class Header extends Influx.Component {
       title: null,
       subtitle: null,
       leftIcon: null,
-      rightIcon: null
+      rightIcon: null,
+      restaurant: {}
     };
   }
 
   getListeners() {
     return [
-      [Dispatcher, Dispatcher.Events.REQUEST_HEADER, this._onRequestHeader]
+      [Dispatcher, Dispatcher.Events.REQUEST_HEADER, this._onRequestHeader],
+      [OrderStore, OrderStore.Events.RESTAURANT_UPDATED, this._onOrderStoreRestaurantUpdated]
     ];
+  }
+
+  _onOrderStoreRestaurantUpdated(restaurant) {
+    this.setState({restaurant});
   }
 
   _onRequestHeader(title, subtitle, other) {
@@ -47,19 +54,33 @@ class Header extends Influx.Component {
   }
 
   render() {
+    let bannerText; // TODO add disconnect status
+
+    if (this.state.restaurant.enabled === false) {
+      bannerText = 'You have disabled orders';
+    } else if (this.state.restaurant.enabled === true) {
+      bannerText = null;
+    } else {
+      bannerText = 'You are not connected to the server';
+    }
+
     return (
-      <div className='header' style={this.state.style}>
-        <div className='nav flex'>
-          <div {...onClick(() => this.state.onLeftClick())}
-            className={`box flex center vertical nav-left ${this.state.leftIcon}`}/>
-          <div className='text' style={{flex: 1}}>
-            <div className='title'>{this.state.title}</div>
-            <div className='subtitle'>{this.state.subtitle}</div>
+      <div>
+        {bannerText ? <div className='banner'
+          {...onClick(() => Dispatcher.emit(Dispatcher.Events.MENU_VISIBILITY, true))}>{bannerText}</div> : null }
+        <div className='header' style={this.state.style}>
+          <div className='nav flex'>
+            <div {...onClick(() => this.state.onLeftClick())}
+              className={`box flex center vertical nav-left ${this.state.leftIcon}`}/>
+            <div className='text' style={{flex: 1}}>
+              <div className='title'>{this.state.title}</div>
+              <div className='subtitle'>{this.state.subtitle}</div>
+            </div>
+            <div {...onClick(() => this.state.onRightClick())}
+              className={`nav-right center vertical ${this.state.rightIcon}`}/>
           </div>
-          <div {...onClick(() => this.state.onRightClick())}
-            className={`nav-right center vertical ${this.state.rightIcon}`}/>
+          {this.state.children}
         </div>
-        {this.state.children}
       </div>
     );
   }

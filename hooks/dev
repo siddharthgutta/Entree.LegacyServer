@@ -2,7 +2,6 @@
 
 id=$(git rev-parse HEAD)
 
-export NODE_ENV=staging;
 export IS_RUNNING_TEST=true;
 
 set -e

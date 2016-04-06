@@ -4,7 +4,6 @@ if [[ $1 != *"manual"* ]]; then
     sleep 10
 fi
 
-export NODE_ENV=staging; # enforce staging
 export IS_RUNNING_TEST=true;
 
 set -e

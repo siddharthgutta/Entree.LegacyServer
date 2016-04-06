@@ -75,7 +75,7 @@ Emitter.on(Events.USER_PAYMENT_REGISTERED, async ({id: userId}) => {
 Emitter.on(Events.UPDATED_ORDER, async order => {
   // TODO @jesse move this to chatbot
   const message = {
-    [Order.Status.RECEIVED_PAYMENT]: `Your order just got sent. Hang tight!`,
+    // [Order.Status.RECEIVED_PAYMENT]: `Your order just got sent. Hang tight!`,
     [Order.Status.ACCEPTED]: `Your order just got accepted :). It will be ready in ${order.prepTime} mins`,
     [Order.Status.DECLINED]: `Your order just got declined :(. ${order.message}`,
     [Order.Status.COMPLETED]: `Your order is ready!`

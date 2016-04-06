@@ -103,10 +103,10 @@ export async function findParentRestaurant(id) {
   const order = await Order.findOne({where: {id}});
 
   if (!order) {
-    throw Error(`Could not find order by id(${id})`);
+    throw Error(`Could not find order by id(${id}) hence no parent restaurant`);
   }
 
-  return await order.getRestaurant();
+  return (await order.getRestaurant()).toJSON();
 }
 
 export async function calculateTotal(id) {

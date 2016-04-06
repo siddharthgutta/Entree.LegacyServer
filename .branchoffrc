@@ -34,7 +34,18 @@
       "HTTPS_SSL_CA": "./keys/staging.textentree.com.chain.crt"
     },
     "mode": {
-      "manual": {
+      "local-release": {
+        "NODE_ENV": "local-production",
+        "HTTPS_REJECT_UNAUTHORIZED": false,
+        "NODE_TLS_REJECT_UNAUTHORIZED": 0,
+        "HTTPS_SSL_KEY": "./keys/localhost.key",
+        "HTTPS_SSL_CERTIFICATE": "./keys/localhost.crt",
+        "HTTPS_SSL_CA": "./keys/localhost.crt",
+        "SOCKET_SERVER_USE_REMOTE": true,
+        "ENTERPRISE_APP_HOSTNAME": "localhost"
+      },
+      "local-stage": {
+        "NODE_ENV": "local-staging",
         "HTTPS_REJECT_UNAUTHORIZED": false,
         "NODE_TLS_REJECT_UNAUTHORIZED": 0,
         "HTTPS_SSL_KEY": "./keys/localhost.key",
