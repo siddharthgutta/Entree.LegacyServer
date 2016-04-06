@@ -59,7 +59,7 @@ class Sidebar extends Influx.Component {
                style={{borderRight: '1px solid rgba(255, 255, 255, 0.1)'}}>
             <div className='value'>
               <div className='bubble light icon dollar'/>
-              {(Number(summary.netPrice) || 0).toFixed(2)}
+              {((Number(summary.netPrice) || 0) / 100).toFixed(2)}
             </div>
             <div className='desc'>MONTH INCOME</div>
           </div>

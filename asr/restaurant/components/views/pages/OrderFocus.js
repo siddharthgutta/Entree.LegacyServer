@@ -77,7 +77,7 @@ class OrderFocus extends Page {
       return {};
     }
 
-    const cost = OrderStore.getTotalCost(order);
+    const cost = OrderStore.getTotalCost(order).toFixed(2);
 
     // TODO give hide control to parent as well
     return {

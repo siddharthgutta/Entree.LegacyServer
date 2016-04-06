@@ -163,7 +163,7 @@ class OrderStore extends Influx.Store {
   }
 
   getTotalCost(order) {
-    return order.Items.reduce((memo, item) => item.price + memo, 0);
+    return order.Items.reduce((memo, item) => item.price + memo, 0) / 100;
   }
 
   getConnectionStatus() {
