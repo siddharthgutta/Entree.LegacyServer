@@ -96,8 +96,9 @@ class Login extends Page {
             <div className='secondary-logo'></div>
           </div>
           <div style={{padding: 20}} ref='wrapper'>
-            <input className='input' placeholder='USERNAME' ref='id'/>
-            <input type='password' placeholder='PASSWORD' className='input' ref='password'/>
+            <input spellCheck='false' autoCapitalize='none' autoCorrect='false'
+                   className='input' placeholder='USERNAME' ref='id'/>
+            <input spellCheck='false' type='password' placeholder='PASSWORD' className='input' ref='password'/>
           </div>
         </div>
         <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 62}}>

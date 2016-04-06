@@ -70,3 +70,15 @@ export function setBackground(enable) {
     }
   }
 }
+
+export function getPlatform() {
+  if (window.cordova) {
+    return window.navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? 'ios' : 'android';
+  }
+}
+
+window.getPlatform = getPlatform;
+
+export function isNative() {
+  return !!window.cordova;
+}

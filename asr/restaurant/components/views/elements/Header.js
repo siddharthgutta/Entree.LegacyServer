@@ -1,8 +1,9 @@
 import React from 'react';
 import Influx from 'react-influx';
 import Dispatcher from '../../../dispatchers/Dispatcher';
-import OrderStore from '../../../stores/OrderStore';
-import {onClick} from '../../../../libs/utils';
+import OrderStore, {Status} from '../../../stores/OrderStore';
+import {onClick, ifcat} from '../../../../libs/utils';
+import {getPlatform} from '../../../../libs/env';
 
 class Header extends Influx.Component {
   constructor(context, props) {
@@ -23,8 +24,13 @@ class Header extends Influx.Component {
   getListeners() {
     return [
       [Dispatcher, Dispatcher.Events.REQUEST_HEADER, this._onRequestHeader],
-      [OrderStore, OrderStore.Events.RESTAURANT_UPDATED, this._onOrderStoreRestaurantUpdated]
+      [OrderStore, OrderStore.Events.RESTAURANT_UPDATED, this._onOrderStoreRestaurantUpdated],
+      [Dispatcher, Dispatcher.Events.CONNECTION_STATUS, this._onDispatcherConnectionStatus]
     ];
+  }
+
+  _onDispatcherConnectionStatus(status) {
+    this.setState({status});
   }
 
   _onOrderStoreRestaurantUpdated(restaurant) {
@@ -55,20 +61,21 @@ class Header extends Influx.Component {
 
   render() {
     let bannerText; // TODO add disconnect status
+    const {restaurant, status} = this.state;
 
-    if (this.state.restaurant.enabled === false) {
+    if (restaurant.enabled === false && status !== Status.DISCONNECTED) {
       bannerText = 'You have disabled orders';
-    } else if (this.state.restaurant.enabled === true) {
-      bannerText = null;
     } else {
-      bannerText = 'You are not connected to the server';
+      bannerText = null;
     }
 
+    const minHeight = (bannerText ? 50 + 55 : 55 + (getPlatform() === 'ios' ? 20 : 0)); // TODO fix
+
     return (
-      <div>
+      <div style={{minHeight}}>
         {bannerText ? <div className='banner'
           {...onClick(() => Dispatcher.emit(Dispatcher.Events.MENU_VISIBILITY, true))}>{bannerText}</div> : null }
-        <div className='header' style={this.state.style}>
+        <div className={ifcat('header', {pad: getPlatform() === 'ios' && !bannerText})} style={this.state.style}>
           <div className='nav flex'>
             <div {...onClick(() => this.state.onLeftClick())}
               className={`box flex center vertical nav-left ${this.state.leftIcon}`}/>

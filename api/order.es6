@@ -22,7 +22,7 @@ export async function findByRestaurant(restaurantId, statuses = []) {
   try {
     const query = {
       where: {id: restaurantId},
-      include: [{model: Order, ...statusQuery, include: [{all: true}]}]
+      include: [{required: false, model: Order, ...statusQuery, include: [{all: true}]}]
     };
     const restaurant = (await Restaurant.findOne(query, {logging: true})).toJSON();
     return restaurant.Orders || [];

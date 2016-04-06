@@ -41,7 +41,8 @@ class Sidebar extends Influx.Component {
 
   render() {
     const {restaurant} = this.state;
-    const summary = restaurant.Orders ? restaurant.Orders[0] : {};
+    const orders = restaurant.Orders;
+    const summary = Array.isArray(orders) && orders.length ? orders[0] : {};
 
     // TODO the Orders key is an array??
     return (
@@ -50,7 +51,7 @@ class Sidebar extends Influx.Component {
           <div className='full blur' style={{position: 'absolute', backgroundImage: `url(${restaurant.profileImage})`,
             height: 400, width: '100%', top: 0, opacity: 0.5, zIndex: 0}}/>
           <div className='profile' style={{backgroundImage: `url(${restaurant.profileImage})`,
-            backgroundSize: 'cover', width: 90, height: 90, borderRadius: '100%', zIndex: 2}}/>
+            backgroundSize: 'cover', borderRadius: '100%', zIndex: 2}}/>
         </div>
         <div className='title'>{restaurant.name}</div>
         <div className='subtitle'>Austin, TX</div>
