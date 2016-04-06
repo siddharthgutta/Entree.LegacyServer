@@ -20,7 +20,8 @@ export {Mode};
 export async function create(name, handle, password, mode = Mode.REGULAR, attributes = {
   phoneNumber: null,
   merchantApproved: null,
-  merchantId: null
+  merchantId: null,
+  profileImage: null
 }) {
   try {
     return (await models.Restaurant.create({name, handle, password, mode, ...attributes})).toJSON();

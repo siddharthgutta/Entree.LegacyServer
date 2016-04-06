@@ -26,6 +26,9 @@ export default function (sequelize, DataTypes) {
         len: 10
       }
     },
+    profileImage: {
+      type: DataTypes.STRING(512) // eslint-disable-line new-cap,babel/new-cap
+    },
     enabled: {
       type: DataTypes.BOOLEAN,
       defaultValue: true
