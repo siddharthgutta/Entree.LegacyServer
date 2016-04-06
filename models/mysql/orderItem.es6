@@ -1,7 +1,7 @@
 export default function (sequelize, DataTypes) {
   const OrderItem = sequelize.define('OrderItem', {
     name: {
-      type: DataTypes.STRING(128), // eslint-disable-line new-cap,babel/new-cap
+      type: DataTypes.STRING(256), // eslint-disable-line new-cap,babel/new-cap
       allowNull: false
     },
     price: {
