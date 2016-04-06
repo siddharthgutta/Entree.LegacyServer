@@ -653,6 +653,10 @@ a {
 .profile {
   height: 50px;
   width: 50px;
+  min-height: 50px;
+  min-width: 50px;
+  max-height: 50px;
+  max-width: 50px;
   float: right;
   border-radius: 50px;
   background: #00BCD4;
@@ -894,11 +898,10 @@ a {
 
 .banner {
   text-align: center;
-  padding: 15px 0;
   background: #FFC107;
-  letter-spacing: 1px;
   font-size: 12px;
   color: #FFF;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   cursor: pointer;
+  padding: 25px 0 10px;
 }

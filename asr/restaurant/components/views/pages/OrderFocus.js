@@ -163,7 +163,7 @@ class OrderFocus extends Page {
     const cost = OrderStore.getTotalCost(order).toFixed(2);
 
     const items = (
-      <div className='full flex vertical'>
+      <div className='full flex vertical' style={{overflow: 'scroll', overflowX: 'hidden'}}>
         <div className='flex status' style={{minHeight: 53}}>
           <div className={ifcat('box event', {active: order.status === OrderConstants.Status.RECEIVED_PAYMENT})}>
             RECEIVED
@@ -184,7 +184,8 @@ class OrderFocus extends Page {
     );
 
     const details = (
-      <div className='full' style={{padding: '30px', overflow: 'scroll', background: 'rgba(0,0,0,0.7)'}}>
+      <div className='full'
+           style={{padding: '30px', overflow: 'scroll', overflowX: 'hidden', background: 'rgba(0,0,0,0.7)'}}>
         <div className='box flex left vertical small info'>
           <div className='value'>#{order.id}</div>
           <div className='desc'>ID</div>

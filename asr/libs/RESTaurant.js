@@ -58,7 +58,7 @@ class RESTaurant extends EventEmitter {
 
         return _token;
       } catch (e) {
-        return false;
+        // ignore
       }
     }
 
