@@ -40,7 +40,10 @@
         "IPC_ALLOW_REMOTE": false
       },
       "socket-master": {
-        "IPC_ALLOW_REMOTE": false
+        "IPC_ALLOW_REMOTE": false,
+        "HTTPS_SSL_KEY": "./keys/textentree.com.key",
+        "HTTPS_SSL_CERTIFICATE": "./keys/textentree.com.crt",
+        "HTTPS_SSL_CA": "./keys/textentree.com.chain.crt"
       }
     }
   },
