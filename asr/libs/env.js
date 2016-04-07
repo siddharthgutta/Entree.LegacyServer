@@ -10,7 +10,7 @@ let notifySound;
 
 export function addStoredEventListener(event, callback) {
   if (events[event]) {
-    callback();
+    return callback();
   }
 
   emitter.once(event, callback, false);
@@ -30,6 +30,8 @@ window.document.addEventListener('DOMContentLoaded', () => {
   notifySound = window.document.createElement('audio');
   notifySound.innerHTML = '<source src="audio/bell.mp3" type="audio/mpeg"/>';
   window.document.body.appendChild(notifySound);
+  events.DOMContentLoaded = true;
+  emitter.emit('DOMContentLoaded');
 }, false);
 
 /**

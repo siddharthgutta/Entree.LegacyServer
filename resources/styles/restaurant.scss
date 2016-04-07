@@ -408,6 +408,9 @@ a {
     .red & {
       background: #FF5722;
     }
+    .black & {
+      background: #BB291E;
+    }
     .green & {
       background: rgba(64, 172, 172, 0.67);
     }
@@ -415,9 +418,12 @@ a {
       background: rgba(64, 88, 181, 0.6);
     }
     &:after {
-      border-left-color: #FF5722;
+      border-left-color: rgba(255, 255, 255, 0.11);
       .red & {
         border-left-color: #FF5722;
+      }
+      .black & {
+        border-left-color: #BB291E;
       }
       .green & {
         border-left-color: rgba(64, 172, 172, 0.67);

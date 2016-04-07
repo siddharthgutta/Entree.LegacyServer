@@ -61,6 +61,8 @@ class OrderStore extends Influx.Store {
       window.localStorage.removeItem('token');
 
       this._setConnectionStatus(Status.DISCONNECTED);
+
+      env.setBackground(false);
     });
 
     restaurant.on(SocketEvents.NEW_ORDER, order => {
