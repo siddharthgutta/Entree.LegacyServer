@@ -315,6 +315,9 @@ a {
     align-items: flex-start;
     padding-left: 15px;
     padding-right: 15px;
+    word-wrap: break-word;
+    // word-break: break-all;
+    white-space: pre-line;
   }
 
   .cost {
