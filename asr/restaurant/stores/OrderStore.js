@@ -62,6 +62,8 @@ class OrderStore extends Influx.Store {
 
       this._setConnectionStatus(Status.DISCONNECTED);
 
+      this.data.orders = [];
+
       env.setBackground(false);
     });
 
