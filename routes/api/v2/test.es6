@@ -29,8 +29,8 @@ async function url() {
 
 async function createTestRestaurant() {
   const name = chance.word();
-  return await Restaurant.RestaurantModel.create(name,
-    name.replace(/[^0-9a-zA-Z]/g, '').toLowerCase(), 'test', Restaurant.RestaurantModel.Mode.GOD);
+  return await Restaurant.RestaurantModel.create(name, name.replace(/[^0-9a-zA-Z]/g, '').toLowerCase(),
+                                                 'test', Restaurant.RestaurantModel.Mode.GOD);
 }
 
 async function fetchToken(id, password) {
@@ -56,8 +56,8 @@ router.get('/generate/restaurant/:name*?', async (req, res) => {
   const name = req.params.name || chance.word();
   const {mode} = String(req.query.mode).toUpperCase() === Restaurant.RestaurantModel.Mode.GOD ?
     Restaurant.RestaurantModel.Mode.GOD : Restaurant.RestaurantModel.Mode.REGULAR;
-  const restaurant = await Restaurant.RestaurantModel.create(name,
-    name.replace(/[^0-9a-zA-Z]/g, '').toLowerCase(), 'test', mode);
+  const restaurant =
+    await Restaurant.RestaurantModel.create(name, name.replace(/[^0-9a-zA-Z]/g, '').toLowerCase(), 'test', mode);
   const {id, password} = restaurant;
   const address = await url();
   const token = await fetchToken(id, password);
@@ -124,7 +124,8 @@ router.get('/order/:id/status', async (req, res) => {
 
   try {
     try {
-      await Order.setOrderStatus(id, Order.Status.RECEIVED_PAYMENT, {transactionId: '234234'});
+      await Order.setOrderStatus(id, Order.Status.RECEIVED_PAYMENT,
+                                 {transactionId: chance.integer({min: 100000, max: 999999})});
     } catch (e) {
       if (status === Order.Status.RECEIVED_PAYMENT) {
         throw e;
