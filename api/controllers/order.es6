@@ -67,7 +67,7 @@ export async function setOrderStatus(id, status, {prepTime, message, transaction
     }
 
     if (internalEvent) {
-      Emitter.emit(internalEvent, _order);
+      Emitter.emit(internalEvent, _order, restaurantId);
     }
 
     return _order;

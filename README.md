@@ -109,7 +109,7 @@ mkdir -p Github && cd Github
 git clone https://github.com/siddharthgutta/Entree.Server && cd Entree.Server
 npm install
 
-# you can delete this folder:
+# you can delete this folder: 
 
 # run database init scripts
 ```
