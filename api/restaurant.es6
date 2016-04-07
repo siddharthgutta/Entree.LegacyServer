@@ -174,6 +174,18 @@ export async function update(id, attributes) {
 }
 
 
+export async function resetOrderCounter(id) {
+  const {Restaurant} = models;
+
+  const [rows] =
+    await Restaurant.update({orderCounter: 1}, {where: {id}});
+
+  if (!rows) {
+    throw new Error(`Could not update increment order counter. Could not find restaurant: ${id}`);
+  }
+}
+
+
 /**
  * Set whether the restaurant is accepting orders
  *

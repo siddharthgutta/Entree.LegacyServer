@@ -9,7 +9,9 @@ export {Status};
 const restaurantStatuses = [Status.ACCEPTED, Status.DECLINED, Status.COMPLETED];
 
 export async function setOrderStatus(id, status, {prepTime, message, transactionId} = {}, isRestaurant = false) {
-  const {RestaurantId: restaurantId} = await Order.findOne(id);
+  const order = await Order.findOne(id);
+  const {RestaurantId: restaurantId} = order;
+
   let notificationEvent;
   let internalEvent;
 
@@ -67,7 +69,7 @@ export async function setOrderStatus(id, status, {prepTime, message, transaction
     }
 
     if (internalEvent) {
-      Emitter.emit(internalEvent, _order, restaurantId);
+      Emitter.emit(internalEvent, _order, order, restaurantId);
     }
 
     return _order;

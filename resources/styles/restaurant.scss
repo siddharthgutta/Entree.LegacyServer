@@ -933,3 +933,43 @@ a {
     padding-top: 25px;
   }
 }
+
+.spinner {
+  height: 60px;
+  width: 60px;
+  position: relative;
+  animation: rotation .6s infinite linear;
+  border: 6px solid rgba(0, 174, 239, .15);
+  border-top-color: rgba(0, 174, 239, .8);
+  border-radius: 100%;
+  margin: 0 auto;
+
+  &.small {
+    border-width: 4px;
+    height: 35px;
+    width: 35px;
+  }
+
+  &.fit-base {
+    margin: 5px auto;
+  }
+
+  &.white {
+    border-color: rgba(255, 255, 255, .15);
+    border-top-color: rgba(255, 255, 255, .8);
+  }
+
+  &.yellow {
+    border-color: rgba(255, 235, 59, 0.24);
+    border-top-color: #FFEB3B;
+  }
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}

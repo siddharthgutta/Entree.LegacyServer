@@ -69,6 +69,10 @@ export default function (sequelize, DataTypes) {
         isInt: true,
         min: 0
       }
+    },
+    orderCounter: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1
     }
   }, {
     classMethods: {

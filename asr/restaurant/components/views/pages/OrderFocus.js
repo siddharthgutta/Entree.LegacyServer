@@ -85,7 +85,7 @@ class OrderFocus extends Page {
       [Modals.ORDER_TIME]: <OrderTime cost={`${cost}`}
                                       onSubmitTime={prepTime => this._handleRequestOrderStatus(OrderConstants.Status.ACCEPTED, {prepTime})}/>, // eslint-disable-line
       [Modals.ORDER_CANCEL]: <OrderDecline cost={`${cost}`}
-                                           onConfirm={message => this._handleRequestOrderStatus(OrderConstants.Status.DECLINED, {message})}/> // eslint-disable-line
+                                           onDecline={message => this._handleRequestOrderStatus(OrderConstants.Status.DECLINED, {message})}/> // eslint-disable-line
     };
   }
 

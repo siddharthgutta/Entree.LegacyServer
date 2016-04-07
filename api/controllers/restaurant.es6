@@ -12,7 +12,7 @@ export async function notify(id) {
   await Notification.notify(id, Notification.Events.RESTAURANT_UPDATED, await getRestaurantWithMetaData(id));
 }
 
-Emitter.on(Events.ORDER_UPDATED, async(order, restaurantId) => {
+Emitter.on(Events.ORDER_UPDATED, async(order, prev, restaurantId) => {
   notify(restaurantId);
 });
 

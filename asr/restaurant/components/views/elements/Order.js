@@ -40,7 +40,7 @@ class Order extends React.Component {
     return (
       <div className='order flex' style={{height: 80}}
         {...onClick(() => history.push(`order/${order.id}`))}>
-        <div className='id box flex left'>{order.id}</div>
+        <div className='id box flex left'>{order.id2}</div>
         <div className='box flex left'>
           <div>
             <div className='name'>{order.User.firstName || 'Mathew'}</div>
