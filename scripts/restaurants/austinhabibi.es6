@@ -31,6 +31,8 @@ const restaurantName = 'Austin\'s Habibi';
 const restaurantHandle = 'austinshabibi';
 const restaurantPass = 'greekwraps';
 
+const profileImage = 'images/habibi.jpg';
+
 // @jlmao @bluejamesbond
 // It's tedious, but please compare with
 // http://www.austinshabibi.com/austins-habibi-menu
@@ -402,7 +404,7 @@ async function importMenu() {
   console.log('Importing Menu');
   try {
     const restaurant = (await Restaurant.create(restaurantName,
-      restaurantHandle, restaurantPass, Mode.REGULAR)).resolve();
+      restaurantHandle, restaurantPass, Mode.REGULAR, {profileImage})).resolve();
     restaurantId = restaurant.id;
     await Restaurant.update(restaurantId, {percentageFee, transactionFee});
     await Promise.each(menu, async menuCategory => {

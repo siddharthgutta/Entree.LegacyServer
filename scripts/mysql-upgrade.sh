@@ -12,7 +12,7 @@ latest_revision=0
 for database in $(mysql -u root --batch --silent --disable-column-names --execute="SHOW DATABASES LIKE 'entree_r%'")
 do
     revision=${database#*_r}
-    if (( ${revision} > ${local_revision} ))
+    if [ "$revision" -gt "$local_revision" ]
     then
         local_revision=${revision}
     fi
@@ -20,7 +20,7 @@ done
 
 
 # find the latest database revision script
-for f in ${REVISION_PATH}/*to*[^a-z].sql
+for f in $REVISION_PATH/*to*[^a-z].sql
 do
     # get the revision from file
     # Ex: Substitutes '2to' with '' in '2to3.sql'
@@ -28,17 +28,17 @@ do
     # Ex: Substitutes '.sql' with '' in '3.sql'
     revision=${revision%.*}
 
-    if (( ${revision} > ${latest_revision} ))
+    if [ "$revision" -gt "$latest_revision" ]
     then
         latest_revision=${revision}
     fi
 done
 
 # check if update is needed
-if (( ${local_revision} >= ${latest_revision} ))
+if (( "$local_revision" >= "$latest_revision" ))
 then
     echo "No upgrade required: entree_r${latest_revision}";
-    return
+    exit
 fi
 
 echo "Local database: entree_r${local_revision}";
@@ -49,10 +49,10 @@ echo "Incrementing revisions..."
 # apply each revisions one-by-one until the latest version
 for source in $(seq ${local_revision} ${latest_revision})
 do
-    if (( ${local_revision} == ${latest_revision} ))
+    if [ "$local_revision" == "$latest_revision" ]
     then
         echo "Finished! Local database: entree_r${local_revision}";
-        return
+        exit
     fi
 
     target=$((${source} + 1))

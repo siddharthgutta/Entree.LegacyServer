@@ -38,7 +38,7 @@ select yn in "Yes" "No"; do
             mysql -u root --batch --silent --disable-column-names --execute="DROP SCHEMA IF EXISTS entree_r${version}";
         done
 
-         return;;
-        No ) return;;
+         exit;;
+        No ) exit;;
     esac
 done
