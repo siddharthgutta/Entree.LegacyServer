@@ -10,7 +10,7 @@ export async function getRestaurantWithMetaData(id) {
 
 export async function setEnabled(id, enabled) {
   const restaurant = await Restaurant.setEnabled(id, enabled);
-  Notification.notify(id, Notification.Events.RESTAURANT_UPDATED, restaurant);
+  Notification.notify(id, Notification.Events.RESTAURANT_UPDATED, await Restaurant.findOneWithMetaData(id));
   return restaurant;
 }
 

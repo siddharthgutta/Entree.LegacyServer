@@ -45,7 +45,7 @@ class App extends Influx.Component {
 
       this.initBraintreeUI();
     } catch (e) {
-      this.setStatus({status: Status.CLOSE, message: 'Your session has expired'});
+      this.setState({status: Status.CLOSE, message: 'Your session has expired'});
     }
   }
 
@@ -55,7 +55,7 @@ class App extends Influx.Component {
     try {
       const {status, data, message} = JSON.parse(frame.contentWindow.document.body.innerText);
       if (status === 200) {
-        this.setStatus({status: Status.CLOSE, message});
+        this.setState({status: Status.CLOSE, message});
         return;
       } else if (status === 500) {
         alert(message || 'Unable to update your profile');

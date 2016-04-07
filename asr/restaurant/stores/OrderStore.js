@@ -77,6 +77,10 @@ class OrderStore extends Influx.Store {
       env.notify('Updated order', `From ${order.User.firstName}`);
     });
 
+    restaurant.on(SocketEvents.RESTAURANT_UPDATED, _restaurant => {
+      this.emit(Events.RESTAURANT_UPDATED, _restaurant);
+    });
+
     const token = window.localStorage.getItem('token');
 
     restaurant.connect({token});
@@ -149,9 +153,7 @@ class OrderStore extends Influx.Store {
   }
 
   async setRestaurantEnabled(enabled) {
-    const restaurant = await this.data.restaurant.enabled(enabled);
-    this.emit(Events.RESTAURANT_UPDATED, restaurant);
-    return restaurant;
+    return await this.data.restaurant.enabled(enabled);
   }
 
   async setOrderStatus(id, status, {prepTime, message}) {

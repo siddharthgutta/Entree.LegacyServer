@@ -69,7 +69,8 @@ class Header extends Influx.Component {
       bannerText = null;
     }
 
-    const minHeight = (bannerText ? 50 + 55 : 55 + (getPlatform() === 'ios' ? 20 : 0)); // TODO fix
+    const bannerHeight = getPlatform() === 'ios' ? 50 : 35;
+    const minHeight = (bannerText ? bannerHeight + 55 : 55 + (getPlatform() === 'ios' ? 20 : 0)); // TODO fix
 
     return (
       <div style={{minHeight}}>

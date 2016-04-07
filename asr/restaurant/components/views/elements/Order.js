@@ -44,7 +44,7 @@ class Order extends React.Component {
         <div className='box flex left'>
           <div>
             <div className='name'>{order.User.firstName || 'Mathew'}</div>
-            <div className='date'>{moment(order.date).format('h:mm A')}</div>
+            <div className='date'>{moment(order.createdAt).format('h:mm A')}</div>
           </div>
         </div>
         <div className='cost box flex center'>{cost.toFixed(2)}</div>

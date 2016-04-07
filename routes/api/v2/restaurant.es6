@@ -92,6 +92,7 @@ router.post('/enabled', isAuthenticated, async(req, res) => {
 
   try {
     const restaurant = await Restaurant.setEnabled(id, enabled);
+
     res.ok({restaurant}, `Enabled is now ${restaurant.enabled}`);
   } catch (e) {
     res.fail(`Failed to set enabled: ${e.message}`).debug(e);
