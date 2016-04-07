@@ -6,6 +6,7 @@ import EventEmitter from 'events';
 
 const emitter = new EventEmitter();
 const events = {};
+let notifySound;
 
 export function addStoredEventListener(event, callback) {
   if (events[event]) {
@@ -25,24 +26,17 @@ window.document.addEventListener('resume', () => {
   emitter.emit('resume');
 }, false);
 
+window.document.addEventListener('DOMContentLoaded', () => {
+  notifySound = window.document.createElement('audio');
+  notifySound.innerHTML = '<source src="audio/bell.mp3" type="audio/mpeg"/>';
+  window.document.body.appendChild(notifySound);
+}, false);
+
 /**
  * Notification strategy
  */
 
 let notificationGranted = false;
-
-export function notify(title, text) {
-  if (window.cordova) {
-    if (notificationGranted) {
-      const sound = window.device.platform === 'Android' ? 'audio/bell.mp3' : 'file://beep.caf';
-      const notification = {id: Date.now(), title, text, message: text, at: new Date(), sound};
-
-      window.cordova.plugins.notification.local.schedule(notification);
-    }
-  } else {
-    alert(`${title}: ${text}`);
-  }
-}
 
 window.document.addEventListener('deviceready', () => {
   if (window.cordova) {
@@ -81,4 +75,27 @@ window.getPlatform = getPlatform;
 
 export function isNative() {
   return !!window.cordova;
+}
+
+
+export function notify(title, text, sound = true) {
+  if (window.cordova) {
+    if (notificationGranted) {
+      const notification = {
+        id: Date.now(),
+        title,
+        text,
+        message: text,
+        at: new Date()
+      };
+
+      window.cordova.plugins.notification.local.schedule(notification);
+
+      if (sound && getPlatform() === 'ios') {
+        notifySound.play();
+      }
+    }
+  } else {
+    alert(`${title}: ${text}`);
+  }
 }

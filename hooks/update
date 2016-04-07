@@ -2,7 +2,7 @@
 
 message=$(git log -1 --pretty=%B)
 
-if [[ ${message} == *"--skip-tests"* ]] && [[ ${1} != *"stage"* ]]
+if [[ ${message} == *"--skip-tests"* ]] && [[ ${1} == *"stage"* ]]
 then
     exit
 fi

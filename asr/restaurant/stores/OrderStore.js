@@ -73,8 +73,7 @@ class OrderStore extends Influx.Store {
     restaurant.on(SocketEvents.ORDER_UPDATE, order => {
       this._addOrder(order);
       this.emit(Events.ORDER_UPDATED, order);
-
-      env.notify('Updated order', `From ${order.User.firstName}`);
+      // env.notify('Updated order', `From ${order.User.firstName}`);
     });
 
     restaurant.on(SocketEvents.RESTAURANT_UPDATED, _restaurant => {
