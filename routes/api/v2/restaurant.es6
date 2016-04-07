@@ -40,10 +40,10 @@ router.get('/info', isAuthenticated, async(req, res) => {
 
 
 router.post('/socket', isAuthenticated, async(req, res) => {
-  const {id} = req.user;
+  const {id, token} = req.user;
 
   try {
-    const {uuid} = await Notification.createSocket(id);
+    const {uuid} = await Notification.createSocket(id, token);
     const address = await Notification.address();
     res.ok({uuid, address}).debug('Created order');
   } catch (e) {

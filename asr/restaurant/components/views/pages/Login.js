@@ -83,8 +83,6 @@ class Login extends Page {
     const password = this.refs.password.value;
 
     Dispatcher.emit(Dispatcher.Events.LOGIN, id, password);
-
-    this.setState({status: 'connecting'});
   }
 
   render() {

@@ -20,6 +20,8 @@ export async function isValid(token) {
 }
 
 export async function invalidate(token) {
+  console.tag('session', 'invalidate').log({token});
+
   try {
     await AuthToken.destroy(token);
   } catch (e) {

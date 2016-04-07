@@ -66,11 +66,30 @@ class RESTaurant extends EventEmitter {
   }
 
   async disconnect() {
-    this.token = null;
+    if (this.socket) {
+      try {
+        this.socket.disconnect();
+      } catch (e) {
+        // ignore
+      }
 
-    if (this.socket && this.socket.connected) {
-      this.socket.disconnect();
+      this.socket = null;
     }
+
+    try {
+      if (this.token) {
+        await fetch(`${this.server}/api/v2/restaurant/logout`, {
+          method: 'post',
+          body: {
+            token: this.token
+          }
+        });
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    this.token = null;
 
     this._emit(RESTaurant.Events.DISCONNECTED, false);
   }
@@ -94,7 +113,7 @@ class RESTaurant extends EventEmitter {
   }
 
   async stream() {
-    if (this.socket && this.socket.connected) {
+    if (this.socket) {
       return;
     }
 
