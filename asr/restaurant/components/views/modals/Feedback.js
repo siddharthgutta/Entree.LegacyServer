@@ -36,14 +36,16 @@ class Feedback extends React.Component {
     return (
       <div className='modal-box center'>
         <div className='flex modal-header'>
-          <div className='box flex center vertical' style={{padding: 15}}>
+          <div className='box flex center vertical' style={{padding: 5}}>
             <div className='desc'>FEEDBACK & CONCERNS</div>
           </div>
         </div>
         <div className='body'>
-          <div className='desc bold normal' style={{marginBottom: 20}}>Let us know what you are thinking</div>
-            <textarea placeholder='Your message' value={this.state.message}
-                      onChange={e => this.setState({message: e.target.value})}/>
+          <div className='desc bold normal' style={{margin: 20}}>Let us know what you are thinking</div>
+          <div style={{padding: 20, paddingTop: 0}}>
+          <textarea placeholder='Your message' value={this.state.message}
+                    onChange={e => this.setState({message: e.target.value})}/>
+          </div>
           <div className='button teal' {...onClick(() => this._handleDecline())}>send feedback
           </div>
         </div>

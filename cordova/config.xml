@@ -15,6 +15,7 @@
         <allow-intent href="market:*" />
         <icon src="www/images/app-icon.png" />
     </platform>
+    <preference name="fullscreen" value="false" />
     <platform name="ios">
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />

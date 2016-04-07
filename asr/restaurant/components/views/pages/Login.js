@@ -89,8 +89,8 @@ class Login extends Page {
     return (
       <div className='full flex vertical login'>
         <div className='flex vertical'
-             style={{padding: '30px 0', height: '100%', minHeight: 130}}>
-          <div style={{height: '100%'}}>
+             style={{padding: '30px 0', paddingTop: 0, height: '100%', minHeight: 130}}>
+          <div style={{height: '100%', position: 'relative'}}>
             <div className='secondary-logo'></div>
           </div>
           <div style={{padding: 20}} ref='wrapper'>

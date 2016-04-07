@@ -442,10 +442,7 @@ a {
     border-radius: 0;
     .modal-header {
       box-shadow: 0 1px 5px rgba(0, 0, 0, 0.19);
-      padding: 25px 15px;
-    }
-    .body {
-      padding: 20px;
+      padding: 15px 15px;
     }
     input, textarea {
       padding: 5px 15px;
@@ -475,12 +472,17 @@ a {
     }
     textarea {
       text-align: left;
-      font-size: 15px;
-      font-weight: normal;
-      padding: 15px;
+      font-size: 14px;
+      padding: 12px;
       resize: none;
+      font-weight: normal;
       letter-spacing: 1px;
-      min-height: 200px;
+      min-height: 90px;
+      margin: 0;
+      border-radius: 5px;
+      color: #000;
+      border: 1px solid #DDD;
+      background: transparent;
     }
     hr {
       opacity: 0.5;
@@ -497,7 +499,7 @@ a {
       }
       &.bold {
         color: #888;
-        font-size: 18px;
+        font-size: 15px;
       }
     }
     .button {
@@ -510,11 +512,17 @@ a {
       font-size: 16px;
       padding: 15px 0;
       background: #3AE041;
-      border-radius: 6px;
       width: 100%;
-      margin-bottom: 10px;
       user-select: none;
       cursor: pointer;
+      &.round {
+        border-radius: 5px;
+        font-size: 14px;
+        margin-right: 12px;
+        &:last-child {
+          margin-right: 0;
+        }
+      }
       .add {
         font-size: 12px;
         margin-right: 10px;
@@ -533,9 +541,6 @@ a {
       }
       &.purple {
         background: #00BCD4;
-      }
-      &:last-child {
-        margin-bottom: 0;
       }
     }
   }
@@ -859,15 +864,17 @@ a {
 
 .secondary-logo {
   background: url(../images/logo10.png) center center;
-  background-size: cover;
-  height: 92px;
-  width: 91px;
+  background-size: auto 100%;
   margin: 0 auto;
   position: absolute;
-  top: 30%;
+  top: 50%;
   transform: translateY(-50%);
   left: 0;
   right: 0;
+  height: 100%;
+  background-repeat: no-repeat;
+  width: 100%;
+  max-height: 92px;
 }
 
 @keyframes shake {
