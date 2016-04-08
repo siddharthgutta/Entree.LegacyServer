@@ -106,7 +106,6 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
      ` ${defaultPayment.cardType} ending in ${defaultPayment.last4}`;
 
     await chatState.clearOrderItems();
-    await chatState.clearRestaurantContext();
     await chatState.updateState(chatStates.start);
   }
 
