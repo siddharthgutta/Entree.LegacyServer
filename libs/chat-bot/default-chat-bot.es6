@@ -480,7 +480,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     });
 
     if (orderItem.name.indexOf('with') === -1 && nameMods.length > 0) {
-      orderItem.name += ' with';
+      orderItem.name += 'with';
     }
 
     orderItem.name += ` ${nameMods.join(', ')}`;
@@ -928,11 +928,14 @@ export default class DefaultChatBot extends ChatBotInterface {
 
   async _transitionToCart(chatState) {
     let orderItems;
+    let total = 0;
     try {
       orderItems = await chatState.findOrderItems();
     } catch (err) {
       throw new TraceError('Failed to find order items', err);
     }
+
+    _.each(orderItems, orderItem => total += orderItem.price);
 
     try {
       await chatState.updateState(chatStates.cart);
@@ -940,7 +943,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       return await this._genOutput(
         chatState,
         response.cart.header,
-        response.cart.footer,
+        `Your current total is $${(total / 100).toFixed(2)}. ${response.cart.footer}`,
         orderItems,
         response.cart.dataFormat);
     } catch (err) {
