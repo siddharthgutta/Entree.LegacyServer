@@ -37,7 +37,7 @@ export async function create(name, handle, password, mode = Mode.REGULAR, attrib
  * @param {Object} attributes: specific restaurant attributes to search by
  * @returns {Promise}: Returns the Restaurant objects
  */
-export function findByMode(mode = Mode.REGULAR, attributes = {enabled: true}) {
+export function findByMode(mode = Mode.REGULAR, attributes = {}) {
   return models.Restaurant.findAll({where: {mode, ...attributes}});
 }
 

@@ -31,6 +31,9 @@ export const response = {
 
   invalidRestaurantHandle: 'Sorry, we don\'t recognize that restaurant handle. Please try again.',
 
+  restaurantDisabled: producer => `Sorry, ${producer.name} is currently closed and not accepting orders.` +
+    ` To start looking at other restaurants type \"/clear\".`,
+
   /* Returned when user tries to execute context command while not in restaurant context */
   invalidContext: 'Sorry that command isn`t available right now. Please try again',
 
@@ -45,31 +48,30 @@ export const response = {
   /* I/O formatting for transition to various states */
   restaurant: {
     header: 'Here are our recommended food trucks.',
-    footer: 'Select the number of a restaurant or type \"/help\" at any time for help.',
-    dataFormat: (i, data) => `${i + 1}) ${data[i].name}: @${data[i].handle}`
+    footer: 'Select the number of a restaurant or type \"/help\" at any time for help.'
   },
 
   categories: {
     header: '',
     footer: 'Select a number to see a category',
-    dataFormat: (i, data) => `${i + 1}) ${data[i].name}`
+    dataFormat: async (i, data) => `${i + 1}) ${data[i].name}`
   },
 
   items: {
     footer: 'Pick a number for an item you want or type \"/menu\" to see the full menu',
-    dataFormat: (i, data) => `${i + 1}) ${data[i].name}: $${(data[i].basePrice / 100).toFixed(2)}\n` +
+    dataFormat: async (i, data) => `${i + 1}) ${data[i].name}: $${(data[i].basePrice / 100).toFixed(2)}\n` +
     `--  ${data[i].description.toLowerCase()} `
   },
 
   mods: {
-    dataFormat: (i, data) => `${i + 1}) ${data[i].name} +$${(data[i].addPrice / 100).toFixed(2)}`
+    dataFormat: async (i, data) => `${i + 1}) ${data[i].name} +$${(data[i].addPrice / 100).toFixed(2)}`
   },
 
   cart: {
     header: 'Here is your cart',
     footer: 'Type \"/checkout\" to finish and pay, \"/menu\" to browse the menu, ' +
     'or \"/clear\" to clear your entire cart',
-    dataFormat: (i, data) => `${i + 1}) ${data[i].name} - $${(data[i].price / 100).toFixed(2)}`
+    dataFormat: async (i, data) => `${i + 1}) ${data[i].name} - $${(data[i].price / 100).toFixed(2)}`
   },
 
   help: 'Here is a list of commands:\n' +
@@ -85,6 +87,74 @@ export default class DefaultChatBot extends ChatBotInterface {
   constructor() {
     super();
     /* Empty Constructor */
+  }
+
+  /**
+   * Generates the header for the mod states using the current item mod and the current order item being modified
+   *
+   * @param {ItemMod} itemMod: current item mod that the user is making a choice on
+   * @param {OrderItem} orderItem: current order being modified
+   * @returns {String} header string for response message
+   * @private
+   */
+  _genModHeader(itemMod, orderItem) {
+    if (itemMod.max === 1) {
+      return `Select a ${itemMod.name.toLowerCase()} for (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})`;
+    }
+    return `Would you like any ${itemMod.name.toLowerCase()} for` +
+      ` (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})?`;
+  }
+
+  _genModFooter(itemMod) {
+    if (itemMod.min === 0) {
+      return `Select up to ${itemMod.max} options by selecting a number or type \"no\" for none of the above. ` +
+        `If you want more than one, separate them with commas (e.g. 1,3,5).`;
+    }
+
+    if (itemMod.min < itemMod.max) {
+      return `Select at least ${itemMod.min} and up to ${itemMod.max} options by typing in comma` +
+        ` separated numbers (e.g. 1 or 1,3,2).`;
+    }
+
+    return `Select exactly ${itemMod.max} ${itemMod.max > 1 ? 'options' : 'option'} by typing in` +
+      ` ${itemMod.max > 1 ? 'comma separated numbers (e.g. 1,2,4).' : 'a number.'}`;
+  }
+
+  /**
+   * Get string for a day's hours
+   * Ex: Resulting String: '1-2PM, 5-7PM'
+   *
+   * @param {Restaurant} producer: restaurant to get hours for
+   * @param {String} day: day in string form - Ex: 'Monday'
+   * @returns {String} Formatted Hours
+   * @private
+   */
+  static async _getDayHours(producer, day) {
+    const producerHours = _.filter(await producer.findHours(), hour => hour.dayOfTheWeek === day);
+    const formattedHours = _.map(producerHours, hour => {
+      const openTime = moment(hour.openTime, 'HH:mm:ss').format('h');
+      const closeTime = moment(hour.closeTime, 'HH:mm:ss').format('h A');
+      return `${openTime} - ${closeTime}`;
+    });
+    return formattedHours.join(', ');
+  }
+
+  /**
+   * Gets producer's info data format string
+   *
+   * @param {Number} i: index into the producers list
+   * @param {Array<Restaurant>} producers: array of producers
+   * @returns {String} resulting info string for a producer
+   * @private
+   */
+  static async _genProducerDataFormat(i, producers) {
+    const producer = producers[i];
+    const {address} = await producer.findLocation();
+    // TODO - Figure out solution for
+    let dataFormat = `${i + 1}) ${producer.name}: ${producer.enabled ? `OPEN` : `CLOSED`}`;
+    dataFormat += `\n${address}`;
+    dataFormat += `\nHours: ${ await DefaultChatBot._getDayHours(producer, moment().format('dddd'))}`;
+    return dataFormat;
   }
 
   /**
@@ -153,7 +223,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
   }
 
-  /**
+   /**
    * Handles transitions from the restaurant state
    *
    * @param {Object} chatState: user chat state
@@ -186,7 +256,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       response.restaurant.header,
       response.restaurant.footer,
       restaurants,
-      response.restaurant.dataFormat);
+      DefaultChatBot._genProducerDataFormat);
   }
 
   async _handleSelectRestaurant(chatState, input) {
@@ -262,37 +332,6 @@ export default class DefaultChatBot extends ChatBotInterface {
     } catch (err) {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to update chat bot metadata`, err);
     }
-  }
-
-  /**
-   * Generates the header for the mod states using the current item mod and the current order item being modified
-   *
-   * @param {ItemMod} itemMod: current item mod that the user is making a choice on
-   * @param {OrderItem} orderItem: current order being modified
-   * @returns {String} header string for response message
-   * @private
-   */
-  _genModHeader(itemMod, orderItem) {
-    if (itemMod.max === 1) {
-      return `Select a ${itemMod.name.toLowerCase()} for (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})`;
-    }
-    return `Would you like any ${itemMod.name.toLowerCase()} for` +
-      ` (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})?`;
-  }
-
-  _genModFooter(itemMod) {
-    if (itemMod.min === 0) {
-      return `Select up to ${itemMod.max} options by selecting a number or type \"no\" for none of the above. ` +
-        `If you want more than one, separate them with commas (e.g. 1,3,5).`;
-    }
-
-    if (itemMod.min < itemMod.max) {
-      return `Select at least ${itemMod.min} and up to ${itemMod.max} options by typing in comma` +
-        ` separated numbers (e.g. 1 or 1,3,2).`;
-    }
-
-    return `Select exactly ${itemMod.max} ${itemMod.max > 1 ? 'options' : 'option'} by typing in` +
-      ` ${itemMod.max > 1 ? 'comma separated numbers (e.g. 1,2,4).' : 'a number.'}`;
   }
 
   /**
@@ -598,6 +637,9 @@ export default class DefaultChatBot extends ChatBotInterface {
     let restaurant, user;
     try {
       restaurant = await chatState.findRestaurantContext();
+      if (!restaurant.enabled) {
+        return response.restaurantDisabled(restaurant);
+      }
       user = await chatState.findUser();
     } catch (err) {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to find user or restaurant for an order`, err);
@@ -717,7 +759,7 @@ export default class DefaultChatBot extends ChatBotInterface {
         response.restaurant.header,
         response.restaurant.footer,
         restaurants,
-        response.restaurant.dataFormat);
+        DefaultChatBot._genProducerDataFormat);
     } catch (err) {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot [_handleRestaurant]`, err);
     }
@@ -876,7 +918,7 @@ export default class DefaultChatBot extends ChatBotInterface {
 
       for (let i = 0; i < data.length; i++) {
         await chatState.insertCommandMap(i + 1, data[i].id); // eslint-disable-line
-        output += `${dataFunc(i, data)}\n`;
+        output += `${ await dataFunc(i, data)}\n`;
       }
       return `${output}\n${footer}`;
     } catch (err) {

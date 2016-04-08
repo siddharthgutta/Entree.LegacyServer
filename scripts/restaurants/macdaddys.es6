@@ -57,21 +57,11 @@ const hours = [
   {
     day: 'Friday',
     open: '17:00:00',
-    close: '23:59:59'
-  },
-  {
-    day: 'Saturday',
-    open: '00:00:00',
     close: '03:00:00'
   },
   {
     day: 'Saturday',
     open: '17:00:00',
-    close: '23:59:59'
-  },
-  {
-    day: 'Sunday',
-    open: '00:00:00',
     close: '03:00:00'
   },
   {
