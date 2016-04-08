@@ -73,7 +73,7 @@ class OrderStore extends Influx.Store {
 
       const cost = this.getTotalCost(order).toFixed(2);
 
-      env.notify(`Received a new order`, `${order.User.firstName} paid ${cost}`);
+      env.notify(`New Order Received`, `Order #${order.id2}: ${order.User.firstName} paid $${cost}`);
     });
 
     restaurant.on(SocketEvents.ORDER_UPDATE, order => {
