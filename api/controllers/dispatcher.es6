@@ -56,7 +56,7 @@ Emitter.on(Events.USER_PAYMENT_REGISTERED, async({id: userId}) => {
         const {id: transactionId} =
           await Payment.paymentWithToken(userId, restaurantId, defaultPayment.token, price);
         await Order.setOrderStatus(orderId, Order.Status.RECEIVED_PAYMENT, {transactionId});
-        sendSMS(user.phoneNumber, `Your order using ${defaultPayment.cardType} - ${defaultPayment.last4} ` +
+        sendSMS(user.phoneNumber, `Your order using ${defaultPayment.cardType} ending in ${defaultPayment.last4} ` +
                 `has been sent to the restaurant. We'll text you once it's confirmed by the restaurant`);
       } catch (e) {
         const err = new TraceError(`Payment failed; user(${userId}) -> restaurant(${restaurantId})`, e);
@@ -79,17 +79,31 @@ Emitter.on(Events.USER_PAYMENT_REGISTERED, async({id: userId}) => {
 Emitter.on(Events.UPDATED_ORDER, async order => {
   // TODO @jesse move this to chatbot
   const message = {
-    // [Order.Status.RECEIVED_PAYMENT]: `Your order just got sent. Hang tight!`,
-    [Order.Status.ACCEPTED]: `Your order just got accepted :). It will be ready in ${order.prepTime} mins`,
-    [Order.Status.DECLINED]: `Your order just got declined :(. ${order.message}`,
+    [Order.Status.ACCEPTED]: `Your order shown below has been placed :) It will be ready in ${order.prepTime} mins`,
+    [Order.Status.DECLINED]: `Your order just got declined :( ${order.message}`,
     [Order.Status.COMPLETED]: `Your order is ready!`
   };
+
+  let response = message[order.status];
 
   const orderObj = resolve(await Order.getOrder(order.id));
   const user = await orderObj.findUser();
 
   if (order.status === Order.Status.ACCEPTED) {
     const chatState = await user.findChatState();
+    const orderItems = await chatState.findOrderItems();
+    const defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
+
+    let itemFormat = '';
+    let total = 0;
+
+    for (let i = 0; i < orderItems.length; i++) {
+      itemFormat += `${i + 1}) ${orderItems[i].name} - $${(orderItems[i].price / 100).toFixed(2)}\n`;
+      total += orderItems[i].price;
+    }
+
+    response += `\n\n${itemFormat}\nA total of $${(total / 100).toFixed(2)} was charged with` +
+     ` ${defaultPayment.cardType} ending in ${defaultPayment.last4}`;
 
     await chatState.clearOrderItems();
     await chatState.clearRestaurantContext();
@@ -101,9 +115,9 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
     await chatState.clearOrderContext();
   }
 
-  const text = message[order.status];
-
-  if (text) {
-    await sendSMS(user.phoneNumber, text);
+  if (response) {
+    await sendSMS(user.phoneNumber, response);
+  } else {
+    throw Error(`UPDATED_ORDER text response for user ${user.id} is null`);
   }
 });
