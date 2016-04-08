@@ -48,17 +48,17 @@ export const response = {
   /* I/O formatting for transition to various states */
   restaurant: {
     header: 'Here are our recommended food trucks.',
-    footer: 'Select the number of a restaurant or type \"/help\" at any time for help.'
+    footer: 'Type the number of a restaurant or type \"/help\" at any time for help.'
   },
 
   categories: {
     header: '',
-    footer: 'Select a number to see a category',
+    footer: 'Type a number to see a category',
     dataFormat: async (i, data) => `${i + 1}) ${data[i].name}`
   },
 
   items: {
-    footer: 'Pick a number for an item you want or type \"/menu\" to see the full menu',
+    footer: 'Type a number for an item you want or type \"/menu\" to see the full menu',
     dataFormat: async (i, data) => `${i + 1}) ${data[i].name}: $${(data[i].basePrice / 100).toFixed(2)}\n` +
     `--  ${data[i].description.toLowerCase()} `
   },
@@ -99,7 +99,8 @@ export default class DefaultChatBot extends ChatBotInterface {
    */
   _genModHeader(itemMod, orderItem) {
     if (itemMod.max === 1) {
-      return `Select a ${itemMod.name.toLowerCase()} for (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})`;
+      return `Type a number to select a ${itemMod.name.toLowerCase()} for` +
+        ` (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})`;
     }
     return `Would you like any ${itemMod.name.toLowerCase()} for` +
       ` (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})?`;
@@ -107,7 +108,7 @@ export default class DefaultChatBot extends ChatBotInterface {
 
   _genModFooter(itemMod) {
     if (itemMod.min === 0) {
-      return `Select up to ${itemMod.max} options by selecting a number or type \"no\" for none of the above. ` +
+      return `Select up to ${itemMod.max} options by typing a number or type \"no\" for none of the above. ` +
         `If you want more than one, separate them with commas (e.g. 1,3,5).`;
     }
 
