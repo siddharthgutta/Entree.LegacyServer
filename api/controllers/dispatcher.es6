@@ -77,17 +77,17 @@ Emitter.on(Events.USER_PAYMENT_REGISTERED, async({id: userId}) => {
 });
 
 Emitter.on(Events.UPDATED_ORDER, async order => {
+  const restaurant = await Order.getRestaurantFromOrder(order.id);
+
   // TODO @jesse move this to chatbot
   const message = {
     [Order.Status.ACCEPTED]: `Your order shown below has been placed :) It will be ready in ${order.prepTime} mins`,
     [Order.Status.DECLINED]: `Your order just got declined :( ${order.message}`,
-    [Order.Status.COMPLETED]: `Your order is ready!`
+    [Order.Status.COMPLETED]: `Your ${restaurant.name} order is ready to be picked up!`
   };
 
   let response = message[order.status];
-
-  const orderObj = resolve(await Order.getOrder(order.id));
-  const user = await orderObj.findUser();
+  const user = resolve(await Order.getUserFromOrder(order.id));
 
   if (order.status === Order.Status.ACCEPTED) {
     const chatState = await user.findChatState();
