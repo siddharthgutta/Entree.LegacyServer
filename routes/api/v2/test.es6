@@ -76,17 +76,17 @@ router.get('/generate/order/:id*?', async (req, res) => {
     const items = [
       {
         name: 'Cheeseburger',
-        price: 6.50,
+        price: 650,
         quantity: 1,
         description: 'good drink'
       }, {
         name: 'Republican',
-        price: 7.38,
+        price: 738,
         quantity: 2,
         description: 'great drink'
       }, {
         name: 'Fountain Drink',
-        price: 1.05,
+        price: 105,
         quantity: 2,
         description: 'great drink'
       }

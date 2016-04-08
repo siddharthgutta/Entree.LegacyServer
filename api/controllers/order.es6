@@ -2,6 +2,7 @@ import * as Order from '../order.es6';
 import * as Notification from './notification.es6';
 import {isEmpty} from '../../libs/utils.es6';
 import Emitter, {Events} from '../events/index.es6';
+import {notify} from './restaurant.es6';
 import {Status} from '../order.es6';
 
 export {Status};
@@ -64,12 +65,14 @@ export async function setOrderStatus(id, status, {prepTime, message, transaction
   try {
     const _order = await Order.findOneAndUpdateStatus(id, status, {prepTime, message, transactionId});
 
-    if (notificationEvent) {
-      Notification.notify(restaurantId, notificationEvent, _order);
-    }
-
     if (internalEvent) {
       Emitter.emit(internalEvent, _order, order, restaurantId);
+      console.tag('DEBUG').log(Emitter.listenerCount(Events.ORDER_UPDATED));
+      notify(restaurantId);
+    }
+
+    if (notificationEvent) {
+      Notification.notify(restaurantId, notificationEvent, _order);
     }
 
     return _order;
