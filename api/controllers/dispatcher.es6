@@ -81,15 +81,17 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
 
   // TODO @jesse move this to chatbot
   const message = {
-    [Order.Status.ACCEPTED]: `Your order shown below has been placed :) It will be ready in ${order.prepTime} mins`,
+    [Order.Status.ACCEPTED]: `Your order has been placed :) It will be ready in ${order.prepTime} mins`,
     [Order.Status.DECLINED]: `Your order just got declined :( ${order.message}`,
-    [Order.Status.COMPLETED]: `Your ${restaurant.name} order is ready to be picked up!`
+    [Order.Status.COMPLETED]: `Your ${restaurant.name} order is ready to be picked up!` +
+      ` Please present your name and order number (#${order.id2}) when you arrive.`
   };
 
   let response = message[order.status];
   const user = resolve(await Order.getUserFromOrder(order.id));
 
   if (order.status === Order.Status.ACCEPTED) {
+    response += `\n\nOrder #${order.id2} Receipt:`;
     const chatState = await user.findChatState();
     const orderItems = await chatState.findOrderItems();
     const defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
@@ -102,7 +104,7 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
       total += orderItems[i].price;
     }
 
-    response += `\n\n${itemFormat}\nA total of $${(total / 100).toFixed(2)} was charged with` +
+    response += `\n${itemFormat}\nA total of $${(total / 100).toFixed(2)} was charged with` +
      ` ${defaultPayment.cardType} ending in ${defaultPayment.last4}`;
 
     await chatState.clearOrderItems();
