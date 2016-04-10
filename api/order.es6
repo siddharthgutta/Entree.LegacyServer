@@ -120,6 +120,16 @@ export async function findUser(id) {
   return (await order.getUser()).toJSON();
 }
 
+export async function findItems(id) {
+  const {Order} = models;
+  const order = await Order.findOne({where: {id}});
+
+  const items = await order.getItems();
+  _.each(items, item => item.toJSON());
+
+  return items;
+}
+
 export async function calculateTotal(id) {
   const {Order} = models;
   const order = await Order.findOne({where: {id}});

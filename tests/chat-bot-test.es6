@@ -285,9 +285,9 @@ describe('ChatBot', () => {
       done();
     });
 
-    it('should stay in the same state using /clear command', async done => {
+    it('should move to start state using /clear command', async done => {
       await bot.updateState(phoneNumber, '/clear');
-      await checkState(chatStates.categories);
+      await checkState(chatStates.start);
       await checkContext(restaurantName, null);
       done();
     });
