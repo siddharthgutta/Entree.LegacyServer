@@ -45,12 +45,25 @@ function stripCountryCode(number) {
 }
 
 /**
+ * Cleaner SMS logs
+ *
+ * @param {Array<String>} tags: tags to log out
+ * @param {Object} text: text object from Twilio
+ * @param {Boolean} receivedOrSent: whether or not sent or received
+ * @returns {Null} No return object
+ */
+function logText(tags, text, receivedOrSent) {
+  console.tag(tags).log(`Processing ${receivedOrSent ? 'received' : 'sent'}`);
+  console.tag(tags).log({id: text.id, from: text.from, to: text.to,
+                         body: text.body, date: text.date, status: text.status});
+}
+/**
  * Handle the texts that are sent to the server
  * @param {SMSData} text: text to be handled
  * @returns {null} void
  */
 async function processReceive(text) {
-  console.tag('api', 'sms', 'processReceive').log('Processing text', text.id, text);
+  logText(['api', 'sms', 'processReceive'], text, true);
 
   text.to = stripCountryCode(text.to);
   text.from = stripCountryCode(text.from);
@@ -79,7 +92,7 @@ async function processReceive(text) {
  * @returns {null} void
  */
 async function processSent(text) {
-  console.tag('api', 'sms', 'processSent').log('Processing text', text.id, text);
+  logText(['api', 'sms', 'processSent'], text, false);
 
   text.to = stripCountryCode(text.to);
   text.from = stripCountryCode(text.from);
