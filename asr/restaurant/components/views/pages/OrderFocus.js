@@ -172,7 +172,7 @@ class OrderFocus extends Page {
           <div className={ifcat('box event', {active: order.status === OrderConstants.Status.ACCEPTED})}>PROGRESS</div>
           <div className={ifcat('box event', {active: order.status === OrderConstants.Status.COMPLETED ||
           order.status === OrderConstants.Status.DECLINED})}>
-            {OrderConstants.Status.DECLINED ? 'DECLINED' : 'COMPLETE'}</div>
+            {order.status === OrderConstants.Status.DECLINED ? 'DECLINED' : 'COMPLETE'}</div>
         </div>
         <div className='full' style={{padding: '10px 15px 0', overflow: 'scroll', background: 'rgba(0,0,0,0.7)'}}>
           {order.Items.map((item, i) => (
