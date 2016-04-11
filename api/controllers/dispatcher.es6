@@ -46,21 +46,14 @@ Emitter.on(Events.USER_PAYMENT_REGISTERED, async({id: userId}) => {
     const chatState = await user.findChatState();
     const orderItems = await chatState.findOrderItems();
     const restaurant = await chatState.findRestaurantContext();
-
-    let output = '';
-    let total = 0;
-    for (let i = 0; i < orderItems.length; i++) {
-      output += `${orderItems[i].name}, `;
-      total += orderItems[i].price;
-    }
-
     const items = orderItems.map(({name, price}) => ({name, price, quantity: 1}));
 
-    const order = await Order.createOrder(user.id, restaurant.id, items);
+    const {id: restaurantId} = restaurant;
+
+    const order = await Order.createOrder(userId, restaurantId, items);
     await chatState.setOrderContext(order.resolve());
 
     const {id: orderId} = order;
-    const {id: restaurantId} = await Order.getRestaurantFromOrder(orderId);
     const defaultPayment = await Payment.getCustomerDefaultPayment(userId);
     const price = await Order.getOrderTotalById(orderId);
 
