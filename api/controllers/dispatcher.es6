@@ -59,10 +59,9 @@ Emitter.on(Events.USER_PAYMENT_REGISTERED, async({id: userId}) => {
     totalPrice = await Order.getOrderTotalById(orderId);
   } catch (e) {
     const err = new TraceError(`Could not process order`, e);
-    console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);
     sendSMS(user.phoneNumber, 'There was a problem processing your last order. Can you please try again?');
 
-    throw err;
+    return console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);
   }
 
   let payment;
@@ -70,13 +69,12 @@ Emitter.on(Events.USER_PAYMENT_REGISTERED, async({id: userId}) => {
     payment = await Payment.paymentWithToken(userId, restaurantId, defaultPayment.token, totalPrice);
   } catch (e) {
     const err = new TraceError(`Payment failed; user(${userId}) -> restaurant(${restaurantId})`, e);
-    console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);
     const secret = await User.requestProfileEdit(userId);
     const profileUrl = await User.getUserProfile(secret);
     sendSMS(user.phoneNumber, `There was a problem with your ${defaultPayment.cardType} credit card ending in` +
       ` ${defaultPayment.last4}. Please update your payment information at ${profileUrl}`);
 
-    throw err;
+    return console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);
   }
 
   try {
@@ -88,10 +86,9 @@ Emitter.on(Events.USER_PAYMENT_REGISTERED, async({id: userId}) => {
       `has been sent to the restaurant. We'll text you once it's confirmed by the restaurant`);
   } catch (e) {
     const err = new TraceError(`Could not process order`, e);
-    console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);
     sendSMS(user.phoneNumber, 'There was a problem processing your last order. Can you please try again?');
 
-    throw err;
+    return console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);
   }
 });
 
