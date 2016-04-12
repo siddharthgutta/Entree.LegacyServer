@@ -113,22 +113,22 @@ const itemMods = {
     },
     spicyDeluxe: {
       meal: {
-        name: 'NEED REAL PRICE',
-        price: 1000
+        name: 'Spicy Deluxe Sandwich',
+        price: 698
       },
       item: {
-        name: 'NEED REAL PRICE',
-        price: 1000
+        name: 'Spicy Deluxe Sandwich',
+        price: 389
       }
     },
     grilled: {
       meal: {
-        name: 'NEED REAL PRICE',
-        price: 1000
+        name: 'Grilled Sandwich',
+        price: 779
       },
       item: {
-        name: 'NEED REAL PRICE',
-        price: 1000
+        name: 'Grilled Sandwich',
+        price: 479
       }
     }
   },
@@ -166,7 +166,7 @@ const itemMods = {
     dietLemonade: {
       meal: {
         name: 'Diet Lemonade',
-        price: 0
+        price: 10
       },
       item: {
         name: 'Sweet Tea',
@@ -603,8 +603,8 @@ const menu = [
         ]
       }, {
         name: 'Spicy Deluxe Sandwich',
-        description: 'NEED PRICE',
-        basePrice: 10000,
+        description: '',
+        basePrice: 695,
         modTypes: [
           {
             name: 'Waffle Fries',
@@ -658,8 +658,8 @@ const menu = [
         ]
       }, {
         name: 'Grilled Sandwich',
-        description: 'NEED PRICE',
-        basePrice: 10000,
+        description: '',
+        basePrice: 779,
         modTypes: [
           {
             name: 'Waffle Fries',
@@ -823,8 +823,8 @@ const menu = [
         ]
       }, {
         name: 'Spicy Deluxe Sandwich',
-        description: 'NEED PRICE',
-        basePrice: 10000,
+        description: '',
+        basePrice: 389,
         modTypes: [
           {
             name: 'Sauces',
@@ -845,7 +845,7 @@ const menu = [
       }, {
         name: 'Grilled Sandwich',
         description: 'NEED PRICE',
-        basePrice: 10000,
+        basePrice: 479,
         modTypes: [
           {
             name: 'Sauces',
