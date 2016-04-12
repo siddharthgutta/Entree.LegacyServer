@@ -63,11 +63,11 @@ export function signup(phoneNumber, overrideGreeting, noText) {
                                          // TODO @jadesym lets get this into async/await if you get some downtime
                                        } catch (error) {
                                          console.tag('controller', 'signup', 'sms')
-                                                .error('Text Message not sent successfully, but user account was ' +
-                                                       'created.' +
-                                                       `User account was ${created ? 'created. Rolling it back now.'
-                                                         : 'not created.'} SMS Error:`, error);
-                                         throw new TraceError('Could not send message after creating user', error);
+                                           .error('Text Message not sent successfully, but user account was ' +
+                                             'created.' +
+                                             `User account was ${created ? 'created. Rolling it back now.'
+                                               : 'not created.'} SMS Error:`, error);
+                                         reject(error);
                                        }
                                      }
 
@@ -81,7 +81,7 @@ export function signup(phoneNumber, overrideGreeting, noText) {
                                        reject(err);
                                      }
 
-                                     return response;
+                                     resolve(response);
                                    })
                                    .catch(error => {
                                      console.tag('controller', 'signup', 'sms')
