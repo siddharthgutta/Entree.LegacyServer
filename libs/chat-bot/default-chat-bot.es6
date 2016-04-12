@@ -663,7 +663,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     } catch (defaultPaymentError) {
       console.tag('chatbot').log('No default payment found. Sending user to signup2.');
       const secret = await User.requestProfileEdit(user.id);
-      const url = await User.resolveProfileEditAddress(secret.secret);
+      const url = await User.resolveProfileEditAddress(secret);
 
       chatState.updateState(chatStates.secondSignup);
       return `To complete your order and pay, please go to ${url}`;

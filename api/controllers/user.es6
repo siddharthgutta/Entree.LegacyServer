@@ -56,17 +56,17 @@ export function signup(phoneNumber, overrideGreeting, noText) {
                                          // this response is not currently being dealt with but needs to be stored
                                          // in the Messages table
                                          console.tag('controller', 'signup')
-                                           .log(`New user was ${created ? 'created' : 'found'} & ` +
-                                             `${created ? 'full' : 'partial'} welcome message.`);
+                                                .log(`New user was ${created ? 'created' : 'found'} & ` +
+                                                     `${created ? 'full' : 'partial'} welcome message.`);
                                          // TODO @jadesym @jesse move getGreeting into chatbot. then ask chatbot
                                          // what to say and send that to the client.
                                          // TODO @jadesym lets get this into async/await if you get some downtime
                                        } catch (error) {
                                          console.tag('controller', 'signup', 'sms')
-                                           .error('Text Message not sent successfully, but user account was ' +
-                                             'created.' +
-                                             `User account was ${created ? 'created. Rolling it back now.'
-                                               : 'not created.'} SMS Error:`, error);
+                                                .error('Text Message not sent successfully, but user account was ' +
+                                                       'created.' +
+                                                       `User account was ${created ? 'created. Rolling it back now.'
+                                                         : 'not created.'} SMS Error:`, error);
                                          throw new TraceError('Could not send message after creating user', error);
                                        }
                                      }
@@ -77,7 +77,7 @@ export function signup(phoneNumber, overrideGreeting, noText) {
                                        }
                                      } catch (err) {
                                        console.tag('api', 'user', 'signup', 'chatstate')
-                                         .error(`Unable to create chat state for user. Error: ${err}`);
+                                              .error(`Unable to create chat state for user. Error: ${err}`);
                                        reject(err);
                                      }
 
@@ -111,7 +111,13 @@ export async function resolveProfileEditAddress(secret) {
 }
 
 export async function requestProfileEdit(userId) {
-  return User.createSecret(userId);
+  try {
+    const {secret} = await User.createSecret(userId);
+    console.log(await User.createSecret(userId));
+    return secret;
+  } catch (e) {
+    throw new TraceError('Could create profile edit', e);
+  }
 }
 
 export async function requestProfileEditByPhoneNumber(phoneNumber) {

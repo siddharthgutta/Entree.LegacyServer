@@ -82,7 +82,7 @@ Emitter.on(Events.USER_PAYMENT_REGISTERED, async({id: userId}) => {
   } catch (e) {
     const err = new TraceError(`Payment failed; user(${userId}) -> restaurant(${restaurantId})`, e);
     const secret = await User.requestProfileEdit(userId);
-    const profileUrl = await User.getUserProfile(secret);
+    const profileUrl = await User.resolveProfileEditAddress(secret);
     sendSMS(user.phoneNumber, `There was a problem with your ${defaultPayment.cardType} credit card ending in` +
       ` ${defaultPayment.last4}. Please update your payment information at ${profileUrl}`);
 
