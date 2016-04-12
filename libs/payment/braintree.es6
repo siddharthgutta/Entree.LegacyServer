@@ -68,26 +68,31 @@ export default class Braintree extends PaymentStrategy {
    * @returns {Promise}: promise containing transaction result object
    */
   transaction(amount, merchantAccountId, merchantName, paymentMethodToken, customerId, serviceFeeAmount) {
+    const transactionSaleParameters = {
+      amount,
+      paymentMethodToken,
+      customerId,
+      /*
+       Dynamic descriptors are sent on a per-transaction basis and
+       define what will appear on your customers' credit card statements
+       for a specific purchase. The clearer the description of your product,
+       the less likely customers will issue chargebacks due to confusion
+       or non-recognition.
+       */
+      // Descriptor name limited to 22 characters
+      descriptor: {name: `Entree *${merchantName.substring(0, 13)}`},
+      options: {
+        submitForSettlement: true,
+      }
+    };
+    if (merchantAccountId !== this.masterMerchantAccountId) {
+      transactionSaleParameters.serviceFeeAmount = serviceFeeAmount;
+      transactionSaleParameters.options.holdInEscrow = true;
+      transactionSaleParameters.merchantAccountId = merchantAccountId;
+    }
+
     return new Promise((resolve, reject) => {
-      this.gateway.transaction.sale({
-        amount,
-        merchantAccountId,
-        paymentMethodToken,
-        customerId,
-        /*
-         Dynamic descriptors are sent on a per-transaction basis and
-         define what will appear on your customers' credit card statements
-         for a specific purchase. The clearer the description of your product,
-         the less likely customers will issue chargebacks due to confusion
-         or non-recognition.
-         */
-        descriptor: {name: `Entree*${merchantName}`, url: 'textentree.com'},
-        options: {
-          submitForSettlement: true,
-          holdInEscrow: true
-        },
-        serviceFeeAmount
-      }, (err, result) => {
+      this.gateway.transaction.sale(transactionSaleParameters, (err, result) => {
         if (err) reject(err);
         else resolve(result);
       });

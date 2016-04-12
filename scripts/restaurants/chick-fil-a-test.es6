@@ -1040,7 +1040,7 @@ async function importMenu() {
         password: restaurantPass, mode: Mode.REGULAR, profileImage, merchantId});
     } catch (e) {
       restaurant = (await Restaurant.create(restaurantName,
-        restaurantHandle, restaurantPass, Mode.REGULAR, {profileImage})).resolve();
+        restaurantHandle, restaurantPass, Mode.REGULAR, {profileImage, merchantId})).resolve();
     }
     restaurantId = restaurant.id;
 
