@@ -113,7 +113,6 @@ export async function resolveProfileEditAddress(secret) {
 export async function requestProfileEdit(userId) {
   try {
     const {secret} = await User.createSecret(userId);
-    console.log(await User.createSecret(userId));
     return secret;
   } catch (e) {
     throw new TraceError('Could create profile edit', e);
