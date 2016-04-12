@@ -82,7 +82,7 @@ export default class Braintree extends PaymentStrategy {
       // Descriptor name limited to 22 characters
       descriptor: {name: `Entree *${merchantName.substring(0, 13)}`},
       options: {
-        submitForSettlement: true,
+        submitForSettlement: true
       }
     };
     if (merchantAccountId !== this.masterMerchantAccountId) {
