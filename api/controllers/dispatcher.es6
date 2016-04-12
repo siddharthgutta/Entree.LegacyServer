@@ -9,7 +9,7 @@ import * as Payment from '../payment.es6';
 import * as Restaurant from './restaurant.es6';
 
 const chatBot = new DefaultChatBot();
-const waitForChicken = false;
+const waitForChicken = true;
 const chickenIsDone = false;
 
 /**
