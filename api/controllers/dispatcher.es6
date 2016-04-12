@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Emitter, {Events} from '../events/index.es6';
 import {DefaultChatBot, chatStates} from '../../libs/chat-bot/index.es6';
 import {sendSMS} from './sms.es6';
@@ -24,20 +25,18 @@ Emitter.on(Events.TEXT_RECEIVED, async text => {
     `Chick-Fil-A. We will text you as soon as you can place an order!`);
   return;
 
-  try {
+  /* try {
     const response = await chatBot.updateState(text.from, text.body);
 
-    /* TODO @Jadesym - move into chatbot. Only reason response is null is if the user isn't signed up*/
     if (response) {
       await sendSMS(text.from, response);
     }
   } catch (err) {
     console.tag('dispatcher', 'TEXT_RECEIVED').error(err);
 
-    /* Best way to handle errors? */
     await sendSMS(text.from, 'Sorry, we had problem on our side. If you are still having problems, contact us at' +
                   ' team@textentree.com');
-  }
+  } */
 });
 
 /**
