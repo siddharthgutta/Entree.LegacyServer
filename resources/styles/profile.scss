@@ -54,12 +54,32 @@ a {
 }
 
 .paypal {
-  background: url(../images/paypal.png);
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  float: right;
+  margin-right: 10px;
+  background: #DDD url(../images/paypal2.png) no-repeat center center;
+  background-size: 120%;
+  border-radius: 3px;
+}
+
+.braintree {
+  background: url(../images/braintree3.jpeg);
   width: 40px;
   height: 40px;
   background-size: cover;
   display: inline-block;
   float: right;
+  border-radius: 3px;
+  opacity: 0.8;
+}
+
+.info {
+  font-size: 11px;
+  line-height: 14px;
+  color: #AAA;
+  margin-top: 12px;
 }
 
 @import 'shared/form-modal';

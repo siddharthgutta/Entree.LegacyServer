@@ -88,6 +88,7 @@ class App extends Influx.Component {
       <div className='full' ref='root' style={{position: 'fixed', left: 0, top: 0, zIndex: 999}}>
         <div className='full-abs' style={{background: 'rgba(232,232,232,0.8)'}}/>
         <div className='header'>
+          <div className='braintree'></div>
           <div className='paypal'></div>
           <div className='logo'></div>
           <div style={{display: 'inline-block', marginLeft: 15, position: 'relative', top: 5}}>
@@ -95,7 +96,7 @@ class App extends Influx.Component {
               textTransform: 'uppercase', letterSpacing: '1px'}}>
               Account
             </div>
-            <div style={{fontSize: 12, color: '#AAA'}}>Secured by <b>PayPal</b></div>
+            <div style={{fontSize: 12, color: '#AAA'}}>Secured by <b>Braintree</b> & <b>Paypal</b></div>
           </div>
         </div>
         <div className='full' ref='wrapper' style={{overflow: 'scroll'}}>
@@ -103,8 +104,9 @@ class App extends Influx.Component {
             { status === Status.OK ?
               <form target='no-forward' id='payment-form' method='POST'
                     action={`api/v2/user/profile/${token || secret}`}>
-                <MaskedInput className='input disabled' name='phoneNumber' onChange={noop} disabled mask='111-111-1111'
-                             value={user.phoneNumber}/>
+                <div className='label'>Phone</div>
+                <MaskedInput className='input disabled' name='phoneNumber' onChange={noop}
+                             disabled mask='111-111-1111' value={`${user.phoneNumber}`}/>
                 <div className='label'>Email</div>
                 <input className='input' name='email' value={user.email}
                        onChange={e => this._handleUpdate('email', e.target.value)}/>
@@ -142,6 +144,9 @@ class App extends Influx.Component {
                 <button className='button' type='submit' style={{margin: 0}}>
                   <span className='icon lock' style={{marginRight: 5}}/>Submit
                 </button>
+                <p className='info'>* We do not store your credit/debit card information on Entree's servers.
+                  All payment information and transactions are handled by BrainTree (a PayPal company) in compliance
+                  with PCI Security Standards.</p>
               </form> :
               <div>
                 <div className='label' style={{textAlign: 'center'}}>{this.state.message}</div>

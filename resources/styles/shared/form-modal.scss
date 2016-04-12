@@ -52,10 +52,10 @@
 .button {
   width: 100%;
   /* background: #228AE6; */
-  background: transparent;
+  background: #228AE6;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
   font-size: 13px;
-  color: #228AE6;
+  color: #FFF;
   letter-spacing: 1.25px;
   line-height: 19px;
   padding: 11px;
@@ -71,7 +71,7 @@
     margin-bottom: 0;
   }
   &:hover {
-    background: #228AE6;
+    background: #185e9f;
     color: #FFF;
   }
   &:active {
