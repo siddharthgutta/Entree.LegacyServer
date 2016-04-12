@@ -64,8 +64,8 @@ export const response = {
 
   items: {
     footer: 'Type a number for an item you want or type \"/menu\" to see the full menu',
-    dataFormat: async (i, data) => `${i + 1}) ${data[i].name}: $${(data[i].basePrice / 100).toFixed(2)}\n` +
-    `--  ${data[i].description.toLowerCase()} `
+    dataFormat: async (i, data) => `${i + 1}) ${data[i].name}: $${(data[i].basePrice / 100).toFixed(2)}` +
+    `${data[i].description === '' ? '' : `\n--  ${data[i].description.toLowerCase()}`}`
   },
 
   mods: {
@@ -180,6 +180,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       if (!user) {
         // TODO - fix after cfa
         await User.signup(phoneNumber, null, true);
+        user = await User.UserModel.findOneByPhoneNumber(phoneNumber);
         return await this._handleAtRestaurant(await user.findChatState(), 'chicken');
       }
       chatState = await user.findChatState();
@@ -490,10 +491,22 @@ export default class DefaultChatBot extends ChatBotInterface {
     });
 
     if (orderItem.name.indexOf('with') === -1 && nameMods.length > 0) {
-      orderItem.name += 'with';
+      orderItem.name += ' with';
     }
 
-    orderItem.name += ` ${nameMods.join(', ')}`;
+    // TODO Remove after Chick-fil-a
+    // Keep the code inside else and move it out, delete the rest
+    if (nameMods.length === 1 && /^[^ ]+\ Drink Size$/.test(nameMods[0])) {
+      const modSize = nameMods[0].split(' ')[0];
+      const orderItemsArraySplitByWith = (orderItem.name).split('with');
+      const modsSplitByComma = orderItemsArraySplitByWith[1].split(',');
+      modsSplitByComma[modsSplitByComma.length - 1] = ` ${modSize}${modsSplitByComma[modsSplitByComma.length - 1]}`;
+      orderItem.name = `${orderItemsArraySplitByWith[0]}with${modsSplitByComma.join(',')}`;
+    } else if (orderItem.name.indexOf('with') === -1) {
+      orderItem.name += ` ${nameMods.join(', ')}`;
+    } else {
+      orderItem.name += `, ${nameMods.join(', ')}`;
+    }
 
     try {
       await orderItem.save();
@@ -675,6 +688,10 @@ export default class DefaultChatBot extends ChatBotInterface {
       output += `${orderItems[i].name}, `;
       total += orderItems[i].price;
     }
+
+    // TEMPORARY TAX IMPLEMENTATION - REMOVE AFTER CHICK-FIL-A
+    total *= 1.0825;
+    total = Math.round(total);
 
     // transform for order to support orders
     const items = orderItems.map(({name, price}) => ({name, price, quantity: 1}));
@@ -961,13 +978,19 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     _.each(orderItems, orderItem => total += orderItem.price);
 
+    // TEMPORARY TAX IMPLEMENTATION - REMOVE AFTER CHICK-FIL-A
+    const subTotal = total;
+    total *= 1.0825;
+    total = Math.round(total);
+
     try {
       await chatState.updateState(chatStates.cart);
       await chatState.clearMenuItemContext();
       return await this._genOutput(
         chatState,
         response.cart.header,
-        `Your current total is $${(total / 100).toFixed(2)}. ${response.cart.footer}`,
+        `Your subtotal is $${(subTotal / 100).toFixed(2)}. Your final total (including tax) is ` +
+          `$${(total / 100).toFixed(2)}. ${response.cart.footer}`,
         orderItems,
         response.cart.dataFormat);
     } catch (err) {

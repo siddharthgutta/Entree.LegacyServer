@@ -58,16 +58,16 @@ export function signup(phoneNumber, overrideGreeting, noText) {
                                          console.tag('controller', 'signup')
                                                 .log(`New user was ${created ? 'created' : 'found'} & ` +
                                                      `${created ? 'full' : 'partial'} welcome message.`);
-                                         // TODO @jadesym @jesse move getGreeting into chatbot. then ask chatbot
+                                         // TODO @jadesym @jesse move getGreeting into chatbot. Then, ask chatbot
                                          // what to say and send that to the client.
                                          // TODO @jadesym lets get this into async/await if you get some downtime
                                        } catch (error) {
                                          console.tag('controller', 'signup', 'sms')
-                                                .error('Text Message not sent successfully, but user account was ' +
-                                                       'created.' +
-                                                       `User account was ${created ? 'created. Rolling it back now.'
-                                                         : 'not created.'} SMS Error:`, error);
-                                         throw new TraceError('Could not send message after creating user', error);
+                                           .error('Text Message not sent successfully, but user account was ' +
+                                             'created.' +
+                                             `User account was ${created ? 'created. Rolling it back now.'
+                                               : 'not created.'} SMS Error:`, error);
+                                         reject(error);
                                        }
                                      }
 
@@ -81,7 +81,7 @@ export function signup(phoneNumber, overrideGreeting, noText) {
                                        reject(err);
                                      }
 
-                                     return response;
+                                     resolve(response);
                                    })
                                    .catch(error => {
                                      console.tag('controller', 'signup', 'sms')
