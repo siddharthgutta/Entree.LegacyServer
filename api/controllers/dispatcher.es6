@@ -9,7 +9,8 @@ import * as Payment from '../payment.es6';
 import * as Restaurant from './restaurant.es6';
 
 const chatBot = new DefaultChatBot();
-const disableChatbot = false;
+const waitForChicken = false;
+const chickenIsDone = false;
 
 /**
  * Dispatcher to handle system events
@@ -24,9 +25,14 @@ Emitter.on(Events.TEXT_RECEIVED, async text => {
   console.tag('api', 'sms', 'processReceive').log('Processing text', text.id, text);
 
   // TODO - fix after cfa run
-  if (disableChatbot) {
+  if (waitForChicken) {
     await sendSMS(text.from, `At 11AM Tuesday (4/12/2016), you can text to order ahead, pre-pay, and skip the line at` +
       ` Chick-Fil-A. We will text you as soon as you can place an order!`);
+    return;
+  }
+
+  if (chickenIsDone) {
+    await sendSMS(text.from, `Sorry we are no longer taking orders!`);
     return;
   }
 
