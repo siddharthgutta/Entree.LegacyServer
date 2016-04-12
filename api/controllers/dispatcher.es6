@@ -24,7 +24,7 @@ const chickenIsDone = false;
 Emitter.on(Events.TEXT_RECEIVED, async text => {
   console.tag('api', 'sms', 'processReceive').log('Processing text', text.id, text);
 
-  // TODO - fix after cfa run yo
+  // TODO - fix after cfa run yo yo
   if (waitForChicken) {
     await sendSMS(text.from, `At 11AM Tuesday (4/12/2016), you can text to order ahead, pre-pay, and skip the line at` +
       ` Chick-Fil-A. We will text you as soon as you can place an order!`);
