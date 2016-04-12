@@ -1,5 +1,6 @@
 import models from './index.es6';
 import Promise from 'bluebird';
+import _ from 'underscore';
 
 export default function (sequelize, DataTypes) {
   const ItemMod = sequelize.define('ItemMod', {
@@ -48,6 +49,13 @@ export default function (sequelize, DataTypes) {
         const newMod = await models.Mod.create({name, addPrice});
         await this.addMod(newMod);
         return newMod;
+      },
+      updateFields: async function (min, max) { // eslint-disable-line
+        await this.update({min, max});
+      },
+      findModByName: async function (name) { // eslint-disable-line
+        const mods = await this.getMods({where: {name}});
+        return _.first(mods);
       },
       findMods: async function() { // eslint-disable-line
         return await this.getMods();

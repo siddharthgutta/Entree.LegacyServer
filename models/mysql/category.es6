@@ -1,4 +1,5 @@
 import models from './index.es6';
+import _ from 'underscore';
 
 export default function (sequelize, DataTypes) {
   const Category = sequelize.define('Category', {
@@ -21,6 +22,10 @@ export default function (sequelize, DataTypes) {
     instanceMethods: {
       findMenuItems: async function () { // eslint-disable-line
         return await this.getMenuItems();
+      },
+      findMenuItemByName: async function (name) { // eslint-disable-line
+        const menuItems = await this.getMenuItems({where: {name}});
+        return _.first(menuItems);
       },
       insertMenuItem: async function (name, description, basePrice) { // eslint-disable-line
         const menuItem = await models.MenuItem.create({name, description, basePrice});

@@ -56,7 +56,8 @@ export default class Braintree extends PaymentStrategy {
   }
 
   /**
-   * Creating a transaction that will be held in escrow/submitted for settlement
+   * Creating a transaction that will be held in escrow
+   * NOTE: The transaction has not been submitted to settlement yet
    *
    * @param {String} amount: total charged amount Ex: 100.00
    * @param {String} merchantAccountId: associated with a restaurant id
@@ -88,47 +89,82 @@ export default class Braintree extends PaymentStrategy {
         serviceFeeAmount
       }, (err, result) => {
         if (err) reject(err);
-        resolve(result);
+        else resolve(result);
       });
     });
   }
 
   /**
-   * Release an list of transactions from escrow to the merchants
+   * Voids an existing transaction
+   * Note: Transaction must be of status authorized or submittedForSettlement
+   * Voiding a transaction can occur while a transaction/sale is pending
+   * while refunding occurs after the transaction/sales is no longer pending/has settled
    *
-   * @param {Array} transactionIds: array of transactions by id to be released
-   * @returns {Error} error since not implemented
+   * @param {String} transactionId: transaction id for the specific transaction of the order
+   * @returns {Promise}: promise containing transaction result object
    */
-  releaseTransactionsFromEscrow(transactionIds) {
-    throw new Error('Implementation Not Finished', transactionIds);
-    /*
-    let releaseBatchPromises = {};
-    transactionIds.forEach(transactionId => {
-      releaseBatchPromises[transactionId] = new Promise((resolve, reject) => {
-        this.gateway.transaction.releaseFromEscrow(transactionId, (err, result) => {
-          if (err) reject(err);
-          resolve(result);
-        });
+  voidTransaction(transactionId) {
+    return new Promise((resolve, reject) => {
+      this.gateway.transaction.void(transactionId, (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
       });
     });
+  }
 
-    // Probably not used for SXSW
-    // Temporary Solution for now
-    Promise.props(Object.keys(releaseBatchPromises).reduce((newObject, key) => {
-      newObject[key] = releaseBatchPromises[key].reflect();
-      return newObject;
-    }, {})).then(resolvedPromises => {
-      transactionIds.forEach(transactionId => {
-        if (resolvedPromises[transactionId].isFulfilled()) {
-          console.log(`Successfully Released Transaction: ${resolvedPromises[transactionId.value()}`);
-          // Do something here to mark transaction released
-        } else {
-          console.log(`Failed to Releasee Transaction: ${resolvedPromises[transactionId.value()}`);
-          // Do something here to mark transaction failed to be released
-        }
+  /**
+   * Refunds an existing transaction
+   * Note: Transaction must be of status settling or settled
+   * Voiding a transaction can occur while a transaction/sale is pending
+   * while refunding occurs after the transaction/sales is no longer pending/has settled
+   *
+   * @param {String} transactionId: transaction id for the specific transaction of the order
+   * @returns {Promise}: promise containing transaction result object
+   */
+  refundTransaction(transactionId) {
+    return new Promise((resolve, reject) => {
+      this.gateway.transaction.refund(transactionId, (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
       });
     });
-    */
+  }
+
+  /**
+   * Set an existing transaction as settled from submitted_for_settlement
+   * NOTE: THIS IS ONLY USED FOR TESTING PURPOSES AND NOTHING ELSE
+   * Braintree normally does this action on their end
+   *
+   * @param {String} transactionId: transaction id for the specific transaction of the order
+   * @returns {Promise}: promise containing transaction result object
+   */
+  setTransactionAsSettled(transactionId) {
+    return new Promise((resolve, reject) => {
+      this.gateway.testing.settle(transactionId, (err, settleResult) => {
+        if (err) reject(err);
+        else resolve(settleResult);
+      });
+    });
+  }
+
+  /**
+   * Release a transaction from escrow to the producer
+   * Note: Whenever we make a transaction with a restaurant, we make them with a merchant account,
+   * but that money/transaction sale does not get sent immediately to the merchant yet.
+   * We hold onto this payment (in escrow) until we are ready to release the appropriate money
+   * from the transactions/sales to the restaurant weekly (or however regularly we choose).
+   * Releasing the correct transactions per merchant is necessary to be done with this function.
+   *
+   * @param {String} transactionId: id transactions to be released
+   * @returns {Promise} result of the transaction
+   */
+  releaseTransactionsFromEscrow(transactionId) {
+    return new Promise((resolve, reject) => {
+      this.gateway.transaction.releaseFromEscrow(transactionId, (err, result) => {
+        if (err) reject(err);
+        resolve(result);
+      });
+    });
   }
 
   /**
@@ -231,8 +267,37 @@ export default class Braintree extends PaymentStrategy {
       };
       this.gateway.merchantAccount.create(merchantAccountParams, (createMerchantErr, result) => {
         if (createMerchantErr) reject(createMerchantErr);
-        if (!result.success) reject(result);
-        resolve(result.merchantAccount);
+        else if (!result.success) reject(result);
+        else resolve(result.merchantAccount);
+      });
+    });
+  }
+
+  /**
+   * Updates an existing Braintree merchant account with individual, business, and funding objects
+   * These accounts will be used to release funds to
+   *
+   * Details of what should be passed in to these calls are of the following:
+   * https://developers.braintreepayments.com/guides/marketplace/onboarding/node#terms-of-service-accepted-parameter
+   * https://developers.braintreepayments.com/reference/request/merchant-account/create/node
+   *
+   * @param {String} merchantId: merchant id of an existing producer
+   * @param {Object} individual: object containing the individual business owner's information
+   * @param {Object} business: object contained the business itself's information
+   * @param {Object} funding: object containing necessary funding information
+   * @returns {Promise}: promise containing result of creating merchant
+   */
+  updateMerchant(merchantId, individual, business, funding) {
+    return new Promise((resolve, reject) => {
+      const merchantAccountParams = {
+        individual,
+        business,
+        funding
+      };
+      this.gateway.merchantAccount.update(merchantId, merchantAccountParams, (createMerchantErr, result) => {
+        if (createMerchantErr) reject(createMerchantErr);
+        else if (!result.success) reject(result);
+        else resolve(result.merchantAccount);
       });
     });
   }

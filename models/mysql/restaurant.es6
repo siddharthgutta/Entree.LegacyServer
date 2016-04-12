@@ -2,6 +2,7 @@ import {Mode} from '../constants/restaurant.es6';
 export {Mode};
 import models from './index.es6';
 import Promise from 'bluebird';
+import _ from 'underscore';
 
 export default function (sequelize, DataTypes) {
   const Restaurant = sequelize.define('Restaurant', {
@@ -107,6 +108,10 @@ export default function (sequelize, DataTypes) {
       },
       findCategories: async function () { // eslint-disable-line
         return await this.getCategories();
+      },
+      findCategoryByName: async function(name) { // eslint-disable-line
+        const categories = await this.getCategories({where: {name}});
+        return _.first(categories);
       },
       upsertLocation: async function (address, city, state, zipcode) { // eslint-disable-line
         const oldLocation = await this.getLocation();

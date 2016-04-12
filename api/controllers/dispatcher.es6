@@ -140,6 +140,12 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
     default:
   }
 
+  if (order.status === Order.Status.DECLINED) {
+    const chatState = await user.findChatState();
+    const {transactionId} = await chatState.findOrderContext();
+    await Payment.voidPayment(transactionId);
+  }
+
   if (response) {
     await sendSMS(user.phoneNumber, response);
   } else {

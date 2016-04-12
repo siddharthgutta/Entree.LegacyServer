@@ -33,6 +33,16 @@ const restaurantPass = 'mac&cheese';
 
 const profileImage = 'images/macdaddys.jpg';
 
+const dayStrings = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday'
+];
+
 const hours = [
   {
     day: 'Monday',
@@ -178,22 +188,50 @@ let restaurantId;
 async function importMenu() {
   console.log('Importing Menu');
   try {
-    const restaurant = (await Restaurant.create(restaurantName,
-      restaurantHandle, restaurantPass, Mode.REGULAR, {profileImage})).resolve();
+    // Find restaurant if already exists, create if doesn't exist
+    let restaurant;
+    try {
+      restaurant = (await Restaurant.findByHandle(restaurantHandle)).resolve();
+      await Restaurant.update(restaurant.id, {name: restaurantName, handle: restaurantHandle,
+        password: restaurantPass, mode: Mode.REGULAR, profileImage});
+    } catch (e) {
+      restaurant = (await Restaurant.create(restaurantName,
+        restaurantHandle, restaurantPass, Mode.REGULAR, {profileImage})).resolve();
+    }
     restaurantId = restaurant.id;
+
+    // Update restaurant percentageFee/transactionFee
     await Restaurant.update(restaurantId, {percentageFee, transactionFee});
+
     await Promise.each(menu, async menuCategory => {
-      const category = await restaurant.insertCategory(menuCategory.category);
+      // Find category if already exists, create if doesn't exist
+      let category;
+      try {
+        category = (await restaurant.findCategoryByName(menuCategory.category)).resolve();
+      } catch (e) {
+        category = await restaurant.insertCategory(menuCategory.category);
+      }
+
       await Promise.each(menuCategory.items, async menuItem => {
-        const item = await category.insertMenuItem(menuItem.name, menuItem.description, menuItem.basePrice);
+        // Find menu item if already exists, create if doesn't exist
+        let item;
+        try {
+          item = await category.findMenuItemByName(menuItem.name);
+          item.updateFields(menuItem.description, menuItem.basePrice);
+        } catch (e) {
+          item = await category.insertMenuItem(menuItem.name, menuItem.description, menuItem.basePrice);
+        }
+
         if (!isEmpty(menuCategory.sizes)) {
           const itemMod = await item.upsertItemMod('Size', 1, 1);
+
           await Promise.each(menuCategory.sizes, async size => {
             itemMod.upsertMod(size.name, size.price);
           });
         }
         if (!isEmpty(menuCategory.mods)) {
           const itemMod = await item.upsertItemMod('Add-ons', 0, 5);
+
           await Promise.each(menuCategory.mods, async mod => {
             await itemMod.upsertMod(mod.name, mod.price);
           });
@@ -201,6 +239,13 @@ async function importMenu() {
       });
     });
     await restaurant.upsertLocation(address, city, addrState, zipcode);
+
+    // Removing existing hours
+    await Promise.each(dayStrings, async day => {
+      await restaurant.removeHours(day);
+    });
+
+    // Adding correct hours
     await Promise.each(hours, async ({day, open, close}) => {
       await restaurant.addHour(day, open, close);
     });
@@ -211,9 +256,9 @@ async function importMenu() {
 }
 
 async function registerRestaurant() {
-  console.log('Registering Restaurant');
+  console.log('Registering of Finding Existing Restaurant');
   try {
-    await Payment.registerRestaurantWithPaymentSystem(restaurantId,
+    await Payment.registerOrUpdateProducerWithPaymentSystem(restaurantId,
       merchant.individual, merchant.business, merchant.funding);
   } catch (err) {
     throw new TraceError('Failed to register restaurant', err);

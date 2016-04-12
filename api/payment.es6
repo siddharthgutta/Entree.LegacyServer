@@ -331,21 +331,114 @@ export async function getCustomerDefaultPayment(userId) {
  * @param {Object} funding: object containing necessary funding information
  * @returns {Promise}: promise containing resulting merchant account object
  */
-export async function registerRestaurantWithPaymentSystem(restaurantId, individual, business, funding) {
+export async function registerOrUpdateProducerWithPaymentSystem(restaurantId, individual, business, funding) {
+  const {merchantId} = await Restaurant.findOne(restaurantId);
   let merchantAccount;
-  try {
-    merchantAccount = await bt.createMerchant(individual, business, funding);
-  } catch (createMerchantErr) {
-    throw new TraceError('Failed to create merchant account for registerRestaurantWithPaymentSystem',
-      createMerchantErr);
-  }
+  if (!isEmpty(merchantId)) {
+    merchantAccount = await bt.updateMerchant(merchantId, individual, business, funding);
+  } else {
+    try {
+      merchantAccount = await bt.createMerchant(individual, business, funding);
+    } catch (createMerchantErr) {
+      throw new TraceError('Failed to create merchant account for registerOrUpdateProducerWithPaymentSystem',
+        createMerchantErr);
+    }
 
-  try {
-    await Restaurant.update(restaurantId, {merchantId: merchantAccount.id});
-  } catch (restaurantUpdateErr) {
-    throw new TraceError('Failed to find/update restaurant by merchant id for registerRestaurantWithPaymentSystem',
-      restaurantUpdateErr);
+    try {
+      await Restaurant.update(restaurantId, {merchantId: merchantAccount.id});
+    } catch (restaurantUpdateErr) {
+      throw new TraceError('Failed to update restaurant by merchant id for registerOrUpdateProducerWithPaymentSystem',
+        restaurantUpdateErr);
+    }
   }
 
   return merchantAccount;
+}
+
+/**
+ * Gets Braintree MerchantAccount object from restaurant id
+ *
+ * @param {String} producerId: producer id
+ * @returns {MerchantAccount}: merchant account that exists in Braintree
+ */
+export async function findProducerPaymentSystemInfo(producerId) {
+  const {merchantId} = await Restaurant.findOne(producerId);
+  let merchantAccount;
+  if (!isEmpty(merchantId)) {
+    merchantAccount = await bt.findMerchant(merchantId);
+  } else {
+    throw new Error(`Failed to find merchantId for producer with id ${producerId}`);
+  }
+  return merchantAccount;
+}
+
+/**
+ * Voids an existing transaction
+ * Note: Transaction must be of status authorized or submittedForSettlement
+ * Voiding a transaction can occur while a transaction/sale is pending
+ * while refunding occurs after the transaction/sales is no longer pending/has settled
+ *
+ * @param {String} transactionId: transaction id for the specific transaction of the order
+ * @returns {Promise}: promise containing transaction result object
+ */
+export async function voidPayment(transactionId) {
+  const result = await bt.voidTransaction(transactionId);
+  if (!result.success) {
+    console.tag(logTags).error(`Failed to void transaction of existing payment`);
+    console.tag(logTags).error(result.transaction);
+    throw result.transaction;
+  }
+  return result.transaction;
+}
+
+/**
+ * Refund an existing transaction
+ * Note: Transaction must be of status settling or settled
+ * Voiding a transaction can occur while a transaction/sale is pending
+ * while refunding occurs after the transaction/sales is no longer pending/has settled
+ *
+ * @param {String} transactionId: transaction id for the specific transaction of the order
+ * @returns {Promise}: promise containing transaction result object
+ */
+export async function refundPayment(transactionId) {
+  const result = await bt.refundTransaction(transactionId);
+  if (!result.success) {
+    console.tag(logTags).error(`Failed to refund transaction of existing payment`);
+    console.tag(logTags).error(result.transaction);
+    throw result.transaction;
+  }
+  return result.transaction;
+}
+
+/**
+ * Set an existing transaction as settled from submitted_for_settlement
+ * NOTE: THIS IS ONLY USED FOR TESTING PURPOSES AND NOTHING ELSE
+ * Braintree normally does this action on their end
+ *
+ * @param {String} transactionId: transaction id for the specific transaction of the order
+ * @returns {Promise}: promise containing transaction result object
+ */
+export async function setTestTransactionAsSettled(transactionId) {
+  const result = await bt.setTransactionAsSettled(transactionId);
+  return result.transaction;
+}
+
+/**
+ * Release a transaction from escrow to the producer
+ * Note: Whenever we make a transaction with a restaurant, we make them with a merchant account,
+ * but that money/transaction sale does not get sent immediately to the merchant yet.
+ * We hold onto this payment (in escrow) until we are ready to release the appropriate money
+ * from the transactions/sales to the restaurant weekly (or however regularly we choose).
+ * Releasing the correct transactions per merchant is necessary to be done with this function.
+ *
+ * @param {String} transactionId: id transactions to be released
+ * @returns {Promise} Braintree transaction object from result
+ */
+export async function releasePaymentToProducer(transactionId) {
+  const result = await bt.releaseTransactionsFromEscrow(transactionId);
+  if (!result.success) {
+    console.tag(logTags).error(`Failed to release transaction payment to producer`);
+    console.tag(logTags).error(result.transaction);
+  }
+  return result.transaction;
 }

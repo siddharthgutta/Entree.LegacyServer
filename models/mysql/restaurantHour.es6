@@ -29,12 +29,7 @@ export default function (sequelize, DataTypes) {
       type: DataTypes.TIME,
       allowNull: false,
       validate: {
-        is: /^[0-9]{2}\:[0-9]{2}\:[0-9]{2}$/,
-        validTimes: function (closeTime) { // eslint-disable-line
-          if (closeTime <= this.openTime) {
-            throw new Error('Close time must be after openTime');
-          }
-        }
+        is: /^[0-9]{2}\:[0-9]{2}\:[0-9]{2}$/
       }
     }
   }, {

@@ -138,7 +138,7 @@ export default class DefaultChatBot extends ChatBotInterface {
   static async _getDayHours(producer, day) {
     const producerHours = _.filter(await producer.findHours(), hour => hour.dayOfTheWeek === day);
     const formattedHours = _.map(producerHours, hour => {
-      const openTime = moment(hour.openTime, 'HH:mm:ss').format('h');
+      const openTime = moment(hour.openTime, 'HH:mm:ss').format('h A');
       const closeTime = moment(hour.closeTime, 'HH:mm:ss').format('h A');
       return `${openTime} - ${closeTime}`;
     });
