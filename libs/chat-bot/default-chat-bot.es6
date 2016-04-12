@@ -178,6 +178,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     try {
       user = await User.UserModel.findOneByPhoneNumber(phoneNumber);
       if (!user) {
+        // TODO - fix after cfa
         await User.signup(phoneNumber, null, true);
         return await this._handleAtRestaurant(await user.findChatState(), 'chicken');
       }

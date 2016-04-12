@@ -46,6 +46,7 @@ export function signup(phoneNumber, overrideGreeting, noText) {
                               _User.findOrCreate({where: {phoneNumber}, transaction: t})
                                    .spread(async (user, created) => {
                                      let response;
+                                     // TODO - fix after cfa
                                      if (!noText) {
                                        try {
                                          response = await sendSMS(
