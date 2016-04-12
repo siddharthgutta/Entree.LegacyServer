@@ -135,7 +135,7 @@ class App extends Influx.Component {
                              onChange={a => this.setState({number: a.target.value})} value={this.state.number || ''}/>
                 <div className='label'>CSV</div>
                 <MaskedInput autoComplete='cc-csc' className='input' data-braintree-name='cvv' placeholder='123'
-                             placeholder='cvv' mask='1111'
+                             placeholder='cvv' mask='1111' placeholderChar=' '
                              onChange={a => this.setState({cvv: a.target.value})} value={this.state.cvv || ''}/>
                 <div className='label'>Expiration</div>
                 <MaskedInput autoComplete='cc-exp' className='input' data-braintree-name='expiration_date'
