@@ -958,6 +958,10 @@ export default class DefaultChatBot extends ChatBotInterface {
 
   async _handleClear(chatState) {
     try {
+      if (chatState.state === chatStates.secondSignup) {
+        await chatState.clearOrderContext();
+      }
+
       await chatState.clearOrderItems();
       await chatState.updateState(chatStates.start);
     } catch (err) {
