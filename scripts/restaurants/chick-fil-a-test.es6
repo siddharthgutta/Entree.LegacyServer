@@ -844,7 +844,7 @@ const menu = [
         ]
       }, {
         name: 'Grilled Sandwich',
-        description: 'NEED PRICE',
+        description: '',
         basePrice: 479,
         modTypes: [
           {
