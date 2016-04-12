@@ -56,18 +56,13 @@ class App extends Influx.Component {
 
     try {
       const {status, data, message} = JSON.parse(frame.contentWindow.document.body.innerText);
-      if (status === 200) {
-        this.setState({status: Status.CLOSE, message});
-        return;
-      } else if (status === 500) {
+      if (status === 500) {
         alert(message || 'Unable to update your profile. Try again');
         window.location.search = window.location.search.replace('nonce', 'void'); // void the previous nonce
         return;
       }
 
-      this.setState({user: data.user});
-
-      alert(message);
+      this.setState({user: data.user, status: Status.CLOSE, message});
     } catch (e) {
       throw Error(`Could not parse JSON: ${e.message}`);
     }
@@ -149,7 +144,7 @@ class App extends Influx.Component {
                   with PCI Security Standards.</p>
               </form> :
               <div>
-                <div className='label' style={{textAlign: 'center'}}>{this.state.message}</div>
+                <div className='label normal' style={{textAlign: 'center'}}>{this.state.message}</div>
               </div>
             }
             <iframe ref='frame' onLoad={() => this._handleResult()}
