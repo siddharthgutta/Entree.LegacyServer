@@ -5,4 +5,4 @@ id=$(git rev-parse HEAD)
 export IS_RUNNING_TEST=true;
 
 set -e
-npm run test-ci ./tests/messenger-test.compiled.js
+npm run test-ci ./tests/chat-bot-test.compiled.js

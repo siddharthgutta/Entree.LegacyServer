@@ -22,7 +22,7 @@ export const chatStates = {
   categories: 'Categories',
   mods: 'Mods',
   cart: 'Cart',
-  cardInfo: 'CardInfo'
+  secondSignup: 'secondSignup'
 };
 
 export const response = {
@@ -33,6 +33,11 @@ export const response = {
 
   restaurantDisabled: producer => `Sorry, ${producer.name} is currently closed and not accepting orders.` +
     ` To start looking at other restaurants type \"/clear\".`,
+
+  existingOrder: 'Sorry, you cannot make another order while your current one is being processed.',
+
+  finishSecondSignup: `Please finish paying using the link provided above or type \"/clear\" to clear your cart to` +
+    ` use additional commands`,
 
   /* Returned when user tries to execute context command while not in restaurant context */
   invalidContext: 'Sorry that command isn`t available right now. Please try again',
@@ -181,6 +186,11 @@ export default class DefaultChatBot extends ChatBotInterface {
       chatState = await user.findChatState();
     } catch (err) {
       throw new TraceError(`Could not find user ChatState info for user ${phoneNumber}`, err);
+    }
+
+    /* Case where user has to second sign up and uses some other command other than clear */
+    if (chatState.state === chatStates.secondSignup && input !== '/clear') {
+      return response.finishSecondSignup;
     }
 
     /* No access to contextual or stateless commands when ordering an item.
@@ -616,26 +626,8 @@ export default class DefaultChatBot extends ChatBotInterface {
   }
 
   async _handleCheckout(chatState) {
-    let orderItems;
-    try {
-      orderItems = await chatState.findOrderItems();
-    } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to find order items`, err);
-    }
-
-    if (orderItems.length === 0) {
-      return response.invalidCheckout;
-    }
-
-    let output = '';
-    let total = 0;
-    for (let i = 0; i < orderItems.length; i++) {
-      output += `${orderItems[i].name}, `;
-      total += orderItems[i].price;
-    }
-
-
     let restaurant, user;
+    /* Check if restaurant is open */
     try {
       restaurant = await chatState.findRestaurantContext();
       if (!restaurant.enabled) {
@@ -644,6 +636,45 @@ export default class DefaultChatBot extends ChatBotInterface {
       user = await chatState.findUser();
     } catch (err) {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to find user or restaurant for an order`, err);
+    }
+
+    let orderItems;
+    try {
+      orderItems = await chatState.findOrderItems();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to find order items`, err);
+    }
+
+    /* Check if user has any order items */
+    if (orderItems.length === 0) {
+      return response.invalidCheckout;
+    }
+
+    /* Cannot make process two orders at once */
+    const orderContext = await chatState.findOrderContext();
+    if (orderContext) {
+      return response.existingOrder;
+    }
+
+    /* Do not create order object unless user has payment. Order will be created in
+    * dispatcher.es6 for first time users */
+    let defaultPayment;
+    try {
+      defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
+    } catch (defaultPaymentError) {
+      console.tag('chatbot').log('No default payment found. Sending user to signup2.');
+      const secret = await User.requestProfileEdit(user.id);
+      const url = await User.resolveProfileEditAddress(secret.secret);
+
+      chatState.updateState(chatStates.secondSignup);
+      return `To complete your order and pay, please go to ${url}`;
+    }
+
+    let output = '';
+    let total = 0;
+    for (let i = 0; i < orderItems.length; i++) {
+      output += `${orderItems[i].name}, `;
+      total += orderItems[i].price;
     }
 
     // transform for order to support orders
@@ -657,17 +688,6 @@ export default class DefaultChatBot extends ChatBotInterface {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to create order and set the context`, err);
     }
 
-    let defaultPayment;
-    try {
-      defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
-    } catch (defaultPaymentError) {
-      console.tag('chatbot').log('No default payment found. Sending user to signup2.');
-      const secret = await User.requestProfileEdit(user.id);
-      const url = await User.resolveProfileEditAddress(secret.secret);
-
-      return `To complete your order and pay, please go to ${url}`;
-    }
-
     try {
       const {id: transactionId} = await Payment.paymentWithToken(user.id, restaurant.id, defaultPayment.token, total);
       await Order.setOrderStatus(order.id, Order.Status.RECEIVED_PAYMENT, {transactionId});
@@ -675,6 +695,9 @@ export default class DefaultChatBot extends ChatBotInterface {
       console.tag('chatbot').error('Payment failed although customer default payment exists', paymentWithTokenError);
       throw new TraceError('Payment failed although customer default payment exists', paymentWithTokenError);
     }
+
+    await chatState.clearOrderItems();
+    await chatState.updateState(chatStates.start);
 
     return `Your order using ${defaultPayment.cardType} - ${defaultPayment.last4} has been sent to the restaurant. ` +
       `We'll text you once it's confirmed by the restaurant`;
@@ -906,8 +929,9 @@ export default class DefaultChatBot extends ChatBotInterface {
   async _handleClear(chatState) {
     try {
       await chatState.clearOrderItems();
+      await chatState.updateState(chatStates.start);
     } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to clear item cart`, err);
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chat state metadata`, err);
     }
     return response.cartClear;
   }
