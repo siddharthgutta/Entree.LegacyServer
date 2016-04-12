@@ -2,6 +2,7 @@ import EventEmitter from 'events';
 import io from 'socket.io-client';
 import {format} from 'url';
 import fetch from './fetch';
+import _ from 'underscore';
 
 const beat = (data, respond) => respond({status: 'ok'});
 
@@ -23,6 +24,8 @@ class RESTaurant extends EventEmitter {
 
     this.server = server;
     this.token = token;
+    this.limit = 50;
+    this.cachedOrders = [];
   }
 
   _emit(...args) {
@@ -201,6 +204,27 @@ class RESTaurant extends EventEmitter {
       });
 
     return order;
+  }
+
+  async history(status, after = null) {
+    if (after === null) {
+      after = _.max(_.groupBy(this.cachedOrders, a => a.status)[status] || [], a => new Date(a.createdAt));
+    }
+
+    const {body: {data: {orders}}} =
+      await fetch(`${this.server}/api/v2/restaurant/order-history`, {
+        method: 'post',
+        body: {
+          token: this.token,
+          after,
+          status,
+          limit: this.limit
+        }
+      });
+
+    this.cachedOrders = this.cachedOrders.concat(orders);
+
+    return this.cachedOrders;
   }
 
   async feedback(content) {

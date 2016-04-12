@@ -9,6 +9,7 @@ import compression from 'compression';
 import BasicRouter from './routes/basic.es6';
 import ApiRouter from './routes/api.es6';
 import TwilioRouter from './routes/twilio.es6';
+import {Router, Middleware} from 'scribe-js';
 import BraintreeRouter from './routes/braintree.es6';
 import * as fs from 'fs';
 
@@ -26,8 +27,8 @@ app.set('views', path.join(__dirname, 'views'));  // points app to location of t
 app.set('view engine', 'jade');                   // sets the view engine to jade
 
 // console access
-app.use(console.middleware('express'));
-app.use('/scribe', console.viewer());
+app.use(new Middleware.ExpressRequestLogger(console).getMiddleware());
+app.use('/scribe', new Router.Viewer(console).getRouter());
 
 // compress gzip
 app.use(compression());

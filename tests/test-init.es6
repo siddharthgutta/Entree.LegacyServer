@@ -6,14 +6,7 @@ import {_disconnect as disconnectPubSub} from '../api/controllers/notification.e
 
 initErrorHandling();
 
-const console = initScribe(true, false, false, {
-  inspector: {
-    colors: false,
-    callsite: false,
-    pre: false,
-    tags: false
-  }
-});
+const console = initScribe(true, true);
 
 console.persistent('tags', []);
 global.TEST = path.basename(stack()[7].getFileName());

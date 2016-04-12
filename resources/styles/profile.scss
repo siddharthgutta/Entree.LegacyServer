@@ -5,6 +5,7 @@
 @import "shared/layouts";
 @import "shared/tabs";
 @import "shared/messenger";
+@import "shared/card";
 
 body {
   font-family: 'Proxima Nova', "Helvetica", "Helvetic Neue", "Open Sans", sans-serif;
@@ -31,6 +32,34 @@ a {
 .input-wrapper {
   padding: 5px;
   background: #EEE;
+}
+
+.header {
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #FFF;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+}
+
+.logo {
+  background: url(../images/logo10.png);
+  width: 40px;
+  height: 40px;
+  background-size: cover;
+  display: inline-block;
+}
+
+.paypal {
+  background: url(../images/paypal.png);
+  width: 40px;
+  height: 40px;
+  background-size: cover;
+  display: inline-block;
+  float: right;
 }
 
 @import 'shared/form-modal';

@@ -7,7 +7,7 @@ import {Status} from '../order.es6';
 
 export {Status};
 
-const restaurantStatuses = [Status.ACCEPTED, Status.DECLINED, Status.COMPLETED];
+const restaurantStatuses = [Status.ACCEPTED, Status.DECLINED, Status.COMPLETED, Status.READY];
 
 export async function setOrderStatus(id, status, {prepTime, message, transactionId} = {}, isRestaurant = false) {
   const order = await Order.findOne(id);
@@ -52,6 +52,7 @@ export async function setOrderStatus(id, status, {prepTime, message, transaction
       internalEvent = Events.UPDATED_ORDER;
       break;
     case Status.ACCEPTED:
+    case Status.READY:
     case Status.COMPLETED:
     case Status.DECLINED:
       notificationEvent = Notification.Events.ORDER_UPDATE;

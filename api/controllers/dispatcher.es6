@@ -102,7 +102,7 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
   const message = {
     [Order.Status.ACCEPTED]: `Your order shown below has been placed :) It will be ready in ${order.prepTime} mins`,
     [Order.Status.DECLINED]: `Your order just got declined :( ${order.message}.`,
-    [Order.Status.COMPLETED]: `Your ${restaurant.name} order is ready to be picked up!` +
+    [Order.Status.READY]: `Your ${restaurant.name} order is ready to be picked up!` +
   ` Please present your name and order number (#${order.id2}) when you arrive.`
   };
 

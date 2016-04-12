@@ -6,7 +6,8 @@ import _ from 'underscore';
 
 export {Status};
 
-const RestaurantReadableStatuses = [Status.RECEIVED_PAYMENT, Status.ACCEPTED, Status.DECLINED, Status.COMPLETED];
+const RestaurantReadableStatuses = [Status.RECEIVED_PAYMENT, Status.ACCEPTED, Status.DECLINED,
+  Status.COMPLETED, Status.READY];
 
 export {RestaurantReadableStatuses};
 
@@ -51,7 +52,8 @@ export const OrderStatusStates = {
   [Status.FAILED_PAYMENT]: [Status.RECEIVED_PAYMENT],
   [Status.RECEIVED_PAYMENT]: [Status.ACCEPTED, Status.DECLINED],
   [Status.COMPLETED]: [],
-  [Status.ACCEPTED]: [Status.COMPLETED],
+  [Status.READY]: [Status.COMPLETED],
+  [Status.ACCEPTED]: [Status.READY],
   [Status.DECLINED]: []
 };
 
