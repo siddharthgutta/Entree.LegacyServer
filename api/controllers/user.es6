@@ -58,7 +58,7 @@ export function signup(phoneNumber, overrideGreeting, noText) {
                                          console.tag('controller', 'signup')
                                                 .log(`New user was ${created ? 'created' : 'found'} & ` +
                                                      `${created ? 'full' : 'partial'} welcome message.`);
-                                         // TODO @jadesym @jesse move getGreeting into chatbot. then ask chatbot
+                                         // TODO @jadesym @jesse move getGreeting into chatbot. Then, ask chatbot
                                          // what to say and send that to the client.
                                          // TODO @jadesym lets get this into async/await if you get some downtime
                                        } catch (error) {
