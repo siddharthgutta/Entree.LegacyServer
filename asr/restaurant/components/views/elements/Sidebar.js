@@ -72,7 +72,7 @@ class Sidebar extends Influx.Component {
         <div className='full scroll scroll-y'>
           <div className='flex'
                style={{padding: 20, lineHeight: '21px', background: 'rgba(255, 255, 255, 0.07)',
-               borderTop: '1px solid rgba(255, 255, 255, 0.1)', borderBottom: '1px solid rgba(255, 255, 255, 0.1)'}}>
+               borderTop: '1px solid rgba(255, 255, 255, 0.1)'}}>
             <div className='box accept-label'>Accept new orders</div>
             <div className='box'>
               <Checkbox checked={restaurant.enabled} toggle
