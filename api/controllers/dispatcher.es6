@@ -20,6 +20,10 @@ const chatBot = new DefaultChatBot();
 Emitter.on(Events.TEXT_RECEIVED, async text => {
   console.tag('api', 'sms', 'processReceive').log('Processing text', text.id, text);
 
+  await sendSMS(text.from, `At 11AM tomorrow (4/11/2016), you can text to order ahead, pre-pay, and skip the line at` +
+    `Chick-Fil-A. We will text you as soon as you can place an order!`);
+  return;
+
   try {
     const response = await chatBot.updateState(text.from, text.body);
 
