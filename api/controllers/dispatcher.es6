@@ -114,7 +114,8 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
 
   // TODO @jesse move this to chatbot
   const message = {
-    [Order.Status.ACCEPTED]: `Your order shown below has been placed :) It will be ready in ${order.prepTime} mins`,
+    [Order.Status.ACCEPTED]: `Your order shown below has been placed :) The estimated wait is ${order.prepTime} mins,` +
+      ` and we will text you once it's ready for pickup.`,
     [Order.Status.DECLINED]: `Your order just got declined :( ${order.message}.`,
     [Order.Status.READY]: `Your ${restaurant.name} order is ready to be picked up!` +
   ` Please present your name and order number (#${order.id2}) when you arrive.`

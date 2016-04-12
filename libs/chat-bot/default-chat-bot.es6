@@ -36,7 +36,7 @@ export const response = {
 
   existingOrder: 'Sorry, you cannot make another order while your current one is being processed.',
 
-  finishSecondSignup: `Please finish paying using the link provided above or type \"/clear\" to clear your cart to` +
+  finishSecondSignup: url => `Finish checking out at ${url} or type \"/clear\" to clear your cart to` +
     ` use additional commands`,
 
   /* Returned when user tries to execute context command while not in restaurant context */
@@ -190,7 +190,16 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     /* Case where user has to second sign up and uses some other command other than clear */
     if (chatState.state === chatStates.secondSignup && input !== '/clear') {
-      return response.finishSecondSignup;
+      // TODO - fix after cfa
+      let secret;
+      try {
+        secret = await User.UserModel.findUserSecret(user.id);
+      } catch (err) {
+        secret = await User.requestProfileEdit(user.id);
+      }
+
+      const profileUrl = await User.resolveProfileEditAddress(secret);
+      return response.finishSecondSignup(profileUrl);
     }
 
     /* No access to contextual or stateless commands when ordering an item.
@@ -200,7 +209,8 @@ export default class DefaultChatBot extends ChatBotInterface {
     try {
       itemContext = await chatState.findMenuItemContext();
       isContextual = await this._isContextual(chatState, input);
-      isStateless = this._isStateless(input);
+      // TODO - fix after cfa
+      isStateless = this._isStateless(input) || input === 'chicken';
     } catch (err) {
       throw new TraceError(`ChatState id ${chatState.id} ` +
         `- Failed to determine if command is contextual or stateless for user ${phoneNumber}`, err);
@@ -211,6 +221,10 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
 
     if (isStateless) {
+      // TODO - fix after cfa
+      if (input === 'chicken') {
+        return await this._handleAtRestaurant(await user.findChatState(), 'chicken');
+      }
       return await this._statelessTransition(chatState, input);
     }
 
