@@ -99,7 +99,7 @@ class App extends Influx.Component {
             <div style={{fontSize: 12, color: '#AAA'}}>Secured by <b>Braintree</b> & <b>Paypal</b></div>
           </div>
         </div>
-        <div className='full' ref='wrapper' style={{overflow: 'scroll'}}>
+        <div className='full momentum' ref='wrapper' style={{overflow: 'scroll'}}>
           <div className='modal'>
             { status === Status.OK ?
               <form target='no-forward' id='payment-form' method='POST'
@@ -131,7 +131,7 @@ class App extends Influx.Component {
                        value={`${user.first || ''} ${user.last || ''}`}/>
                 <div className='label'>Card Number</div>
                 <MaskedInput autoComplete='cc-number' className='input' data-braintree-name='number'
-                             mask='1111 1111 1111 1111' placeholder='0000 0000 0000 0000' placeholder='123'
+                             mask='1111 1111 1111 1111' placeholder='0000 0000 0000 0000' placeholderChar=' '
                              onChange={a => this.setState({number: a.target.value})} value={this.state.number || ''}/>
                 <div className='label'>CSV</div>
                 <MaskedInput autoComplete='cc-csc' className='input' data-braintree-name='cvv' placeholder='123'
@@ -139,7 +139,7 @@ class App extends Influx.Component {
                              onChange={a => this.setState({cvv: a.target.value})} value={this.state.cvv || ''}/>
                 <div className='label'>Expiration</div>
                 <MaskedInput autoComplete='cc-exp' className='input' data-braintree-name='expiration_date'
-                             placeholder='MM/YY' mask='11/11'
+                             placeholder='MM/YY' mask='11/11' placeholderChar=' '
                              onChange={a => this.setState({expiry: a.target.value})} value={this.state.expiry || ''}/>
                 <button className='button' type='submit' style={{margin: 0}}>
                   <span className='icon lock' style={{marginRight: 5}}/>Submit
