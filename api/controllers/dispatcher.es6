@@ -6,8 +6,10 @@ import {resolve} from '../../models/index.es6';
 import * as Order from './order.es6';
 import * as User from './user.es6';
 import * as Payment from '../payment.es6';
+import * as Restaurant from './restaurant.es6';
 
 const chatBot = new DefaultChatBot();
+const chickenCheck = false;
 
 /**
  * Dispatcher to handle system events
@@ -21,22 +23,23 @@ const chatBot = new DefaultChatBot();
 Emitter.on(Events.TEXT_RECEIVED, async text => {
   console.tag('api', 'sms', 'processReceive').log('Processing text', text.id, text);
 
-  await sendSMS(text.from, `At 11AM Tuesday (4/12/2016), you can text to order ahead, pre-pay, and skip the line at` +
-    ` Chick-Fil-A. We will text you as soon as you can place an order!`);
-  return;
+  const restaurant = await Restaurant.RestaurantModel.findByHandle('chicken');
+  if (chickenCheck && (!restaurant || !restaurant.enabled)) {
+    await sendSMS(text.from, `At 11AM Tuesday (4/12/2016), you can text to order ahead, pre-pay, and skip the line at` +
+      ` Chick-Fil-A. We will text you as soon as you can place an order!`);
+    return;
+  }
 
-  /* try {
+  try {
     const response = await chatBot.updateState(text.from, text.body);
-
     if (response) {
       await sendSMS(text.from, response);
     }
   } catch (err) {
     console.tag('dispatcher', 'TEXT_RECEIVED').error(err);
-
     await sendSMS(text.from, 'Sorry, we had problem on our side. If you are still having problems, contact us at' +
                   ' team@textentree.com');
-  } */
+  }
 });
 
 /**
