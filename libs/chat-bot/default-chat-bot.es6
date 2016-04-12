@@ -174,14 +174,17 @@ export default class DefaultChatBot extends ChatBotInterface {
     input = input.trim().toLowerCase();
     /* Sanitize user input */
 
+    if (input === 'chicken') {
+      return `We are closed for the day! Visit textentree.com to check us out. If you put in your number on` +
+        ` our website, we can send you a message when will let you order again with Chick-Fil-A!`;
+    }
+
     let user, chatState;
     try {
       user = await User.UserModel.findOneByPhoneNumber(phoneNumber);
       if (!user) {
-        // TODO - fix after cfa
-        await User.signup(phoneNumber, null, true);
-        user = await User.UserModel.findOneByPhoneNumber(phoneNumber);
-        return await this._handleAtRestaurant(await user.findChatState(), 'chicken');
+        await User.signup(phoneNumber);
+        return null;
       }
       chatState = await user.findChatState();
     } catch (err) {
@@ -190,7 +193,6 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     /* Case where user has to second sign up and uses some other command other than clear */
     if (chatState.state === chatStates.secondSignup && input !== '/clear') {
-      // TODO - fix after cfa
       let secret;
       try {
         secret = await User.UserModel.findUserSecret(user.id);
@@ -209,8 +211,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     try {
       itemContext = await chatState.findMenuItemContext();
       isContextual = await this._isContextual(chatState, input);
-      // TODO - fix after cfa
-      isStateless = this._isStateless(input) || input === 'chicken';
+      isStateless = this._isStateless(input);
     } catch (err) {
       throw new TraceError(`ChatState id ${chatState.id} ` +
         `- Failed to determine if command is contextual or stateless for user ${phoneNumber}`, err);
@@ -221,10 +222,6 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
 
     if (isStateless) {
-      // TODO - fix after cfa
-      if (input === 'chicken') {
-        return await this._handleAtRestaurant(await user.findChatState(), 'chicken');
-      }
       return await this._statelessTransition(chatState, input);
     }
 

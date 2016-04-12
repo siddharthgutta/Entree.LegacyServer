@@ -9,8 +9,6 @@ import * as Payment from '../payment.es6';
 import * as Restaurant from './restaurant.es6';
 
 const chatBot = new DefaultChatBot();
-const waitForChicken = false;
-const chickenIsDone = false;
 
 /**
  * Dispatcher to handle system events
@@ -23,18 +21,6 @@ const chickenIsDone = false;
  */
 Emitter.on(Events.TEXT_RECEIVED, async text => {
   console.tag('api', 'sms', 'processReceive').log('Processing text', text.id, text);
-
-  // TODO - fix after cfa run yo yo
-  if (waitForChicken) {
-    await sendSMS(text.from, `At 11AM Tuesday (4/12/2016), you can text to order ahead, pre-pay, and skip the line at` +
-      ` Chick-Fil-A. We will text you as soon as you can place an order!`);
-    return;
-  }
-
-  if (chickenIsDone) {
-    await sendSMS(text.from, `Sorry we are no longer taking orders!`);
-    return;
-  }
 
   try {
     const response = await chatBot.updateState(text.from, text.body);
@@ -117,10 +103,8 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
     [Order.Status.ACCEPTED]: `Your order shown below has been placed :) The estimated wait is ${order.prepTime} mins,` +
       ` and we will text you once it's ready for pickup.`,
     [Order.Status.DECLINED]: `Your order just got declined :( ${order.message}.`,
-    [Order.Status.READY]: `Come pick up your order! We're at a table in front of the Chick-Fil-A at SAC.` +
-     ` Look for a couple of nerdy Asian and Indian dudes. One person should be wearing an Entree t-shirt.`
-    // [Order.Status.READY]: `Your ${restaurant.name} order is ready to be picked up!` +
-  //` Please present your name and order number (#${order.id2}) when you arrive.`
+    [Order.Status.READY]: `Your ${restaurant.name} order is ready to be picked up!` +
+      ` Please present your name and order number (#${order.id2}) when you arrive.`
   };
 
   let response = message[order.status];
