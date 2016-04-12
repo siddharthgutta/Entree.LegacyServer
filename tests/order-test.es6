@@ -11,8 +11,9 @@ let order2;
 
 describe('User', () => {
   it('should create a restaurant', async () => {
-    restaurant = (await Restaurant.RestaurantModel.create('Rest1',
-      'rest1', 'test', Restaurant.RestaurantModel.Mode.GOD)).resolve();
+    restaurant =
+      (await Restaurant.RestaurantModel
+                       .create('Rest1', 'rest1', 'test', Restaurant.RestaurantModel.Mode.GOD)).resolve();
   });
 
   it('should create a user', async () => {
@@ -147,8 +148,23 @@ describe('User', () => {
     }
   });
 
+  it('should fail to set to order1 to COMPLETED', async () => {
+    try {
+      await Order.setOrderStatus(order1.id, Order.Status.COMPLETED);
+      assert.fail('should have thrown an error');
+    } catch (e) {
+      assert.ok('should throw an error since READY is before COMPLETED');
+    }
+  });
+
   it('should set to order1 to COMPLETED', async () => {
-    await Order.setOrderStatus(order1.id, Order.Status.COMPLETED);
+    try {
+      await Order.setOrderStatus(order1.id, Order.Status.READY);
+      await Order.setOrderStatus(order1.id, Order.Status.COMPLETED);
+      assert.ok('should set the status to READY; then status to COMPLETED');
+    } catch (e) {
+      assert.ok('should NOT have throw an error since READY is before COMPLETED');
+    }
   });
 
   it('should set to order2 order to DECLINED', async () => {

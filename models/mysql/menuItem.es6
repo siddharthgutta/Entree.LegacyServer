@@ -45,6 +45,9 @@ export default function (sequelize, DataTypes) {
         await this.addItemMod(newItemMod);
         return newItemMod;
       },
+      updateFields: async function (description, basePrice) { // eslint-disable-line
+        await this.update({description, basePrice});
+      },
       findItemMods: async function () { // eslint-disable-line
         return await this.getItemMods();
       }

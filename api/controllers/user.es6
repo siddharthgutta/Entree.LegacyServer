@@ -33,9 +33,10 @@ function getGreeting(name, firstTime) {
  *
  * @param {string} phoneNumber: User phone number
  * @param {string} overrideGreeting: String override greeting
+ * @param {boolean} noText: Indicates if we should send a signup text or not
  * @returns {Promise}: Returns the user object.
  */
-export function signup(phoneNumber, overrideGreeting) {
+export function signup(phoneNumber, overrideGreeting, noText) {
   // FIXME @jesse: why are the raw db connections used here?
   const {User: _User, sequelize: Sequelize} = User.connection;
 
@@ -43,41 +44,44 @@ export function signup(phoneNumber, overrideGreeting) {
     Sequelize.transaction(t =>
                             new Promise((resolve, reject) => {
                               _User.findOrCreate({where: {phoneNumber}, transaction: t})
-                                   .spread((user, created) => {
-                                     sendSMS(user.phoneNumber, overrideGreeting || getGreeting(user.name, created))
-                                     .then(response => {
-                                       // sendSMS will pass the response from twilio with text sent details
-                                       // this response is not currently being dealt with but needs to be stored
-                                       // in the Messages table
-                                       console.tag('controller', 'signup')
-                                              .log(`New user was ${created ? 'created' : 'found'} & ` +
-                                                   `${created ? 'full' : 'partial'} welcome message.`);
-                                       // TODO @jadesym @jesse move getGreeting into chatbot. then ask chatbot
-                                       // what to say and send that to the client.
-                                       // TODO @jadesym lets get this into async/await if you get some downtime
-
-                                       // FIXME disabling chatState insertion for ensuring texts are sent out
-                                       // TODO this is temporary only. @jesse a more permanent solution?
-                                       if (created) {
-                                         user.insertChatState(chatStates.start, t)
-                                             .then(() => resolve(response))
-                                             .catch(err => {
-                                               console.tag('api', 'user', 'signup', 'chatstate')
-                                                      .error(`Unable to create chat state for user. Error: ${err}`);
-                                               reject(err);
-                                             });
-                                       } else {
-                                         resolve(response);
+                                   .spread(async (user, created) => {
+                                     let response;
+                                     // TODO - fix after cfa
+                                     if (!noText) {
+                                       try {
+                                         response = await sendSMS(
+                                           user.phoneNumber,
+                                           overrideGreeting || getGreeting(user.name, created));
+                                         // sendSMS will pass the response from twilio with text sent details
+                                         // this response is not currently being dealt with but needs to be stored
+                                         // in the Messages table
+                                         console.tag('controller', 'signup')
+                                                .log(`New user was ${created ? 'created' : 'found'} & ` +
+                                                     `${created ? 'full' : 'partial'} welcome message.`);
+                                         // TODO @jadesym @jesse move getGreeting into chatbot. Then, ask chatbot
+                                         // what to say and send that to the client.
+                                         // TODO @jadesym lets get this into async/await if you get some downtime
+                                       } catch (error) {
+                                         console.tag('controller', 'signup', 'sms')
+                                           .error('Text Message not sent successfully, but user account was ' +
+                                             'created.' +
+                                             `User account was ${created ? 'created. Rolling it back now.'
+                                               : 'not created.'} SMS Error:`, error);
+                                         reject(error);
                                        }
-                                     })
-                                     .catch(error => {
-                                       console.tag('controller', 'signup', 'sms')
-                                              .error('Text Message not sent successfully, but user account was ' +
-                                                     'created.' +
-                                                     `User account was ${created ? 'created. Rolling it back now.'
-                                                       : 'not created.'} SMS Error:`, error);
-                                       reject(error);
-                                     });
+                                     }
+
+                                     try {
+                                       if (created) {
+                                         await user.insertChatState(chatStates.start, t);
+                                       }
+                                     } catch (err) {
+                                       console.tag('api', 'user', 'signup', 'chatstate')
+                                              .error(`Unable to create chat state for user. Error: ${err}`);
+                                       reject(err);
+                                     }
+
+                                     resolve(response);
                                    })
                                    .catch(error => {
                                      console.tag('controller', 'signup', 'sms')
@@ -107,7 +111,12 @@ export async function resolveProfileEditAddress(secret) {
 }
 
 export async function requestProfileEdit(userId) {
-  return User.createSecret(userId);
+  try {
+    const {secret} = await User.createSecret(userId);
+    return secret;
+  } catch (e) {
+    throw new TraceError('Could create profile edit', e);
+  }
 }
 
 export async function requestProfileEditByPhoneNumber(phoneNumber) {

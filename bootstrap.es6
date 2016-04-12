@@ -1,10 +1,11 @@
-import Scribe from 'scribe-js';
+import * as Scribe from 'scribe-js';
 import config from 'config';
-import extend from 'extend';
 import {TraceError, useSourceOnError} from './libs/utils.es6';
 import {init as initMongo, close as closeMongo} from './models/mongo/index.es6';
 import {init as initSQL, close as closeSQL} from './models/mysql/index.es6';
 import Promise from 'bluebird';
+import fs from 'fs';
+import https from 'https';
 
 export function initErrorHandling() {
   // Promise.suppressUnhandledRejections();
@@ -15,65 +16,88 @@ export function initErrorHandling() {
   useSourceOnError();
 }
 
-export function initScribe(override = true, mongo = true, socket = true, opts = {}, ...exposers) {
+export function initScribe(override = true, stdOnly = false) {
   const id = config.get('AppId');
   const port = config.get('Server.port');
   const env = config.get('NodeEnv');
+  const socketPort = 50000 + (Number(process.env.pm_id) || port);
+  const ssl = {
+    key: fs.readFileSync(config.get('Server.sslKey')),
+    cert: fs.readFileSync(config.get('Server.sslCert')),
+    ca: fs.readFileSync(config.get('Server.sslCa')),
+    rejectUnauthorized: config.get('Server.httpsRejectUnauthorized')
+  };
 
-  const scribeConsole = new Scribe(id, extend(true, {
-    inspector: {
-      colors: true,
-      showHidden: false,
-      depth: 5,
-      pre: true,
-      callsite: false,
-      tags: true,
-      args: true,
-      metrics: true
-    },
-    name: 'Entree',
-    mongoUri: 'mongodb://localhost/scribe',
-    mongo,
-    basePath: 'scribe/',
-    socketPort: 50000 + (Number(process.env.pm_id) || port),
-    socket,
-    nwjs: {
-      buildDir: `${__dirname}/../public/native`
-    },
-    web: {
-      router: {
-        username: 'build',
-        password: 'build',
-        authentication: true,
-        useBodyParser: true
-      },
-      client: {
-        socketPorts: [50000 + (Number(process.env.pm_id) || port)],
-        exposed: {
-          all: {label: 'all', query: {expose: {$exists: true}}},
-          error: {label: 'error', query: {expose: 'error'}},
-          express: {label: 'express', query: {expose: 'express'}},
-          info: {label: 'info', query: {expose: 'info'}},
-          log: {label: 'log', query: {expose: 'log'}},
-          warn: {label: 'warn', query: {expose: 'warn'}},
-          trace: {label: 'trace', query: {expose: 'trace'}},
-          test: {label: 'test', query: {expose: 'test'}},
-          timing: {label: 'time', query: {expose: 'timing'}},
-          user: {label: 'user', query: {'transient.tags': {$in: ['USER ID']}}}
-        }
-      }
-    },
-    native: {},
-    debug: false
-  }, opts), ...['test', ...exposers]);
+  let server;
 
-  scribeConsole.persistent('tags', [port, env]);
-
-  if (override) {
-    scribeConsole.override();
+  if (!stdOnly) {
+    server = https.createServer(ssl);
+    server.listen(socketPort);
   }
 
-  return scribeConsole;
+  const options = {
+    name: 'Entree',
+    id,
+    expose: {
+      default: stdOnly ? ['bash'] : [
+        'mongo-socket',
+        'bash'
+      ],
+      test: ['bash'],
+      express: stdOnly ? ['express-bash'] : [
+        'express-mongo-socket',
+        'express-bash'
+      ]
+    },
+    'expose/pipeline': {
+      'mongo-socket': [
+        'transform/ErrorExtractor',
+        'transform/ToJSON2',
+        'transform/FullTextSerialize',
+        'writer/MongoDB',
+        'writer/SocketIO'
+      ],
+      'express-mongo-socket': [
+        'transform/ExpressExtractor',
+        'transform/ErrorExtractor',
+        'transform/ToJSON2',
+        'transform/FullTextSerialize',
+        'writer/MongoDB',
+        'writer/SocketIO'
+      ],
+      bash: [
+        'transform/Inspector',
+        'writer/DefaultConsole'
+      ],
+      'express-bash': [
+        'transform/ExpressExtractor',
+        'transform/ExpressInspector',
+        'transform/Inspector',
+        'writer/DefaultConsole'
+      ]
+    },
+    module: {
+      'writer/SocketIO': {
+        server,
+        options: {secure: true}
+      },
+      'router/Viewer/client': {
+        background: '#131B21',
+        socketPorts: [socketPort], // get other instance ports,
+        options: {secure: true}
+      }
+    }
+  };
+
+  const scribe = Scribe.create(options);
+
+  scribe.persistent('tags', [port, env]);
+
+  if (override) {
+    scribe.override();
+  }
+
+  return scribe;
 }
 
 export async function initDatabase(forceClear) {

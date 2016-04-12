@@ -42,7 +42,7 @@
 }
 
 .section {
-  padding: 20px;
+  padding: 10px;
   background: #EEE;
   border: 1px solid #DDD;
   border-radius: 10px;
@@ -52,10 +52,10 @@
 .button {
   width: 100%;
   /* background: #228AE6; */
-  background: transparent;
+  background: #228AE6;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
   font-size: 13px;
-  color: #228AE6;
+  color: #FFF;
   letter-spacing: 1.25px;
   line-height: 19px;
   padding: 11px;
@@ -71,7 +71,7 @@
     margin-bottom: 0;
   }
   &:hover {
-    background: #228AE6;
+    background: #185e9f;
     color: #FFF;
   }
   &:active {
@@ -82,19 +82,19 @@
 
 .modal {
   width: 500px;
-  margin: 30px auto;
   background: #FFF;
   border-radius: 10px;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
   position: relative;
   padding: 20px;
+  margin: 90px auto 30px;
 
   @media (max-width: 600px) {
     transform: none;
     width: 100%;
     margin: 0;
-    padding: 20px;
     top: 0;
+    padding: 90px 15px 15px;
     border-radius: 0;
   }
 }

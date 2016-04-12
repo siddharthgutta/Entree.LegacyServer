@@ -43,30 +43,34 @@ npm cache clear # if modules need to be downloaded again
  
 ### Setup
 ```bash
-# MAC OSX!
+# general env setup
+
+# osx
 brew install automake
 brew install libtool
 brew install libpng
 
-# general env setup
+# linux
 sudo apt-get update
 sudo apt-get -y install git build-essential git ruby libpam0g-dev debconf-utils automake libtool libpng-dev libkrb5-dev sshpass zip unzip
+
+# sass engine
 sudo gem install sass
 
-# node via. nvm
+# nvm
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash
 source ~/.bashrc
 nvm install 5.7.0
 echo "5.7.0" > ~/.nvmrc
 
-# shell init
+# init
 cd; cd -
 
 # open ports < 1024 for non-sudo
 killall node
 sudo setcap 'cap_net_bind_service=+ep' `which node`
 
-# node global
+# npm global
 npm install pm2 -g
 npm install eslint@1.10.3 -g
 npm install babel-eslint@4.1.8 -g
@@ -100,16 +104,13 @@ sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password passwor
 sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password 123456'
 sudo apt-get install -y mysql-server
 
-# open ports < 1024 for non-sudo
-sudo setcap 'cap_net_bind_service=+ep' `which node`
-
 # clone and install - required!
 git config --global credential.helper store
 mkdir -p Github && cd Github
 git clone https://github.com/siddharthgutta/Entree.Server && cd Entree.Server
 npm install
 
-# you can delete this folder: 
+# you can delete the folder ~/Github now
 
 # run database init scripts
 ```

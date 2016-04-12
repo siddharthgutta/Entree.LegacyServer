@@ -6,8 +6,11 @@ import {resolve} from '../../models/index.es6';
 import * as Order from './order.es6';
 import * as User from './user.es6';
 import * as Payment from '../payment.es6';
+import * as Restaurant from './restaurant.es6';
 
 const chatBot = new DefaultChatBot();
+const waitForChicken = true;
+const chickenIsDone = false;
 
 /**
  * Dispatcher to handle system events
@@ -21,22 +24,28 @@ const chatBot = new DefaultChatBot();
 Emitter.on(Events.TEXT_RECEIVED, async text => {
   console.tag('api', 'sms', 'processReceive').log('Processing text', text.id, text);
 
-  await sendSMS(text.from, `At 11AM Tuesday (4/12/2016), you can text to order ahead, pre-pay, and skip the line at` +
-    ` Chick-Fil-A. We will text you as soon as you can place an order!`);
-  return;
+  // TODO - fix after cfa run
+  if (waitForChicken) {
+    await sendSMS(text.from, `At 11AM Tuesday (4/12/2016), you can text to order ahead, pre-pay, and skip the line at` +
+      ` Chick-Fil-A. We will text you as soon as you can place an order!`);
+    return;
+  }
 
-  /* try {
+  if (chickenIsDone) {
+    await sendSMS(text.from, `Sorry we are no longer taking orders!`);
+    return;
+  }
+
+  try {
     const response = await chatBot.updateState(text.from, text.body);
-
     if (response) {
       await sendSMS(text.from, response);
     }
   } catch (err) {
     console.tag('dispatcher', 'TEXT_RECEIVED').error(err);
-
     await sendSMS(text.from, 'Sorry, we had problem on our side. If you are still having problems, contact us at' +
                   ' team@textentree.com');
-  } */
+  }
 });
 
 /**
@@ -45,37 +54,58 @@ Emitter.on(Events.TEXT_RECEIVED, async text => {
 Emitter.on(Events.USER_PAYMENT_REGISTERED, async({id: userId}) => {
   const user = await User.UserModel.findOne(userId);
 
+  let chatState, defaultPayment, restaurantId, orderId, totalPrice; // eslint-disable-line
   try {
-    const chatState = await user.findChatState();
-    const order = await chatState.findOrderContext();
+    chatState = await user.findChatState();
+    const orderItems = await chatState.findOrderItems();
+    const restaurant = await chatState.findRestaurantContext();
+    const items = orderItems.map(({name, price}) => ({name, price, quantity: 1}));
 
-    if (order) {
-      const {id: orderId} = order;
-      const {id: restaurantId} = await Order.getRestaurantFromOrder(orderId);
-      const defaultPayment = await Payment.getCustomerDefaultPayment(userId);
-      const price = await Order.getOrderTotalById(orderId);
+    restaurantId = restaurant.id;
 
-      try {
-        const {id: transactionId} =
-          await Payment.paymentWithToken(userId, restaurantId, defaultPayment.token, price);
-        await Order.setOrderStatus(orderId, Order.Status.RECEIVED_PAYMENT, {transactionId});
-        sendSMS(user.phoneNumber, `Your order using ${defaultPayment.cardType} ending in ${defaultPayment.last4} ` +
-                `has been sent to the restaurant. We'll text you once it's confirmed by the restaurant`);
-      } catch (e) {
-        const err = new TraceError(`Payment failed; user(${userId}) -> restaurant(${restaurantId})`, e);
-        console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);
-        const secret = await User.requestProfileEdit(userId);
-        const profileUrl = await User.getUserProfile(secret);
+    const order = await Order.createOrder(userId, restaurantId, items);
+    await chatState.setOrderContext(order.resolve());
 
-        // FIXME I am not sure what e.message will output @jadesym
-        sendSMS(user.phoneNumber, `The order could not be processed. There was a problem with your` +
-        ` credit card: ${e.message}. Please update your payment information at ${profileUrl}`);
-      }
-    }
+    orderId = order.id;
+    defaultPayment = await Payment.getCustomerDefaultPayment(userId);
+    totalPrice = await Order.getOrderTotalById(orderId);
+
+    // TEMPORARY TAX IMPLEMENTATION - REMOVE AFTER CHICK-FIL-A
+    totalPrice *= 1.0825;
+    totalPrice = Math.round(totalPrice);
+
   } catch (e) {
     const err = new TraceError(`Could not process order`, e);
-    console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);
-    sendSMS(user.phoneNumber, 'There was a problem locating your last order. Can you please try again?');
+    sendSMS(user.phoneNumber, 'There was a problem processing your last order. Can you please try again?');
+
+    return console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);
+  }
+
+  let payment;
+  try {
+    payment = await Payment.paymentWithToken(userId, restaurantId, defaultPayment.token, totalPrice);
+  } catch (e) {
+    const err = new TraceError(`Payment failed; user(${userId}) -> restaurant(${restaurantId})`, e);
+    const secret = await User.requestProfileEdit(userId);
+    const profileUrl = await User.resolveProfileEditAddress(secret);
+    sendSMS(user.phoneNumber, `There was a problem with your ${defaultPayment.cardType} credit card ending in` +
+      ` ${defaultPayment.last4}. Please update your payment information at ${profileUrl}`);
+
+    return console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);
+  }
+
+  try {
+    await chatState.clearOrderItems();
+    await chatState.updateState(chatStates.start);
+
+    await Order.setOrderStatus(orderId, Order.Status.RECEIVED_PAYMENT, {transactionId: payment.id});
+    sendSMS(user.phoneNumber, `Your order using ${defaultPayment.cardType} ending in ${defaultPayment.last4} ` +
+      `has been sent to the restaurant. We'll text you once it's confirmed by the restaurant`);
+  } catch (e) {
+    const err = new TraceError(`Could not process order`, e);
+    sendSMS(user.phoneNumber, 'There was a problem processing your last order. Can you please try again?');
+
+    return console.tag('dispatcher', 'USER_PAYMENT_REGISTERED').error(err);
   }
 });
 
@@ -84,39 +114,51 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
 
   // TODO @jesse move this to chatbot
   const message = {
-    [Order.Status.ACCEPTED]: `Your order has been placed :) It will be ready in ${order.prepTime} mins`,
-    [Order.Status.DECLINED]: `Your order just got declined :( ${order.message}`,
-    [Order.Status.COMPLETED]: `Your ${restaurant.name} order is ready to be picked up!` +
-      ` Please present your name and order number (#${order.id2}) when you arrive.`
+    [Order.Status.ACCEPTED]: `Your order shown below has been placed :) The estimated wait is ${order.prepTime} mins,` +
+      ` and we will text you once it's ready for pickup.`,
+    [Order.Status.DECLINED]: `Your order just got declined :( ${order.message}.`,
+    [Order.Status.READY]: `Your ${restaurant.name} order is ready to be picked up!` +
+  ` Please present your name and order number (#${order.id2}) when you arrive.`
   };
 
   let response = message[order.status];
   const user = resolve(await Order.getUserFromOrder(order.id));
+  const chatState = await user.findChatState();
 
-  if (order.status === Order.Status.ACCEPTED) {
-    response += `\n\nOrder #${order.id2} Receipt:`;
-    const chatState = await user.findChatState();
-    const orderItems = await chatState.findOrderItems();
-    const defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
+  switch (order.status) {
+    case Order.Status.ACCEPTED:
+      const items = await Order.OrderModel.findItems(order.id);
+      const defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
 
-    let itemFormat = '';
-    let total = 0;
+      let itemFormat = '';
+      let total = 0;
 
-    for (let i = 0; i < orderItems.length; i++) {
-      itemFormat += `${i + 1}) ${orderItems[i].name} - $${(orderItems[i].price / 100).toFixed(2)}\n`;
-      total += orderItems[i].price;
-    }
+      response += `\n\nOrder #${order.id2} Receipt:`;
 
-    response += `\n${itemFormat}\nA total of $${(total / 100).toFixed(2)} was charged with` +
-     ` ${defaultPayment.cardType} ending in ${defaultPayment.last4}`;
+      for (let i = 0; i < items.length; i++) {
+        itemFormat += `${i + 1}) ${items[i].name} - $${(items[i].price / 100).toFixed(2)}\n`;
+        total += items[i].price;
+      }
 
-    await chatState.clearOrderItems();
-    await chatState.updateState(chatStates.start);
+      response += `\n\n${itemFormat}\nA total of $${(total / 100).toFixed(2)} was charged with` +
+        ` ${defaultPayment.cardType} ending in ${defaultPayment.last4}`;
+
+      await chatState.updateState(chatStates.start);
+      break;
+    case Order.Status.DECLINED:
+      await chatState.clearOrderContext();
+      await chatState.updateState(chatStates.start);
+      break;
+    case Order.Status.COMPLETED:
+      await chatState.clearOrderContext();
+      break;
+    default:
   }
 
-  if (order.status === Order.Status.COMPLETED) {
+  if (order.status === Order.Status.DECLINED) {
     const chatState = await user.findChatState();
-    await chatState.clearOrderContext();
+    const {transactionId} = await chatState.findOrderContext();
+    await Payment.voidPayment(transactionId);
   }
 
   if (response) {

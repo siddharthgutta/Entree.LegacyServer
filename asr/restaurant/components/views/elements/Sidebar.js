@@ -80,7 +80,7 @@ class Sidebar extends Influx.Component {
             </div>
           </div>
           <div className='item selected' {...onClick(() => this.context.history.push('/orders'))}>ORDERS</div>
-          <div className='item' style={{marginBottom: 10}}>DECLINED</div>
+          <div className='item' style={{marginBottom: 10}}>HISTORY</div>
           <div className='big-button' {...onClick(() => Dispatcher.emit(Dispatcher.Events.LOGOUT))}>SIGN OUT</div>
         </div>
       </div>

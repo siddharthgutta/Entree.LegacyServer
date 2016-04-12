@@ -45,7 +45,7 @@ async function fetchToken(id, password) {
 
 router.get('/generate/user', async (req, res) => {
   const user = await createTestUser();
-  const {secret} = await User.requestProfileEdit(user.id);
+  const secret = await User.requestProfileEdit(user.id);
   const _url = await User.resolveProfileEditAddress(secret);
 
   res.ok({user, url: _url});

@@ -113,6 +113,11 @@ export async function findBySecret(secret) {
   return findOne(userId);
 }
 
+export async function findUserSecret(userId) {
+  const {secret} = await UserSecret.findOne({userId}).exec();
+  return secret;
+}
+
 /**
  * Destroy the secret id; user remains intact
  *

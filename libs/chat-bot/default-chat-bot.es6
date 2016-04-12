@@ -22,7 +22,7 @@ export const chatStates = {
   categories: 'Categories',
   mods: 'Mods',
   cart: 'Cart',
-  cardInfo: 'CardInfo'
+  secondSignup: 'secondSignup'
 };
 
 export const response = {
@@ -33,6 +33,11 @@ export const response = {
 
   restaurantDisabled: producer => `Sorry, ${producer.name} is currently closed and not accepting orders.` +
     ` To start looking at other restaurants type \"/clear\".`,
+
+  existingOrder: 'Sorry, you cannot make another order while your current one is being processed.',
+
+  finishSecondSignup: url => `Finish checking out at ${url} or type \"/clear\" to clear your cart to` +
+    ` use additional commands`,
 
   /* Returned when user tries to execute context command while not in restaurant context */
   invalidContext: 'Sorry that command isn`t available right now. Please try again',
@@ -59,8 +64,8 @@ export const response = {
 
   items: {
     footer: 'Type a number for an item you want or type \"/menu\" to see the full menu',
-    dataFormat: async (i, data) => `${i + 1}) ${data[i].name}: $${(data[i].basePrice / 100).toFixed(2)}\n` +
-    `--  ${data[i].description.toLowerCase()} `
+    dataFormat: async (i, data) => `${i + 1}) ${data[i].name}: $${(data[i].basePrice / 100).toFixed(2)}` +
+    `${data[i].description === '' ? '' : `\n--  ${data[i].description.toLowerCase()}`}`
   },
 
   mods: {
@@ -133,7 +138,7 @@ export default class DefaultChatBot extends ChatBotInterface {
   static async _getDayHours(producer, day) {
     const producerHours = _.filter(await producer.findHours(), hour => hour.dayOfTheWeek === day);
     const formattedHours = _.map(producerHours, hour => {
-      const openTime = moment(hour.openTime, 'HH:mm:ss').format('h');
+      const openTime = moment(hour.openTime, 'HH:mm:ss').format('h A');
       const closeTime = moment(hour.closeTime, 'HH:mm:ss').format('h A');
       return `${openTime} - ${closeTime}`;
     });
@@ -173,14 +178,28 @@ export default class DefaultChatBot extends ChatBotInterface {
     try {
       user = await User.UserModel.findOneByPhoneNumber(phoneNumber);
       if (!user) {
-        await User.signup(phoneNumber);
-
-        /* TODO @Jadesym - Move signup into chatbot. User.signup() will text the user the initial message */
-        return null;
+        // TODO - fix after cfa
+        await User.signup(phoneNumber, null, true);
+        user = await User.UserModel.findOneByPhoneNumber(phoneNumber);
+        return await this._handleAtRestaurant(await user.findChatState(), 'chicken');
       }
       chatState = await user.findChatState();
     } catch (err) {
       throw new TraceError(`Could not find user ChatState info for user ${phoneNumber}`, err);
+    }
+
+    /* Case where user has to second sign up and uses some other command other than clear */
+    if (chatState.state === chatStates.secondSignup && input !== '/clear') {
+      // TODO - fix after cfa
+      let secret;
+      try {
+        secret = await User.UserModel.findUserSecret(user.id);
+      } catch (err) {
+        secret = await User.requestProfileEdit(user.id);
+      }
+
+      const profileUrl = await User.resolveProfileEditAddress(secret);
+      return response.finishSecondSignup(profileUrl);
     }
 
     /* No access to contextual or stateless commands when ordering an item.
@@ -190,7 +209,8 @@ export default class DefaultChatBot extends ChatBotInterface {
     try {
       itemContext = await chatState.findMenuItemContext();
       isContextual = await this._isContextual(chatState, input);
-      isStateless = this._isStateless(input);
+      // TODO - fix after cfa
+      isStateless = this._isStateless(input) || input === 'chicken';
     } catch (err) {
       throw new TraceError(`ChatState id ${chatState.id} ` +
         `- Failed to determine if command is contextual or stateless for user ${phoneNumber}`, err);
@@ -201,6 +221,10 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
 
     if (isStateless) {
+      // TODO - fix after cfa
+      if (input === 'chicken') {
+        return await this._handleAtRestaurant(await user.findChatState(), 'chicken');
+      }
       return await this._statelessTransition(chatState, input);
     }
 
@@ -481,10 +505,22 @@ export default class DefaultChatBot extends ChatBotInterface {
     });
 
     if (orderItem.name.indexOf('with') === -1 && nameMods.length > 0) {
-      orderItem.name += 'with';
+      orderItem.name += ' with';
     }
 
-    orderItem.name += ` ${nameMods.join(', ')}`;
+    // TODO Remove after Chick-fil-a
+    // Keep the code inside else and move it out, delete the rest
+    if (nameMods.length === 1 && /^[^ ]+\ Drink Size$/.test(nameMods[0])) {
+      const modSize = nameMods[0].split(' ')[0];
+      const orderItemsArraySplitByWith = (orderItem.name).split('with');
+      const modsSplitByComma = orderItemsArraySplitByWith[1].split(',');
+      modsSplitByComma[modsSplitByComma.length - 1] = ` ${modSize}${modsSplitByComma[modsSplitByComma.length - 1]}`;
+      orderItem.name = `${orderItemsArraySplitByWith[0]}with${modsSplitByComma.join(',')}`;
+    } else if (orderItem.name.indexOf('with') === -1) {
+      orderItem.name += ` ${nameMods.join(', ')}`;
+    } else {
+      orderItem.name += `, ${nameMods.join(', ')}`;
+    }
 
     try {
       await orderItem.save();
@@ -616,26 +652,8 @@ export default class DefaultChatBot extends ChatBotInterface {
   }
 
   async _handleCheckout(chatState) {
-    let orderItems;
-    try {
-      orderItems = await chatState.findOrderItems();
-    } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to find order items`, err);
-    }
-
-    if (orderItems.length === 0) {
-      return response.invalidCheckout;
-    }
-
-    let output = '';
-    let total = 0;
-    for (let i = 0; i < orderItems.length; i++) {
-      output += `${orderItems[i].name}, `;
-      total += orderItems[i].price;
-    }
-
-
     let restaurant, user;
+    /* Check if restaurant is open */
     try {
       restaurant = await chatState.findRestaurantContext();
       if (!restaurant.enabled) {
@@ -645,6 +663,49 @@ export default class DefaultChatBot extends ChatBotInterface {
     } catch (err) {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to find user or restaurant for an order`, err);
     }
+
+    let orderItems;
+    try {
+      orderItems = await chatState.findOrderItems();
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to find order items`, err);
+    }
+
+    /* Check if user has any order items */
+    if (orderItems.length === 0) {
+      return response.invalidCheckout;
+    }
+
+    /* Cannot make process two orders at once */
+    const orderContext = await chatState.findOrderContext();
+    if (orderContext) {
+      return response.existingOrder;
+    }
+
+    /* Do not create order object unless user has payment. Order will be created in
+    * dispatcher.es6 for first time users */
+    let defaultPayment;
+    try {
+      defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
+    } catch (defaultPaymentError) {
+      console.tag('chatbot').log('No default payment found. Sending user to signup2.');
+      const secret = await User.requestProfileEdit(user.id);
+      const url = await User.resolveProfileEditAddress(secret);
+
+      chatState.updateState(chatStates.secondSignup);
+      return `To complete your order and pay, please go to ${url}`;
+    }
+
+    let output = '';
+    let total = 0;
+    for (let i = 0; i < orderItems.length; i++) {
+      output += `${orderItems[i].name}, `;
+      total += orderItems[i].price;
+    }
+
+    // TEMPORARY TAX IMPLEMENTATION - REMOVE AFTER CHICK-FIL-A
+    total *= 1.0825;
+    total = Math.round(total);
 
     // transform for order to support orders
     const items = orderItems.map(({name, price}) => ({name, price, quantity: 1}));
@@ -657,17 +718,6 @@ export default class DefaultChatBot extends ChatBotInterface {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to create order and set the context`, err);
     }
 
-    let defaultPayment;
-    try {
-      defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
-    } catch (defaultPaymentError) {
-      console.tag('chatbot').log('No default payment found. Sending user to signup2.');
-      const secret = await User.requestProfileEdit(user.id);
-      const url = await User.resolveProfileEditAddress(secret.secret);
-
-      return `To complete your order and pay, please go to ${url}`;
-    }
-
     try {
       const {id: transactionId} = await Payment.paymentWithToken(user.id, restaurant.id, defaultPayment.token, total);
       await Order.setOrderStatus(order.id, Order.Status.RECEIVED_PAYMENT, {transactionId});
@@ -675,6 +725,9 @@ export default class DefaultChatBot extends ChatBotInterface {
       console.tag('chatbot').error('Payment failed although customer default payment exists', paymentWithTokenError);
       throw new TraceError('Payment failed although customer default payment exists', paymentWithTokenError);
     }
+
+    await chatState.clearOrderItems();
+    await chatState.updateState(chatStates.start);
 
     return `Your order using ${defaultPayment.cardType} - ${defaultPayment.last4} has been sent to the restaurant. ` +
       `We'll text you once it's confirmed by the restaurant`;
@@ -906,8 +959,9 @@ export default class DefaultChatBot extends ChatBotInterface {
   async _handleClear(chatState) {
     try {
       await chatState.clearOrderItems();
+      await chatState.updateState(chatStates.start);
     } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to clear item cart`, err);
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chat state metadata`, err);
     }
     return response.cartClear;
   }
@@ -938,13 +992,19 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     _.each(orderItems, orderItem => total += orderItem.price);
 
+    // TEMPORARY TAX IMPLEMENTATION - REMOVE AFTER CHICK-FIL-A
+    const subTotal = total;
+    total *= 1.0825;
+    total = Math.round(total);
+
     try {
       await chatState.updateState(chatStates.cart);
       await chatState.clearMenuItemContext();
       return await this._genOutput(
         chatState,
         response.cart.header,
-        `Your current total is $${(total / 100).toFixed(2)}. ${response.cart.footer}`,
+        `Your subtotal is $${(subTotal / 100).toFixed(2)}. Your final total (including tax) is ` +
+          `$${(total / 100).toFixed(2)}. ${response.cart.footer}`,
         orderItems,
         response.cart.dataFormat);
     } catch (err) {

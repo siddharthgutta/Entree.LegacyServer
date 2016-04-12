@@ -292,10 +292,54 @@ describe('Braintree', () => {
           done();
         });
       });
+
+      it('#voidPayment should successfully void payment', async () => {
+        await Braintree.registerPaymentForUser(userId, validNonce);
+        const defaultPayment = await Braintree.getCustomerDefaultPayment(userId);
+        const transaction = await Braintree.paymentWithToken(userId, restaurantId,
+          defaultPayment.token, authorizedAmount);
+        assert.deepEqual((authorizedAmount / 100), parseFloat(transaction.amount));
+        assert.deepEqual((calculateServiceFee(authorizedAmount) / 100), parseFloat(transaction.serviceFeeAmount));
+        assert.deepEqual('submitted_for_settlement', transaction.status);
+        const voidedTransaction = await Braintree.voidPayment(transaction.id);
+        assert.deepEqual(voidedTransaction.status, 'voided');
+      });
+
+      it('#refundPayment should successfully refund payment', async () => {
+        await Braintree.registerPaymentForUser(userId, validNonce);
+        const defaultPayment = await Braintree.getCustomerDefaultPayment(userId);
+        const transaction = await Braintree.paymentWithToken(userId, restaurantId,
+          defaultPayment.token, authorizedAmount);
+        assert.deepEqual((authorizedAmount / 100), parseFloat(transaction.amount));
+        assert.deepEqual((calculateServiceFee(authorizedAmount) / 100), parseFloat(transaction.serviceFeeAmount));
+        assert.deepEqual('submitted_for_settlement', transaction.status);
+        const settledTransaction = await Braintree.setTestTransactionAsSettled(transaction.id);
+        assert.deepEqual('settled', settledTransaction.status);
+        const refundedTransaction = await Braintree.refundPayment(transaction.id);
+        assert.deepEqual('submitted_for_settlement', refundedTransaction.status);
+        assert.deepEqual('credit', refundedTransaction.type);
+        assert.notEqual(transaction.id, refundedTransaction.id);
+      });
+
+      it('#releasePaymentToProducer should successfully release payment to producer', async () => {
+        await Braintree.registerPaymentForUser(userId, validNonce);
+        const defaultPayment = await Braintree.getCustomerDefaultPayment(userId);
+        const transaction = await Braintree.paymentWithToken(userId, restaurantId,
+          defaultPayment.token, authorizedAmount);
+        assert.deepEqual((authorizedAmount / 100), parseFloat(transaction.amount));
+        assert.deepEqual((calculateServiceFee(authorizedAmount) / 100), parseFloat(transaction.serviceFeeAmount));
+        assert.deepEqual('submitted_for_settlement', transaction.status);
+        const settledTransaction = await Braintree.setTestTransactionAsSettled(transaction.id);
+        assert.deepEqual('settled', settledTransaction.status);
+        const releasedPayment = await Braintree.releasePaymentToProducer(transaction.id);
+        assert.deepEqual('settled', releasedPayment.status);
+        assert.deepEqual('release_pending', releasedPayment.escrowStatus);
+        assert.deepEqual(transaction.id, releasedPayment.id);
+      });
     });
   });
 
-  describe('#registerRestaurantWithPaymentSystem', () => {
+  describe('#registerOrUpdateProducerWithPaymentSystem', () => {
     function createIndividual(approved) {
       return {
         firstName: approved ? braintree.Test.MerchantAccountTest.Approve :
@@ -311,6 +355,19 @@ describe('Braintree', () => {
         }
       };
     }
+
+    const individual2 = {
+      firstName: braintree.Test.MerchantAccountTest.Approve,
+      lastName: 'SecondLastName',
+      dateOfBirth: '1950-01-01',
+      email: 'test2@textentree.com',
+      address: {
+        streetAddress: '5678 Test St.',
+        locality: 'Mountain View',
+        region: 'CA',
+        postalCode: '94035'
+      }
+    };
 
     const funding = {
       descriptor: 'test',
@@ -330,7 +387,7 @@ describe('Braintree', () => {
       const restaurantId = (await Restaurant.create(name, handle, password, mode, {percentageFee, transactionFee})).id;
       const individual = createIndividual(false);
       try {
-        const merchantAccount = await Braintree.registerRestaurantWithPaymentSystem(
+        const merchantAccount = await Braintree.registerOrUpdateProducerWithPaymentSystem(
           restaurantId, individual, {}, funding);
         assert.deepEqual(merchantAccount.status, 'suspended');
         assert.deepEqual(merchantAccount.subMerchantAccount, true);
@@ -344,10 +401,26 @@ describe('Braintree', () => {
     it('creating approved merchant account should succeed', async done => {
       const restaurantId = (await Restaurant.create(name, handle, password, mode, {percentageFee, transactionFee})).id;
       const individual = createIndividual(true);
-      const merchantAccount = await Braintree.registerRestaurantWithPaymentSystem(
+      let merchantAccount = await Braintree.registerOrUpdateProducerWithPaymentSystem(
         restaurantId, individual, {}, funding);
       assert.deepEqual(merchantAccount.status, 'pending');
       assert.deepEqual(merchantAccount.subMerchantAccount, true);
+      merchantAccount = await Braintree.findProducerPaymentSystemInfo(restaurantId);
+      const resultIndividual = _.pick(merchantAccount.individual, _.allKeys(individual));
+      assert.deepEqual(resultIndividual, individual);
+      done();
+    });
+
+    it('updating merchant account should succeed', async done => {
+      const restaurantId = (await Restaurant.create(name, handle, password, mode, {percentageFee, transactionFee})).id;
+      const individual = createIndividual(true);
+      await Braintree.registerOrUpdateProducerWithPaymentSystem(
+        restaurantId, individual, {}, funding);
+      const merchantAccount = await Braintree.registerOrUpdateProducerWithPaymentSystem(
+        restaurantId, individual2, {}, {});
+      assert.deepEqual(merchantAccount.status, 'active');
+      const resultIndividual = _.pick(merchantAccount.individual, _.allKeys(individual2));
+      assert.deepEqual(resultIndividual, individual2);
       done();
     });
   });

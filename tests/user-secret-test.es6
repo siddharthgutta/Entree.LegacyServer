@@ -14,8 +14,7 @@ describe('User', () => {
   });
 
   it('should create a user edit secret', async () => {
-    const {secret: _secret} = await User.requestProfileEditByPhoneNumber(phone);
-    secret = _secret;
+    secret = await User.requestProfileEditByPhoneNumber(phone);
   });
 
   it('should retrieve user profile', async () => {

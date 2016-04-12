@@ -37,7 +37,8 @@ class OrderFocus extends Page {
     const bgSelector = {
       [OrderConstants.Status.RECEIVED_PAYMENT]: 'red',
       [OrderConstants.Status.ACCEPTED]: 'green',
-      [OrderConstants.Status.COMPLETED]: 'blue',
+      [OrderConstants.Status.COMPLETED]: 'black',
+      [OrderConstants.Status.READY]: 'blue',
       [OrderConstants.Status.DECLINED]: 'black'
     };
 
@@ -94,11 +95,12 @@ class OrderFocus extends Page {
     const {order} = this.state;
     const {history} = this.props;
 
-    Dispatcher.emit(Dispatcher.Events.REQUEST_HEADER, order ? `#${order.id}` : 'Loading', 'Order', {
-      style: {minHeight: 55},
-      leftIcon: 'evil-icon back',
-      onLeftClick: () => history.goBack()
-    });
+    Dispatcher.emit(Dispatcher.Events.REQUEST_HEADER, order ? order.User.firstName : 'Loading',
+                    order ? `#${order.id}` : '...', {
+                      style: {minHeight: 55},
+                      leftIcon: 'evil-icon back',
+                      onLeftClick: () => history.goBack()
+                    });
   }
 
   _handleRequestOrderStatus(status, {message, prepTime} = {}) {
@@ -138,14 +140,27 @@ class OrderFocus extends Page {
             </div>
           </div>
         );
-      case OrderConstants.Status.ACCEPTED:
+      case OrderConstants.Status.READY:
         return (
           <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 62}}>
             <div className='floater'>
               <div className='flex'>
                 <div className='button box dim'
                   {...onClick(() => this._handleRequestOrderStatus(OrderConstants.Status.COMPLETED))}>
-                  COMPLETED
+                  PICKED UP
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case OrderConstants.Status.ACCEPTED:
+        return (
+          <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 62}}>
+            <div className='floater'>
+              <div className='flex'>
+                <div className='button box green'
+                  {...onClick(() => this._handleRequestOrderStatus(OrderConstants.Status.READY))}>
+                  READY
                 </div>
               </div>
             </div>
@@ -162,6 +177,9 @@ class OrderFocus extends Page {
     }
 
     const cost = OrderStore.getTotalCost(order).toFixed(2);
+    const afterProgress = order.status === OrderConstants.Status.COMPLETED ||
+      order.status === OrderConstants.Status.DECLINED ||
+      order.status === OrderConstants.Status.READY;
 
     const items = (
       <div className='full flex vertical' style={{overflow: 'scroll', overflowX: 'hidden'}}>
@@ -170,9 +188,7 @@ class OrderFocus extends Page {
             RECEIVED
           </div>
           <div className={ifcat('box event', {active: order.status === OrderConstants.Status.ACCEPTED})}>PROGRESS</div>
-          <div className={ifcat('box event', {active: order.status === OrderConstants.Status.COMPLETED ||
-          order.status === OrderConstants.Status.DECLINED})}>
-            {order.status === OrderConstants.Status.DECLINED ? 'DECLINED' : 'COMPLETE'}</div>
+          <div className={ifcat('box event', {active: afterProgress})}>{afterProgress ? order.status : 'READY'}</div>
         </div>
         <div className='full' style={{padding: '10px 15px 0', overflow: 'scroll', background: 'rgba(0,0,0,0.7)'}}>
           {order.Items.map((item, i) => (

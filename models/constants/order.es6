@@ -8,6 +8,7 @@ export const Status = keyMirror({
   RECEIVED_PAYMENT: null,
   ACCEPTED: null,
   DECLINED: null,
+  READY: null,
   COMPLETED: null
 });
 
