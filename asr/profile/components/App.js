@@ -17,7 +17,7 @@ class App extends Influx.Component {
   constructor(context, props) {
     super(context, props);
 
-    this.state = {user: {}, expiry: ''};
+    this.state = {user: {}, expiry: '', number: ''};
     this.params = querystring.parse(window.location.search.substring(1));
   }
 
@@ -112,7 +112,7 @@ class App extends Influx.Component {
                        onChange={e => this._handleUpdate('email', e.target.value)}/>
                 <Card name={`${user.firstName || ''} ${user.lastName || ''}`}
                       expiry={this.state.expiry.replace(/\//g, '')}
-                      number={this.state.number}
+                      number={this.state.number.replace(/\s/g, '')}
                       cvc={this.state.cvv}
                       focused={'name'}/>
                 <div className='flex group' style={{marginTop: 15}}>
