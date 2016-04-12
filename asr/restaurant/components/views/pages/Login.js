@@ -83,33 +83,51 @@ class Login extends Page {
     const password = this.refs.password.value;
 
     Dispatcher.emit(Dispatcher.Events.LOGIN, id, password);
-
-    this.setState({status: 'connecting'});
   }
 
   render() {
+    const {status} = this.state;
+
+    let bottom;
+    let inputStyle;
+
+    if (status === Status.DISCONNECTED) {
+      bottom = (
+        <div className='button box green'
+          {...onClick(() => this._handleLogin())}>
+          LOGIN
+        </div>
+      );
+    } else if (status === Status.CONNECTING) {
+      bottom = (
+        <div className='spinner small yellow fit-base'></div>
+      );
+      inputStyle = {readOnly: true, disabled: true};
+    } else {
+      bottom = null;
+    }
+
     return (
       <div className='full flex vertical login'>
         <div className='flex vertical'
-             style={{padding: '30px 0', height: '100%', minHeight: 130}}>
-          <div style={{height: '100%'}}>
+             style={{padding: '30px 0', paddingTop: 0, height: '100%', minHeight: 130}}>
+          <div style={{height: '100%', position: 'relative'}}>
             <div className='secondary-logo'></div>
           </div>
           <div style={{padding: 20}} ref='wrapper'>
-            <input className='input' placeholder='USERNAME' ref='id'/>
-            <input type='password' placeholder='PASSWORD' className='input' ref='password'/>
+            <input spellCheck='false' autoCapitalize='none' autoCorrect='false'
+                   className='input' placeholder='USERNAME' ref='id' {...inputStyle}/>
+            <input spellCheck='false' type='password' placeholder='PASSWORD' className='input'
+                   ref='password' {...inputStyle}/>
           </div>
         </div>
-        <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 62}}>
-          <div className='floater'>
-            <div className='flex'>
-              <div className='button box green'
-                {...onClick(() => this._handleLogin())}>
-                LOGIN
-              </div>
+        { bottom ? (
+          <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 62}}>
+            <div className='floater'>
+              <div className='flex'>{bottom}</div>
             </div>
           </div>
-        </div>
+        ) : null }
       </div>
     );
   }

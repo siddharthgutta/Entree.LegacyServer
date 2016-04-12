@@ -40,10 +40,10 @@ router.get('/info', isAuthenticated, async(req, res) => {
 
 
 router.post('/socket', isAuthenticated, async(req, res) => {
-  const {id} = req.user;
+  const {id, token} = req.user;
 
   try {
-    const {uuid} = await Notification.createSocket(id);
+    const {uuid} = await Notification.createSocket(id, token);
     const address = await Notification.address();
     res.ok({uuid, address}).debug('Created order');
   } catch (e) {
@@ -92,6 +92,7 @@ router.post('/enabled', isAuthenticated, async(req, res) => {
 
   try {
     const restaurant = await Restaurant.setEnabled(id, enabled);
+
     res.ok({restaurant}, `Enabled is now ${restaurant.enabled}`);
   } catch (e) {
     res.fail(`Failed to set enabled: ${e.message}`).debug(e);

@@ -171,8 +171,8 @@ describe('ChatState', () => {
 
   describe('#setOrderContext()', () => {
     it('should set the order context correctly', async () => {
-      const restaurant = (await Restaurant.RestaurantModel.create('Rest1', 'test', Restaurant.RestaurantModel.Mode.GOD))
-        .resolve();
+      const restaurant = (await Restaurant.RestaurantModel.create('Rest1',
+        'rest1', 'test', Restaurant.RestaurantModel.Mode.GOD)).resolve();
       const user = await User.create(phoneNumber, name, email);
       const chatState = await user.insertChatState(state);
       const order1 = await Order.createOrder(user.id, restaurant.id, [

@@ -27,8 +27,11 @@ const zipcode = '78705';
 const percentageFee = 3.5;
 const transactionFee = 30;
 
-const restaurantName = 'macdaddys';
+const restaurantName = 'Mac Daddy\'s';
+const restaurantHandle = 'macdaddys';
 const restaurantPass = 'mac&cheese';
+
+const profileImage = 'images/macdaddys.jpg';
 
 const hours = [
   {
@@ -54,21 +57,11 @@ const hours = [
   {
     day: 'Friday',
     open: '17:00:00',
-    close: '23:59:59'
-  },
-  {
-    day: 'Saturday',
-    open: '00:00:00',
     close: '03:00:00'
   },
   {
     day: 'Saturday',
     open: '17:00:00',
-    close: '23:59:59'
-  },
-  {
-    day: 'Sunday',
-    open: '00:00:00',
     close: '03:00:00'
   },
   {
@@ -185,7 +178,8 @@ let restaurantId;
 async function importMenu() {
   console.log('Importing Menu');
   try {
-    const restaurant = (await Restaurant.create(restaurantName, restaurantPass, Mode.REGULAR)).resolve();
+    const restaurant = (await Restaurant.create(restaurantName,
+      restaurantHandle, restaurantPass, Mode.REGULAR, {profileImage})).resolve();
     restaurantId = restaurant.id;
     await Restaurant.update(restaurantId, {percentageFee, transactionFee});
     await Promise.each(menu, async menuCategory => {

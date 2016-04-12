@@ -27,8 +27,11 @@ const zipcode = '78703';
 const percentageFee = 5;
 const transactionFee = 30;
 
-const restaurantName = 'austinshabibi';
+const restaurantName = 'Austin\'s Habibi';
+const restaurantHandle = 'austinshabibi';
 const restaurantPass = 'greekwraps';
+
+const profileImage = 'images/habibi.jpg';
 
 // @jlmao @bluejamesbond
 // It's tedious, but please compare with
@@ -212,10 +215,10 @@ const menu = [
           {
             name: 'Add-ons',
             mods: [
-              itemMods[6], itemMods[7], itemMods[2], itemMods[5], itemMods[3]
+              itemMods[6], itemMods[2], itemMods[5], itemMods[3]
             ],
             min: 0,
-            max: 5
+            max: 4
           }
         ]
       }, {
@@ -400,7 +403,8 @@ let restaurantId;
 async function importMenu() {
   console.log('Importing Menu');
   try {
-    const restaurant = (await Restaurant.create(restaurantName, restaurantPass, Mode.REGULAR)).resolve();
+    const restaurant = (await Restaurant.create(restaurantName,
+      restaurantHandle, restaurantPass, Mode.REGULAR, {profileImage})).resolve();
     restaurantId = restaurant.id;
     await Restaurant.update(restaurantId, {percentageFee, transactionFee});
     await Promise.each(menu, async menuCategory => {

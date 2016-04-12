@@ -20,7 +20,7 @@ export default function fetch(url, opts = {}) {
 
     let req = request[method.toLowerCase()](url);
 
-    req = req.withCredentials();
+    // req = req.withCredentials();
 
     if (method === 'post') {
       req = req.send(opts.body);

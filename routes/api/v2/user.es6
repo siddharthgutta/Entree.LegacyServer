@@ -59,9 +59,14 @@ profile.post(async (req, res) => {
               .debug('Client tried to a null secret');
   }
 
+  let user;
   try {
-    const user = await User.updateUserProfile(secret, req.body);
-
+    user = await User.updateUserProfile(secret, req.body);
+  } catch (e) {
+    return res.fail(`Sorry, we couldn't update your account with that name or e-mail. ` +
+      `Please try again.`, null, 500).debug(e);
+  }
+  try {
     try {
       await Payment.registerPaymentForUser(user.id, req.body.payment_method_nonce, Runtime.isProduction());
 
@@ -70,9 +75,9 @@ profile.post(async (req, res) => {
       throw new TraceError('Could not register payment', e);
     }
 
-    res.ok({user}, 'Updated profile!').debug(user);
+    res.ok({user}, 'Your account and credit card info has been updated!').debug(user);
   } catch (e) {
-    res.fail(`Sorry, we couldn't update your profile`, null, 500).debug(e);
+    res.fail(`Sorry, your credit card information is incorrect. Please try again.`, null, 500).debug(e);
   }
 });
 

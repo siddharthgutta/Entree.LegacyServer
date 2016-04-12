@@ -1,4 +1,7 @@
+#!/usr/bin/env bash
+
 mkdir -p ~/mongodb
+
 if [ "$(hostname)" == 'kfu-pc' ]
 then
   mongod --dbpath ~/mongodb --smallfiles

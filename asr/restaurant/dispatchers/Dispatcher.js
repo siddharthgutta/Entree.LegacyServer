@@ -4,6 +4,7 @@ import keyMirror from 'keymirror';
 // @formatter:off
 const Events = keyMirror({
   LOGIN: null,
+  LOGOUT: null,
   CONNECTION_STATUS: null,
   REQUEST_HEADER: null,
   REGISTER_MODAL: null,

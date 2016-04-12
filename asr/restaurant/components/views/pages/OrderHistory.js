@@ -56,7 +56,8 @@ class OrderHistory extends Page {
 
     return (
       <div className='full flex vertical'>
-        <TabbedPane spread onChange={tab => this._handleTabChange(tab)} {...tabSetup}/>
+        <TabbedPane spread style={{background: 'rgba(0,0,0,0.7)'}}
+                    onChange={tab => this._handleTabChange(tab)} {...tabSetup}/>
         <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 45}}>
           <div className='floater'>
             <div className='flex'>

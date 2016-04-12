@@ -9,6 +9,7 @@ password=$(curl -L ${SSH_OSX_PASSWORD})
 dir=$RANDOM
 message=$(git log -1 --pretty=%B)
 branch=${BRANCHOFF_BRANCH}
+version=$(echo $(npm version) | egrep -o "'(.*?)'" | sed -n 2p | sed 's/^.\(.*\).$/\1/')
 
 rm -rf ../cordova/build/ || true
 mkdir -p ../cordova/build/
@@ -37,6 +38,7 @@ sshpass -p ${password} ssh -o StrictHostKeyChecking=no  -p ${port} ${username}@$
 ios_raw=$(curl https://api.tryouts.io/v1/applications/NCKHE4E1/releases/ \
     -F "build=@../cordova/build/Entree.ipa" \
     -F "notes=$message" \
+    -F "version=$version" \
     -F "notify=1" \
     -F "status=2" \
     -H "Authorization: b0fbf0eb2c9fded09aefdcf2eeff759c:73da365b26d0ff39f865f285012538fa69d8405e")
@@ -45,6 +47,7 @@ ios_raw=$(curl https://api.tryouts.io/v1/applications/NCKHE4E1/releases/ \
 android_raw=$(curl https://api.tryouts.io/v1/applications/6A6cacUG/releases/ \
     -F "build=@../cordova/build/Entree.apk" \
     -F "notes=$message" \
+    -F "version=$version" \
     -F "notify=1" \
     -F "status=2" \
     -H "Authorization: b0fbf0eb2c9fded09aefdcf2eeff759c:73da365b26d0ff39f865f285012538fa69d8405e")

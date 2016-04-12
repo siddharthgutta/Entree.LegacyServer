@@ -10,6 +10,11 @@ export default function (sequelize, DataTypes) {
       unique: true,
       allowNull: false
     },
+    handle: {
+      type: DataTypes.STRING(25), // eslint-disable-line new-cap,babel/new-cap
+      unique: true,
+      allowNull: false
+    },
     password: {
       type: DataTypes.STRING(64), // eslint-disable-line new-cap,babel/new-cap
       allowNull: false
@@ -20,6 +25,9 @@ export default function (sequelize, DataTypes) {
         isNumeric: true,
         len: 10
       }
+    },
+    profileImage: {
+      type: DataTypes.STRING(512) // eslint-disable-line new-cap,babel/new-cap
     },
     enabled: {
       type: DataTypes.BOOLEAN,
@@ -61,6 +69,10 @@ export default function (sequelize, DataTypes) {
         isInt: true,
         min: 0
       }
+    },
+    orderCounter: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1
     }
   }, {
     classMethods: {

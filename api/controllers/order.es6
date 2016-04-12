@@ -2,6 +2,7 @@ import * as Order from '../order.es6';
 import * as Notification from './notification.es6';
 import {isEmpty} from '../../libs/utils.es6';
 import Emitter, {Events} from '../events/index.es6';
+import {notify} from './restaurant.es6';
 import {Status} from '../order.es6';
 
 export {Status};
@@ -9,7 +10,9 @@ export {Status};
 const restaurantStatuses = [Status.ACCEPTED, Status.DECLINED, Status.COMPLETED];
 
 export async function setOrderStatus(id, status, {prepTime, message, transactionId} = {}, isRestaurant = false) {
-  const {RestaurantId: restaurantId} = await Order.findOne(id);
+  const order = await Order.findOne(id);
+  const {RestaurantId: restaurantId} = order;
+
   let notificationEvent;
   let internalEvent;
 
@@ -62,12 +65,14 @@ export async function setOrderStatus(id, status, {prepTime, message, transaction
   try {
     const _order = await Order.findOneAndUpdateStatus(id, status, {prepTime, message, transactionId});
 
-    if (notificationEvent) {
-      Notification.notify(restaurantId, notificationEvent, _order);
+    if (internalEvent) {
+      Emitter.emit(internalEvent, _order, order, restaurantId);
+      console.tag('DEBUG').log(Emitter.listenerCount(Events.ORDER_UPDATED));
+      notify(restaurantId);
     }
 
-    if (internalEvent) {
-      Emitter.emit(internalEvent, _order);
+    if (notificationEvent) {
+      Notification.notify(restaurantId, notificationEvent, _order);
     }
 
     return _order;
@@ -116,6 +121,14 @@ export async function getOrderTotalById(orderId) {
 export async function getRestaurantFromOrder(orderId) {
   try {
     return await Order.findParentRestaurant(orderId);
+  } catch (e) {
+    throw new TraceError('Could not find parent restaurant', e);
+  }
+}
+
+export async function getUserFromOrder(orderId) {
+  try {
+    return await Order.findUser(orderId);
   } catch (e) {
     throw new TraceError('Could not find parent restaurant', e);
   }

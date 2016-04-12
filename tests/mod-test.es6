@@ -5,6 +5,7 @@ import * as Restaurant from '../api/restaurant.es6';
 
 describe('Mod', () => {
   const name = 'TestRestaurant';
+  const handle = 'testrestaurant';
   const password = '1234';
   const phoneNumber = '1234567890';
   const mode = Restaurant.Mode.REGULAR;
@@ -23,7 +24,7 @@ describe('Mod', () => {
 
   beforeEach(async () => {
     await clearDatabase();
-    const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+    const restaurant = (await Restaurant.create(name, handle, password, mode, {phoneNumber})).resolve();
     const category = await restaurant.insertCategory(categoryName);
     const menuItem = await category.insertMenuItem(itemName, description, basePrice);
     itemMod = await menuItem.upsertItemMod(itemModName, min, max);

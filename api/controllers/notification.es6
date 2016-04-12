@@ -160,7 +160,7 @@ export async function notifyGods(channel, data) {
       }
     });
   } catch (e) {
-    console.tag('notification', 'notify-gods').error(e, {channel, data});
+    // console.tag('notification', 'notify-gods').error(e, {channel, data});
   }
 }
 

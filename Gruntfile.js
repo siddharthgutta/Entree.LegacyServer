@@ -6,8 +6,6 @@ const mozjpeg = require('imagemin-mozjpeg');
 const autoprefixer = require('autoprefixer');
 const config = require('config');
 
-// requesting build1
-
 module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
   require('./tasks/grunt-filetransform')(grunt);
@@ -17,10 +15,9 @@ module.exports = grunt => {
       options: {
         banner: '/*! Grunt Uglify <%= grunt.template.today(\'yyyy-mm-dd\') %> */ ',
         compress: {
-          drop_console: false,
-          keep_fnames: true,
-          keep_fargs: true
-        }
+          drop_console: false
+        },
+        mangle: {keep_fnames: true, keep_fargs: true}
       },
       dist: {
         files: [{
@@ -99,7 +96,7 @@ module.exports = grunt => {
       options: {
         map: false,
         processors: [
-          autoprefixer({browsers: ['> 1%', 'last 10 versions']})
+          autoprefixer({browsers: ['> 1%']})
         ]
       },
       dist: {
@@ -225,8 +222,9 @@ module.exports = grunt => {
     },
     concurrent: {
       clean: ['clean:build', 'clean:compiled'],
-      build: ['imagemin', 'browserify:dist', 'filetransform:babel', 'sass:dist', 'jade:dist'],
-      'build-production': ['imagemin', ['browserify:dist', 'uglify:dist'], 'compile', 'sass:dist', 'jade:dist']
+      build: ['imagemin', 'browserify:dist', 'filetransform:babel', ['sass:dist', 'postcss:dist'], 'jade:dist'],
+      'build-production': ['imagemin', ['browserify:dist'], 'compile',
+        ['sass:dist', 'postcss:dist'], 'jade:dist']
     }
   };
 

@@ -43,7 +43,7 @@ class OrderDecline extends React.Component {
     return (
       <div className='modal-box center'>
         <div className='flex modal-header'>
-          <div className='box flex center vertical' style={{padding: 15}}>
+          <div className='box flex center vertical' style={{padding: 5}}>
             <div className='value'>
               <div className='bubble icon dollar'/>
               {this.props.cost}</div>
@@ -51,9 +51,11 @@ class OrderDecline extends React.Component {
           </div>
         </div>
         <div className='body'>
-          <div className='desc bold normal' ref='wrapper' style={{marginBottom: 20}}>Why are you declining?</div>
+          <div className='desc bold normal' ref='wrapper' style={{margin: 20}}>Why are you declining?</div>
+          <div style={{padding: 20, paddingTop: 0}}>
             <textarea placeholder='Your message' value={this.state.message}
                       onChange={e => this.setState({message: e.target.value})}/>
+          </div>
           <div className='button red' {...onClick(() => this._handleDecline())}>decline order
           </div>
         </div>

@@ -1,5 +1,12 @@
 #!/usr/bin/env sh
 
+message=$(git log -1 --pretty=%B)
+
+if [[ ${message} == *"--skip-tests"* ]] && [[ ${1} == *"stage"* ]]
+then
+    exit
+fi
+
 ## NPM SETUP
 ############
 
@@ -36,8 +43,6 @@ fi
 
 ## APP RELEASES
 ################
-
-message=$(git log -1 --pretty=%B)
 
 if [[ ${message} == *"--release"* ]] && [[ ${1} != *"stage"* ]]
 then

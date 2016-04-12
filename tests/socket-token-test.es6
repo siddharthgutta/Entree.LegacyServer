@@ -30,6 +30,10 @@ describe('Message', () => {
                  .then(() => SocketToken.addTokenOrCreate(restaurantId, token))
                  .then(() => SocketToken.addTokenOrCreate(restaurantId, token))
                  .then(() => SocketToken.addTokenOrCreate(restaurantId, token))
+                 .then(() => SocketToken.addTokenOrCreate(restaurantId, token))
+                 .then(() => SocketToken.addTokenOrCreate(restaurantId, token))
+                 .then(() => SocketToken.addTokenOrCreate(restaurantId, token))
+                 .then(() => SocketToken.addTokenOrCreate(restaurantId, token))
                  .then(() => {
                    assert(false);
                    done();

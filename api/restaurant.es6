@@ -11,17 +11,20 @@ export {Mode};
  * Create a restaurant
  *
  * @param {string} name : Name of restaurant
+ * @param {string} handle: Restaurant handle
  * @param {string} password: Password for restaurant login
+ * @param {string} mode: mode of the restaurant
  * @param {Object} attributes : Restaurant phone number is optional
  * @returns {Promise}: Returns the Restaurant object
  */
-export async function create(name, password, mode = Mode.REGULAR, attributes = {
+export async function create(name, handle, password, mode = Mode.REGULAR, attributes = {
   phoneNumber: null,
   merchantApproved: null,
-  merchantId: null
+  merchantId: null,
+  profileImage: null
 }) {
   try {
-    return (await models.Restaurant.create({name, password, mode, ...attributes})).toJSON();
+    return (await models.Restaurant.create({name, handle, password, mode, ...attributes})).toJSON();
   } catch (e) {
     throw new TraceError('Could not create restaurant', e, ...(e.errors || []));
   }
@@ -30,11 +33,12 @@ export async function create(name, password, mode = Mode.REGULAR, attributes = {
 /**
  * Find restaurants by mode
  *
- * @param {String} mode : Mode of the restaurant
+ * @param {string} mode : Mode of the restaurant
+ * @param {Object} attributes: specific restaurant attributes to search by
  * @returns {Promise}: Returns the Restaurant objects
  */
-export function findByMode(mode) {
-  return models.Restaurant.findAll({where: {mode}});
+export function findByMode(mode = Mode.REGULAR, attributes = {}) {
+  return models.Restaurant.findAll({where: {mode, ...attributes}});
 }
 
 /**
@@ -102,6 +106,7 @@ export async function findOneWithMetaData(id, ...metadata) {
     case MetaData.ORDER_SUMMARY:
       query.include = [{
         model: Order,
+        where: {status: {$in: ['ACCEPTED', 'COMPLETED']}},
         attributes: [
           ['id', 'orderId'],
           [sequelize.fn('SUM', sequelize.col('price')), 'netPrice'],
@@ -136,16 +141,20 @@ export async function findByName(name) {
 }
 
 /**
+ * @param {string} handle: handle of restaurant
+ * @returns {Promise}: Returns the Restaurant object
+ */
+export async function findByHandle(handle) {
+  return (await models.Restaurant.findOne({where: {handle}})).toJSON();
+}
+
+/**
  * Get all restaurants
  *
  * @returns {Promise<Array<Restaurant>>}: A list of all restaurnts
  */
 export function findAll() {
   return models.Restaurant.findAll();
-}
-
-export async function findAllRegular() {
-  return await models.Restaurant.findAll({where: {mode: Mode.REGULAR}});
 }
 
 /**
@@ -161,6 +170,18 @@ export async function update(id, attributes) {
     return (await restaurant.update(attributes)).toJSON();
   } catch (e) {
     throw new TraceError('Could not update restaurant', e);
+  }
+}
+
+
+export async function resetOrderCounter(id) {
+  const {Restaurant} = models;
+
+  const [rows] =
+    await Restaurant.update({orderCounter: 1}, {where: {id}});
+
+  if (!rows) {
+    throw new Error(`Could not update increment order counter. Could not find restaurant: ${id}`);
   }
 }
 

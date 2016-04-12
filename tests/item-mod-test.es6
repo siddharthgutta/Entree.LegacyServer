@@ -6,6 +6,7 @@ let globalMenuItem;
 
 describe('ItemMod', () => {
   const name = 'TestRestaurant';
+  const handle = 'testrestaurant';
   const password = '1234';
   const phoneNumber = '1234567890';
   const mode = Restaurant.Mode.REGULAR;
@@ -18,7 +19,7 @@ describe('ItemMod', () => {
 
   beforeEach(async done => {
     await clearDatabase();
-    const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+    const restaurant = (await Restaurant.create(name, handle, password, mode, {phoneNumber})).resolve();
     const category = await restaurant.insertCategory(categoryName);
     globalMenuItem = await category.insertMenuItem(itemName, description, basePrice);
     done();

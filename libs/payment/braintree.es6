@@ -193,12 +193,16 @@ export default class Braintree extends PaymentStrategy {
   addNewPaymentMethod(customerId, paymentMethodNonce) {
     return new Promise((resolve, reject) => {
       this.gateway.customer.find(customerId, (findError, customer) => {
-        if (findError) reject(findError);
-        const creditCard = {paymentMethodNonce, options: {makeDefault: true, verifyCard: true}};
-        this.gateway.customer.update(customer.id, {creditCard}, (updateError, result) => {
-          if (updateError) reject(updateError);
-          resolve(result);
-        });
+        if (findError) reject(new TraceError(`Failed to find customer by ${customerId} via Braintree`, findError));
+        else {
+          const creditCard = {paymentMethodNonce, options: {makeDefault: true, verifyCard: true}};
+          this.gateway.customer.update(customer.id, {creditCard}, (updateError, result) => {
+            if (updateError) {
+              reject(new TraceError(`Failed to update payment method for ${customerId} via Braintree`, updateError));
+            }
+            resolve(result);
+          });
+        }
       });
     });
   }

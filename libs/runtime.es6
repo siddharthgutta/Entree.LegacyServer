@@ -6,7 +6,6 @@ import {format} from 'url';
 const address = config.get('Server');
 const hostnames = config.get('Server.hostnames');
 const mode = config.get('Mode');
-const env = config.get('NodeEnv');
 const branch = config.get('AppBranch');
 
 let clusterId = 'X';
@@ -19,9 +18,54 @@ export const cid = clusterId; // cluster id
 export const pid = config.get('NodeEnv') + config.get('Mode') + config.get('AppId'); // process level id (virtual)
 export const uid = process.pid + config.get('Mode') + cid + config.get('AppBranch'); // unique id
 
-export function isProduction() {
-  return mode === 'release' && env === 'production' && branch === 'master';
+
+/**
+ * @returns {boolean} true if system is running locally
+ */
+export function isLocal() {
+  return mode === 'local-stage' || mode === 'local-release';
 }
+
+
+/**
+ * @returns {boolean} true if system is running on remote
+ */
+export function isRemote() {
+  return mode === 'stage' || mode === 'release';
+}
+
+
+/**
+ * @returns {boolean} true if system is being staged
+ */
+export function isStaging() {
+  return mode === 'local-stage' || mode === 'stage';
+}
+
+
+/**
+ * @returns {boolean} true if system is released (not staging)
+ */
+export function isRelease() {
+  return mode === 'local-release' || mode === 'release';
+}
+
+
+/**
+ * @returns {boolean} true if it is the master branch
+ */
+export function isMaster() {
+  return branch === 'master';
+}
+
+
+/**
+ * @returns {boolean} true if system is running in production on remote server
+ */
+export function isProduction() {
+  return isRelease() && isRemote() && isMaster();
+}
+
 
 let _hostname;
 export async function hostname() {

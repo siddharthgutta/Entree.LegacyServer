@@ -37,7 +37,8 @@ class OrderFocus extends Page {
     const bgSelector = {
       [OrderConstants.Status.RECEIVED_PAYMENT]: 'red',
       [OrderConstants.Status.ACCEPTED]: 'green',
-      [OrderConstants.Status.COMPLETED]: 'blue'
+      [OrderConstants.Status.COMPLETED]: 'blue',
+      [OrderConstants.Status.DECLINED]: 'black'
     };
 
     document.body.classList.remove('red', 'green', 'blue', 'black');
@@ -77,7 +78,7 @@ class OrderFocus extends Page {
       return {};
     }
 
-    const cost = OrderStore.getTotalCost(order);
+    const cost = OrderStore.getTotalCost(order).toFixed(2);
 
     // TODO give hide control to parent as well
     return {
@@ -85,7 +86,7 @@ class OrderFocus extends Page {
       [Modals.ORDER_TIME]: <OrderTime cost={`${cost}`}
                                       onSubmitTime={prepTime => this._handleRequestOrderStatus(OrderConstants.Status.ACCEPTED, {prepTime})}/>, // eslint-disable-line
       [Modals.ORDER_CANCEL]: <OrderDecline cost={`${cost}`}
-                                           onConfirm={message => this._handleRequestOrderStatus(OrderConstants.Status.DECLINED, {message})}/> // eslint-disable-line
+                                           onDecline={message => this._handleRequestOrderStatus(OrderConstants.Status.DECLINED, {message})}/> // eslint-disable-line
     };
   }
 
@@ -163,20 +164,22 @@ class OrderFocus extends Page {
     const cost = OrderStore.getTotalCost(order).toFixed(2);
 
     const items = (
-      <div className='full flex vertical'>
+      <div className='full flex vertical' style={{overflow: 'scroll', overflowX: 'hidden'}}>
         <div className='flex status' style={{minHeight: 53}}>
           <div className={ifcat('box event', {active: order.status === OrderConstants.Status.RECEIVED_PAYMENT})}>
             RECEIVED
           </div>
           <div className={ifcat('box event', {active: order.status === OrderConstants.Status.ACCEPTED})}>PROGRESS</div>
-          <div className={ifcat('box event', {active: order.status === OrderConstants.Status.COMPLETED})}>COMPLETE</div>
+          <div className={ifcat('box event', {active: order.status === OrderConstants.Status.COMPLETED ||
+          order.status === OrderConstants.Status.DECLINED})}>
+            {order.status === OrderConstants.Status.DECLINED ? 'DECLINED' : 'COMPLETE'}</div>
         </div>
         <div className='full' style={{padding: '10px 15px 0', overflow: 'scroll', background: 'rgba(0,0,0,0.7)'}}>
           {order.Items.map((item, i) => (
             <div className='item flex' key={i}>
               <div className='box flex quantity center vertical'>{item.quantity || 1 }</div>
               <div className='box flex name center vertical'>{item.name}</div>
-              <div className='box flex cost center right vertical'>{`$${Number(item.price).toFixed(2)}`}</div>
+              <div className='box flex cost center right vertical'>{`$${Number(item.price / 100).toFixed(2)}`}</div>
             </div>
           ))}
         </div>
@@ -184,7 +187,8 @@ class OrderFocus extends Page {
     );
 
     const details = (
-      <div className='full' style={{padding: '30px', overflow: 'scroll', background: 'rgba(0,0,0,0.7)'}}>
+      <div className='full'
+           style={{padding: '30px', overflow: 'scroll', overflowX: 'hidden', background: 'rgba(0,0,0,0.7)'}}>
         <div className='box flex left vertical small info'>
           <div className='value'>#{order.id}</div>
           <div className='desc'>ID</div>

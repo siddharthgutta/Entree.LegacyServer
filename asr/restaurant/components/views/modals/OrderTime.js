@@ -60,7 +60,7 @@ class OrderTime extends React.Component {
     return (
       <div className='modal-box center'>
         <div className='flex modal-header'>
-          <div className='box flex center vertical' style={{padding: 15}}>
+          <div className='box flex center vertical' style={{padding: 5}}>
             <div className='value'>
               <div className='bubble icon dollar'/>
               {Number(this.props.cost).toFixed(2)}</div>
@@ -68,19 +68,20 @@ class OrderTime extends React.Component {
           </div>
         </div>
         <div className='body' ref='body'>
-          <div className='desc bold normal' style={{marginBottom: 20}}>Select a preparation time</div>
-          <div className='button navy flex center' {...onClick(() => this._addTime(1))}>
-            <span className='icon add'/><span>&nbsp;1 Minutes</span>
+          <div className='desc bold normal' style={{margin: 20}}>Select a preparation time</div>
+          <div style={{padding: 20, paddingTop: 0, paddingBottom: 10}}>
+            <div className='flex' style={{marginBottom: 10}}>
+              <div className='box button navy flex center round' {...onClick(() => this._addTime(1))}>
+                <span className='icon add'/><span>&nbsp;1 min</span>
+              </div>
+              <div className='box button navy flex center round' {...onClick(() => this._addTime(5))}>
+                <span className='icon add'/><span>&nbsp;5 min</span>
+              </div>
+            </div>
+            <div className='desc' style={{marginBottom: 10}}>OR</div>
+            <input type='number' placeholder='minutes' value={this.state.time} style={{paddingRight: 0}}
+                   onChange={e => this._setTime(e.target.value)}/>
           </div>
-          <div className='button navy flex center' {...onClick(() => this._addTime(5))}>
-            <span className='icon add'/><span>&nbsp;5 Minutes</span>
-          </div>
-          <div className='button navy flex center' {...onClick(() => this._addTime(15))}>
-            <span className='icon add'/><span>&nbsp;15 Minutes</span>
-          </div>
-          <div className='desc' style={{marginBottom: 10}}>OR</div>
-          <input type='number' placeholder='minutes' value={this.state.time} style={{paddingRight: 0}}
-                 onChange={e => this._setTime(e.target.value)}/>
           <div className='button' {...onClick(() => this._handleAccept())}>submit
           </div>
         </div>

@@ -1,10 +1,16 @@
 #!/usr/bin/env sh
 
+message=$(git log -1 --pretty=%B)
+
+if [[ ${message} == *"--skip-tests"* ]]
+then
+    exit
+fi
+
 if [[ $1 != *"manual"* ]]; then
     sleep 10
 fi
 
-export NODE_ENV=staging; # enforce staging
 export IS_RUNNING_TEST=true;
 
 set -e

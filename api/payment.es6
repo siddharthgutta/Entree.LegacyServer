@@ -218,6 +218,15 @@ export async function registerPaymentForUser(userId, paymentMethodNonce) {
   }
   const phone = user.phoneNumber;
   let customerId = user.customerId;
+  // @bluejamesbond use these log statements to debug the front end
+  // Your payment method nonce should be different each time the submit button is hit
+  // Or else you're not sending a new payment, also paymentMethodNonce should not
+  // be an array of values or more than one (saw this bug when I tried another React approach)
+  /*
+  console.log(`Payment Method Nonce: ${paymentMethodNonce}`);
+  console.log(`Phone Number: ${phone}`);
+  console.log(`Customer Id: ${customerId}`);
+  */
   // Check if user does already have a customerId - indicates that signup2 hasn't occurred
   if (!customerId) {
     try {

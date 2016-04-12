@@ -5,7 +5,7 @@ import Promise from 'bluebird';
  * IMPORTANT: Must return promises!
  */
 
-const MAX_TOKENS = 4;
+export const MAX_TOKENS = 8;
 
 /**
  * Adds a token to a specific SocketToken object and increments numTokens count

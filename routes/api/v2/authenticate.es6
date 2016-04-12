@@ -25,7 +25,7 @@ passport.use('local', new LocalStrategy({
   }
 
   try {
-    restaurant = await Restaurant.RestaurantModel.findByName(id);
+    restaurant = await Restaurant.RestaurantModel.findByHandle(id);
   } catch (e) {
     console.error(e);
     return next(e);

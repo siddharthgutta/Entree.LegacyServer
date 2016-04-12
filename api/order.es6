@@ -22,7 +22,7 @@ export async function findByRestaurant(restaurantId, statuses = []) {
   try {
     const query = {
       where: {id: restaurantId},
-      include: [{model: Order, ...statusQuery, include: [{all: true}]}]
+      include: [{required: false, model: Order, ...statusQuery, include: [{all: true}]}]
     };
     const restaurant = (await Restaurant.findOne(query, {logging: true})).toJSON();
     return restaurant.Orders || [];
@@ -56,19 +56,19 @@ export const OrderStatusStates = {
 };
 
 export async function safelyCreate(userId, restaurantId, items) {
-  const {Restaurant, Order, Item, User, transact} = models;
+  const {Restaurant, Order, Item, User, transact, sequelize} = models;
 
   const order = await transact(async transaction => {
     const user = await User.findOne({where: {id: userId}}, {transaction});
     const query = {where: {id: restaurantId, enabled: true, deleted: false}};
     const restaurant = await Restaurant.findOne(query, {transaction});
     const _items = await Promise.map(items, item => Item.create(item, {transaction})); // TODO extract fields
-    const _order = await Order.create({userId, restaurantId, status: Status.PENDING_PAYMENT}, {transaction});
+    const orderQuery = {userId, restaurantId, status: Status.PENDING_PAYMENT, id2: restaurant.get('orderCounter')};
+    const _order = await Order.create(orderQuery, {transaction});
     await _order.addItems(_items, {transaction});
-    // await restaurant.addItems(_items, {transaction});
     await restaurant.addOrder(_order, {transaction});
     await user.addOrder(_order, {transaction});
-
+    await restaurant.update({orderCounter: sequelize.literal('orderCounter + 1')}, {transaction});
     return _order;
   });
 
@@ -103,10 +103,21 @@ export async function findParentRestaurant(id) {
   const order = await Order.findOne({where: {id}});
 
   if (!order) {
-    throw Error(`Could not find order by id(${id})`);
+    throw Error(`Could not find order by id(${id}) hence no parent restaurant`);
   }
 
-  return await order.getRestaurant();
+  return (await order.getRestaurant()).toJSON();
+}
+
+export async function findUser(id) {
+  const {Order} = models;
+  const order = await Order.findOne({where: {id}});
+
+  if (!order) {
+    throw Error(`Could not find order by id(${id}) hence no user`);
+  }
+
+  return (await order.getUser()).toJSON();
 }
 
 export async function calculateTotal(id) {

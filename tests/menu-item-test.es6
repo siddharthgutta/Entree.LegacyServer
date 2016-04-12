@@ -6,6 +6,7 @@ let globalCategory;
 
 describe('MenuItem', () => {
   const name = 'TestRestaurant';
+  const handle = 'testrestaurant';
   const password = '1234';
   const phoneNumber = '1234567890';
   const mode = Restaurant.Mode.REGULAR;
@@ -18,7 +19,7 @@ describe('MenuItem', () => {
 
   beforeEach(async () => {
     await clearDatabase();
-    const restaurant = (await Restaurant.create(name, password, mode, {phoneNumber})).resolve();
+    const restaurant = (await Restaurant.create(name, handle, password, mode, {phoneNumber})).resolve();
     globalCategory = await restaurant.insertCategory(categoryName);
   });
 

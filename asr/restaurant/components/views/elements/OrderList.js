@@ -49,7 +49,7 @@ class OrderList extends Influx.Component {
       <ReactCSSTransitionGroup
         component='div'
         className='group full momentum'
-        style={{padding: 15, background: 'rgba(0,0,0,0.7)', overflowY: 'scroll'}}
+        style={{padding: 15, overflowY: 'scroll'}}
         transitionName='order-list'
         transitionEnterTimeout={500}
         transitionLeaveTimeout={500}>

@@ -25,7 +25,7 @@ class Sidebar extends Influx.Component {
 
   _onDispatcherConnectionStatus(status) {
     if (status === Status.CONNECTED) {
-      OrderStore.fetchRestaurantInfo();
+      OrderStore.fetchRestaurantInfo(); // TODO move to Store
     }
   }
 
@@ -41,16 +41,17 @@ class Sidebar extends Influx.Component {
 
   render() {
     const {restaurant} = this.state;
-    const summary = restaurant.Order ? restaurant.Orders[0] : {};
+    const orders = restaurant.Orders;
+    const summary = Array.isArray(orders) && orders.length ? orders[0] : {};
 
     // TODO the Orders key is an array??
     return (
       <div className='sidebar flex vertical' style={{width: 300, height: '100%'}}>
         <div className='flex center vertical' style={{height: 150, minHeight: 150, width: '100%'}}>
-          <div className='full blur' style={{position: 'absolute', backgroundImage: 'url(images/pluckers.jpg)',
+          <div className='full blur' style={{position: 'absolute', backgroundImage: `url(${restaurant.profileImage})`,
             height: 400, width: '100%', top: 0, opacity: 0.5, zIndex: 0}}/>
-          <div className='profile' style={{backgroundImage: 'url(images/pluckers.jpg)',
-            backgroundSize: 'cover', width: 90, height: 90, borderRadius: '100%', zIndex: 2}}/>
+          <div className='profile' style={{backgroundImage: `url(${restaurant.profileImage})`,
+            backgroundSize: 'cover', borderRadius: '100%', zIndex: 2}}/>
         </div>
         <div className='title'>{restaurant.name}</div>
         <div className='subtitle'>Austin, TX</div>
@@ -59,7 +60,7 @@ class Sidebar extends Influx.Component {
                style={{borderRight: '1px solid rgba(255, 255, 255, 0.1)'}}>
             <div className='value'>
               <div className='bubble light icon dollar'/>
-              {(Number(summary.netPrice) || 0).toFixed(2)}
+              {((Number(summary.netPrice) || 0) / 100).toFixed(2)}
             </div>
             <div className='desc'>MONTH INCOME</div>
           </div>
@@ -80,7 +81,7 @@ class Sidebar extends Influx.Component {
           </div>
           <div className='item selected' {...onClick(() => this.context.history.push('/orders'))}>ORDERS</div>
           <div className='item' style={{marginBottom: 10}}>DECLINED</div>
-          <div className='big-button' {...onClick(() => OrderStore.logout())}>SIGN OUT</div>
+          <div className='big-button' {...onClick(() => Dispatcher.emit(Dispatcher.Events.LOGOUT))}>SIGN OUT</div>
         </div>
       </div>
     );

@@ -5,8 +5,8 @@ import querystring from 'querystring';
 import fetch from '../../libs/fetch';
 
 const Status = {
-  EXPIRED: Symbol(),
-  OK: Symbol()
+  OK: Symbol(),
+  CLOSE: Symbol()
 };
 
 const noop = () => 0;
@@ -19,6 +19,22 @@ class App extends Influx.Component {
     this.params = querystring.parse(window.location.search.substring(1));
   }
 
+  async initBraintreeUI() {
+    const {body: {data: {clientToken}}} =
+      await fetch(`/api/v2/user/client-token`);
+    // @bluejamesbond Use this to debug the front end
+    // Each time, a new client token needs to be retrieved
+    // for each individual payment. Every single time
+    // different payment info is put in, a new client token
+    // and a new BrainTree.setup should be executed
+    /*
+    console.log(`Fetched ${clientToken}`);
+    */
+    BrainTree.setup(clientToken, 'custom', {
+      id: 'payment-form'
+    });
+  }
+
   async componentWillMount() {
     try {
       const {token, secret} = this.params;
@@ -27,14 +43,9 @@ class App extends Influx.Component {
 
       this.setState({user, status: Status.OK});
 
-      const {body: {data: {clientToken}}} =
-        await fetch(`/api/v2/user/client-token`);
-
-      BrainTree.setup(clientToken, 'custom', {
-        id: 'payment-form'
-      });
+      this.initBraintreeUI();
     } catch (e) {
-      this.setStatus({status: Status.EXPIRED});
+      this.setState({status: Status.CLOSE, message: 'Your session has expired'});
     }
   }
 
@@ -43,8 +54,13 @@ class App extends Influx.Component {
 
     try {
       const {status, data, message} = JSON.parse(frame.contentWindow.document.body.innerText);
-      if (status) {
-        return alert(message || 'Unable to update your profile');
+      if (status === 200) {
+        this.setState({status: Status.CLOSE, message});
+        return;
+      } else if (status === 500) {
+        alert(message || 'Unable to update your profile');
+        window.location.reload();
+        return;
       }
 
       this.setState({user: data.user});
@@ -103,7 +119,7 @@ class App extends Influx.Component {
                 <button className='button' type='submit' style={{margin: 0}}>Submit</button>
               </form> :
               <div>
-                <div className='label' style={{textAlign: 'center'}}>Your session has expired</div>
+                <div className='label' style={{textAlign: 'center'}}>{this.state.message}</div>
               </div>
             }
             <iframe ref='frame' onLoad={() => this._handleResult()}
