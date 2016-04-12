@@ -34,12 +34,12 @@
     "underscore": "1.8.3"
   },
   "scripts": {
-    "test": "set -e; mocha --timeout 120000 --no-exit -R nyan",
+    "test": "set -e; mocha --timeout 12000 --no-exit -R nyan",
     "tests": "set -e; for f in ./tests/*-test.compiled.js ; do npm run test $f; done",
     "start": "node index.compiled.js",
-    "test-no-nyan": "set -e; mocha --timeout 120000 --no-exit --colors",
+    "test-no-nyan": "set -e; mocha --timeout 12000 --no-exit --colors",
     "tests-no-nyan": "set -e; for f in ./tests/*-test.compiled.js ; do npm run test-no-nyan $f; done",
-    "test-ci": "set -e; mocha --timeout 120000 --no-exit --no-colors -R spec --bail",
+    "test-ci": "set -e; mocha --timeout 12000 --no-exit --no-colors -R spec --bail",
     "tests-ci": "set -e;for f in ./tests/*-test.compiled.js ; do npm run test-ci $f; done",
     "lint": "eslint --ext js,.es6,.jsx ./",
     "lint-ci": "set -e; eslint --no-color --ext js,.es6,.jsx ./",
