@@ -132,6 +132,8 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
       await chatState.updateState(chatStates.start);
       break;
     case Order.Status.DECLINED:
+      const {transactionId} = await chatState.findOrderContext();
+      await Payment.voidPayment(transactionId);
       await chatState.clearOrderContext();
       await chatState.updateState(chatStates.start);
       break;
@@ -139,12 +141,6 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
       await chatState.clearOrderContext();
       break;
     default:
-  }
-
-  if (order.status === Order.Status.DECLINED) {
-    const chatState = await user.findChatState();
-    const {transactionId} = await chatState.findOrderContext();
-    await Payment.voidPayment(transactionId);
   }
 
   if (response) {
