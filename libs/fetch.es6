@@ -13,7 +13,7 @@ export default function fetch(url, opts = {}) {
     const method = opts.method || 'get';
 
     if (method === 'get') {
-      const urlParts = new URL(url);
+      const urlParts = new URL(url, true);
       urlParts.query = Object.assign(urlParts.query || {}, opts.body);
       url = urlParts.toString();
     }

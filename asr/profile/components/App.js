@@ -2,7 +2,7 @@ import React from 'react';
 import Influx from 'react-influx';
 import BrainTree from 'braintree-web';
 import querystring from 'querystring';
-import fetch from '../../libs/fetch';
+import fetch from '../../libs/fetch.es6';
 import Card from 'react-credit-card';
 import InputElement from 'react-input-mask';
 

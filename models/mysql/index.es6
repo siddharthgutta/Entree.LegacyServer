@@ -12,6 +12,12 @@ const database = mysqlConfig.revision ? `${mysqlConfig.database}_${mysqlConfig.r
 const sequelize = new Sequelize(database, mysqlConfig.username, mysqlConfig.password, {...mysqlConfig, database});
 const objectLookup = new WeakMap();
 
+const modes = ['STRICT_TRANS_TABLES',
+  'NO_ZERO_IN_DATE', 'NO_ZERO_DATE',
+  'ERROR_FOR_DIVISION_BY_ZERO',
+  'NO_AUTO_CREATE_USER',
+  'NO_ENGINE_SUBSTITUTION'];
+
 Sequelize.resolve = obj => {
   if (obj instanceof Instance) {
     return obj;
@@ -85,7 +91,8 @@ export async function init(clearAll = false) {
     await sequelize.sync({force: clearAll});
 
     if (clearAll) {
-      await sequelize.query(`SET SQL_MODE = 'traditional';`); // FIXME not sure how to reset
+      await sequelize.query(`SET SQL_MODE = '${modes.join(',')}';`);
+      await sequelize.query(`SET global SQL_MODE = '${modes.join(',')}';`);
       await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
       await sequelize.query('SET UNIQUE_CHECKS = 1;');
     }

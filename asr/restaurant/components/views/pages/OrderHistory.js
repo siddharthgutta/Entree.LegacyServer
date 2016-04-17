@@ -17,15 +17,16 @@ class OrderHistory extends Page {
     this.state = {};
   }
 
-  _handleTabChange(tab) {
-    const bgSelector = {
-      Received: 'red',
-      Progress: 'green',
-      Completed: 'blue'
-    };
+  componentDidMount() {
+    super.componentDidMount();
 
     document.body.classList.remove('red', 'green', 'blue', 'black');
-    document.body.classList.add(bgSelector[tab]);
+    document.body.classList.add('black');
+  }
+
+  componentDidUpdate() {
+    document.body.classList.remove('red', 'green', 'blue', 'black');
+    document.body.classList.add('black');
   }
 
   getModals() {
@@ -35,7 +36,7 @@ class OrderHistory extends Page {
   }
 
   renderHeader() {
-    Dispatcher.emit(Dispatcher.Events.REQUEST_HEADER, 'Order', 'History', {
+    Dispatcher.emit(Dispatcher.Events.REQUEST_HEADER, 'Orders', 'History', {
       style: {minHeight: 55, borderBottom: 'none'},
       leftIcon: 'evil-icon menu',
       onLeftClick: () => Dispatcher.emit(Dispatcher.Events.MENU_VISIBILITY)
@@ -43,21 +44,18 @@ class OrderHistory extends Page {
   }
 
   render() {
-    const received = <OrderList status={OrderConstants.Status.RECEIVED_PAYMENT} empty='No New Orders'/>;
-    const completed = <OrderList status={OrderConstants.Status.COMPLETED} empty='No Completed Orders'/>;
-    const progress = <OrderList status={OrderConstants.Status.ACCEPTED} empty='No Accepted Orders'/>;
+    const completed = <OrderList history status={OrderConstants.Status.COMPLETED} empty='No Completed Orders'/>;
+    const declined = <OrderList history status={OrderConstants.Status.DECLINED} empty='No Declined Orders'/>;
 
     const tabSetup = {
-      Received: received,
       Completed: completed,
-      Progress: progress,
-      tabs: ['Received', 'Progress', 'Completed']
+      Declined: declined,
+      tabs: ['Completed', 'Declined']
     };
 
     return (
       <div className='full flex vertical'>
-        <TabbedPane spread style={{background: 'rgba(0,0,0,0.7)'}}
-                    onChange={tab => this._handleTabChange(tab)} {...tabSetup}/>
+        <TabbedPane spread style={{background: 'rgba(0,0,0,0.7)'}} {...tabSetup}/>
         <div style={{padding: '0px 20px', background: 'rgba(0,0,0,0.7)', minHeight: 45}}>
           <div className='floater'>
             <div className='flex'>

@@ -1,7 +1,7 @@
 import BasicConsole from 'scribe-js/dist/reader/BasicConsole';
 import ToJSON2 from 'scribe-js/dist/transform/ToJSON2';
 import ErrorExtractor from 'scribe-js/dist/transform/ErrorExtractor';
-import fetch from './fetch';
+import fetch from './fetch.es6';
 import config from './config';
 import {format} from 'url';
 

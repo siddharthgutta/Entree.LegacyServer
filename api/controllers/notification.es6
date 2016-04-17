@@ -72,7 +72,7 @@ export async function validate(id) {
     const {tokens} = await SocketTokens.findOne(id);
     await validateTokens(tokens, token => SocketTokens.removeToken(id, token));
   } catch (e) {
-    console.tag('notification', 'validate').error(e);
+    // console.tag('notification', 'validate').warn(e);
   }
 }
 
@@ -176,8 +176,6 @@ export async function notify(id, channel, data) {
 
   try {
     const {tokens} = await SocketTokens.findOne(id);
-
-    console.log(tokens);
 
     for (const token of tokens) {
       Client.volatile(token, channel, data);

@@ -53,10 +53,26 @@ router.post('/socket', isAuthenticated, async(req, res) => {
 
 router.get('/orders', isAuthenticated, async(req, res) => {
   const {id} = req.user;
+  const {Status} = Order.OrderModel;
 
   // TODO verify the restaurant! check if GOD and return all
   try {
-    const orders = await Order.OrderModel.findByRestaurant(id, Order.OrderModel.RestaurantReadableStatuses);
+    const orders = await Order.OrderModel
+                              .findByRestaurant(id, [Status.RECEIVED_PAYMENT, Status.ACCEPTED, Status.READY]);
+    res.ok({orders}).debug('Found orders');
+  } catch (e) {
+    res.fail(e.message).debug(e, 'Could not find orders');
+  }
+});
+
+
+router.get('/orders/history', isAuthenticated, async(req, res) => {
+  const {id} = req.user;
+  const {Status} = Order.OrderModel;
+
+  // TODO verify the restaurant! check if GOD and return all
+  try {
+    const orders = await Order.OrderModel.findByRestaurant(id, [Status.COMPLETED, Status.DECLINED]);
     res.ok({orders}).debug('Found orders');
   } catch (e) {
     res.fail(e.message).debug(e, 'Could not find orders');

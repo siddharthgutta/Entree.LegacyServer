@@ -16,7 +16,7 @@ export function initErrorHandling() {
   useSourceOnError();
 }
 
-export function initScribe(override = true, stdOnly = false) {
+export function initScribe(override = true, stdOnly = false, callSite = true) {
   const id = config.get('AppId');
   const port = config.get('Server.port');
   const env = config.get('NodeEnv');
@@ -77,6 +77,9 @@ export function initScribe(override = true, stdOnly = false) {
       ]
     },
     module: {
+      'transform/Inspector': {
+        callsite: callSite
+      },
       'writer/SocketIO': {
         server,
         options: {secure: true}

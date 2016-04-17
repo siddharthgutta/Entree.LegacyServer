@@ -6,11 +6,6 @@ import _ from 'underscore';
 
 export {Status};
 
-const RestaurantReadableStatuses = [Status.RECEIVED_PAYMENT, Status.ACCEPTED, Status.DECLINED,
-  Status.COMPLETED, Status.READY];
-
-export {RestaurantReadableStatuses};
-
 // TODO move to controllers/restaurant
 export async function findByRestaurant(restaurantId, statuses = []) {
   const {Restaurant, Order} = models;

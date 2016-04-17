@@ -2,7 +2,7 @@ import React from 'react';
 import Influx from 'react-influx';
 import {findDOMNode} from 'react-dom';
 import {onClick, type} from '../../libs/utils';
-import fetch from '../../libs/fetch';
+import fetch from '../../libs/fetch.es6';
 import Messenger from './../../components/Messenger';
 
 const me = {
