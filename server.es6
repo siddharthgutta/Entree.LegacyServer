@@ -9,6 +9,7 @@ import compression from 'compression';
 import BasicRouter from './routes/basic.es6';
 import ApiRouter from './routes/api.es6';
 import TwilioRouter from './routes/twilio.es6';
+import FBMessengerRouter from './routes/fb-messenger.es6';
 import {Router, Middleware} from 'scribe-js';
 import BraintreeRouter from './routes/braintree.es6';
 import * as fs from 'fs';
@@ -42,6 +43,7 @@ app.use(express.static(path.join(__dirname, 'public'))); // points app to public
 app.use('/', BasicRouter);
 app.use('/api', ApiRouter);
 app.use('/twilio', TwilioRouter);
+app.use('/fbmessenger', FBMessengerRouter);
 app.use('/braintree', BraintreeRouter);
 
 export default server;
