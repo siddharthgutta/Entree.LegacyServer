@@ -4,7 +4,7 @@ import BrainTree from 'braintree-web';
 import querystring from 'querystring';
 import fetch from '../../libs/fetch';
 import Card from 'react-credit-card';
-import MaskedInput from 'react-maskedinput';
+import InputElement from 'react-input-mask';
 
 const Status = {
   OK: Symbol(),
@@ -100,7 +100,7 @@ class App extends Influx.Component {
               <form target='no-forward' id='payment-form' method='POST'
                     action={`api/v2/user/profile/${token || secret}`}>
                 <div className='label'>Phone</div>
-                <MaskedInput className='input disabled' name='phoneNumber' onChange={noop}
+                <InputElement className='input disabled' name='phoneNumber' onChange={noop}
                              disabled mask='111-111-1111' value={`${user.phoneNumber}`}/>
                 <div className='label'>Email</div>
                 <input className='input' name='email' value={user.email}
@@ -125,17 +125,17 @@ class App extends Influx.Component {
                 <input hidden data-braintree-name='cardholder_name' onChange={noop}
                        value={`${user.first || ''} ${user.last || ''}`}/>
                 <div className='label'>Card Number</div>
-                <MaskedInput autoComplete='cc-number' className='input' data-braintree-name='number'
-                             mask='1111 1111 1111 1111' placeholder='0000 0000 0000 0000' placeholderChar=' '
-                             onChange={a => this.setState({number: a.target.value})} value={this.state.number || ''}/>
+                <InputElement autoComplete='cc-number' className='input' data-braintree-name='number'
+                             mask='9999 9999 9999 9999' placeholder='0000 0000 0000 0000' maskChar=' '
+                             onChange={e => this.setState({number: e.target.value})} value={this.state.number || ''}/>
                 <div className='label'>CSV</div>
-                <MaskedInput autoComplete='cc-csc' className='input' data-braintree-name='cvv' placeholder='123'
-                             placeholder='CVV' mask='1111' placeholderChar=' '
-                             onChange={a => this.setState({cvv: a.target.value})} value={this.state.cvv || ''}/>
+                <InputElement autoComplete='cc-csc' className='input' data-braintree-name='cvv'
+                             placeholder='CVV' mask='9999' maskChar=' '
+                             onChange={e => this.setState({cvv: e.target.value})} value={this.state.cvv || ''}/>
                 <div className='label'>Expiration</div>
-                <MaskedInput autoComplete='cc-exp' className='input' data-braintree-name='expiration_date'
-                             placeholder='MM/YY' mask='11/11' placeholderChar=' '
-                             onChange={a => this.setState({expiry: a.target.value})} value={this.state.expiry || ''}/>
+                <InputElement autoComplete='cc-exp' className='input' data-braintree-name='expiration_date'
+                             placeholder='MM/YY' mask='99/99' maskChar=' '
+                             onChange={e => this.setState({expiry: e.target.value})} value={this.state.expiry || ''}/>
                 <button className='button' type='submit' style={{margin: 0}}>
                   <span className='icon lock' style={{marginRight: 5}}/>Submit
                 </button>

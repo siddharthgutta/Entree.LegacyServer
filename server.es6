@@ -4,6 +4,7 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import https from 'https';
+import http from 'http';
 import config from 'config';
 import compression from 'compression';
 import BasicRouter from './routes/basic.es6';
@@ -22,7 +23,7 @@ const ssl = {
   rejectUnauthorized: config.get('Server.httpsRejectUnauthorized')
 };
 
-const server = https.createServer(ssl, app);
+const server = config.get('Server.protocol') === 'https' ? https.createServer(ssl, app) : http.createServer(app);
 
 app.set('views', path.join(__dirname, 'views'));  // points app to location of the views
 app.set('view engine', 'jade');                   // sets the view engine to jade
