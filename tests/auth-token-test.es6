@@ -1,12 +1,8 @@
 import assert from 'assert';
-import {clearDatabase, disconnectDatabase} from './test-init.es6';
+import {clearDatabase} from './test-init.es6';
 import * as AuthToken from '../api/authToken.es6';
 
-beforeEach(async () => {
-  await clearDatabase();
-});
-
-after(() => disconnectDatabase());
+beforeEach(() => clearDatabase());
 
 describe('Message', () => {
   if (console) {

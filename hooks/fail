@@ -57,9 +57,9 @@ curl -X POST -H 'Content-type: application/json' \
      --data "$payload" https://hooks.slack.com/services/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
 
 
-echo "${output}" > Entree_Out.txt
+clean=$(printf "$output")
 
-curl -F file=@Entree_Out.txt \
+curl -F content="$clean" \
      -F channels=\#continous3 \
      -F mode=snippet \
      -F token=xoxp-16957148439-17257626929-35351887127-493fceaec8 \

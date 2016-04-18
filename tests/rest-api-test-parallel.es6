@@ -1,4 +1,4 @@
-import {doneAt, clearDatabase} from './test-init.es6';
+import {doneAt} from './test-init.es6';
 import assert from 'assert';
 import RESTaurant from '../asr/libs/RESTaurant.es6';
 import {OrderConstants} from '../api/constants/client.es6';
@@ -12,8 +12,7 @@ let order;
 
 const getTotalPrice = items => items.reduce((memo, i) => memo + i.price, 0);
 
-before(async () => clearDatabase());
-after(async () => api.disconnect());
+after(() => api.disconnect());
 
 function assertOrderUpdatedEvent(baseOrder, _order, status) {
   assert.equal(baseOrder.id, _order.id);
@@ -26,7 +25,7 @@ function assertRestaurantUpdatedEvent(_restaurant, enabled = true) {
   assert.equal(enabled, _restaurant.enabled);
 }
 
-describe('should test the front-end rest api connector', () => {
+describe('Rest API', () => {
   it('should create a test restaurant', async () => {
     const {body: {data}} = await fetch(`${SERVER_URL}/api/v2/test/generate/restaurant`);
     restaurant = data.restaurant;

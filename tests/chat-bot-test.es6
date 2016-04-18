@@ -1,5 +1,5 @@
 import assert from 'assert';
-import {clearDatabase, disconnectDatabase} from './test-init.es6';
+import {clearDatabase} from './test-init.es6';
 import {isEmpty} from '../libs/utils.es6';
 import {DefaultChatBot, chatStates, response} from '../libs/chat-bot/index.es6';
 import * as User from '../api/user.es6';
@@ -41,7 +41,7 @@ describe('ChatBot', () => {
    * which has two modifications */
   async function setupRestaurant() {
     const restaurant = (await Restaurant.create(restaurantName,
-      restaurantHandle, password, mode, {phoneNumber})).resolve();
+                                                restaurantHandle, password, mode, {phoneNumber})).resolve();
     await restaurant.upsertLocation(address, city, addrState, zipcode);
     await restaurant.addHour(dayOfTheWeek, openTime, closeTime);
 
@@ -92,13 +92,10 @@ describe('ChatBot', () => {
     }
   }
 
-  beforeEach(done => {
-    clearDatabase()
-      .then(() => setupRestaurant())
-      .then(() => done());
+  beforeEach(async () => {
+    await clearDatabase();
+    await setupRestaurant();
   });
-
-  after(() => disconnectDatabase());
 
   if (console) {
     console.log('true');

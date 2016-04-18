@@ -1,15 +1,10 @@
 import assert from 'assert';
-import {clearDatabase, disconnectDatabase} from './test-init.es6';
+import {clearDatabase} from './test-init.es6';
 import * as User from '../api/user.es6';
 import * as Order from '../api/controllers/order.es6';
 import * as Restaurant from '../api/controllers/restaurant.es6';
 
-beforeEach(done => {
-  clearDatabase()
-    .then(() => done());
-});
-
-after(() => disconnectDatabase());
+beforeEach(() => clearDatabase());
 
 describe('ChatState', () => {
   const phoneNumber = '1234567890';
@@ -30,40 +25,40 @@ describe('ChatState', () => {
   describe('#insertChatState()', () => {
     it('should set a chat state correctly', done => {
       User.create(phoneNumber, name, email)
-        .then(user => user.insertChatState(state))
-        .then(chatState => {
-          assert.equal(chatState.state, state);
-          done();
-        });
+          .then(user => user.insertChatState(state))
+          .then(chatState => {
+            assert.equal(chatState.state, state);
+            done();
+          });
     });
 
     it('should not set a chat state with null state', done => {
       User.create(phoneNumber, name, email)
-        .then(user => user.insertChatState(null))
-        .then(() => {
-          assert(false);
-          done();
-        })
-        .catch(() => {
-          assert(true);
-          done();
-        });
+          .then(user => user.insertChatState(null))
+          .then(() => {
+            assert(false);
+            done();
+          })
+          .catch(() => {
+            assert(true);
+            done();
+          });
     });
 
     it('should not set a chat state when one exists for the user already', done => {
       let user;
       User.create(phoneNumber, name, email)
-        .then(_user => user = _user)
-        .then(() => user.insertChatState(state))
-        .then(() => user.insertChatState(state))
-        .then(() => {
-          assert(false);
-          done();
-        })
-        .catch(() => {
-          assert(true);
-          done();
-        });
+          .then(_user => user = _user)
+          .then(() => user.insertChatState(state))
+          .then(() => user.insertChatState(state))
+          .then(() => {
+            assert(false);
+            done();
+          })
+          .catch(() => {
+            assert(true);
+            done();
+          });
     });
   });
 
@@ -71,13 +66,13 @@ describe('ChatState', () => {
     it('should find the chat state correctly,', done => {
       let user;
       User.create(phoneNumber, name, email)
-        .then(_user => user = _user)
-        .then(() => user.insertChatState(state))
-        .then(() => user.findChatState())
-        .then(chatState => {
-          assert.equal(chatState.state, state);
-          done();
-        });
+          .then(_user => user = _user)
+          .then(() => user.insertChatState(state))
+          .then(() => user.findChatState())
+          .then(chatState => {
+            assert.equal(chatState.state, state);
+            done();
+          });
     });
 
     it('should return null if there is no chat state', async done => {
@@ -171,8 +166,10 @@ describe('ChatState', () => {
 
   describe('#setOrderContext()', () => {
     it('should set the order context correctly', async () => {
-      const restaurant = (await Restaurant.RestaurantModel.create('Rest1',
-        'rest1', 'test', Restaurant.RestaurantModel.Mode.GOD)).resolve();
+      const restaurant =
+        (await Restaurant
+          .RestaurantModel
+          .create('Rest1', 'rest1', 'test', Restaurant.RestaurantModel.Mode.GOD)).resolve();
       const user = await User.create(phoneNumber, name, email);
       const chatState = await user.insertChatState(state);
       const order1 = await Order.createOrder(user.id, restaurant.id, [

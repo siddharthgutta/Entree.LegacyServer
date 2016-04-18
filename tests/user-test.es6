@@ -10,9 +10,7 @@ const TWILIO_FROM_NUMBER = config.get('Twilio.production.number');
 const port = config.get('Server.port');
 const server = supertest.agent(`https://localhost:${port}`);
 
-beforeEach(async() => {
-  await clearDatabase();
-});
+beforeEach(() => clearDatabase());
 
 describe('User', () => {
   const firstName = 'TestUser';

@@ -1,5 +1,5 @@
 import './test-init.es6';
-import {clearDatabase, disconnectDatabase} from './test-init.es6';
+import {clearDatabase} from './test-init.es6';
 import config from 'config';
 import assert from 'assert';
 import * as SocketToken from '../api/socketToken.es6';
@@ -12,14 +12,10 @@ const port = config.get('Server.port');
 const SERVER_URL = `https://localhost:${port}/api/v1`;
 const server = supertest.agent(SERVER_URL);
 
-beforeEach(async () => {
-  await clearDatabase();
-});
+beforeEach(() => clearDatabase());
 
 const runProductionTests = false;
 const productionPhoneNumber = '2149664948';
-
-after(() => disconnectDatabase());
 
 describe('Messenger Tests', () => {
   describe('/token endpoint', () => {
