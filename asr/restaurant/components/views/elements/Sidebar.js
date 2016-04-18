@@ -43,6 +43,13 @@ class Sidebar extends Influx.Component {
     this.setState({restaurant});
   }
 
+  async _handlePageToggle(active, path) {
+    this.setState({active});
+    this.context.history.push(path);
+
+    Dispatcher.emit(Dispatcher.Events.MENU_VISIBILITY, false);
+  }
+
   render() {
     const {restaurant} = this.state;
     const orders = restaurant.Orders;
@@ -84,10 +91,10 @@ class Sidebar extends Influx.Component {
             </div>
           </div>
           <div className={ifcat('item', {selected: this.state.active === 'orders'})}
-            {...onClick(() => this.setState({active: 'orders'}) || this.context.history.push('/orders'))}>ORDERS
+            {...onClick(() => this._handlePageToggle('orders', '/orders'))}>ORDERS
           </div>
           <div className={ifcat('item', {selected: this.state.active === 'history'})}
-            {...onClick(() => this.setState({active: 'history'}) || this.context.history.push('/history'))}
+            {...onClick(() => this._handlePageToggle('history', '/history'))}
                style={{marginBottom: 10}}>HISTORY
           </div>
           <div className='big-button' {...onClick(() => Dispatcher.emit(Dispatcher.Events.LOGOUT))}>SIGN OUT</div>
