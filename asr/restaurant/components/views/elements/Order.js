@@ -2,6 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import {ifcat, onClick} from '../../../../libs/utils';
 import {OrderConstants} from '../../../../../api/constants/client.es6';
+import OrderStore from '../../../stores/OrderStore';
 
 class Order extends React.Component {
   static propTypes = {
@@ -46,7 +47,7 @@ class Order extends React.Component {
         <div className='id box flex left'>{order.id2}</div>
         <div className='box flex left'>
           <div>
-            <div className='name'>{order.User.firstName || 'Mathew'}</div>
+            <div className='name'>{OrderStore.getFirstName(order)}</div>
             <div className='date'>{date}</div>
           </div>
         </div>

@@ -6,6 +6,8 @@ import EventEmitter from 'events';
 
 const emitter = new EventEmitter();
 const events = {};
+const forceSound = true;
+
 let notifySound;
 
 export function addStoredEventListener(event, callback) {
@@ -93,7 +95,7 @@ export function notify(title, text, sound = true) {
 
       window.cordova.plugins.notification.local.schedule(notification);
 
-      if (sound && getPlatform() === 'ios') {
+      if (forceSound || sound && getPlatform() === 'ios') {
         notifySound.play();
       }
     }

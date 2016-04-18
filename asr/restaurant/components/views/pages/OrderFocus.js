@@ -95,7 +95,7 @@ class OrderFocus extends Page {
     const {order} = this.state;
     const {history} = this.props;
 
-    Dispatcher.emit(Dispatcher.Events.REQUEST_HEADER, order ? order.User.firstName : 'Loading',
+    Dispatcher.emit(Dispatcher.Events.REQUEST_HEADER, order ? OrderStore.getFirstName(order) : 'Loading',
                     order ? `#${order.id}` : '...', {
                       style: {minHeight: 55},
                       leftIcon: 'evil-icon back',
@@ -210,7 +210,9 @@ class OrderFocus extends Page {
           <div className='desc'>ID</div>
         </div>
         <div className='box flex left vertical small info'>
-          <div className='value'>{`${order.User.firstName} ${order.User.lastName}`}</div>
+          <div className='value'>
+            {`${OrderStore.getFirstName(order)} ${OrderStore.getLastName(order)}`}
+          </div>
           <div className='desc'>NAME</div>
         </div>
         <div className='box flex left vertical small info hide'>

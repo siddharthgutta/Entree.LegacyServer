@@ -186,6 +186,22 @@ class OrderStore extends Influx.Store {
     return order.Items.reduce((memo, item) => item.price + memo, 0) / 100;
   }
 
+  getFirstName(order) {
+    if (order) {
+      return order.User ? order.User.firstName || 'None' : 'Deleted';
+    }
+
+    return '';
+  }
+
+  getLastName(order) {
+    if (order) {
+      return order.User ? order.User.lastName || 'None' : 'Deleted';
+    }
+
+    return '';
+  }
+
   getConnectionStatus() {
     return this.data.status;
   }
