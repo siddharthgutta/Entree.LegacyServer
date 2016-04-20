@@ -4,7 +4,8 @@ import keyMirror from 'keymirror';
 
 export const Mode = keyMirror({
   REGULAR: 'REGULAR',
-  GOD: 'GOD'
+  GOD: 'GOD',
+  UNAVAILABLE: 'UNAVAILABLE'
 });
 
 // TODO @jesse can you add timeModes to restaurantHours?
