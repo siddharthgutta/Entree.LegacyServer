@@ -166,20 +166,6 @@ describe('User', () => {
           });
     });
 
-    it('should not create Users that have null phoneNumber', done => {
-      User.create(null, firstName, email)
-          .then(user => {
-            user.destroy()
-                .then(() => {
-                  assert(false);
-                  done();
-                });
-          }, err => {
-            assert.equal(err.errors.length, 1);
-            done();
-          });
-    });
-
     it('should not create Users with invalid email  format', done => {
       User.create(phoneNumber, {firstName, email: 'NotValidEmail'})
           .then(user => {
