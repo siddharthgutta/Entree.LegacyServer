@@ -7,7 +7,7 @@ import {isEmpty} from '../libs/utils.es6';
 import * as User from '../api/user.es6';
 import * as Restaurant from '../api/restaurant.es6';
 import assert from 'assert';
-import {clearDatabase, disconnectDatabase} from './test-init.es6';
+import {clearDatabase} from './test-init.es6';
 import _ from 'underscore';
 import braintree from 'braintree';
 import config from 'config';
@@ -22,11 +22,7 @@ const port = config.get('Server.port');
 const serverUrl = `https://localhost:${port}`;
 const server = supertest.agent(serverUrl);
 
-beforeEach(done => {
-  clearDatabase().then(() => done());
-});
-
-after(() => disconnectDatabase());
+beforeEach(() => clearDatabase());
 
 describe('Braintree', () => {
   describe('#generateClientToken', () => {
@@ -98,6 +94,7 @@ describe('Braintree', () => {
       function calculateServiceFee(orderTotal) {
         return Math.round(orderTotal * percentageFee / 100 + transactionFee);
       }
+
       const authorizedAmount = 100000; // $1000 or 100,000 cents
       const processorDeclinedAmount = 300000; // $3000 or 300,000 cents
       const gatewayRejectedAmount = 500100; // $5001.00 or 500,100 cents
@@ -297,7 +294,7 @@ describe('Braintree', () => {
         await Braintree.registerPaymentForUser(userId, validNonce);
         const defaultPayment = await Braintree.getCustomerDefaultPayment(userId);
         const transaction = await Braintree.paymentWithToken(userId, restaurantId,
-          defaultPayment.token, authorizedAmount);
+                                                             defaultPayment.token, authorizedAmount);
         assert.deepEqual((authorizedAmount / 100), parseFloat(transaction.amount));
         assert.deepEqual((calculateServiceFee(authorizedAmount) / 100), parseFloat(transaction.serviceFeeAmount));
         assert.deepEqual('submitted_for_settlement', transaction.status);
@@ -309,7 +306,7 @@ describe('Braintree', () => {
         await Braintree.registerPaymentForUser(userId, validNonce);
         const defaultPayment = await Braintree.getCustomerDefaultPayment(userId);
         const transaction = await Braintree.paymentWithToken(userId, restaurantId,
-          defaultPayment.token, authorizedAmount);
+                                                             defaultPayment.token, authorizedAmount);
         assert.deepEqual((authorizedAmount / 100), parseFloat(transaction.amount));
         assert.deepEqual((calculateServiceFee(authorizedAmount) / 100), parseFloat(transaction.serviceFeeAmount));
         assert.deepEqual('submitted_for_settlement', transaction.status);
@@ -325,7 +322,7 @@ describe('Braintree', () => {
         await Braintree.registerPaymentForUser(userId, validNonce);
         const defaultPayment = await Braintree.getCustomerDefaultPayment(userId);
         const transaction = await Braintree.paymentWithToken(userId, restaurantId,
-          defaultPayment.token, authorizedAmount);
+                                                             defaultPayment.token, authorizedAmount);
         assert.deepEqual((authorizedAmount / 100), parseFloat(transaction.amount));
         assert.deepEqual((calculateServiceFee(authorizedAmount) / 100), parseFloat(transaction.serviceFeeAmount));
         assert.deepEqual('submitted_for_settlement', transaction.status);
@@ -430,9 +427,9 @@ describe('Braintree', () => {
 
     it('should fail when not send signature or payload', done => {
       server
-      .post(`/braintree/webhooks`)
-      .send({})
-      .expect(500, done);
+        .post(`/braintree/webhooks`)
+        .send({})
+        .expect(500, done);
     });
 
     it('should fail with subscription since not implemented yet', async done => {

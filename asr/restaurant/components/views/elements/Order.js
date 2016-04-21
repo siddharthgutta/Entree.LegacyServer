@@ -2,10 +2,11 @@ import React from 'react';
 import moment from 'moment';
 import {ifcat, onClick} from '../../../../libs/utils';
 import {OrderConstants} from '../../../../../api/constants/client.es6';
+import OrderStore from '../../../stores/OrderStore';
 
 class Order extends React.Component {
-
   static propTypes = {
+    relative: React.PropTypes.bool,
     order: React.PropTypes.object
   };
 
@@ -37,14 +38,17 @@ class Order extends React.Component {
       bgBlue: order.status === OrderConstants.Status.RECEIVED_PAYMENT
     };
 
+    const date = this.props.relative ?
+      moment(order.createdAt).fromNow() : moment(order.createdAt).format('h:mm A');
+
     return (
       <div className='order flex' style={{height: 80}}
         {...onClick(() => history.push(`order/${order.id}`))}>
         <div className='id box flex left'>{order.id2}</div>
         <div className='box flex left'>
           <div>
-            <div className='name'>{order.User.firstName || 'Mathew'}</div>
-            <div className='date'>{moment(order.createdAt).format('h:mm A')}</div>
+            <div className='name'>{OrderStore.getFirstName(order)}</div>
+            <div className='date'>{date}</div>
           </div>
         </div>
         <div className='cost box flex center'>{cost.toFixed(2)}</div>

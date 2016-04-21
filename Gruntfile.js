@@ -151,7 +151,7 @@ module.exports = grunt => {
       },
       builds: {
         files: {
-          'cordova/build/Entree.apk': 'cordova/platforms/android/build/outputs/apk/android-debug.apk',
+          'cordova/build/Entree.apk': 'cordova/platforms/android/build/outputs/apk/android-release.apk',
           'cordova/build/Entree.ipa': 'cordova/platforms/ios/build/device/Entree.ipa'
         }
       }
@@ -212,7 +212,8 @@ module.exports = grunt => {
         }
       },
       'cordova-build': {
-        command: ['cd cordova', 'cordova build ios --device', 'cordova build android'].join(' && '),
+        command: ['cd cordova', 'cordova build ios --device',
+          'cordova build android --release --buildConfig=build.json'].join(' && '),
         options: {
           execOptions: {
             maxBuffer: Number.MAX_SAFE_INTEGER

@@ -4,7 +4,7 @@ import keyMirror from 'keymirror';
 import {format} from 'url';
 import config from '../../libs/config';
 import {SocketEvents} from '../../../api/constants/client.es6';
-import RESTaurant from '../../libs/RESTaurant';
+import RESTaurant from '../../libs/RESTaurant.es6';
 import _ from 'underscore';
 import * as env from '../../libs/env';
 
@@ -13,7 +13,8 @@ export const Events = keyMirror({
   READY: null,
   ORDER_RECEIVED: null,
   ORDER_UPDATED: null,
-  RESTAURANT_UPDATED: null
+  RESTAURANT_UPDATED: null,
+  HISTORY_UPDATED: null
 });
 
 export const Status = keyMirror({
@@ -31,6 +32,7 @@ class OrderStore extends Influx.Store {
 
     this.data = {
       orders: [],
+      history: [],
       status: Status.DISCONNECTED,
       restaurant: new RESTaurant(SERVER_URL, localStorage.getItem('token'))
     };
@@ -157,6 +159,13 @@ class OrderStore extends Influx.Store {
     return restaurant;
   }
 
+  async fetchOrderHistory(status) {
+    const history = await this.data.restaurant.history(status);
+    this.data.history = history;
+    this.emit(Events.HISTORY_UPDATED, history);
+    return this.data.history;
+  }
+
   async setRestaurantEnabled(enabled) {
     return await this.data.restaurant.enabled(enabled);
   }
@@ -165,12 +174,32 @@ class OrderStore extends Influx.Store {
     return await this.data.restaurant.order(id, status, {prepTime, message});
   }
 
+  getHistory(status) {
+    return status ? this.data.history.filter(order => order.status === status) : this.data.history;
+  }
+
   getOrders(status) {
     return status ? this.data.orders.filter(order => order.status === status) : this.data.orders;
   }
 
   getTotalCost(order) {
     return order.Items.reduce((memo, item) => item.price + memo, 0) / 100;
+  }
+
+  getFirstName(order) {
+    if (order) {
+      return order.User ? order.User.firstName || 'None' : 'Deleted';
+    }
+
+    return '';
+  }
+
+  getLastName(order) {
+    if (order) {
+      return order.User ? order.User.lastName || 'None' : 'Deleted';
+    }
+
+    return '';
   }
 
   getConnectionStatus() {

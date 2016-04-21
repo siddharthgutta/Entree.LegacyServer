@@ -4,11 +4,13 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import https from 'https';
+import http from 'http';
 import config from 'config';
 import compression from 'compression';
 import BasicRouter from './routes/basic.es6';
 import ApiRouter from './routes/api.es6';
 import TwilioRouter from './routes/twilio.es6';
+import FBMessengerRouter from './routes/fb-messenger.es6';
 import {Router, Middleware} from 'scribe-js';
 import BraintreeRouter from './routes/braintree.es6';
 import * as fs from 'fs';
@@ -21,7 +23,7 @@ const ssl = {
   rejectUnauthorized: config.get('Server.httpsRejectUnauthorized')
 };
 
-const server = https.createServer(ssl, app);
+const server = config.get('Server.protocol') === 'https' ? https.createServer(ssl, app) : http.createServer(app);
 
 app.set('views', path.join(__dirname, 'views'));  // points app to location of the views
 app.set('view engine', 'jade');                   // sets the view engine to jade
@@ -42,6 +44,7 @@ app.use(express.static(path.join(__dirname, 'public'))); // points app to public
 app.use('/', BasicRouter);
 app.use('/api', ApiRouter);
 app.use('/twilio', TwilioRouter);
+app.use('/fbmessenger', FBMessengerRouter);
 app.use('/braintree', BraintreeRouter);
 
 export default server;

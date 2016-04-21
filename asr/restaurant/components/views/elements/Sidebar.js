@@ -1,15 +1,19 @@
 import React from 'react';
 import Influx from 'react-influx';
-import {onClick} from '../../../../libs/utils';
+import {onClick, ifcat} from '../../../../libs/utils';
 import Dispatcher from '../../../dispatchers/Dispatcher';
 import OrderStore, {Status} from '../../../stores/OrderStore';
 import Checkbox from '../general/Checkbox';
 
 class Sidebar extends Influx.Component {
+  static contextTypes = {
+    history: React.PropTypes.object
+  };
+
   constructor(context, props) {
     super(context, props);
 
-    this.state = {restaurant: {}};
+    this.state = {restaurant: {}, active: 'orders'};
   }
 
   getListeners() {
@@ -37,6 +41,13 @@ class Sidebar extends Influx.Component {
     const _restaurant = await OrderStore.setRestaurantEnabled(enabled);
     restaurant.enabled = _restaurant.enabled;
     this.setState({restaurant});
+  }
+
+  async _handlePageToggle(active, path) {
+    this.setState({active});
+    this.context.history.push(path);
+
+    Dispatcher.emit(Dispatcher.Events.MENU_VISIBILITY, false);
   }
 
   render() {
@@ -79,8 +90,13 @@ class Sidebar extends Influx.Component {
                         onChange={e => this._handleToggle(e.target.checked)}/>
             </div>
           </div>
-          <div className='item selected' {...onClick(() => this.context.history.push('/orders'))}>ORDERS</div>
-          <div className='item' style={{marginBottom: 10}}>HISTORY</div>
+          <div className={ifcat('item', {selected: this.state.active === 'orders'})}
+            {...onClick(() => this._handlePageToggle('orders', '/orders'))}>ORDERS
+          </div>
+          <div className={ifcat('item', {selected: this.state.active === 'history'})}
+            {...onClick(() => this._handlePageToggle('history', '/history'))}
+               style={{marginBottom: 10}}>HISTORY
+          </div>
           <div className='big-button' {...onClick(() => Dispatcher.emit(Dispatcher.Events.LOGOUT))}>SIGN OUT</div>
         </div>
       </div>

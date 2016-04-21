@@ -43,26 +43,26 @@ describe('Twilio SMS Receive', () => {
   describe('/receive endpoint', () => {
     it('should fail validation for complex request', done => {
       server
-      .post(`/twilio/receive`)
-      .set(TWILIO_SIGNATURE.key, TWILIO_SIGNATURE.value)
-      .send(REAL_RECEIVE_BODY)
-      .expect('Content-type', 'text/plain; charset=utf-8')
-      .expect(403, done);
+        .post(`/twilio/receive`)
+        .set(TWILIO_SIGNATURE.key, TWILIO_SIGNATURE.value)
+        .send(REAL_RECEIVE_BODY)
+        .expect('Content-type', 'text/plain; charset=utf-8')
+        .expect(403, done);
     });
 
     it('should fail validation for simple request', done => {
       server
-      .post(`/twilio/receive`)
-      .send({})
-      .expect('Content-type', 'text/plain; charset=utf-8')
-      .expect(403, done);
+        .post(`/twilio/receive`)
+        .send({})
+        .expect('Content-type', 'text/plain; charset=utf-8')
+        .expect(403, done);
     });
   });
 
   describe('/fallback endpoint', () => {
     beforeEach(done => {
       clearDatabase()
-      .then(() => done());
+        .then(() => done());
     });
 
     /*
@@ -98,18 +98,18 @@ describe('Twilio SMS Receive', () => {
 
       socket.once('connect', () => {
         server
-        .post(`/twilio/fallback`)
-        .set(TWILIO_SIGNATURE.key, TWILIO_SIGNATURE.value)
-        .send(REAL_RECEIVE_BODY)
-        .expect('Content-type', 'text/xml; charset=utf-8')
-        .expect(200)
-        .end(err => {
-          if (err) {
-            // If expected error occurs, test is good
-            console.tag(global.TEST).log(err);
-            expect().fail('Error response returned');
-          }
-        });
+          .post(`/twilio/fallback`)
+          .set(TWILIO_SIGNATURE.key, TWILIO_SIGNATURE.value)
+          .send(REAL_RECEIVE_BODY)
+          .expect('Content-type', 'text/xml; charset=utf-8')
+          .expect(200)
+          .end(err => {
+            if (err) {
+              // If expected error occurs, test is good
+              console.tag(global.TEST).log(err);
+              expect().fail('Error response returned');
+            }
+          });
       });
     });
   });

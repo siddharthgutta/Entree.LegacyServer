@@ -5,6 +5,7 @@ import models from '../models/mysql/index.es6';
  */
 
 import {Mode} from '../models/mysql/restaurant.es6';
+import {Status} from './order.es6';
 export {Mode};
 
 /**
@@ -106,7 +107,7 @@ export async function findOneWithMetaData(id, ...metadata) {
     case MetaData.ORDER_SUMMARY:
       query.include = [{
         model: Order,
-        where: {status: {$in: ['ACCEPTED', 'COMPLETED']}},
+        where: {status: {$in: [Status.ACCEPTED, Status.READY, Status.COMPLETED]}},
         attributes: [
           ['id', 'orderId'],
           [sequelize.fn('SUM', sequelize.col('price')), 'netPrice'],

@@ -96,6 +96,10 @@
       "masterMerchantAccountId": "entree"
     }
   },
+  "Facebook": {
+    "verify_token": "cd99a72486b8b63f3e81ec121534f7df43d15553330a900744a3ff243413df69",
+    "page_access_token": "CAAYMNarix14BAF8lQF5ZCA8ft0DL0WT2j1CLdspLdexSqdxKyRFwrjPfpx5ed8kZBHZAZA19R5yqntULDXCobFg8c4KYD5NVZAgpi92g5RG5jE1qxRF0GhVYdkLZAq0wgph7eD3WcyTozTgW5ghP1SDQNxEabuFmdNjDZC4uqvrpHti7Xurkr8dBUlRT8BQjl8BZBNMbGvbHGAZDZD"
+  },
   "MySQL": {
     "username": "root",
     "password": "123456",
@@ -104,7 +108,7 @@
     "clearOnStart": false,
     "dialect": "mysql",
     "logging": true,
-    "revision": "r11"
+    "revision": "r12"
   },
   "MongoDb": {
     "clearOnStart": false,

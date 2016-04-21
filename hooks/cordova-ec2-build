@@ -24,9 +24,9 @@ sshpass -p ${password} ssh -o StrictHostKeyChecking=no -p ${port} ${username}@${
         cordova prepare
         cordova prepare ios
         cordova prepare android
-        cordova build android
+        cordova build android --release --buildConfig=build.json
         cordova build ios --device\""
-sshpass -p ${password} scp -o StrictHostKeyChecking=no -P ${port} ${username}@${hostname}:~/Github/builds/${dir}/cordova/platforms/android/build/outputs/apk/android-debug.apk ../cordova/build/Entree.apk
+sshpass -p ${password} scp -o StrictHostKeyChecking=no -P ${port} ${username}@${hostname}:~/Github/builds/${dir}/cordova/platforms/android/build/outputs/apk/android-release.apk ../cordova/build/Entree.apk
 sshpass -p ${password} scp -o StrictHostKeyChecking=no -P ${port} ${username}@${hostname}:~/Github/builds/${dir}/cordova/platforms/ios/build/device/Entree.ipa ../cordova/build/Entree.ipa
 rm ${dir}.zip
 
@@ -57,4 +57,4 @@ android_url=$(echo ${android_raw} | sed 's/.*"download_url": "\(.*\)", "size".*/
 
 payload=$(echo "{\"channel\":\"#continous3\",\"text\":\"*$branch*\n\`\`\`$message\`\`\`\n*iOS*\n$ios_url\n*Android*\n$android_url\"}")
 
-curl -X POST -H 'Content-type: application/json' --data "$payload" https://hooks.slack.com/services/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
+curl -X POST -H 'Content-type: application/json' --data "$payload" https://hooks.slack.com/services/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

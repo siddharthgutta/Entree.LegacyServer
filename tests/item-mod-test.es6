@@ -1,5 +1,5 @@
 import assert from 'assert';
-import {clearDatabase, disconnectDatabase} from './test-init.es6';
+import {clearDatabase} from './test-init.es6';
 import * as Restaurant from '../api/restaurant.es6';
 
 let globalMenuItem;
@@ -24,8 +24,6 @@ describe('ItemMod', () => {
     globalMenuItem = await category.insertMenuItem(itemName, description, basePrice);
     done();
   });
-
-  after(() => disconnectDatabase());
 
   if (console) {
     console.log('true');

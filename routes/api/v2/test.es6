@@ -11,7 +11,13 @@ import {format} from 'url';
 const router = new Router();
 const chance = new Chance();
 
-async function createTestUser() {
+async function url() {
+  const _address = config.get('Server');
+  _address.hostname = await Runtime.hostname();
+  return format(_address);
+}
+
+export async function createTestUser() {
   const phone = Math.floor(Math.random() * 10000000000).toString();
 
   return await User.UserModel.create(phone, {
@@ -21,26 +27,47 @@ async function createTestUser() {
   });
 }
 
-async function url() {
-  const _address = config.get('Server');
-  _address.hostname = await Runtime.hostname();
-  return format(_address);
-}
-
-async function createTestRestaurant() {
+export async function createTestRestaurant() {
   const name = chance.word();
   return await Restaurant.RestaurantModel.create(name, name.replace(/[^0-9a-zA-Z]/g, '').toLowerCase(),
                                                  'test', Restaurant.RestaurantModel.Mode.GOD);
 }
 
-async function fetchToken(id, password) {
+export async function createTestToken(id) {
+  const {handle, password} = await Restaurant.RestaurantModel.findOne(id);
   const address = await url();
   const {body: {data: {token}}} = await fetch(`${address}/api/v2/restaurant/login`, {
     method: 'post',
-    body: {id, password}
+    body: {id: handle, password}
   });
 
   return token;
+}
+
+export async function createTestOrder(userId, restaurantId, items = [
+  {
+    name: 'Cheeseburger',
+    price: 650,
+    quantity: 1,
+    description: 'good drink'
+  }, {
+    name: 'Republican',
+    price: 738,
+    quantity: 2,
+    description: 'great drink'
+  }, {
+    name: 'Fountain Drink',
+    price: 105,
+    quantity: 2,
+    description: 'great drink'
+  }
+]) {
+  return await Order.createOrder(userId, restaurantId, items);
+}
+
+export async function markTestOrderAsReceived(id) {
+  await Order.setOrderStatus(id, Order.Status.RECEIVED_PAYMENT,
+                             {transactionId: chance.integer({min: 100000, max: 999999})});
 }
 
 router.get('/generate/user', async (req, res) => {
@@ -57,10 +84,11 @@ router.get('/generate/restaurant/:name*?', async (req, res) => {
   const {mode} = String(req.query.mode).toUpperCase() === Restaurant.RestaurantModel.Mode.GOD ?
     Restaurant.RestaurantModel.Mode.GOD : Restaurant.RestaurantModel.Mode.REGULAR;
   const restaurant =
-    await Restaurant.RestaurantModel.create(name, name.replace(/[^0-9a-zA-Z]/g, '').toLowerCase(), 'test', mode);
+    await Restaurant.RestaurantModel.create(name, name.replace(/[^0-9a-zA-Z]/g, '').toLowerCase(),
+                                            'test', mode, {phoneNumber: '9999999999'});
   const {id, password} = restaurant;
   const address = await url();
-  const token = await fetchToken(id, password);
+  const token = await createTestToken(id, password);
 
   restaurant.close = `${address}/api/v2/test/restaurant/${id}/enabled?enabled=false`;
   restaurant.open = `${address}/api/v2/test/restaurant/${id}/enabled?enabled=true`;
@@ -73,25 +101,6 @@ router.get('/generate/restaurant/:name*?', async (req, res) => {
 
 router.get('/generate/order/:id*?', async (req, res) => {
   try {
-    const items = [
-      {
-        name: 'Cheeseburger',
-        price: 650,
-        quantity: 1,
-        description: 'good drink'
-      }, {
-        name: 'Republican',
-        price: 738,
-        quantity: 2,
-        description: 'great drink'
-      }, {
-        name: 'Fountain Drink',
-        price: 105,
-        quantity: 2,
-        description: 'great drink'
-      }
-    ];
-
     const {id} = req.params;
     let restaurant;
 
@@ -102,13 +111,12 @@ router.get('/generate/order/:id*?', async (req, res) => {
     }
 
     const user = await createTestUser();
-    const order = await Order.createOrder(user.id, restaurant.id, items);
-    const creds = `&id=${restaurant.id}&password=${restaurant.password}`;
+    const order = await createTestOrder(user.id, restaurant.id);
     const address = await url();
 
-    order.accept = `${address}/api/v2/test/order/${order.id}/status?status=ACCEPTED${creds}`;
-    order.decline = `${address}/api/v2/test/order/${order.id}/status?status=DECLINED${creds}`;
-    order.paid = `${address}/api/v2/test/order/${order.id}/status?status=RECEIVED_PAYMENT${creds}`;
+    order.accept = `${address}/api/v2/test/order/${order.id}/status?status=ACCEPTED&id=${restaurant.id}`;
+    order.decline = `${address}/api/v2/test/order/${order.id}/status?status=DECLINED&id=${restaurant.id}`;
+    order.paid = `${address}/api/v2/test/order/${order.id}/status?status=RECEIVED_PAYMENT&id=${restaurant.id}`;
 
     res.ok({order});
   } catch (e) {
@@ -124,8 +132,7 @@ router.get('/order/:id/status', async (req, res) => {
 
   try {
     try {
-      await Order.setOrderStatus(id, Order.Status.RECEIVED_PAYMENT,
-                                 {transactionId: chance.integer({min: 100000, max: 999999})});
+      await markTestOrderAsReceived(id);
     } catch (e) {
       if (status === Order.Status.RECEIVED_PAYMENT) {
         throw e;
@@ -139,7 +146,7 @@ router.get('/order/:id/status', async (req, res) => {
       return res.ok(order);
     }
 
-    const token = await fetchToken(restaurantId, password);
+    const token = await createTestToken(restaurantId, password);
     const {body: {data}} = await fetch(`${address}/api/v2/restaurant/order/${id}/status`, {
       method: 'post',
       body: {token, status, prepTime, message}
@@ -158,7 +165,7 @@ router.get('/restaurant/:id/enabled', async (req, res) => {
   const address = await url();
 
   try {
-    const token = await fetchToken(id, restaurant.password);
+    const token = await createTestToken(id, restaurant.password);
     const {body: {data}} = await fetch(`${address}/api/v2/restaurant/enabled`, {
       method: 'post',
       body: {token, enabled}

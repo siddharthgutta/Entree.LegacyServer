@@ -1,13 +1,8 @@
+import {clearDatabase} from './test-init.es6';
 import assert from 'assert';
-import {clearDatabase, disconnectDatabase} from './test-init.es6';
 import * as Message from '../api/message.es6';
 
-beforeEach(done => {
-  clearDatabase()
-  .then(() => done());
-});
-
-after(() => disconnectDatabase());
+beforeEach(() => clearDatabase());
 
 describe('Message', () => {
   if (console) {

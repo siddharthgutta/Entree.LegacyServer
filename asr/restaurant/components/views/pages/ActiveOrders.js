@@ -10,7 +10,7 @@ import {OrderConstants} from '../../../../../api/constants/client.es6';
 
 const Modals = keyMirror({FEEDBACK: null});
 
-class OrderPager extends Page {
+class ActiveOrders extends Page {
   constructor(context, props) {
     super(context, props);
 
@@ -35,7 +35,7 @@ class OrderPager extends Page {
   }
 
   renderHeader() {
-    Dispatcher.emit(Dispatcher.Events.REQUEST_HEADER, 'Order', 'History', {
+    Dispatcher.emit(Dispatcher.Events.REQUEST_HEADER, 'Orders', 'Active', {
       style: {minHeight: 55, borderBottom: 'none'},
       leftIcon: 'evil-icon menu',
       onLeftClick: () => Dispatcher.emit(Dispatcher.Events.MENU_VISIBILITY)
@@ -73,4 +73,4 @@ class OrderPager extends Page {
   }
 }
 
-export default OrderPager;
+export default ActiveOrders;

@@ -6,7 +6,7 @@ import {_disconnect as disconnectPubSub} from '../api/controllers/notification.e
 
 initErrorHandling();
 
-const console = initScribe(true, true);
+const console = initScribe(true, true, false);
 
 console.persistent('tags', []);
 global.TEST = path.basename(stack()[7].getFileName());
@@ -24,6 +24,18 @@ export async function clearDatabase() {
 }
 
 export {disconnectDatabase};
+
+export function doneAt(done, at) {
+  let count = 0;
+
+  return () => {
+    if (++count === at) {
+      done();
+    } else {
+      return count;
+    }
+  };
+}
 
 before(async () => initDatabase()); // auto connect since most tests atm are model stressed
 after(() => disconnectPubSub());

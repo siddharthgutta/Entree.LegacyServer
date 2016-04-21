@@ -1,7 +1,7 @@
 import React from 'react';
 import Influx from 'react-influx';
 import {browserHistory, Router, Route, IndexRoute} from 'react-router';
-import OrderPager from './views/pages/OrderPager';
+import ActiveOrders from './views/pages/ActiveOrders';
 import OrderHistory from './views/pages/OrderHistory';
 import Login from './views/pages/Login';
 import OrderFocus from './views/pages/OrderFocus';
@@ -23,7 +23,7 @@ class App extends Influx.Component {
         <Route path='/' component={Board}>
           <IndexRoute component={Login}/>
           <Route path='login' component={Login}/>
-          <Route path='orders' component={OrderPager}/>
+          <Route path='orders' component={ActiveOrders}/>
           <Route path='history' component={OrderHistory}/>
           <Route path='order/:id' component={OrderFocus}/>
         </Route>

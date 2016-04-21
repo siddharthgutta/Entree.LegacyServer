@@ -1,13 +1,9 @@
 import assert from 'assert';
-import {clearDatabase, disconnectDatabase} from './test-init.es6';
+import {clearDatabase} from './test-init.es6';
 import * as SocketToken from '../api/socketToken.es6';
 import _ from 'underscore';
 
-beforeEach(done => {
-  clearDatabase().then(() => done());
-});
-
-after(() => disconnectDatabase());
+beforeEach(() => clearDatabase());
 
 describe('Message', () => {
   const restaurantId = 1;

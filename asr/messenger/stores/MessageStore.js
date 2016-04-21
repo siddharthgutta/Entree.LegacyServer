@@ -3,7 +3,7 @@ import Dispatcher from '../dispatchers/Dispatcher.js';
 import keyMirror from 'keymirror';
 import _ from 'underscore';
 import Chance from 'chance';
-import fetch from '../../libs/fetch';
+import fetch from '../../libs/fetch.es6';
 import io from 'socket.io-client';
 import {format} from 'url';
 import SocketEvents from '../../../api/constants/client.es6';

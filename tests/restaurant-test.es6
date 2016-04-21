@@ -1,15 +1,11 @@
 import assert from 'assert';
-import {clearDatabase, disconnectDatabase} from './test-init.es6';
+import {clearDatabase} from './test-init.es6';
 import * as Restaurant from '../api/restaurant.es6';
 import * as RestaurantHour from '../api/restaurantHour.es6';
 import * as Location from '../api/location.es6';
 import * as Category from '../api/category.es6';
 
-beforeEach(done => {
-  clearDatabase().then(() => done());
-});
-
-after(() => disconnectDatabase());
+beforeEach(() => clearDatabase());
 
 describe('Restaurant', () => {
   const name = 'TestRestaurant';
