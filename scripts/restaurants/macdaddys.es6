@@ -29,7 +29,7 @@ const transactionFee = 30;
 
 const restaurantName = 'Mac Daddy\'s';
 const restaurantHandle = 'macdaddys';
-const restaurantPass = 'mac&cheese';
+const restaurantPass = 'cheese';
 
 const profileImage = 'images/macdaddys.jpg';
 
