@@ -1,0 +1,11 @@
+{
+  "android": {
+    "release": {
+      "keystore": "entree-release.keystore",
+      "storePassword": "TextEntree1234!",
+      "alias": "entree",
+      "password": "TextEntree1234!",
+      "keystoreType": ""
+    }
+  }
+}
