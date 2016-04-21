@@ -79,7 +79,7 @@
     "react-dom": "0.14.7",
     "react-fastclick": "2.0.0",
     "react-influx": "1.1.5",
-    "react-maskedinput": "3.1.2",
+    "react-input-mask": "0.6.6",
     "react-prefixr": "0.1.0",
     "react-router": "1.0.3",
     "react-tap-event-plugin": "0.2.1",
