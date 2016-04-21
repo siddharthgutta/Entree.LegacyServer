@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+# This script is for running the producer onboarding scripts
+# Run this with
+# branch-off trigger onboardProducer <release | manual> <script>
+
+# Ex:
+# branch-off trigger onboardProducer release scripts/restaurants/austinhabibi.compiled.js
+
+# Splits arguments passed in, into an array
+IFS=', ' read -r -a argArray <<< "$@"
+nodeArgs=${argArray[@]:2}
+echo "${argArray[@]:2}"
+
+# Echoing what script will run with what arguments
+echo "Running script: ${2} with $(($#-2)) arguments:"
+echo "[${argArray[@]:2}]"
+
+cd ../ && node ${2} ${argArray[@]:2}

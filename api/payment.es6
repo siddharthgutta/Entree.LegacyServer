@@ -76,6 +76,45 @@ export function parse(slackbot, btSignature, btPayload, test = false) {
             resolve({message: webhookNotification.message, kind: webhookNotification.kind,
               errors: webhookNotification.errors});
             break;
+          case braintree.WebhookNotification.Kind.Disbursement:
+            color = test ? color : 'good';
+            fields.push(Slack.generateField('Disbursement Status', `SUCCESS`));
+            fields.push(Slack.generateField('Amount',
+              `${webhookNotification.disbursement.amount}`));
+            fields.push(Slack.generateField('Disbursement Id',
+              `${webhookNotification.disbursement.id}`));
+            fields.push(Slack.generateField('Date of Disbursement',
+              `${webhookNotification.disbursement.disbursementDate}`));
+            fields.push(Slack.generateField('Transaction Ids',
+              `${webhookNotification.disbursement.transactionIds}`));
+            fields.push(Slack.generateField('Merchant Account Id',
+              `${webhookNotification.disbursement.merchantAccount}`));
+            fields.push(Slack.generateField('First Disbursement Attempt?',
+              `${!webhookNotification.disbursement.retry}`));
+            break;
+          case braintree.WebhookNotification.Kind.DisbursementException:
+            color = test ? color : 'danger';
+            fields.push(Slack.generateField('Disbursement Status',
+              `${webhookNotification.disbursement.exceptionMessage}`));
+            fields.push(Slack.generateField('Amount',
+              `${webhookNotification.disbursement.amount}`));
+            fields.push(Slack.generateField('Disbursement Id',
+              `${webhookNotification.disbursement.id}`));
+            fields.push(Slack.generateField('Date of Disbursement',
+              `${webhookNotification.disbursement.disbursementDate}`));
+            fields.push(Slack.generateField('Transaction Ids',
+              `${webhookNotification.disbursement.transactionIds}`));
+            fields.push(Slack.generateField('Merchant Account Id',
+              `${webhookNotification.disbursement.merchantAccount}`));
+            fields.push(Slack.generateField('First Disbursement Attempt?',
+              `${!webhookNotification.disbursement.retry}`));
+            fields.push(Slack.generateField('Follow Up Action',
+              `${webhookNotification.disbursement.followUpAction}`));
+            fields.push(Slack.generateField('Reason for Failed Disbursement',
+              `${webhookNotification.disbursement.disbursementDate}`));
+            break;
+          case braintree.WebhookNotification.Kind.TransactionDisbursed:
+          // Deprecated by Braintree
           default:
             color = test ? color : '#3aa3e3';
             msg += `Notification Type: ${webhookNotification.kind}`;
