@@ -3,7 +3,6 @@ import Dispatcher from '../dispatchers/Dispatcher.js';
 import keyMirror from 'keymirror';
 import {format} from 'url';
 import config from '../../libs/config';
-import {SocketEvents} from '../../../api/constants/client.es6';
 import RESTaurant from '../../libs/RESTaurant.es6';
 import _ from 'underscore';
 import * as env from '../../libs/env';
@@ -69,7 +68,7 @@ class OrderStore extends Influx.Store {
       env.setBackground(false);
     });
 
-    restaurant.on(SocketEvents.NEW_ORDER, order => {
+    restaurant.on(RESTaurant.Events.NEW_ORDER, order => {
       this._addOrder(order);
       this.emit(Events.ORDER_RECEIVED, order);
 
@@ -78,13 +77,13 @@ class OrderStore extends Influx.Store {
       env.notify(`New Order Received`, `Order #${order.id2}: ${order.User.firstName} paid $${cost}`);
     });
 
-    restaurant.on(SocketEvents.ORDER_UPDATE, order => {
+    restaurant.on(RESTaurant.Events.ORDER_UPDATE, order => {
       this._addOrder(order);
       this.emit(Events.ORDER_UPDATED, order);
       // env.notify('Updated order', `From ${order.User.firstName}`);
     });
 
-    restaurant.on(SocketEvents.RESTAURANT_UPDATED, _restaurant => {
+    restaurant.on(RESTaurant.Events.RESTAURANT_UPDATED, _restaurant => {
       this.emit(Events.RESTAURANT_UPDATED, _restaurant);
     });
 
