@@ -32,11 +32,11 @@ export const response = {
   invalidRestaurantHandle: 'Sorry, we don\'t recognize that restaurant handle. Please try again.',
 
   restaurantDisabled: producer => `Sorry, ${producer.name} is currently closed and not accepting orders.` +
-    ` To start looking at other restaurants type \"/clear\".`,
+    ` To start looking at other food trucks type \"clear\".`,
 
   existingOrder: 'Sorry, you cannot make another order while your current one is being processed.',
 
-  finishSecondSignup: url => `Finish checking out at ${url} or type \"/clear\" to clear your cart to` +
+  finishSecondSignup: url => `Finish checking out at ${url} or type \"clear\" to clear your cart to` +
     ` use additional commands`,
 
   /* Returned when user tries to execute context command while not in restaurant context */
@@ -46,14 +46,14 @@ export const response = {
   finishItem: 'Please finish selecting your item before doing that',
 
   /* Returned when user checks out with empty cart */
-  invalidCheckout: 'You can\'t checkout with an empty cart. Try typing \"/r\" to see restaurants to choose from',
+  invalidCheckout: 'You can\'t checkout with an empty cart. Try typing \"trucks\" to see food trucks to choose from',
 
-  cartClear: 'Your cart has been cleared. Type \"/menu\" to view the menu or \"/r\" for more restaurants',
+  cartClear: 'Your cart has been cleared. Type \"menu\" to view the menu or \"trucks\" for more food trucks',
 
   /* I/O formatting for transition to various states */
   restaurant: {
     header: 'Here are our recommended food trucks.',
-    footer: 'Type the number of a restaurant or type \"/help\" at any time for help.'
+    footer: 'Type the number of a food truck or type \"/help\" at any time for help.'
   },
 
   categories: {
@@ -63,7 +63,7 @@ export const response = {
   },
 
   items: {
-    footer: 'Type a number for an item you want or type \"/menu\" to see the full menu',
+    footer: 'Type a number for an item you want or type \"menu\" to see the full menu',
     dataFormat: async (i, data) => `${i + 1}) ${data[i].name}: $${(data[i].basePrice / 100).toFixed(2)}` +
     `${data[i].description === '' ? '' : `\n--  ${data[i].description.toLowerCase()}`}`
   },
@@ -74,13 +74,13 @@ export const response = {
 
   cart: {
     header: 'Here is your cart',
-    footer: 'Type \"/checkout\" to finish and pay, \"/menu\" to browse the menu, ' +
-    'or \"/clear\" to clear your entire cart',
+    footer: 'Type \"checkout\" to finish and pay, \"menu\" to browse the menu, ' +
+    'or \"clear\" to clear your entire cart',
     dataFormat: async (i, data) => `${i + 1}) ${data[i].name} - $${(data[i].price / 100).toFixed(2)}`
   },
 
   help: 'Here is a list of commands:\n' +
-  '\"/r\" - lists restaurants\n' +
+  '\"trucks\" - lists restaurants\n' +
   '\"@<restaurant name>\" - view restaurant\n' +
   '\"@<restaurant name> menu\" - view menu\n' +
   '\"@<restaurant name> info\" - view hours and restaurant information\n' +
@@ -192,7 +192,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
 
     /* Case where user has to second sign up and uses some other command other than clear */
-    if (chatState.state === chatStates.secondSignup && input !== '/clear') {
+    if (chatState.state === chatStates.secondSignup && input !== 'clear') {
       let secret;
       try {
         secret = await User.UserModel.findUserSecret(user.id);
@@ -586,9 +586,9 @@ export default class DefaultChatBot extends ChatBotInterface {
     }
 
     switch (true) {
-      case /^\/checkout$/.test(input):
+      case /^checkout$/.test(input):
         return await this._handleCheckout(chatState);
-      case /^\/menu$/.test(input):
+      case /^menu$/.test(input):
         return await this._handleContextMenu(chatState, restaurant);
       case /^\/info$/.test(input):
         return await this._handleContextInfo(chatState, restaurant);
@@ -620,8 +620,8 @@ export default class DefaultChatBot extends ChatBotInterface {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to determine if user selected a category`, err);
     }
 
-    return /^\/checkout$/.test(input)
-      || /^\/menu$/.test(input)
+    return /^checkout$/.test(input)
+      || /^menu$/.test(input)
       || /^\/info$/.test(input)
       || isCategory;
   }
@@ -746,12 +746,12 @@ export default class DefaultChatBot extends ChatBotInterface {
    * @private
    */
   _isStateless(input) {
-    return /^\/r$/.test(input)
+    return /^trucks$/.test(input)
       || /^@[^ ]+$/.test(input)
       || /^@[^ ]+\ menu$/.test(input)
       || /^@.+\ info$/.test(input)
       || /^\/help$/.test(input)
-      || /^\/clear$/.test(input);
+      || /^clear$/.test(input);
   }
 
   /**
@@ -764,9 +764,9 @@ export default class DefaultChatBot extends ChatBotInterface {
    */
   async _statelessTransition(chatState, input) {
     switch (true) {
-      case /^\/r$/.test(input):
+      case /^trucks$/.test(input):
         return await this._handleRestaurant(chatState);
-      case /^\/clear$/.test(input):
+      case /^clear$/.test(input):
         return await this._handleClear(chatState);
       case /^@[^ ]+$/.test(input):
         return await this._handleAtRestaurant(chatState, input.substr(1));
@@ -783,7 +783,7 @@ export default class DefaultChatBot extends ChatBotInterface {
   }
 
   /**
-   * Handles chat bot of "/r" command
+   * Handles chat bot of "trucks" command
    *
    * @param {Object} chatState: input chat state object
    * @returns {String}: output of the transition
@@ -1045,7 +1045,7 @@ export default class DefaultChatBot extends ChatBotInterface {
         throw new TraceError(`ChatState id ${chatState.id} - Failed to find restaurant context`, err);
       }
 
-      return `Please finish ordering with ${restaurant.name} or clear your cart by typing \"/clear\" before` +
+      return `Please finish ordering with ${restaurant.name} or clear your cart by typing \"clear\" before` +
         ` browsing other restaurants`;
     }
 

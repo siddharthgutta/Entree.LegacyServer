@@ -14,7 +14,7 @@ console.log('Production: ', Runtime.isProduction());
 process.argv.forEach(async (val, index) => {
   // Skip node and the script name (index 0 and 1)
   if (index > 1) {
-    const logLine = `${index}: Transaction Release with id [${val}] to producer`;
+    const logLine = `${index - 1}: Transaction Release with id [${val}] to producer`;
     try {
       const transaction = await Payment.releasePaymentToProducer(val);
       console.log(transaction);

@@ -478,6 +478,7 @@ export async function releasePaymentToProducer(transactionId) {
   if (!result.success) {
     console.tag(logTags).error(`Failed to release transaction payment to producer`);
     console.tag(logTags).error(result.transaction);
+    throw result.transaction;
   }
   return result.transaction;
 }

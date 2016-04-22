@@ -302,6 +302,18 @@ describe('Braintree', () => {
         assert.deepEqual(voidedTransaction.status, 'voided');
       });
 
+      it('#registerPaymentForUser should be settleable', async () => {
+        await Braintree.registerPaymentForUser(userId, validNonce);
+        const defaultPayment = await Braintree.getCustomerDefaultPayment(userId);
+        const transaction = await Braintree.paymentWithToken(userId, restaurantId,
+          defaultPayment.token, authorizedAmount);
+        assert.deepEqual((authorizedAmount / 100), parseFloat(transaction.amount));
+        assert.deepEqual((calculateServiceFee(authorizedAmount) / 100), parseFloat(transaction.serviceFeeAmount));
+        assert.deepEqual('submitted_for_settlement', transaction.status);
+        const settledTransaction = await Braintree.setTestTransactionAsSettled(transaction.id);
+        assert.deepEqual('settled', settledTransaction.status);
+      });
+
       it('#refundPayment should successfully refund payment', async () => {
         await Braintree.registerPaymentForUser(userId, validNonce);
         const defaultPayment = await Braintree.getCustomerDefaultPayment(userId);
