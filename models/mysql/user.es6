@@ -5,7 +5,7 @@ export default function (sequelize, DataTypes) {
   const User = sequelize.define('User', {
     phoneNumber: {
       type: DataTypes.STRING(10), // eslint-disable-line new-cap,babel/new-cap
-      allowNull: false,
+      allowNull: true,
       unique: true,
       validate: {
         is: /^\d{10}$/
@@ -33,6 +33,11 @@ export default function (sequelize, DataTypes) {
       validate: {
         len: [1, 36]
       }
+    },
+    fbId: {
+      type: DataTypes.STRING(32), // eslint-disable-line new-cap
+      allowNull: true,
+      unique: true
     }
   }, {
     classMethods: {
@@ -42,6 +47,14 @@ export default function (sequelize, DataTypes) {
         });
 
         User.hasMany(_models.Order, {
+          onDelete: 'CASCADE'
+        });
+
+        User.hasMany(_models.WishList, {
+          onDelete: 'CASCADE'
+        });
+
+        User.hasMany(_models.UserLocation, {
           onDelete: 'CASCADE'
         });
       }
