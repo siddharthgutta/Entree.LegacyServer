@@ -112,7 +112,7 @@ export async function findOneWithMetaData(id, ...metadata) {
           ['id', 'orderId'],
           [sequelize.fn('SUM', sequelize.col('price')), 'netPrice'],
           [sequelize.fn('COUNT', sequelize.col('itemId')), 'netItemsCount'],
-          [sequelize.fn('COUNT', sequelize.col('orderId')), 'netCount']
+          [sequelize.literal('COUNT(DISTINCT(orderId))'), 'netCount']
         ],
         include: [{
           model: Item,

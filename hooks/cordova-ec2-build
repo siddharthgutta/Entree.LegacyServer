@@ -12,6 +12,8 @@ branch=${BRANCHOFF_BRANCH}
 version=$(echo $(npm version) | egrep -o "'(.*?)'" | sed -n 2p | sed 's/^.\(.*\).$/\1/')
 
 rm -rf ../cordova/build/ || true
+rm -rf ../public/Entree.apk || true
+rm -rf ../public/Entree.ipa || true
 mkdir -p ../cordova/build/
 zip -r ${dir}.zip ../cordova # TODO fix relative path issue
 sshpass -p ${password} scp -o StrictHostKeyChecking=no -P ${port} ${dir}.zip ${username}@${hostname}:~/Github/builds/

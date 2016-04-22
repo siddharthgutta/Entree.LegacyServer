@@ -69,6 +69,6 @@ cordova/build
 cordova/platforms
 cordova/plugins
 cordova/www
-dev/hook
+hooks/dev
 
 # iOS
