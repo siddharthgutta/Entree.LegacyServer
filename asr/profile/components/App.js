@@ -101,7 +101,7 @@ class App extends Influx.Component {
                     action={`api/v2/user/profile/${token || secret}`}>
                 <div className='label'>Phone</div>
                 <InputElement className='input disabled' name='phoneNumber' onChange={noop}
-                             disabled mask='111-111-1111' value={`${user.phoneNumber}`}/>
+                             disabled mask='999-999-9999' value={`${user.phoneNumber}`}/>
                 <div className='label'>Email</div>
                 <input className='input' name='email' value={user.email}
                        onChange={e => this._handleUpdate('email', e.target.value)}/>

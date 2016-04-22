@@ -13,6 +13,7 @@
     <allow-intent href="geo:*" />
     <platform name="android">
         <allow-intent href="market:*" />
+        <preference name="android-minSdkVersion" value="15"/>
         <icon src="www/images/app-icons/Icon-ldpi.png" density="ldpi" />
         <icon src="www/images/app-icons/Icon-mdpi.png" density="mdpi" />
         <icon src="www/images/app-icons/Icon-hdpi.png" density="hdpi" />
@@ -59,6 +60,9 @@
     <preference name="StatusBarStyle" value="lightcontent" />
     <engine name="ios" spec="~4.1.1" />
     <engine name="android" spec="~5.1.1" />
+    <plugin name="phonegap-plugin-push" spec="1.6.0">
+        <variable name="SENDER_ID" value="862006285691" />
+    </plugin>
     <plugin name="de.appplant.cordova.plugin.local-notification" spec="~0.8.4" />
     <plugin name="cordova-plugin-statusbar" spec="~2.1.0" />
     <plugin name="cordova-plugin-background-mode" spec="~0.6.5" />
