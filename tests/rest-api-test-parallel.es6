@@ -20,7 +20,7 @@ function assertOrderUpdatedEvent(baseOrder, _order, status) {
 }
 
 function assertRestaurantUpdatedEvent(_restaurant, enabled = true) {
-  assert.equal(order.Items.length, _restaurant.Orders[0].netCount);
+  assert.equal(1, _restaurant.Orders[0].netCount);
   assert.equal(getTotalPrice(order.Items), _restaurant.Orders[0].netPrice);
   assert.equal(enabled, _restaurant.enabled);
 }

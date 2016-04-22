@@ -18,7 +18,7 @@ async function url() {
 }
 
 export async function createTestUser() {
-  const phone = Math.floor(Math.random() * 10000000000).toString();
+  const phone = (Date.now() + Math.floor(Math.random() * 5000)).toString().substr(-10);
 
   return await User.UserModel.create(phone, {
     firstName: chance.first(),
