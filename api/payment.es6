@@ -88,7 +88,7 @@ export function parse(slackbot, btSignature, btPayload, test = false) {
             fields.push(Slack.generateField('Transaction Ids',
               `${webhookNotification.disbursement.transactionIds}`));
             fields.push(Slack.generateField('Merchant Account Id',
-              `${webhookNotification.disbursement.merchantAccount}`));
+              `${webhookNotification.disbursement.merchantAccount.id}`));
             fields.push(Slack.generateField('First Disbursement Attempt?',
               `${!webhookNotification.disbursement.retry}`));
             break;
@@ -105,7 +105,7 @@ export function parse(slackbot, btSignature, btPayload, test = false) {
             fields.push(Slack.generateField('Transaction Ids',
               `${webhookNotification.disbursement.transactionIds}`));
             fields.push(Slack.generateField('Merchant Account Id',
-              `${webhookNotification.disbursement.merchantAccount}`));
+              `${webhookNotification.disbursement.merchantAccount.id}`));
             fields.push(Slack.generateField('First Disbursement Attempt?',
               `${!webhookNotification.disbursement.retry}`));
             fields.push(Slack.generateField('Follow Up Action',
