@@ -24,8 +24,6 @@ export const events = {
   delivery: 'Delivery'
 };
 
-export const orders = [];
-
 export const restaurants = [
   {
     title: 'Panera Bread',
@@ -96,6 +94,25 @@ export const menus = {
   ]
 };
 
+export const orders = [];
+
+export const menuItems = [
+  {
+    id: 1,
+    name: 'Cheese Burger',
+    description: 'Beef with Cheese',
+    price: 100,
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cheeseburger.jpg/1024px-Cheeseburger.jpg'
+  },
+  {
+    id: 2,
+    name: 'Pizza',
+    description: 'Pepperoni',
+    price: 100,
+    photoUrl: 'http://www.mysticpizza.com/admin/resources/pizza-pepperoni-w857h456.jpg'
+  }
+];
+
 export default class FbChatBot {
   constructor(msgPlatform) {
     this.msgPlatform = msgPlatform;
@@ -108,6 +125,18 @@ export default class FbChatBot {
       'new places to eat. We\'re currently in Beta, but press start to see what you can do with Entrée!');
     welcomeMessage.pushPostbackButton('Start', this._genPayload(actions.restaurant));
     msgPlatform.setWelcomeMessage(welcomeMessage.toJSON());
+  }
+
+  _genPayload(action, attachment = {}) {
+    return JSON.stringify({action, attachment});
+  }
+
+  _getAction(payload) {
+    return payload.action;
+  }
+
+  _getAttachment(payload) {
+    return payload.attachment;
   }
 
   /**
@@ -237,9 +266,9 @@ export default class FbChatBot {
 
           response = new GenericMessageData();
           const restaurant = this._getAttachment(payload).restaurant; // eslint-disable-line
-          const menuItems = menus[restaurant.title];
+          const restaurantMenuItems = menus[restaurant.title];
 
-          _.each(menuItems, item => {
+          _.each(restaurantMenuItems, item => {
             response.pushElement(item.title, item.subtitle, item.imageUrl);
             response.pushPostbackButton('Add to Cart', this._genPayload(actions.addItem, {item, restaurant}));
           });
