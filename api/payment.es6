@@ -165,7 +165,6 @@ async function handleParseResult(kind, result) {
       // Future Implementations of other Parse Result cases here
       break;
   }
-  return Promise.resolve(result);
 }
 
 /**
