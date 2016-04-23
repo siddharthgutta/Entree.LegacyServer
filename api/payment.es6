@@ -91,6 +91,7 @@ export function parse(slackbot, btSignature, btPayload, test = false) {
               `${webhookNotification.disbursement.merchantAccount.id}`));
             fields.push(Slack.generateField('First Disbursement Attempt?',
               `${!webhookNotification.disbursement.retry}`));
+            resolve({kind: webhookNotification.kind, result: webhookNotification.disbursement.transactionIds});
             break;
           case braintree.WebhookNotification.Kind.DisbursementException:
             color = test ? color : 'danger';
@@ -112,6 +113,7 @@ export function parse(slackbot, btSignature, btPayload, test = false) {
               `${webhookNotification.disbursement.followUpAction}`));
             fields.push(Slack.generateField('Reason for Failed Disbursement',
               `${webhookNotification.disbursement.disbursementDate}`));
+            resolve({kind: webhookNotification.kind, result: webhookNotification.merchantAccount});
             break;
           case braintree.WebhookNotification.Kind.TransactionDisbursed:
           // Deprecated by Braintree
