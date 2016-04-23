@@ -108,6 +108,10 @@ export default class FbChatBot {
     msgPlatform.setWelcomeMessage(welcomeMessage.toJSON());
   }
 
+  _genPayload(action, attachment = {}) {
+    return JSON.stringify({action, attachment});
+  }
+
   _getAction(payload) {
     return payload.action;
   }
