@@ -3,7 +3,8 @@ import fs from 'fs';
 import https from 'https';
 import config from 'config';
 import PubSub from './pubsub.es6';
-import TwilioRouter from './routers/twilio.es6';
+import TwilioRouter from './routes/twilio.es6';
+import './controller/gcm.es6';
 
 const port = config.get('Server.port');
 const offset = config.get('Server.portOffset');

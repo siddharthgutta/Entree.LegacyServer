@@ -22,6 +22,10 @@
     "token": "3cab9f01ad5ccc20c9ec6f63b92f33cb",
     "number": "+15125999985"
   },
+  "Google": {
+    "gcmApiKey": "AIzaSyCjjoBRgyyA9MAvcro8___UNQA_GOHdL1U",
+    "gcmSenderId": "862006285691"
+  },
   "Server": {
     "protocol": "https",
     "portOffset": 10000,
