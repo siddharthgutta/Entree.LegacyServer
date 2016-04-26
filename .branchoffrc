@@ -11,7 +11,10 @@
       "socket-master": 2999,
       "socket-test": 2997,
       "socket-shared": 2996,
-      "dev": 3030
+      "dev": 3030,
+      "kfu-dev": 3031,
+      "jlmao-dev": 3032,
+      "mkurian-dev": 3033
     }
   },
   "env": {

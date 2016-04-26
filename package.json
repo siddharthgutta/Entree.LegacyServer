@@ -23,7 +23,7 @@
     "babel-runtime": "6.5.0",
     "babelify": "https://github.com/bluejamesbond/babelify",
     "bluebird": "3.2.1",
-    "body-parser": "1.14.2",
+    "body-parser": "1.15.0",
     "brace": "0.7.0",
     "braintree": "1.36.0",
     "braintree-web": "2.21.0",
