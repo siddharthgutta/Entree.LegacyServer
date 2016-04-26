@@ -6,9 +6,9 @@ const key = config.get('Google.gcmApiKey');
 const sender = config.get('Google.gcmSenderId');
 let xcs;
 
-const castMessage = message => {
+const toXCSMessage = message => {
   if (message.mNotification) {
-    const notification = new Notification();
+    const notification = new Notification(message.mNotification.mIcon);
     Object.assign(notification, message.mNotification);
     message.mNotification = notification;
   }
@@ -23,7 +23,7 @@ PubSub.Slave.on('gcm-sender', (origin, data, respond) => respond(sender));
 
 PubSub.Slave.on('gcm-sendNoRetry', (origin, {message, to}, respond) => {
   console.log('Sending (no retry) GCM');
-  xcs.sendNoRetry(castMessage(message), to, result => {
+  xcs.sendNoRetry(toXCSMessage(message), to, result => {
     console.log(result);
     respond(result);
   });
@@ -31,7 +31,7 @@ PubSub.Slave.on('gcm-sendNoRetry', (origin, {message, to}, respond) => {
 
 PubSub.Slave.on('gcm-send', (origin, {message, to}, respond) => {
   console.log('Sending GCM');
-  xcs.send(castMessage(message), to, result => {
+  xcs.send(toXCSMessage(message), to, result => {
     console.log(result);
     respond(result);
   });
