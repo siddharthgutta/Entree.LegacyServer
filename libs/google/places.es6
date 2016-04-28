@@ -101,4 +101,6 @@ export default class GooglePlaces extends GoogleAPIStrategy {
 
     return url.toString();
   }
+
+
 }
