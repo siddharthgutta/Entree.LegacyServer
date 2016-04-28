@@ -255,7 +255,7 @@ export default class FbChatBot {
           response = new ReceiptMessageData(`${user.firstName} ${user.lastName}`,
             user.receiptCount.toString(), 'USD', 'Visa 2345');
 
-          response.pushElement(`${item.title} from ${restaurant.title}`, 1, item.price, 'USD', item.imageUrl,
+          response.pushElement(`${item.title} from ${restaurant.title}`, 1, item.price / 100, 'USD', item.imageUrl,
             item.subtitle);
           response.addSummary(item.price);
 
