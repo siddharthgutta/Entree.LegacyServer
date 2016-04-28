@@ -7,11 +7,7 @@ import * as Order from './order.es6';
 import * as User from './user.es6';
 import * as Payment from '../payment.es6';
 import * as Restaurant from './restaurant.es6';
-<<<<<<< HEAD
 import {MsgPlatform} from './messaging.es6';
-=======
-import MsgPlatform from './messaging.es6';
->>>>>>> Integrated with dispatcher
 
 const chatBot = new DefaultChatBot();
 const fbChatBot = new FbChatBot(MsgPlatform);
