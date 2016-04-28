@@ -94,6 +94,68 @@ export const menus = {
   ]
 };
 
+// TODO change to menu items later
+export const realMenuItems = {
+  0: [
+    {
+      title: 'Italian Combo On Ciabatta',
+      subtitle: 'roast beef, smoked turkey, ham, salami, swiss, peperoncini, lettuce, tomatoes, ' +
+        'onions & our special spread',
+      imageUrl: 'https://photos-3.dropbox.com/t/2/AAATAWGDXI2XCYRcwHk5SjAhLDw8Uo1GPzsKg_GxH6KeuA/12/347397651/jpeg/' +
+        '32x32/1/1461873600/0/2/italian%20combo%20on%20ciabatta.jpg/EODD3-UCGNi2ASACKAI/mO0HNlXZlR9NuzY3MT4XKz' +
+        'yolty8ozS1BcG65m3DRvc?size_mode=3&size=1600x1200',
+      price: 859
+    },
+    {
+      title: 'Roasted Turkey Fuji Apple Salad',
+      subtitle: 'mixed field greens, romaine, tomatoes, onions, pecans, gorgonzola, apple chips & white ' +
+        'balsamic fuji apple vinaigrette',
+      imageUrl: 'https://photos-1.dropbox.com/t/2/AAAJis8ILbOm9khtjwdUlI9Jcd26_pfTgE2tnsYeeHwXdA/12/347397651/jpeg/' +
+        '32x32/1/1461873600/0/2/roasted%20turkey%20apple%20fuji.jpg/EODD3-UCGNi2ASACKAI/0-R0X7Oj9NVJt-L6eVHNc-' +
+        'ix1Uil3hdYqX46f1N0YOw?size_mode=3&size=1600x1200',
+      price: 899
+    }
+  ],
+  1: [
+    {
+      title: 'Chicken Burrito',
+      subtitle: 'with brown rice, shredded cheese, pico de gallo, and guacamole',
+      imageUrl: 'https://photos-3.dropbox.com/t/2/AABINqRemD7X23Ob-btfz7kAZduNgatG7ZaXwACka2Jv7w/12/347397651/jpeg/' +
+        '32x32/1/1461873600/0/2/chicken%20burrito%20.jpg/EODD3-UCGNi2ASACKAI/W2xWqorFQeog8XX2JCiLJjZm5T15OjyuQ1QVr' +
+        'CS289o?size_mode=3&size=1600x1200',
+      price: 830
+    },
+    {
+      title: 'Vegetarian Bowl',
+      subtitle: 'with brown rice, vegetable fajitas, pico de gallo, sour cream, lettuce, and hot sauce',
+      imageUrl: 'https://photos-3.dropbox.com/t/2/AACZESjJFsqEfJnea2kF5QIKeN7yxqRB2hKyFpIJYctX_Q/12/347397651/jpeg/' +
+        '32x32/1/1461873600/0/2/veggie%20bowl.jpg/EODD3-UCGNi2ASACKAI/wBND0N8gspOt5Koz5rnaTuKfMoRuZHJtPfj_qpkVSac?' +
+        'size_mode=3&size=1600x1200',
+      price: 650
+    }
+  ],
+  2: [
+    {
+      title: 'The Original Kimchi Fries',
+      subtitle: 'choice of protein, caramelized kimchi, cheddar + monterey jack, onions, cilantro, ' +
+        'magic sauce, sesame seeds, sriracha',
+      imageUrl: 'https://photos-4.dropbox.com/t/2/AAAZbcJywEErqXxg1YcQB7dcxmszgirNAB1--l51X-E7BQ/12/347397651/jpeg/' +
+        '32x32/1/1461873600/0/2/kimchifries.jpg/EODD3-UCGNi2ASACKAI/HvIvd4r6-tP-RFM4dPq4zFWQgbB9l4YtrOugAEf7YkQ%' +
+        '2CCuIxQqnsRZrQQ6Ycl6WH_908PxRvNOMJqyqHej_d6dg?size_mode=3&size=1600x1200',
+      price: 749
+    },
+    {
+      title: 'Rice Bowl',
+      subtitle: 'lime buttered rice or brown rice, black beans, grilled corn, garden veggies, kimchi, ' +
+        'fried egg, house made salsa',
+      imageUrl: 'https://photos-5.dropbox.com/t/2/AADzLX4vLjYyynpQG3Cb1y_jxgmGaKeCGmxyjlA7fN44hg/12/347397651/jpeg/' +
+        '32x32/1/1461873600/0/2/ricebowl.jpg/EODD3-UCGNi2ASACKAI/b9jk0Y-N6BvRfBgZYa9yzOOMq9h9smhIKdQzaqdkskI?' +
+        'size_mode=3&size=1600x1200',
+      price: 749
+    }
+  ]
+};
+
 export default class FbChatBot {
   constructor(msgPlatform) {
     this.msgPlatform = msgPlatform;
