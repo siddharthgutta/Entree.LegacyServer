@@ -1,6 +1,6 @@
 /* eslint-disable */
 import Emitter, {Events} from '../events/index.es6';
-import {DefaultChatBot, chatStates} from '../../libs/chat-bot/index.es6';
+import {DefaultChatBot, chatStates, FbChatBot} from '../../libs/chat-bot/index.es6';
 import {sendSMS} from './sms.es6';
 import {resolve} from '../../models/index.es6';
 import * as Order from './order.es6';
@@ -9,6 +9,7 @@ import * as Payment from '../payment.es6';
 import * as Restaurant from './restaurant.es6';
 
 const chatBot = new DefaultChatBot();
+const fbChatBot = new FbChatBot();
 
 /**
  * Dispatcher to handle system events
@@ -149,3 +150,14 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
     throw Error(`UPDATED_ORDER text response for user ${user.id} is null`);
   }
 });
+
+Emitter.on(Events.MSG_RECEIVED, async event => {
+  try {
+    // Use Handle input here
+    // fbChatBot.handleInput(event);
+    console.tag('api', 'controllers', 'dispatcher', 'MSG_RECEIVED').log(event);
+  } catch (err) {
+    console.tag('api', 'controllers', 'dispatcher', 'MSG_RECEIVED').error(err, event);
+  }
+});
+

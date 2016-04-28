@@ -5,7 +5,7 @@ import {FBMessenger} from '../../libs/msg/messenger.es6';
 import config from 'config';
 import * as Runtime from '../../libs/runtime.es6';
 // import Promise from 'bluebird';
-// import Emitter, {Events} from '../events/index.es6';
+import Emitter, {Events} from '../events/index.es6';
 
 const productionOrSandbox = Runtime.isProduction();
 
@@ -38,10 +38,11 @@ const msgPlatform = new FBMessenger(facebookCreds.pageAccessToken, facebookCreds
   productionOrSandbox);
 console.tag('api', 'controllers', 'messaging').info('Initialized FB Messenger');
 
-/*
-msgPlatform.on(MsgPlatform.RECEIVED, async msg => {
+
+msgPlatform.on(FBMessenger.RECEIVED, async event => {
+  Emitter.emit(Events.MSG_RECEIVED, event);
 });
-*/
+
 
 /**
  * MsgPlatform strategy

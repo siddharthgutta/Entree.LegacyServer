@@ -170,6 +170,7 @@ export default class FBMessenger extends MsgPlatform {
         // Loop through each of the messaging events
         for (let j = 0; j < messagingEvents.length; j++) {
           const event = messagingEvents[j];
+          this._handleEvent(event);
           const sender = event.sender.id;
           if (event.postback) {
             // Postbacks are end calls to your webhook when buttons are tapped
