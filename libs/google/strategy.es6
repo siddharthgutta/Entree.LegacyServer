@@ -25,7 +25,7 @@ export default class GoogleAPIStrategy {
    * @param {Boolean} getResponse: return response instead of just body
    * @returns {Promise}: promise containing error or response body
    */
-  apiCall(url, method, qs, getResponse = false) {
+  apiCall(url, method, qs) {
     return new Promise((resolve, reject) => {
       request({
         url,
@@ -38,8 +38,7 @@ export default class GoogleAPIStrategy {
         } else if (response.body.error) {
           reject(response.body.error);
         } else {
-          if (getResponse) resolve(response);
-          else resolve(body);
+          resolve(body);
         }
       });
     });
