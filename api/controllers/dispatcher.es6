@@ -158,7 +158,6 @@ Emitter.on(Events.MSG_RECEIVED, async event => {
 
     const responses = await fbChatBot.handleInput(event);
     const sender = event.sender.id;
-    console.tag('api', 'controllers', 'dispatcher', 'RESPONSES').log(responses);
 
     for (let index in responses) {
       const message = responses[index].toJSON();

@@ -295,22 +295,17 @@ export default class FbChatBot {
         return [text, response];
       }
       case actions.confirmation: {
-        let textFirst, button;
+        let button;
         try {
           button = new ButtonMessageData('It\'s that easy! Now your reorder has been sent directly to the restaurant.' +
             ' With Entrée, we also notify you when your order is ready for pickup. All of these features are coming ' +
             'soon to your favorite restaurants. Click \'Continue\' to see what Entrée can do for you right now.');
           button.pushPostbackButton('Continue', this._genPayload(actions.search));
-          /*
-
-          textLast = new TextMessageData('In the meantime, tell us your three favorite restaurants. ' +
-            'We’ll notify you when you can order food or get a great deal there. Please separate them with a comma ' +
-            '(Ex: Chick-fil-a, In-n-out, Chipotle)'); */
         } catch (err) {
           throw new TraceError('Failed to generate continue message', err);
         }
 
-        return [textFirst, button];
+        return [button];
       }
       case actions.search: {
         let text;
