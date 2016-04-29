@@ -27,6 +27,6 @@ export default class GoogleMapsGeocoding extends GoogleAPIStrategy {
       'https://maps.googleapis.com/maps/api/geocode/json',
       'GET', {address: zipcode, key: this.apiKey}
     );
-    return responseBody.results.geometry.location;
+    return responseBody.results[0].geometry.location;
   }
 }

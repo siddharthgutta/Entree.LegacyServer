@@ -9,6 +9,7 @@ export default keyMirror({
   USER_PROFILE_UPDATED: null,
   UPDATED_ORDER: null,
   ORDER_PLACED: null,
-  USER_PAYMENT_REGISTERED: true
+  USER_PAYMENT_REGISTERED: true,
+  MSG_RECEIVED: null
 });
 // @formatter:on

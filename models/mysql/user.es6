@@ -38,6 +38,11 @@ export default function (sequelize, DataTypes) {
       type: DataTypes.STRING(32), // eslint-disable-line new-cap
       allowNull: true,
       unique: true
+    },
+    receiptCount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
     }
   }, {
     classMethods: {

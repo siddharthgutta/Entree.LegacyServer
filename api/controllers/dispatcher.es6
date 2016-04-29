@@ -1,14 +1,16 @@
 /* eslint-disable */
 import Emitter, {Events} from '../events/index.es6';
-import {DefaultChatBot, chatStates} from '../../libs/chat-bot/index.es6';
+import {DefaultChatBot, chatStates, FbChatBot} from '../../libs/chat-bot/index.es6';
 import {sendSMS} from './sms.es6';
 import {resolve} from '../../models/index.es6';
 import * as Order from './order.es6';
 import * as User from './user.es6';
 import * as Payment from '../payment.es6';
 import * as Restaurant from './restaurant.es6';
+import {MsgPlatform} from './messaging.es6';
 
 const chatBot = new DefaultChatBot();
+const fbChatBot = new FbChatBot(MsgPlatform);
 
 /**
  * Dispatcher to handle system events
@@ -149,3 +151,22 @@ Emitter.on(Events.UPDATED_ORDER, async order => {
     throw Error(`UPDATED_ORDER text response for user ${user.id} is null`);
   }
 });
+
+Emitter.on(Events.MSG_RECEIVED, async event => {
+  try {
+    console.tag('api', 'controllers', 'dispatcher', 'MSG_RECEIVED').log(event);
+
+    const responses = await fbChatBot.handleInput(event);
+    const sender = event.sender.id;
+    console.tag('api', 'controllers', 'dispatcher', 'RESPONSES').log(responses);
+
+    for (let index in responses) {
+      const message = responses[index].toJSON();
+      await MsgPlatform.sendMessageToId(sender, message);
+    }
+  } catch (err) {
+    console.tag('api', 'controllers', 'dispatcher', 'MSG_RECEIVED', 'ERROR').error(err);
+    console.tag('api', 'controllers', 'dispatcher', 'MSG_RECEIVED', 'EVENT').error(event);
+  }
+});
+

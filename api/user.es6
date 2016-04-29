@@ -29,6 +29,18 @@ export function create(phoneNumber, {firstName, lastName, email}) {
 }
 
 /**
+ * Create a user for fb messenger
+ *
+ * @param {string} fbId: FB messenger id for user
+ * @param {string} firstName: user first name
+ * @param {string} lastName: user last name
+ * @returns {Promise}: Returns the user object
+ */
+export async function createFbUser(fbId, firstName, lastName) {
+  return models.User.create({fbId, firstName, lastName});
+}
+
+/**
  * Find a user by id
  *
  * @param {string} userId: User id
@@ -82,6 +94,27 @@ export function findOneByPhoneNumber(phoneNumber) {
   return models.User.findOne({where: {phoneNumber}});
 }
 
+/**
+ * Find a user by facebook id
+ *
+ * @param {string} fbId: User phone number
+ * @returns {Promise}: Returns the user object
+ */
+export async function findOneByFbId(fbId) {
+  return await models.User.findOne({where: {fbId}});
+}
+
+/**
+ * Find a user's restaurant wish list
+ *
+ * @param {string} fbId: User's fb ID
+ * @returns {Promise}: Returns the user object
+ */
+export async function findWishList(fbId) {
+  const user = await models.User.findOne({where: {fbId}});
+  return await user.getWishLists();
+}
+
 
 /**
  * Create a secret id for a user
@@ -100,6 +133,25 @@ export async function createSecret(userId) {
 
     throw e;
   }
+}
+
+/**
+ * Adds a new location for a user, and sets it to the default location
+ *
+ * @param {String} fbId: fbid of user
+ * @param {Number} latitude: lat of location
+ * @param {Number} longitude: long of location
+ * @returns {Object} the UserLocation object added
+ */
+export async function addLocation(fbId, latitude, longitude) {
+  /* Set all other locations to be false */
+  await models.UserLocation.update({default: false}, {where: {fbId}});
+
+  const location = await models.UserLocation.create({latitude, longitude, default: true});
+  const user = await findOneByFbId(fbId);
+  await user.addUserLocation(location);
+
+  return location;
 }
 
 /**
