@@ -4,6 +4,7 @@
 
 import GoogleAPIStrategy from './strategy.es6';
 import URI from 'urijs';
+import google from 'googleapis';
 
 export default class GooglePlaces extends GoogleAPIStrategy {
   /**
@@ -14,6 +15,7 @@ export default class GooglePlaces extends GoogleAPIStrategy {
    */
   constructor(apiKey) {
     super(apiKey);
+    this.urlshortener = google.urlshortener({version: 'v1', auth: apiKey});
   }
 
   /**
@@ -101,6 +103,4 @@ export default class GooglePlaces extends GoogleAPIStrategy {
 
     return url.toString();
   }
-
-
 }
