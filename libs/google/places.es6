@@ -15,7 +15,6 @@ export default class GooglePlaces extends GoogleAPIStrategy {
    */
   constructor(apiKey) {
     super(apiKey);
-    this.urlshortener = google.urlshortener({version: 'v1', auth: apiKey});
   }
 
   /**
