@@ -162,7 +162,6 @@ Emitter.on(Events.MSG_RECEIVED, async event => {
 
     for (let index in responses) {
       const message = responses[index].toJSON();
-      console.tag('api', 'controllers', 'dispatcher', 'MSG_SENT').log(message);
       await MsgPlatform.sendMessageToId(sender, message);
     }
   } catch (err) {
