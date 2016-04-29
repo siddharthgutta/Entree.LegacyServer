@@ -52,14 +52,14 @@ export const menus = {
       subtitle: 'roast beef, smoked turkey, ham, salami, swiss, peperoncini, lettuce, tomatoes, ' +
         'onions & our special spread',
       imageUrl: 'https://i.imgur.com/QdQTJu9.jpg',
-      price: 8.59
+      price: 859
     },
     {
       title: 'Roasted Turkey Fuji Apple Salad',
       subtitle: 'mixed field greens, romaine, tomatoes, onions, pecans, gorgonzola, apple chips & white ' +
         'balsamic fuji apple vinaigrette',
       imageUrl: 'https://i.imgur.com/GCUzQNX.jpg',
-      price: 8.99
+      price: 899
     }
   ],
   'Chipotle': [ // eslint-disable-line quote-props
@@ -67,13 +67,13 @@ export const menus = {
       title: 'Chicken Burrito',
       subtitle: 'with brown rice, shredded cheese, pico de gallo, and guacamole',
       imageUrl: 'https://i.imgur.com/LEuvROh.jpg',
-      price: 8.30
+      price: 830
     },
     {
       title: 'Vegetarian Bowl',
       subtitle: 'with brown rice, vegetable fajitas, pico de gallo, sour cream, lettuce, and hot sauce',
       imageUrl: 'https://i.imgur.com/4lhY42l.jpg',
-      price: 6.50
+      price: 650
     }
   ],
   'Chi\'lantro': [
@@ -82,14 +82,14 @@ export const menus = {
       subtitle: 'choice of protein, caramelized kimchi, cheddar + monterey jack, onions, cilantro, ' +
         'magic sauce, sesame seeds, sriracha',
       imageUrl: 'https://i.imgur.com/XDda2St.jpg',
-      price: 7.49
+      price: 749
     },
     {
       title: 'Rice Bowl',
       subtitle: 'lime buttered rice or brown rice, black beans, grilled corn, garden veggies, kimchi, ' +
         'fried egg, house made salsa',
       imageUrl: 'https://i.imgur.com/KGjmUB0.jpg',
-      price: 7.49
+      price: 749
     }
   ]
 };
