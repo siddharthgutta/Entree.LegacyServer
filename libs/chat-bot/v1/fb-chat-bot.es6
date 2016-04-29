@@ -100,7 +100,7 @@ export default class FbChatBot {
   constructor(msgPlatform) {
     this.msgPlatform = msgPlatform;
 
-    // Delete a current conversation of Messenger (only on Desktop)
+    // Delete a current conversation of Messenger (only on Desktop Messenger)
     // Then, search for the bot you are trying to have a conversation with
     // Then, the welcome message should be shown
     /* Setup welcome message */
