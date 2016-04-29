@@ -155,25 +155,6 @@ export async function addLocation(fbId, latitude, longitude) {
 }
 
 /**
- * Adds a new location for a user, and sets it to the default location
- *
- * @param {String} fbId: fbid of user
- * @param {Number} latitude: lat of location
- * @param {Number} longitude: long of location
- * @returns {Object} the UserLocation object added
- */
-export async function addLocation(fbId, latitude, longitude) {
-  /* Set all other locations to be false */
-  await models.UserLocation.update({default: false}, {where: {fbId}});
-
-  const location = await models.UserLocation.create({latitude, longitude, default: true});
-  const user = await findOneByFbId(fbId);
-  await user.addUserLocation(location);
-
-  return location;
-}
-
-/**
  * Find a user by a secret id
  *
  * @param {string} secret: the secret id

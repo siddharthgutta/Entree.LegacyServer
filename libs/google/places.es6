@@ -4,7 +4,6 @@
 
 import GoogleAPIStrategy from './strategy.es6';
 import URI from 'urijs';
-import google from 'googleapis';
 
 export default class GooglePlaces extends GoogleAPIStrategy {
   /**
