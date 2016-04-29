@@ -52,14 +52,14 @@ export const menus = {
       subtitle: 'roast beef, smoked turkey, ham, salami, swiss, peperoncini, lettuce, tomatoes, ' +
         'onions & our special spread',
       imageUrl: 'https://i.imgur.com/QdQTJu9.jpg',
-      price: 859
+      price: 8.59
     },
     {
       title: 'Roasted Turkey Fuji Apple Salad',
       subtitle: 'mixed field greens, romaine, tomatoes, onions, pecans, gorgonzola, apple chips & white ' +
         'balsamic fuji apple vinaigrette',
       imageUrl: 'https://i.imgur.com/GCUzQNX.jpg',
-      price: 899
+      price: 8.99
     }
   ],
   'Chipotle': [ // eslint-disable-line quote-props
@@ -67,13 +67,13 @@ export const menus = {
       title: 'Chicken Burrito',
       subtitle: 'with brown rice, shredded cheese, pico de gallo, and guacamole',
       imageUrl: 'https://i.imgur.com/LEuvROh.jpg',
-      price: 830
+      price: 8.30
     },
     {
       title: 'Vegetarian Bowl',
       subtitle: 'with brown rice, vegetable fajitas, pico de gallo, sour cream, lettuce, and hot sauce',
       imageUrl: 'https://i.imgur.com/4lhY42l.jpg',
-      price: 650
+      price: 6.50
     }
   ],
   'Chi\'lantro': [
@@ -82,14 +82,14 @@ export const menus = {
       subtitle: 'choice of protein, caramelized kimchi, cheddar + monterey jack, onions, cilantro, ' +
         'magic sauce, sesame seeds, sriracha',
       imageUrl: 'https://i.imgur.com/XDda2St.jpg',
-      price: 749
+      price: 7.49
     },
     {
       title: 'Rice Bowl',
       subtitle: 'lime buttered rice or brown rice, black beans, grilled corn, garden veggies, kimchi, ' +
         'fried egg, house made salsa',
       imageUrl: 'https://i.imgur.com/KGjmUB0.jpg',
-      price: 749
+      price: 7.49
     }
   ]
 };
@@ -255,7 +255,7 @@ export default class FbChatBot {
           response = new ReceiptMessageData(`${user.firstName} ${user.lastName}`,
             user.receiptCount.toString(), 'USD', 'Visa 2345');
 
-          response.pushElement(`${item.title} from ${restaurant.title}`, 1, item.price / 100, 'USD', item.imageUrl,
+          response.pushElement(`${item.title} from ${restaurant.title}`, 1, item.price, 'USD', item.imageUrl,
             item.subtitle);
           response.addSummary(item.price);
 
