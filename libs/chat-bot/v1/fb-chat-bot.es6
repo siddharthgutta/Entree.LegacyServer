@@ -287,7 +287,7 @@ export default class FbChatBot {
 
           /* Need to format order again better */
           response = new GenericMessageData();
-          response.pushElement(restaurant.title, item.title);
+          response.pushElement(restaurant.title, item.title, restaurant.imageUrl);
           response.pushPostbackButton('Order Again', this._genPayload(actions.confirmation));
         } catch (err) {
           throw new TraceError('Failed to generate order again message', err);
