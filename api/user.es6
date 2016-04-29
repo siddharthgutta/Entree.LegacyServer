@@ -135,6 +135,17 @@ export async function createSecret(userId) {
   }
 }
 
+export async function addLocation(fbId, latitude, longitude) {
+  /* Set all other locations to be false */
+  await models.UserLocation.update({default: false});
+
+  const location = await models.UserLocation.create({latitude, longitude, default: true});
+  const user = await findOneByFbId(fbId);
+  await user.addUserLocation(location);
+
+  return location;
+}
+
 /**
  * Adds a new location for a user, and sets it to the default location
  *
