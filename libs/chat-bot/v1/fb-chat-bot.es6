@@ -297,8 +297,8 @@ export default class FbChatBot {
       case actions.confirmation: {
         let textFirst, button;
         try {
-          button = new ButtonMessageData('It\'s that easy! Now your reorder has been sent directly to the restaurant. ' +
-            'With Entrée, we also notify you when your order is ready for pickup. All of these features are coming ' +
+          button = new ButtonMessageData('It\'s that easy! Now your reorder has been sent directly to the restaurant.' +
+            ' With Entrée, we also notify you when your order is ready for pickup. All of these features are coming ' +
             'soon to your favorite restaurants. Click \'Continue\' to see what Entrée can do for you right now.');
           button.pushPostbackButton('Continue', this._genPayload(actions.search));
           /*
