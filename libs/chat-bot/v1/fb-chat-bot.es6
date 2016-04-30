@@ -1,4 +1,4 @@
-/* Disabling lint rule since it doesn't make sense */
+/* Disabling lint rule since it doesn't make sense. */
 /* eslint-disable babel/generator-star-spacing,one-var,valid-jsdoc */
 
 import * as User from '../../../api/controllers/user.es6';
