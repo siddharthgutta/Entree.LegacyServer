@@ -1,35 +1,53 @@
-import config from 'config';
-import {LocalSocketServer, RemoteSocketServer} from '../../libs/socket-server/index.es6';
+import ipc from '../../libs/ipc.es6';
 import * as SocketTokens from './../socketToken.es6';
+import * as Runtime from '../../libs/runtime.es6';
+import {GCM} from '../../libs/socket-server/index.es6';
 import shortid from 'shortid';
 import Promise from 'bluebird';
 import * as Restaurants from './../restaurant.es6';
+import Events from '../constants/client.es6';
+import * as GCMToken from '../gcmToken.es6';
 
-/**
- * Select the socket server strategy
- */
-let ss;
-if (config.get('UseRemoteSocketServer')) {
-  ss = new RemoteSocketServer();
-} else {
-  ss = new LocalSocketServer();
+class TokenStore extends GCM.TokenStore {
+
+  async set(token, data) {
+    await GCMToken.set(token, JSON.stringify(data));
+  }
+
+  async get(token) {
+    const doc = await GCMToken.get(token);
+    doc.data = JSON.parse(doc.data);
+    return doc;
+  }
+
+  async has(token) {
+    return await GCMToken.has(token);
+  }
+
+  async delete(token) {
+    try {
+      await GCMToken.remove(token);
+    } catch (e) {
+      // ignore
+    }
+  }
 }
 
 /**
- * Client context for ease of access
+ * SocketIO context for ease of access
  */
-const {Client} = ss;
+export const sio = ipc.Client; // sio
+export const gcm = new GCM(ipc, new TokenStore()); // GCM
 
 /**
- * Start connecting to socket server
+ * Connect gcm
  */
-ss.connect();
-
+gcm.connect();
 
 /**
- * Client events
+ * sio events
  */
-export {default as Events} from '../constants/client.es6';
+export {Events};
 
 /**
  * Tokens are validated to see if they are still responding
@@ -43,20 +61,18 @@ export async function validateTokens(tokens, rejected) {
 
     // run in parallel
     await Promise.map(tokens, async token => {
+      console.tag('notification', 'validate-tokens').log({token});
+
       try {
-        console.tag('notification', 'validate-tokens', 'check').log({token});
-
-        await Client.emit(token, 'alive?', {}, waitTime);
+        // check if any of them return a response
+        await Promise.any([sio.emit(token, 'alive?', {}, waitTime), gcm.emit(token, 'alive?', {}, waitTime)]);
       } catch (e) {
-        console.tag('notification', 'validate-tokens', 'not-alive').log({token});
-
-        Client.reject(token);
+        sio.reject(token);
+        gcm.reject(token);
 
         await rejected(token);
       }
-    });
-
-    console.tag('notification', 'validate-tokens', 'completed').log({tokens});
+    }, {concurrency: 8});
   } catch (e) {
     console.tag('notification', 'validate-tokens').error(e);
   }
@@ -68,6 +84,8 @@ export async function validateTokens(tokens, rejected) {
  * @returns {null} void
  */
 export async function validate(id) {
+  console.tag('notification', 'validate').log({id});
+
   try {
     const {tokens} = await SocketTokens.findOne(id);
     await validateTokens(tokens, token => SocketTokens.removeToken(id, token));
@@ -97,26 +115,30 @@ export async function isValidSocket(id, token) {
  * @returns {Object} accessor object {uuid,token}
  */
 export async function createSocket(id, token = shortid.generate()) {
-  await validate(id);
-
-  console.tag('notification', 'create-socket').log({id, token});
+  console.tag('notification', 'createSocket').log({id, token});
 
   try {
     await SocketTokens.addTokenOrCreate(id, token);
   } catch (e) {
-    throw new TraceError('No more tokens available', e);
+    console.error(new TraceError('Attempting to release tokens', e));
+
+    await validate(id);
+    try {
+      await SocketTokens.addTokenOrCreate(id, token);
+    } catch (ee) {
+      throw new TraceError('No more tokens available', ee, e);
+    }
   }
 
-  const accessor = await Client.accept(token);
+  const _sio = await sio.accept(token);
+  const _gcm = await gcm.accept(token);
 
-  Client.once(`disconnect-${token}`, () => {
-    SocketTokens.removeToken(id, token);
-    Client.reject(token);
-  });
+  sio.once(`disconnect-${token}`, () => sio.reject(token));
+  gcm.once(`disconnect-${token}`, () => gcm.reject(token));
 
-  console.tag('notification', 'create-socket').log({accessor});
+  console.tag('notification', 'create-socket').log({sio: _sio, gcm: _gcm});
 
-  return accessor;
+  return {sio: _sio, gcm: _gcm};
 }
 
 
@@ -127,17 +149,14 @@ export async function createSocket(id, token = shortid.generate()) {
  * @returns {null} void
  */
 export async function removeSocket(id, token) {
-  await validate(id);
-
-  console.tag('notification', 'remove-socket').log({id, token});
-
   try {
     await SocketTokens.removeToken(id, token);
   } catch (e) {
     console.tag('notification', 'remove-socket').error(e, {id, token});
   }
 
-  Client.reject(token);
+  sio.reject(token);
+  gcm.reject(token);
 }
 
 
@@ -156,7 +175,8 @@ export async function notifyGods(channel, data) {
     await Promise.map(restaurants, async({id}) => {
       const {tokens} = await SocketTokens.findOne(id);
       for (const token of tokens) {
-        Client.volatile(token, channel, data);
+        sio.volatile(token, channel, data);
+        gcm.volatile(token, channel, data);
       }
     });
   } catch (e) {
@@ -172,13 +192,19 @@ export async function notifyGods(channel, data) {
  * @returns {null} void
  */
 export async function notify(id, channel, data) {
+  if (channel === Events.NEW_ORDER) {
+    const order = data;
+    data.notification = {title: `New Order Received`, body: `Order #${order.id2}: ${order.User.firstName}`};
+  }
+
   console.tag('notification', 'notify').log(id, channel, data);
 
   try {
     const {tokens} = await SocketTokens.findOne(id);
 
     for (const token of tokens) {
-      Client.volatile(token, channel, data);
+      sio.volatile(token, channel, data);
+      gcm.volatile(token, channel, data);
     }
   } catch (e) {
     console.tag('notification', 'notify').error(e, {id, channel, data});
@@ -199,32 +225,18 @@ export async function notifyAndWait(id, channel, data) {
   console.tag('notification', 'notify').log(id, channel, data);
 
   const {tokens} = await SocketTokens.findOne(id);
-  await Promise.map(tokens, token => Client.emit(token, channel, data, false)); // No awk for regular ones for now
+  await Promise.map(tokens, token => sio.emit(token, channel, data, false)); // No awk for regular ones for now
 }
 
-/**
- * Fetch the socket server port for the client
- * @type {function(this:*)}
- * @returns {Object} {protocol, hostname, path, port, search}
- */
-export const address = ss.address.bind(ss);
+export async function address() {
+  return {sio: await sio.address(), gcm: await gcm.address(await Runtime.resolveAddress(), '/gcm')};
+}
 
-/**
- * Reject a token
- */
-export const reject = Client.reject.bind(ss);
+export async function reject(token) {
+  // TODO inform before rejecting GCM
+  return {sio: await sio.reject(token), gcm: await gcm.reject(token)};
+}
 
-/**
- * Accept a token
- */
-export const accept = Client.accept.bind(ss);
-
-/**
- * SocketServer object
- */
-export const SocketServer = ss;
-
-/**
- * Disconnect socket server (for testing only)
- */
-export const _disconnect = ss.disconnect.bind(ss);
+export async function accept(token) {
+  return {sio: await sio.accept(token), gcm: gcm.accept(token)};
+}

@@ -6,7 +6,7 @@ import OrderHistory from './views/pages/OrderHistory';
 import Login from './views/pages/Login';
 import OrderFocus from './views/pages/OrderFocus';
 import Board from './views/Board';
-import {getPlatform} from '../../libs/env';
+import {getPlatform} from '../../libs/env.es6';
 
 class App extends Influx.Component {
   constructor(context, props) {

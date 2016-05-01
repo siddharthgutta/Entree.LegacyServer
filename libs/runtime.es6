@@ -7,6 +7,7 @@ const address = config.get('Server');
 const hostnames = config.get('Server.hostnames');
 const mode = config.get('Mode');
 const branch = config.get('AppBranch');
+const isInsideTest = config.get('IsTest');
 
 let clusterId = 'X';
 
@@ -67,6 +68,11 @@ export function isProduction() {
 }
 
 
+export function isTest() {
+  return isInsideTest;
+}
+
+
 let _hostname;
 export async function hostname() {
   if (_hostname) {
@@ -91,4 +97,8 @@ export async function hostname() {
   }
 
   throw new Error('Could not resolve hostname!');
+}
+
+export async function resolveAddress() {
+  return Object.assign({}, address, {hostname: await hostname()});
 }

@@ -24,17 +24,17 @@ describe('Messenger Tests', () => {
 
     it('should succeed adding a token to an existing SocketToken; but deletes any non-responsive sockets', async () => {
       await SocketToken.addTokenOrCreate(restaurantId, token);
-      const {body: {data: {accessor: {token: newToken}}}} =
+      const {body: {data: {accessor: {sio: {token: newToken}}}}} =
         await fetch(`${SERVER_URL}/messenger/token`, {method: 'post'});
       const socketToken = await SocketToken.findOne(restaurantId);
 
       assert.equal(socketToken.restaurantId, restaurantId);
-      assert.equal(socketToken.numTokens, 1);
-      assert.deepStrictEqual(Array.from(socketToken.tokens), [newToken]);
+      assert.equal(socketToken.numTokens, 2);
+      assert.deepStrictEqual(Array.from(socketToken.tokens), ['abc', newToken]);
     });
 
     it('should succeed on creating a new SocketToken', async () => {
-      const {body: {data: {accessor: {token: newToken}}}} =
+      const {body: {data: {accessor: {sio: {token: newToken}}}}} =
         await fetch(`${SERVER_URL}/messenger/token`, {method: 'post'});
       const socketToken = await SocketToken.findOne(restaurantId);
       assert.equal(socketToken.restaurantId, restaurantId);
@@ -97,28 +97,28 @@ describe('Messenger Tests', () => {
     if (runProductionTests) {
       it('should fail with invalid phone number', done => {
         server
-        .post(`/messenger/send`)
-        .send({phoneNumber: '123', content: 'Message with invalid number'})
-        .expect('Content-type', 'application/json; charset=utf-8')
-        .expect(500, done);
+          .post(`/messenger/send`)
+          .send({phoneNumber: '123', content: 'Message with invalid number'})
+          .expect('Content-type', 'application/json; charset=utf-8')
+          .expect(500, done);
       });
 
       it('should fail without a SocketToken', done => {
         server
-        .post(`/messenger/send`)
-        .send({phoneNumber: productionPhoneNumber, content: 'Message without existing token'})
-        .expect('Content-type', 'application/json; charset=utf-8')
-        .expect(500, done);
+          .post(`/messenger/send`)
+          .send({phoneNumber: productionPhoneNumber, content: 'Message without existing token'})
+          .expect('Content-type', 'application/json; charset=utf-8')
+          .expect(500, done);
       });
 
       it('should fail without a SocketToken', done => {
         SocketToken.addTokenOrCreate(restaurantId, token)
                    .then(() => {
                      server
-                     .post(`/messenger/send`)
-                     .send({phoneNumber: productionPhoneNumber, content: 'Valid Message'})
-                     .expect('Content-type', 'application/json; charset=utf-8')
-                     .expect(200, done);
+                       .post(`/messenger/send`)
+                       .send({phoneNumber: productionPhoneNumber, content: 'Valid Message'})
+                       .expect('Content-type', 'application/json; charset=utf-8')
+                       .expect(200, done);
                    })
                    .catch(createError => {
                      expect().fail(`Token could not be created: ${createError}`);

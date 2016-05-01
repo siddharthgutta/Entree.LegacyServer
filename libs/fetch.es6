@@ -12,11 +12,9 @@ export default function fetch(url, opts = {}) {
 
     const method = opts.method || 'get';
 
-    if (method === 'get') {
-      const urlParts = new URL(url, true);
-      urlParts.query = Object.assign(urlParts.query || {}, opts.body);
-      url = urlParts.toString();
-    }
+    const urlParts = new URL(url, true);
+    urlParts.query = Object.assign(urlParts.query || {}, opts.query, method === 'get' ? opts.body : {});
+    url = urlParts.toString();
 
     let req = request[method.toLowerCase()](url);
 
@@ -31,6 +29,8 @@ export default function fetch(url, opts = {}) {
         req = req.set(k, v);
       }
     }
+
+    console.log(url, opts);
 
     req.end((err, res) => {
       if (err) {

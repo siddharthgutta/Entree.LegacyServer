@@ -31,6 +31,8 @@ class OrderFocus extends Page {
     super(context, props);
 
     this.state = {time: 0, order: null};
+
+    this._refresh = this._refresh.bind(this);
   }
 
   _handleColorChange(status) {
@@ -46,12 +48,18 @@ class OrderFocus extends Page {
     document.body.classList.add(bgSelector[status]);
   }
 
-  componentDidMount() {
-    super.componentDidMount();
-
+  _refresh() {
     const {params} = this.props;
 
     OrderStore.fetchOrderById(params.id);
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+
+    this._refresh();
+
+    document.addEventListener('resume', this._refresh, false);
   }
 
   componentDidUpdate() {
@@ -64,6 +72,12 @@ class OrderFocus extends Page {
     }
 
     this._handleColorChange(order.status);
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+
+    document.removeEventListener('resume', this._refresh);
   }
 
   getListeners() {
