@@ -190,7 +190,10 @@ class OrderStore extends Influx.Store {
   }
 
   async setOrderStatus(id, status, {prepTime, message}) {
-    return await this.data.restaurant.order(id, status, {prepTime, message});
+    const order = await this.data.restaurant.order(id, status, {prepTime, message});
+    this._addOrder(order);
+    this.emit(Events.ORDER_UPDATED, order);
+    return order;
   }
 
   getHistory(status) {
