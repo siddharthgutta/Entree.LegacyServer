@@ -43,9 +43,9 @@ router.post('/socket', isAuthenticated, async(req, res) => {
   const {id, token} = req.user;
 
   try {
-    const {uuid} = await Notification.createSocket(id, token);
+    const extras = await Notification.createSocket(id, token);
     const address = await Notification.address();
-    res.ok({uuid, address}).debug('Created order');
+    res.ok({extras, address}).debug('Created order');
   } catch (e) {
     res.fail(e.message).debug(e, 'Could not create socket');
   }

@@ -1,5 +1,5 @@
-import assert from 'assert';
 import {clearDatabase} from './test-init.es6';
+import assert from 'assert';
 import * as SocketToken from '../api/socketToken.es6';
 import _ from 'underscore';
 

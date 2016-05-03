@@ -4,6 +4,7 @@ import {format} from 'url';
 import fetch from './fetch.es6';
 import _ from 'underscore';
 import {SocketEvents} from '../../api/constants/client.es6';
+import * as env from './env.es6';
 
 const beat = (data, respond) => respond({status: 'ok'});
 
@@ -13,10 +14,10 @@ class RESTaurant extends EventEmitter {
     CONNECTING: 'REST/CONNECTING',
     CONNECTED: 'REST/CONNECTED',
     DISCONNECTED: 'REST/DISCONNECTED',
-    NEW_ORDER: `REST/${SocketEvents.NEW_ORDER}`,
-    ORDER_UPDATE: `REST/${SocketEvents.ORDER_UPDATE}`,
-    RESTAURANT_STATUS: `REST/${SocketEvents.RESTAURANT_STATUS}`,
-    RESTAURANT_UPDATED: `REST/${SocketEvents.RESTAURANT_UPDATED}`
+    NEW_ORDER: `${SocketEvents.NEW_ORDER}`,
+    ORDER_UPDATE: `${SocketEvents.ORDER_UPDATE}`,
+    RESTAURANT_STATUS: `${SocketEvents.RESTAURANT_STATUS}`,
+    RESTAURANT_UPDATED: `${SocketEvents.RESTAURANT_UPDATED}`
   };
 
   token = null;
@@ -45,7 +46,9 @@ class RESTaurant extends EventEmitter {
     if (token) {
       this._token = token;
 
-      if (await this.connected()) {
+      const connected = await this.connected();
+
+      if (connected) {
         this._emit(RESTaurant.Events.CONNECTED, token);
 
         return token;
@@ -83,6 +86,14 @@ class RESTaurant extends EventEmitter {
       this._socket = null;
     }
 
+    if (env.isNative() && this._push) {
+      await fetch(`${this._server}${this._gcmEndpoints.disconnect.pathname}`,
+                  {method: 'post', query: this._gcmEndpoints.disconnect.query});
+
+      this._push.unregister();
+      this._push = null;
+    }
+
     try {
       if (this._token) {
         await fetch(`${this._server}/api/v2/restaurant/logout`, {method: 'post', body: {token: this._token}});
@@ -106,6 +117,7 @@ class RESTaurant extends EventEmitter {
     try {
       await fetch(`${this._server}/api/v2/restaurant/connection`, {body: {token: this._token}});
     } catch (e) {
+      this._token = null;
       return false;
     }
 
@@ -114,31 +126,96 @@ class RESTaurant extends EventEmitter {
 
   async stream() {
     if (this._socket) {
-      return;
-    }
-
-    const {body: {data: {address, uuid}}} = await fetch(`${this._server}/api/v2/restaurant/socket`, {
-      method: 'post', body: {token: this._token}
-    });
-
-    const socket = io(format(address), {query: `id=${uuid}`, secure: true});
-
-    // intercept
-    socket.onevent = packet => {
-      const args = packet.data || [];
-
-      if (packet.id !== null) {
-        args.push(socket.ack(packet.id));
+      try {
+        this._socket.disconnect();
+      } catch (e) {
+        // ignore
       }
 
-      const _args = args.slice();
-      _args[0] = `REST/${args[0]}`;
+      this._socket = null;
+    }
 
-      this._emit(..._args);
-      this._emit(...args);
-    };
+    const {body: {data: {address, extras}}} =
+      await fetch(`${this._server}/api/v2/restaurant/socket`, {
+        method: 'post', body: {token: this._token}
+      });
 
-    this.on('alive?', beat);
+    if (env.isNative()) {
+      const gcm = env.getGCM();
+      const ecb = `handleNotification${Date.now()}`;
+
+      window[ecb] = event => {
+        console.log(event);
+      };
+
+      this._gcmEndpoints = {};
+
+      const conf = {
+        android: {senderID: extras.gcm.sender},
+        ios: {senderID: extras.gcm.sender, alert: 'true', badge: 'true', sound: 'true', gcmSandbox: false}
+      };
+
+      const push = gcm.init(conf);
+
+      push.on('registration', async subscription => {
+        const {body: endpoints} = await fetch(this._server + address.gcm.pathname, {
+          method: 'post',
+          query: {uuid: extras.gcm.uuid},
+          body: {id: subscription.registrationId}
+        });
+
+        console.log(endpoints, subscription);
+
+        this._gcmEndpoints = endpoints;
+
+        push.on('notification', async message => {
+          console.log(message);
+
+          if (message.additionalData.data) {
+            try {
+              message.additionalData.data = JSON.parse(message.additionalData.data);
+            } catch (e) {
+              // ignore
+            }
+          } else {
+            message.additionalData.data = {};
+          }
+
+          const {awk, data, channel, id} = message.additionalData;
+
+          this._emit(channel, data);
+
+          try {
+            if (awk !== 'false') {
+              await fetch(`${this._server}${this._gcmEndpoints.awk.pathname}`, {method: 'post', body: {id}});
+            }
+          } catch (e) {
+            // ignore
+          } finally {
+            push.finish();
+          }
+        });
+      });
+
+      push.on('error', e => {
+        console.error(e);
+      });
+
+      this._push = push;
+    } else {
+      this._socket = io(format(address.sio), {query: `id=${extras.sio.uuid}`, secure: true});
+
+      const onevent = this._socket.onevent;
+      this._socket.onevent = function (packet) {
+        const args = packet.data || [];
+        onevent.call(this, packet);
+        packet.data = ['*'].concat(args);
+        onevent.call(this, packet);
+      };
+
+      this._socket.on('*', (...args) => this._emit(...args));
+      this._socket.on('alive?', beat);
+    }
   }
 
   async orders() {

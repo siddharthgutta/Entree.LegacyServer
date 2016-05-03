@@ -3,7 +3,7 @@ import Influx from 'react-influx';
 import Dispatcher from '../../../dispatchers/Dispatcher';
 import OrderStore, {Status} from '../../../stores/OrderStore';
 import {onClick, ifcat} from '../../../../libs/utils';
-import {getPlatform} from '../../../../libs/env';
+import {getPlatform} from '../../../../libs/env.es6';
 
 class Header extends Influx.Component {
   constructor(context, props) {

@@ -4,7 +4,7 @@ import * as Runtime from '../runtime.es6';
 import Promise from 'bluebird';
 
 const socketServer = config.get('SocketServer');
-const debug = false;
+const debug = !Runtime.isTest();
 
 class LocalSocketServer extends Slave {
   constructor(id = '') {

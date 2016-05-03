@@ -49,7 +49,7 @@ class MessageStore extends Influx.Store {
 
   sendSMS(to, content) {
     fetch('/api/v2/message/send', {method: 'post', body: {content, phoneNumber: to}})
-    .then(({body}) => console.log(body));
+      .then(({body}) => console.log(body));
   }
 
   getMessages(user) {
@@ -115,8 +115,8 @@ class MessageStore extends Influx.Store {
 
     this._setConnectionStatus(Status.CONNECTED);
 
-    const {body: {data: {address, uuid}}} = await fetch('api/v2/restaurant/socket', {method: 'post', body: {token}});
-    const socket = io(format(address), {query: `id=${uuid}`, secure: true});
+    const {body: {data: {address, extras}}} = await fetch('api/v2/restaurant/socket', {method: 'post', body: {token}});
+    const socket = io(format(address.sio), {query: `id=${extras.sio.uuid}`, secure: true});
 
     socket.on(SocketEvents.TEXT_SENT, message => {
       message = this._transform([message])[0];

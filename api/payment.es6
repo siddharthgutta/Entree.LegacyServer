@@ -88,9 +88,10 @@ export function parse(slackbot, btSignature, btPayload, test = false) {
             fields.push(Slack.generateField('Transaction Ids',
               `${webhookNotification.disbursement.transactionIds}`));
             fields.push(Slack.generateField('Merchant Account Id',
-              `${webhookNotification.disbursement.merchantAccount}`));
+              `${webhookNotification.disbursement.merchantAccount.id}`));
             fields.push(Slack.generateField('First Disbursement Attempt?',
               `${!webhookNotification.disbursement.retry}`));
+            resolve({kind: webhookNotification.kind, result: webhookNotification.disbursement.transactionIds});
             break;
           case braintree.WebhookNotification.Kind.DisbursementException:
             color = test ? color : 'danger';
@@ -105,13 +106,14 @@ export function parse(slackbot, btSignature, btPayload, test = false) {
             fields.push(Slack.generateField('Transaction Ids',
               `${webhookNotification.disbursement.transactionIds}`));
             fields.push(Slack.generateField('Merchant Account Id',
-              `${webhookNotification.disbursement.merchantAccount}`));
+              `${webhookNotification.disbursement.merchantAccount.id}`));
             fields.push(Slack.generateField('First Disbursement Attempt?',
               `${!webhookNotification.disbursement.retry}`));
             fields.push(Slack.generateField('Follow Up Action',
               `${webhookNotification.disbursement.followUpAction}`));
             fields.push(Slack.generateField('Reason for Failed Disbursement',
               `${webhookNotification.disbursement.disbursementDate}`));
+            resolve({kind: webhookNotification.kind, result: webhookNotification.merchantAccount});
             break;
           case braintree.WebhookNotification.Kind.TransactionDisbursed:
           // Deprecated by Braintree
@@ -478,6 +480,7 @@ export async function releasePaymentToProducer(transactionId) {
   if (!result.success) {
     console.tag(logTags).error(`Failed to release transaction payment to producer`);
     console.tag(logTags).error(result.transaction);
+    throw result.transaction;
   }
   return result.transaction;
 }

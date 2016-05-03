@@ -7,7 +7,7 @@ then
     exit
 fi
 
-if [[ $1 != *"manual"* ]]; then
+if [[ $1 != *"local-stage"* ]]; then
     sleep 10
 fi
 

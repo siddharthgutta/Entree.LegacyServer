@@ -3,6 +3,7 @@
  */
 
 import GoogleAPIStrategy from './strategy.es6';
+import URI from 'urijs';
 
 export default class GooglePlaces extends GoogleAPIStrategy {
   /**
@@ -21,19 +22,24 @@ export default class GooglePlaces extends GoogleAPIStrategy {
    * @param {String} keyword: keyword to search by
    * @param {Number} lat: latitude coordinate value
    * @param {Number} long: longitude coordinate value
+   * @param {Boolean} opennow: search for only opennow places
    * @returns {*}: results with a list of places and their data
    */
-  async searchByKeyword(keyword, lat, long) {
+  async searchByKeyword(keyword, lat, long, opennow = false) {
+    const qs = {
+      key: this.apiKey,
+      keyword,
+      opennow,
+      // 16km ~ 10 mile radius
+      radius: 16000,
+      location: `${lat},${long}`
+    };
+    if (opennow) qs.opennow = true;
+
     const responseBody = await this.apiCall(
       'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
-      'GET', {
-        key: this.apiKey,
-        keyword,
-        opennow: true,
-        // 16km ~ 10 mile radius
-        radius: 16000,
-        location: `${lat},${long}`
-      }
+      'GET',
+      qs
     );
     return responseBody.results;
   }
@@ -44,19 +50,23 @@ export default class GooglePlaces extends GoogleAPIStrategy {
    * @param {String} name: name of place to search by
    * @param {Number} lat: latitude coordinate value
    * @param {Number} long: longitude coordinate value
+   * @param {Boolean} opennow: search for only opennow places
    * @returns {*}: results with a list of places and their data
    */
-  async searchByName(name, lat, long) {
+  async searchByName(name, lat, long, opennow = false) {
+    const qs = {
+      key: this.apiKey,
+      name,
+      // 16km ~ 10 mile radius
+      radius: 16000,
+      location: `${lat},${long}`
+    };
+    if (opennow) qs.opennow = true;
+
     const responseBody = await this.apiCall(
       'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
-      'GET', {
-        key: this.apiKey,
-        name,
-        opennow: true,
-        // 16km ~ 10 mile radius
-        radius: 16000,
-        location: `${lat},${long}`
-      }
+      'GET',
+      qs
     );
     return responseBody.results;
   }
@@ -79,17 +89,16 @@ export default class GooglePlaces extends GoogleAPIStrategy {
    * Get photo by google photo reference
    *
    * @param {String} photoreference: google photo reference string
-   * @returns {*}: image result url
+   * @returns {String}: image result url
    */
-  async photos(photoreference) {
-    const responseBody = await this.apiCall(
-      'https://maps.googleapis.com/maps/api/place/photo',
-      'GET', {
-        photoreference,
-        // Get highest resolution image possible
-        maxHeight: 1600,
-        key: this.apiKey}
-    );
-    return responseBody;
+  photos(photoreference) {
+    const url = new URI('https://maps.googleapis.com/maps/api/place/photo');
+    url.addQuery({
+      photoreference,
+      maxheight: 1600,
+      key: this.apiKey
+    });
+
+    return url.toString();
   }
 }

@@ -5,7 +5,8 @@
     },
     "Server": {
       "protocol": "https",
-      "port": 3000,
+      "port": 3006,
+      "overridePort": 0,
       "hostname": "localhost"
     }
   },
@@ -97,11 +98,36 @@
     }
   },
   "Google": {
-    "apiKey": "AIzaSyCTRuUGZgHw8hR8Wbegrs0WwJqDJBaMRDU"
+    "apiKey": "AIzaSyCTRuUGZgHw8hR8Wbegrs0WwJqDJBaMRDU",
+    "gcmApiKey": "AIzaSyCjjoBRgyyA9MAvcro8___UNQA_GOHdL1U",
+    "gcmSenderId": "862006285691"
   },
   "Facebook": {
-    "verify_token": "cd99a72486b8b63f3e81ec121534f7df43d15553330a900744a3ff243413df69",
-    "page_access_token": "CAAYMNarix14BAF8lQF5ZCA8ft0DL0WT2j1CLdspLdexSqdxKyRFwrjPfpx5ed8kZBHZAZA19R5yqntULDXCobFg8c4KYD5NVZAgpi92g5RG5jE1qxRF0GhVYdkLZAq0wgph7eD3WcyTozTgW5ghP1SDQNxEabuFmdNjDZC4uqvrpHti7Xurkr8dBUlRT8BQjl8BZBNMbGvbHGAZDZD"
+    "production": {
+      "verificationToken": "cd99a72486b8b63f3e81ec121534f7df43d15553330a900744a3ff243413df69",
+      "pageAccessToken": "CAAYMNarix14BAF8lQF5ZCA8ft0DL0WT2j1CLdspLdexSqdxKyRFwrjPfpx5ed8kZBHZAZA19R5yqntULDXCobFg8c4KYD5NVZAgpi92g5RG5jE1qxRF0GhVYdkLZAq0wgph7eD3WcyTozTgW5ghP1SDQNxEabuFmdNjDZC4uqvrpHti7Xurkr8dBUlRT8BQjl8BZBNMbGvbHGAZDZD",
+      "pageId": "906336609427619"
+    },
+    "dev": {
+      "verificationToken": "cd99a72486b8b63f3e81ec121534f7df43d15553330a900744a3ff243413df69",
+      "pageAccessToken": "CAADuxdXeTuIBABEE6q6pZBqEOHSYIWK6aIZAEZBOGfYfl0gDfPbKXdpeI2ZBQZBZBqw5o8ZAurg8lEyLb0a6GxQcbRnwH5zAUjWZAlaA4GMCIT5ecMwGdZCr2F81AmWZBULjSSBvnPheZCryterDMgDvEdFwR8WjSOHJdYGJMFZB1H0pW196sTVJclR1Dp5iKa0E0A3CCDvIHf3mCgZDZD",
+      "pageId": "1031674843586566"
+    },
+    "kfu": {
+      "verificationToken": "cd99a72486b8b63f3e81ec121534f7df43d15553330a900744a3ff243413df69",
+      "pageAccessToken": "CAAWr87vbYZBIBAHiq4MS5dkrTzZAOs7Cou3MsAMhsyEECkuWkZAINW5JWSpAxZAotJSeAwzCIKtfFFsZCmqqdZAP4f6ZA6joup9jRusADCE19nOUkSS31spaBrwJdJMsvdVjrslGg5fFY2E9qontnKeIVOV3rbDCb1CCKxzJGXtytpBZByuAPbJDtT5d8hap6BeCgRR2tvhZAfgZDZD",
+      "pageId": "993289687425169"
+    },
+    "jlmao": {
+      "verificationToken": "cd99a72486b8b63f3e81ec121534f7df43d15553330a900744a3ff243413df69",
+      "pageAccessToken": "CAAYMWjpm4VgBAGAfy3IZBaPGmLhvx9y0uu4DnuPPU61agwxJZAG2EutvZCqhxr6X9gqPybaxlI0HsY6qStjBgnU0xnvxXqdMdDkpeFMPcuNhzIcXWZB3fywAGSYfns3EBYBhKP280bHXc3I4xcuaVRYcGRR3v7sQorDdh4ofqn5d8ob65uaWePNDZALs6NbPrhTItJ1fn7wZDZD",
+      "pageId": "237589033263709"
+    },
+    "mkurian": {
+      "verificationToken": "cd99a72486b8b63f3e81ec121534f7df43d15553330a900744a3ff243413df69",
+      "pageAccessToken": "CAABeCQdKZCRMBAALKWfqIrbzwD1lxL17RM2ZBPLigaZCSI0dLEp4w21ZC0xPZBmQYTDVizntxsxpwKM0Bk6cy9dYjmKFUOfPrLdZAzLxAW0qZAkOhvXCmJZACZBrDV5GankrCJAWtSLuSrLtUWsCZAs76D33xKHu8b4sLQxcGAVAAfnGqUGdPuFfGqNCzrXGiZAc0Np2JbBUKekyAZDZD",
+      "pageId": "1072592789468697"
+    }
   },
   "MySQL": {
     "username": "root",
@@ -111,7 +137,7 @@
     "clearOnStart": false,
     "dialect": "mysql",
     "logging": true,
-    "revision": "r12"
+    "revision": "r14"
   },
   "MongoDb": {
     "clearOnStart": false,

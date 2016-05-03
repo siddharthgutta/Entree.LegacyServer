@@ -11,7 +11,10 @@
       "socket-master": 2999,
       "socket-test": 2997,
       "socket-shared": 2996,
-      "dev": 3030
+      "dev": 3030,
+      "kfu-dev": 3031,
+      "jlmao-dev": 3032,
+      "mkurian-dev": 3033
     }
   },
   "env": {
@@ -35,17 +38,17 @@
     },
     "mode": {
       "local-release": {
-        "NODE_ENV": "local-production",
+        "NODE_ENV": "local_production",
         "HTTPS_REJECT_UNAUTHORIZED": false,
         "NODE_TLS_REJECT_UNAUTHORIZED": 0,
         "HTTPS_SSL_KEY": "./keys/localhost.key",
         "HTTPS_SSL_CERTIFICATE": "./keys/localhost.crt",
         "HTTPS_SSL_CA": "./keys/localhost.crt",
         "SOCKET_SERVER_USE_REMOTE": true,
-        "ENTERPRISE_APP_HOSTNAME": "localhost"
+        "ENTERPRISE_APP_HOSTNAME": "e1a78b94.ngrok.io"
       },
       "local-stage": {
-        "NODE_ENV": "local-staging",
+        "NODE_ENV": "local_staging",
         "HTTPS_REJECT_UNAUTHORIZED": false,
         "NODE_TLS_REJECT_UNAUTHORIZED": 0,
         "HTTPS_SSL_KEY": "./keys/localhost.key",

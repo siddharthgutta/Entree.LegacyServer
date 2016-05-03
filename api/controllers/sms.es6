@@ -2,7 +2,7 @@ import {Twilio, TwilioRemote} from '../../libs/sms/index.es6';
 import {RemoteSocketServer} from '../../libs/socket-server/index.es6';
 import config from 'config';
 import Promise from 'bluebird';
-import {SocketServer} from './notification.es6';
+import SocketServer from '../../libs/ipc.es6';
 import * as Message from './../message.es6';
 import * as Notification from './notification.es6';
 import Emitter, {Events} from '../events/index.es6';
@@ -54,8 +54,17 @@ function stripCountryCode(number) {
  */
 function logText(tags, text, receivedOrSent) {
   console.tag(tags).log(`Processing ${receivedOrSent ? 'received' : 'sent'}`);
-  console.tag(tags).log({id: text.id, from: text.from, to: text.to,
-                         body: text.body, date: text.date, status: text.status});
+
+  const log = {
+    id: text.id,
+    from: text.from,
+    to: text.to,
+    body: text.body,
+    date: text.date,
+    status: text.status
+  };
+
+  console.tag(tags).log(log);
 }
 /**
  * Handle the texts that are sent to the server

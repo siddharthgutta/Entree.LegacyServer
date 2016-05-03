@@ -22,6 +22,7 @@ export default class GoogleAPIStrategy {
    * @param {String} url: url to conduct the request on
    * @param {String} method: type of request (Ex: GET, POST, etc.)
    * @param {Object} qs: query parameters
+   * @param {Boolean} getResponse: return response instead of just body
    * @returns {Promise}: promise containing error or response body
    */
   apiCall(url, method, qs) {
