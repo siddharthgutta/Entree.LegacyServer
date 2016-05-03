@@ -1,5 +1,5 @@
 export default function (sequelize, DataTypes) {
-  const WishList = sequelize.define('WishList', {
+  const WishListPlace = sequelize.define('WishListPlace', {
     placeId: {
       type: DataTypes.STRING(64), // eslint-disable-line new-cap
       allowNull: false
@@ -7,12 +7,12 @@ export default function (sequelize, DataTypes) {
   }, {
     classMethods: {
       associate: _models => {
-        WishList.belongsTo(_models.User, {
+        WishListPlace.belongsTo(_models.User, {
           onDelete: 'CASCADE'
         });
       }
     }
   });
 
-  return WishList;
+  return WishListPlace;
 }

@@ -111,8 +111,22 @@ export async function findOneByFbId(fbId) {
  * @returns {Promise}: Returns the user object
  */
 export async function findWishList(fbId) {
-  const user = await models.User.findOne({where: {fbId}});
-  return await user.getWishLists();
+  const user = await findOneByFbId(fbId);
+  return await user.getWishListPlaces();
+}
+
+/**
+ * Adds a new place to a users wish list
+ *
+ * @param {String} fbId: users's FB id
+ * @param {String} placeId: Google's place id of the place to add
+ * @returns {Object}: The wishListPlace object we just added
+ */
+export async function addToWishList(fbId, placeId) {
+  const user = await findOneByFbId(fbId);
+  const place = await models.WishListPlace.create({placeId});
+  await user.addWishListPlace(place);
+  return place;
 }
 
 
@@ -152,6 +166,16 @@ export async function addLocation(fbId, latitude, longitude) {
   await user.addUserLocation(location);
 
   return location;
+}
+
+/**
+ * Returns the default location for the user
+ *
+ * @param {String} fbId: the fbId of the user we are searching for
+ * @returns {Object} the UserLocation object
+ */
+export async function getDefaultLocation(fbId) {
+  return await models.UserLocation.findOne({where: {fbId, default: true}});
 }
 
 /**
