@@ -111,8 +111,22 @@ export async function findOneByFbId(fbId) {
  * @returns {Promise}: Returns the user object
  */
 export async function findWishList(fbId) {
-  const user = await models.User.findOne({where: {fbId}});
-  return await user.getWishLists();
+  const user = await findOneByFbId(fbId);
+  return await user.getWishListPlaces();
+}
+
+/**
+ * Adds a new place to a users wish list
+ *
+ * @param {String} fbId: users's FB id
+ * @param {String} placeId: Google's place id of the place to add
+ * @returns {Object}: The wishListPlace object we just added
+ */
+export async function addToWishList(fbId, placeId) {
+  const user = await findOneByFbId(fbId);
+  const place = await models.WishListPlace.create({placeId});
+  await user.addWishListPlace(place);
+  return place;
 }
 
 
@@ -144,14 +158,31 @@ export async function createSecret(userId) {
  * @returns {Object} the UserLocation object added
  */
 export async function addLocation(fbId, latitude, longitude) {
+  const user = await findOneByFbId(fbId);
+
   /* Set all other locations to be false */
-  await models.UserLocation.update({default: false}, {where: {fbId}});
+  await models.UserLocation.update({default: false}, {where: {UserId: user.id}});
 
   const location = await models.UserLocation.create({latitude, longitude, default: true});
-  const user = await findOneByFbId(fbId);
   await user.addUserLocation(location);
 
   return location;
+}
+
+/**
+ * Returns the default location for the user
+ *
+ * @param {String} fbId: the fbId of the user we are searching for
+ * @returns {Object} the UserLocation object
+ */
+export async function getDefaultLocation(fbId) {
+  const user = await findOneByFbId(fbId);
+  const locations = await user.getUserLocations({where: {default: true}});
+  if (locations.length !== 1) {
+    console.tag('api', 'user', 'LOCATION ERROR').log(`User with fbId ${fbId} has duplicate default locaitons`);
+  }
+
+  return locations[0];
 }
 
 /**

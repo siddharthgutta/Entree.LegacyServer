@@ -1,20 +1,26 @@
 /* Disabling lint rule since it doesn't make sense. */
 /* eslint-disable babel/generator-star-spacing,one-var,valid-jsdoc */
 
+import config from 'config';
+import _ from 'underscore';
 import * as User from '../../../api/controllers/user.es6';
+import {GoogleMapsGeocoding, GooglePlaces} from '../../google/api.es6';
 import {GenericMessageData, TextMessageData, ReceiptMessageData, ButtonMessageData}
   from '../../msg/facebook/message-data.es6';
-import _ from 'underscore';
+
+const googleMapsGeocoding = new GoogleMapsGeocoding(config.get('Google.apiKey'));
+const googlePlaces = new GooglePlaces(config.get('Google.apiKey'));
 
 export const actions = {
   restaurant: 'Restaurant',
   menu: 'Menu',
   addItem: 'AddItem',
-  next: 'Next',
   orderAgain: 'OrderAgain',
+  requestLocation: 'RequestLocation',
   search: 'Search',
   moreInfo: 'MoreInfo',
-  confirmation: 'Confirmation'
+  confirmation: 'Confirmation',
+  addToWishList: 'AddToWishList'
 };
 
 export const events = {
@@ -209,121 +215,172 @@ export default class FbChatBot {
     }
 
     switch (action) {
-      case actions.restaurant: {
-        let text, response;
-        try {
-          text = new TextMessageData('Entrée\'s lets you order ahead at your favorite restaurants. Here are some ' +
-            'of my usual restaurants. Click \'View Menu\' to see items from a restaurant.');
-
-          response = new GenericMessageData();
-          _.each(restaurants, restaurant => {
-            response.pushElement(restaurant.title, restaurant.subtitle, restaurant.imageUrl);
-            response.pushPostbackButton('View Menu', this._genPayload(actions.menu, {restaurant}));
-          });
-        } catch (err) {
-          throw new TraceError('Failed to generate restaurants', err);
-        }
-
-        return [text, response];
-      }
-      case actions.menu: {
-        /* Get the actual restaurant menu */
-        let text, response;
-        try {
-          text = new TextMessageData('Once you select a restaurant, we\'ll show you menu items that you can order. ' +
-            'Here are two menu items. Click \'Add to Cart\' to see how your receipt will look like.');
-
-          response = new GenericMessageData();
-          const restaurant = this._getAttachment(payload).restaurant; // eslint-disable-line
-          const restaurantMenuItems = menus[restaurant.title];
-
-          _.each(restaurantMenuItems, item => {
-            response.pushElement(item.title, item.subtitle, item.imageUrl);
-            response.pushPostbackButton('Add to Cart', this._genPayload(actions.addItem, {item, restaurant}));
-          });
-        } catch (err) {
-          throw new TraceError('Failed to generate menu items', err);
-        }
-        return [text, response];
-      }
-      case actions.addItem: {
-        let response, button;
-        try {
-          const item = this._getAttachment(payload).item;
-          const restaurant = this._getAttachment(payload).restaurant;
-
-          response = new ReceiptMessageData(`${user.firstName} ${user.lastName}`,
-            user.receiptCount.toString(), 'USD', 'Visa 2345');
-
-          response.pushElement(`${item.title} from ${restaurant.title}`, 1, item.price, 'USD', item.imageUrl,
-            item.subtitle);
-          response.addSummary(item.price);
-
-          button = new ButtonMessageData('This is what your receipt might look like. Now let\'s show you what else ' +
-            'you can do with Entrée.');
-          button.pushPostbackButton('Show Me More', this._genPayload(actions.orderAgain, {item, restaurant}));
-        } catch (err) {
-          throw new TraceError('Failed to generate receipt', err);
-        }
-
-        try {
-          /* Increment receipt count */
-          await User.UserModel.update(user.id, {receiptCount: user.receiptCount + 1});
-        } catch (err) {
-          throw new TraceError(`Failed to increment receipt count for user ${user.id}`, err);
-        }
-
-        return [response, button];
-      }
-      case actions.orderAgain: {
-        let text, response;
-        try {
-          text = new TextMessageData('Entrée\'s coolest feature is that we let you save your previous orders and let' +
-            ' you re-order in a few clicks. For example, here are my last few orders. I can reorder these' +
-            ' with a touch of a button. Click \'Order Again\' for any of these.');
-
-          const item = this._getAttachment(payload).item;
-          const restaurant = this._getAttachment(payload).restaurant;
-
-          /* Need to format order again better */
-          response = new GenericMessageData();
-          response.pushElement(restaurant.title, item.title, restaurant.imageUrl);
-          response.pushPostbackButton('Order Again', this._genPayload(actions.confirmation));
-        } catch (err) {
-          throw new TraceError('Failed to generate order again message', err);
-        }
-        return [text, response];
-      }
-      case actions.confirmation: {
-        let button;
-        try {
-          button = new ButtonMessageData('It\'s that easy! Now your reorder has been sent directly to the restaurant.' +
-            ' With Entrée, we also notify you when your order is ready for pickup. All of these features are coming ' +
-            'soon to your favorite restaurants. Click \'Continue\' to see what Entrée can do for you right now.');
-          button.pushPostbackButton('Continue', this._genPayload(actions.search));
-        } catch (err) {
-          throw new TraceError('Failed to generate continue message', err);
-        }
-
-        return [button];
-      }
-      case actions.search: {
-        let text;
-        try {
-          text = new TextMessageData('Now, you can search for restaurants near you. First, send us your location:' +
-            '.\n1. For Android, click the \'…\' button, press \'Location\', and then press the send button\n' +
-            '2. For iOS, tap the location button to the right of the microphone\n3. If you\'re on desktop, ' +
-            'just type in your zip code (Ex: 78705)');
-        } catch (err) {
-          throw new TraceError('Failed to generate search message', err);
-        }
-
-        return [text];
-      }
+      case actions.restaurant:
+        return this._handleRestaurant();
+      case actions.menu:
+        return await this._handleMenu(payload);
+      case actions.addItem:
+        return this._handleAddItem(payload, user);
+      case actions.orderAgain:
+        return this._handleOrderAgain(payload);
+      case actions.confirmation:
+        return await this._handleConfirmation();
+      case actions.requestLocation:
+        return await this._handleRequestLocation();
+      case actions.search:
+        return await this._handleSearch();
+      case actions.addToWishList:
+        return await this._handleAddToWishList(payload, user);
       case actions.moreInfo:
         break;
       default:
         throw Error();
+    }
+  }
+
+  async _handleRestaurant() {
+    let text, response;
+    try {
+      text = new TextMessageData('Entrée\'s lets you order ahead at your favorite restaurants. Here are some ' +
+        'of my usual restaurants. Click \'View Menu\' to see items from a restaurant.');
+
+      response = new GenericMessageData();
+      _.each(restaurants, restaurant => {
+        response.pushElement(restaurant.title, restaurant.subtitle, restaurant.imageUrl);
+        response.pushPostbackButton('View Menu', this._genPayload(actions.menu, {restaurant}));
+      });
+    } catch (err) {
+      throw new TraceError('Failed to generate restaurants', err);
+    }
+
+    return [text, response];
+  }
+
+  async _handleMenu(payload) {
+    /* Get the actual restaurant menu */
+    let text, response;
+    try {
+      text = new TextMessageData('Once you select a restaurant, we\'ll show you menu items that you can order. ' +
+        'Here are two menu items. Click \'Add to Cart\' to see how your receipt will look like.');
+
+      response = new GenericMessageData();
+      const restaurant = this._getAttachment(payload).restaurant; // eslint-disable-line
+      const restaurantMenuItems = menus[restaurant.title];
+
+      _.each(restaurantMenuItems, item => {
+        response.pushElement(item.title, item.subtitle, item.imageUrl);
+        response.pushPostbackButton('Add to Cart', this._genPayload(actions.addItem, {item, restaurant}));
+      });
+    } catch (err) {
+      throw new TraceError('Failed to generate menu items', err);
+    }
+    return [text, response];
+  }
+
+  async _handleAddItem(payload, user) {
+    let response, button;
+    try {
+      const item = this._getAttachment(payload).item;
+      const restaurant = this._getAttachment(payload).restaurant;
+
+      response = new ReceiptMessageData(`${user.firstName} ${user.lastName}`,
+        user.receiptCount.toString(), 'USD', 'Visa 2345');
+
+      response.pushElement(`${item.title} from ${restaurant.title}`, 1, item.price, 'USD', item.imageUrl,
+        item.subtitle);
+      response.addSummary(item.price);
+
+      button = new ButtonMessageData('This is what your receipt might look like. Now let\'s show you what else ' +
+        'you can do with Entrée.');
+      button.pushPostbackButton('Show Me More', this._genPayload(actions.orderAgain, {item, restaurant}));
+    } catch (err) {
+      throw new TraceError('Failed to generate receipt', err);
+    }
+
+    try {
+      /* Increment receipt count */
+      await User.UserModel.update(user.id, {receiptCount: user.receiptCount + 1});
+    } catch (err) {
+      throw new TraceError(`Failed to increment receipt count for user ${user.id}`, err);
+    }
+
+    return [response, button];
+  }
+
+  async _handleOrderAgain(payload) {
+    let text, response;
+    try {
+      text = new TextMessageData('Entrée\'s coolest feature is that we let you save your previous orders and let' +
+        ' you re-order in a few clicks. For example, here are my last few orders. I can reorder these' +
+        ' with a touch of a button. Click \'Order Again\' for any of these.');
+
+      const item = this._getAttachment(payload).item;
+      const restaurant = this._getAttachment(payload).restaurant;
+
+      /* Need to format order again better */
+      response = new GenericMessageData();
+      response.pushElement(restaurant.title, item.title, restaurant.imageUrl);
+      response.pushPostbackButton('Order Again', this._genPayload(actions.confirmation));
+    } catch (err) {
+      throw new TraceError('Failed to generate order again message', err);
+    }
+    return [text, response];
+  }
+
+  async _handleConfirmation() {
+    let button;
+    try {
+      button = new ButtonMessageData('It\'s that easy! Now your reorder has been sent directly to the restaurant.' +
+        ' With Entrée, we also notify you when your order is ready for pickup. All of these features are coming ' +
+        'soon to your favorite restaurants. Click \'Continue\' to see what Entrée can do for you right now.');
+      button.pushPostbackButton('Continue', this._genPayload(actions.requestLocation));
+    } catch (err) {
+      throw new TraceError('Failed to generate continue message', err);
+    }
+
+    return [button];
+  }
+
+  async _handleRequestLocation() {
+    let text;
+    try {
+      text = new TextMessageData('Now, you can search for restaurants near you. First, send us your location:' +
+        '.\n1. For Android, click the \'…\' button, press \'Location\', and then press the send button\n' +
+        '2. For iOS, tap the location button\n3. If you\'re on desktop, ' +
+        'just type in your zip code (Ex: 78705)');
+    } catch (err) {
+      throw new TraceError('Failed to generate search message', err);
+    }
+
+    return [text];
+  }
+
+  async _handleSearch() {
+    let text;
+    try {
+      text = new TextMessageData('Thanks! For now, I can search for restaurants near you. Type any keyword to ' +
+        'start (Ex: chipotle, thai food, etc.). Feel free to add more restaurants to your wishlist so I can tell ' +
+        'you when you can order ahead and get great deals.');
+    } catch (err) {
+      throw new TraceError('Failed to generate search message', err);
+    }
+
+    return [text];
+  }
+
+  async _handleAddToWishList(paylod, user) {
+    let button;
+    try {
+      const place = this._getAttachment(paylod).place;
+      await User.UserModel.addToWishList(user.fbId, place.place_id);
+
+      button = new ButtonMessageData(`${place.name} has been added to your wishlist. I’ll let you know when you can
+        order food or get a great deal. If you want to add any more restaurants, type to search again (Ex: torchy’s
+        tacos, sandwiches, etc.). You can also go back and see how Entree will work at an example restaurant again
+        by clicking the ‘Walkthrough’ button.`);
+      button.pushPostbackButton('Walkthrough', this._genPayload(actions.menu));
+    } catch (err) {
+      throw new TraceError('Failed to add place to wish list', err);
     }
   }
 
@@ -344,6 +401,33 @@ export default class FbChatBot {
     return false;
   }
 
+  async _search(event, user) {
+    if (!(await this._hasWishlist(user.fbId))) {
+      return await this._handleInitialWishList(event, user);
+    }
+
+    let response;
+    try {
+      const location = await User.UserModel.getDefaultLocation(user.fbId);
+
+      const inputText = event.message.text.trim();
+      const searchResult = await googlePlaces.searchByName(inputText, location.latitude, location.longitude);
+
+      response = new GenericMessageData();
+      for (let idx = 0; idx < 10 && idx < searchResult.length; idx++) {
+        const place = searchResult[idx];
+        const photoRef = place.photos[0].photo_reference;
+        response.pushElement(place.name, place.price_level, googlePlaces.photos(photoRef));
+        response.pushPostbackButton('Add to Wish list',
+          this._genPayload(actions.addToWishList, {place}));
+      }
+    } catch (err) {
+      throw new TraceError('Failed during search', err);
+    }
+
+    return [response];
+  }
+
   /**
    * Handles text events
    *
@@ -357,7 +441,7 @@ export default class FbChatBot {
       return await this._updateUserLocation(event, user);
     }
 
-    return await this._handleSearch(event);
+    return await this._search(event, user);
   }
 
   /**
@@ -371,18 +455,38 @@ export default class FbChatBot {
     return await this._updateUserLocation(event, user);
   }
 
-  async _handleSearch(event) {
-    throw Error('Not Implemented', event);
-  }
-
   /**
-   * Updates a user's wishlist
+   * When the user types in his or her favorite 3 restaurants
    *
    * @param {Object} event: input event from messenger
-   * @returns {Object}: messenger output
+   * @returns {Object}: messengerPlace output
    */
-  async _handleWishList(event) {
-    throw Error('Not Implemented', event);
+  async _handleInitialWishList(event, user) {
+    const inputText = event.message.text;
+    const places = inputText.split(',');
+
+    /* Sanitize user input */
+    _.map(places, place => place.trim());
+
+    let response, button;
+    try {
+      const location = await User.UserModel.getDefaultLocation(user.fbId);
+      response = new GenericMessageData();
+      button = new ButtonMessageData('We have added the following restaurants to your wish list');
+      button.pushPostbackButton('Continue', this._genPayload(actions.search));
+
+      for (let idx = 0; idx < places.length; idx++) { // eslint-disable-line
+        const result = await googlePlaces.searchByName(places[idx], location.latitude, location.longitude);
+        const place = result[0];
+        await User.UserModel.addToWishList(user.fbId, place.place_id);
+        const photoRef = place.photos[0].photo_reference;
+        response.pushElement(place.name, place.price_level, googlePlaces.photos(photoRef));
+      }
+    } catch (err) {
+      throw new TraceError('Could not create initial wish list response', err);
+    }
+
+    return [response, button];
   }
 
   /**
@@ -392,20 +496,33 @@ export default class FbChatBot {
    * @returns {Object}: messenger output
    */
   async _updateUserLocation(event, user) {
-    let attachment;
-
-    try {
-      attachment = event.message.attachments[0];
-      if (attachment.type === 'location') {
-        User.UserModel.addLocation(user.fbId, attachment.payload.coordinates.lat, attachment.payload.coordinates.long);
-        const text = new TextMessageData('Thanks! Now you can type in the name of any restaurant to search for it');
-        return [text];
+    const inputText = event.message.text;
+    if (inputText) { /* In this case the input is a zip code */
+      try {
+        const location = await googleMapsGeocoding.getLocationFromZipcode(inputText);
+        await User.UserModel.addLocation(user.fbId, location.lat, location.lng);
+      } catch (err) {
+        throw new TraceError('Failed to update user location with zipcode', err);
       }
-    } catch (err) {
-      throw new TraceError('Failed to update user location', err);
+    } else { /* In this case the input is a location attachment sent from mobile */
+      let attachment;
+      try {
+        attachment = event.message.attachments[0];
+        if (attachment.type === 'location') {
+          await User.UserModel.addLocation(user.fbId, attachment.payload.coordinates.lat,
+            attachment.payload.coordinates.long);
+        } else {
+          console.tag('libs', 'chat-bot', 'v1', 'fb-chat-bot', 'ATTACHMENT ERROR').log(attachment);
+          throw Error(`Attachment did not contain location`);
+        }
+      } catch (err) {
+        throw new TraceError('Failed to update user location with attachment', err);
+      }
     }
 
-    console.tag('libs', 'chat-bot', 'v1', 'fb-chat-bot', 'ATTACHMENT ERROR').log(attachment);
-    throw Error(`Attachment did not contain location`);
+    const text = new TextMessageData('Thanks! Now tell me your three favorite restaurants where you want to ' +
+      'order from.  I will notify you when you can order food or get a great deal from there. Please separate ' +
+      'them with a comma (Ex: Chick-fil-a, In-n-out, Chipotle)');
+    return [text];
   }
 }
