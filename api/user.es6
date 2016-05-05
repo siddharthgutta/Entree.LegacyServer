@@ -112,7 +112,7 @@ export async function findOneByFbId(fbId) {
  */
 export async function findWishList(fbId) {
   const user = await findOneByFbId(fbId);
-  return await user.getWishListPlaces();
+  return await user.getPlaces();
 }
 
 /**
@@ -124,8 +124,8 @@ export async function findWishList(fbId) {
  */
 export async function addToWishList(fbId, placeId) {
   const user = await findOneByFbId(fbId);
-  const place = await models.WishListPlace.create({placeId});
-  await user.addWishListPlace(place);
+  const place = await models.Place.create({placeId});
+  await user.addPlace(place);
   return place;
 }
 
@@ -138,7 +138,7 @@ export async function addToWishList(fbId, placeId) {
  */
 export async function hasWishListPlace(fbId, placeId) {
   const user = await findOneByFbId(fbId);
-  const places = await user.getWishListPlaces({where: {placeId}});
+  const places = await user.getPlaces({where: {placeId}});
   return places.length !== 0;
 }
 

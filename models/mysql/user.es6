@@ -55,7 +55,7 @@ export default function (sequelize, DataTypes) {
           onDelete: 'CASCADE'
         });
 
-        User.hasMany(_models.WishListPlace, {
+        User.hasMany(_models.Place, {
           onDelete: 'CASCADE'
         });
 

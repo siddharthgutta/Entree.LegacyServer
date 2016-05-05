@@ -152,7 +152,7 @@ export default class FbChatBot {
   async _handlePostback(event, user) {
     let payload, action;
     try {
-      payload = event.postback.payload;
+      payload = JSON.parse(event.postback.payload);
       action = this._getAction(payload);
     } catch (err) {
       throw new TraceError('Could not get payload or action for event', err);
@@ -329,9 +329,9 @@ export default class FbChatBot {
       response.pushElement(restaurant.title, item.title, restaurant.imageUrl);
       response.pushPostbackButton('Order Again', this._genPayload(actions.confirmation));
       for (const idx in restaurants) {
-        if (restaurants[idx].title !== restaurant. title) {
+        if (restaurants[idx].title !== restaurant.title) {
           response.pushElement(restaurants[idx].title, menus[restaurants[idx].title][0].title,
-            restaurant[idx].imageUrl);
+            restaurants[idx].imageUrl);
           response.pushPostbackButton('Order Again', this._genPayload(actions.confirmation));
         }
       }
@@ -644,7 +644,7 @@ export default class FbChatBot {
   }
 
   _genPayload(action, data) {
-    return {action, data};
+    return JSON.stringify({action, data});
   }
 
   _getAction(payload) {
