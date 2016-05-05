@@ -417,7 +417,6 @@ export default class FbChatBot {
       }
 
       const details = await Goog.getPlaceDetailsFromPlaceId(placeId);
-
       await User.UserModel.addToWishList(user.fbId, placeId);
 
       button = new ButtonMessageData(`${details.name} has been added to your wishlist. I’ll let you know when ` +
