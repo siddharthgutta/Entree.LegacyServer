@@ -1,16 +1,11 @@
 /* Disabling lint rule since it doesn't make sense. */
 /* eslint-disable babel/generator-star-spacing,one-var,valid-jsdoc */
 
-import config from 'config';
 import _ from 'underscore';
 import * as User from '../../../api/controllers/user.es6';
-import {GoogleMapsGeocoding, GooglePlaces, GoogleURLShortener} from '../../google/api.es6';
+import * as Goog from '../../../api/controllers/google.es6';
 import {GenericMessageData, TextMessageData, ReceiptMessageData, ButtonMessageData}
   from '../../msg/facebook/message-data.es6';
-
-const googleMapsGeocoding = new GoogleMapsGeocoding(config.get('Google.apiKey'));
-const googlePlaces = new GooglePlaces(config.get('Google.apiKey'));
-const urlShortener = new GoogleURLShortener(config.get('Google.apiKey'));
 
 export const actions = {
   restaurant: 'Restaurant',
@@ -122,7 +117,7 @@ export default class FbChatBot {
    * @returns {Object}: Messenger response to user
    */
   async handleInput(event) {
-    const user = await this._findUser(event);
+    const user = await this._findOrCreateUser(event);
 
     let output;
     switch (this._getEventType(event)) {
@@ -157,7 +152,7 @@ export default class FbChatBot {
   async _handlePostback(event, user) {
     let payload, action;
     try {
-      payload = JSON.parse(event.postback.payload);
+      payload = event.postback.payload;
       action = this._getAction(payload);
     } catch (err) {
       throw new TraceError('Could not get payload or action for event', err);
@@ -208,13 +203,26 @@ export default class FbChatBot {
    * Handles attachment events
    *
    * @param {Object} event: input event from messenger
+   * @param {Object} user: user object that sent attachment
    * @returns {Object}: messenger output
    */
   async _handleAttachment(event, user) {
     /* The only attachment we are handling right now is location */
-    return await this._updateUserLocation(event, user);
+    const attachment = event.message.attachments[0];
+    if (attachment.type === 'location') {
+      return await this._updateUserLocation(event, user);
+    }
+
+    console.tag('libs', 'chat-bot', 'v1', 'fb-chat-bot', 'ATTACHMENT ERROR').log(attachment);
+    throw Error(`Attachment did not contain location`);
   }
 
+  /**
+   * Executed when the user first starts the walk through
+   *
+   * @returns {Object}: GenericMessageData containing restaurants
+   * @private
+   */
   async _handleRestaurant() {
     let text, response;
     try {
@@ -233,6 +241,13 @@ export default class FbChatBot {
     return [text, response];
   }
 
+  /**
+   * Executed when user presses the ViewMenu button of a restaurant
+   *
+   * @param {Object} payload: Restaurant whose menu we are displaying
+   * @returns {Object}: GenericMessageData containing the menu items
+   * @private
+   */
   async _handleMenu(payload) {
     /* Get the actual restaurant menu */
     let text, response;
@@ -241,7 +256,7 @@ export default class FbChatBot {
         'Here are two menu items. Click \'Add to Cart\' to see how your receipt will look like.');
 
       response = new GenericMessageData();
-      const restaurant = this._getAttachment(payload).restaurant; // eslint-disable-line
+      const restaurant = this._getData(payload).restaurant; // eslint-disable-line
       const restaurantMenuItems = menus[restaurant.title];
 
       _.each(restaurantMenuItems, item => {
@@ -254,11 +269,19 @@ export default class FbChatBot {
     return [text, response];
   }
 
+  /**
+   * Executed when user presses AddItem of a single menu item
+   *
+   * @param {Object} payload: Contains the item object the user added
+   * @param {Object} user: The user who added the item
+   * @returns {Object}: ReceiptMessageData of what the receipt looks like and a show me more button
+   * @private
+   */
   async _handleAddItem(payload, user) {
     let response, button;
     try {
-      const item = this._getAttachment(payload).item;
-      const restaurant = this._getAttachment(payload).restaurant;
+      const item = this._getData(payload).item;
+      const restaurant = this._getData(payload).restaurant;
 
       response = new ReceiptMessageData(`${user.firstName} ${user.lastName}`,
         user.receiptCount.toString(), 'USD', 'Visa 2345');
@@ -284,6 +307,13 @@ export default class FbChatBot {
     return [response, button];
   }
 
+  /**
+   * Executed when user presses the Show Me More button
+   *
+   * @param {Object} payload: the item the user previously ordered
+   * @returns {Object}: TextMessageData and Button allow user to press OrderAgain
+   * @private
+   */
   async _handleOrderAgain(payload) {
     let text, response;
     try {
@@ -291,19 +321,32 @@ export default class FbChatBot {
         ' you re-order in a few clicks. For example, here are my last few orders. I can reorder these' +
         ' with a touch of a button. Click \'Order Again\' for any of these.');
 
-      const item = this._getAttachment(payload).item;
-      const restaurant = this._getAttachment(payload).restaurant;
+      const item = this._getData(payload).item;
+      const restaurant = this._getData(payload).restaurant;
 
       /* Need to format order again better */
       response = new GenericMessageData();
       response.pushElement(restaurant.title, item.title, restaurant.imageUrl);
       response.pushPostbackButton('Order Again', this._genPayload(actions.confirmation));
+      for (const idx in restaurants) {
+        if (restaurants[idx].title !== restaurant. title) {
+          response.pushElement(restaurants[idx].title, menus[restaurants[idx].title][0].title,
+            restaurant[idx].imageUrl);
+          response.pushPostbackButton('Order Again', this._genPayload(actions.confirmation));
+        }
+      }
     } catch (err) {
       throw new TraceError('Failed to generate order again message', err);
     }
     return [text, response];
   }
 
+  /**
+   * Executed after the user presses the Order Again button
+   *
+   * @returns {Object}: Button containing instructions on what to do next
+   * @private
+   */
   async _handleConfirmation() {
     let button;
     try {
@@ -318,6 +361,12 @@ export default class FbChatBot {
     return [button];
   }
 
+  /**
+   * Executed after user presses Continue
+   *
+   * @returns {Object}: Instructions on how to submit location
+   * @private
+   */
   async _handleRequestLocation() {
     let text;
     try {
@@ -332,6 +381,12 @@ export default class FbChatBot {
     return [text];
   }
 
+  /**
+   * Executed after user enters in Location
+   *
+   * @returns {Object}: Instructions on how to search
+   * @private
+   */
   async _handleSearch() {
     let text;
     try {
@@ -345,15 +400,23 @@ export default class FbChatBot {
     return [text];
   }
 
+  /**
+   * Execute when user taps AddToWishlist button for a specific item
+   *
+   * @param {Object} payload: Item that user wants to add to wishlist
+   * @param {Object} user: User object who added the item
+   * @returns {Object}: Returns instructions on next steps
+   * @private
+   */
   async _handleAddToWishList(payload, user) {
     let button;
     try {
-      const placeId = this._getAttachment(payload).placeId;
+      const placeId = this._getData(payload).placeId;
       if (await User.UserModel.hasWishListPlace(user.fbId, placeId)) {
         return [new TextMessageData('You already have that place on your wishlist!')];
       }
 
-      const details = await googlePlaces.details(placeId);
+      const details = await Goog.getPlaceDetailsFromPlaceId(placeId);
 
       await User.UserModel.addToWishList(user.fbId, placeId);
 
@@ -365,25 +428,25 @@ export default class FbChatBot {
       throw new TraceError('Failed to add place to wish list', err);
     }
 
-    try {
-      /* Increment receipt count */
-      await User.UserModel.update(user.id, {receiptCount: user.receiptCount + 1});
-    } catch (err) {
-      throw new TraceError(`Failed to increment receipt count for user ${user.id}`, err);
-    }
-
     return [button];
   }
 
+  /**
+   * Executed when user presses the MoreInfo button on a specific restaurautn searched
+   *
+   * @param {Object} payload: Restaurant tht was searched
+   * @returns {Object}: Buttons and more text information on the restaurant
+   * @private
+   */
   async _handleMoreInfo(payload) {
     let button;
     try {
-      const placeId = this._getAttachment(payload).placeId;
-      const details = await googlePlaces.details(placeId);
+      const placeId = this._getData(payload).placeId;
+      const details = await Goog.getPlaceDetailsFromPlaceId(placeId);
 
       button = new ButtonMessageData(`${details.name} has an average rating of ${details.rating}/5 and you ` +
         `can call them at ${details.formatted_phone_number}`);
-      button.pushLinkButton('Location', `${ await urlShortener.shortenUrl(details.url)}`);
+      button.pushLinkButton('Location', `${details.url}`);
       button.pushLinkButton('Website', `${details.website}`);
       button.pushPostbackButton('Add to Wish list', this._genPayload(actions.addToWishList, {placeId}));
     } catch (err) {
@@ -393,6 +456,14 @@ export default class FbChatBot {
     return [button];
   }
 
+  /**
+   * Does the actual searching when user types in text to search
+   *
+   * @param {Object} event: The event associated with the user input
+   * @param {Object} user: User who searched
+   * @returns {Object}: Generic message data containing results of the search
+   * @private
+   */
   async _search(event, user) {
     if (!(await this._hasWishlist(user.fbId))) {
       return await this._handleInitialWishList(event, user);
@@ -403,18 +474,18 @@ export default class FbChatBot {
       const location = await User.UserModel.getDefaultLocation(user.fbId);
 
       const inputText = event.message.text.trim();
-      const searchResult = await googlePlaces.searchByName(inputText, location.latitude, location.longitude);
-      if (searchResult.length === 0) {
+      const searchResults = await Goog.searchPlacesByName(inputText, location.latitude, location.longitude);
+      if (searchResults.length === 0) {
         const text = new TextMessageData(`Sorry we could not find anything for ${inputText}. ` +
           `Please try something else`);
         return [text];
       }
 
       response = new GenericMessageData();
-      for (let idx = 0; idx < 10 && idx < searchResult.length; idx++) {
-        const place = searchResult[idx];
-        const photoUrl = place.photos ? googlePlaces.photos(place.photos[0].photo_reference) : null;
-        const details = await googlePlaces.details(place.place_id);
+      for (let idx = 0; idx < 10 && idx < searchResults.length; idx++) {
+        const place = searchResults[idx];
+        const photoUrl = place.photos ? Goog.getShortUrlFromPhotoReference(place.photos[0].photo_reference) : null;
+        const details = await Goog.getPlaceDetailsFromPlaceId(place.place_id);
         response.pushElement(place.name,
           `${details.formatted_address} - Price Range: ${'$'.repeat(place.price_level)}`, photoUrl);
         response.pushPostbackButton('More Info', this._genPayload(actions.moreInfo, {placeId: place.place_id}));
@@ -439,7 +510,7 @@ export default class FbChatBot {
     const places = inputText.split(',');
 
     /* Sanitize user input */
-    _.map(places, place => place.trim());
+    _.each(places, place => place.trim());
 
     let response, button;
     try {
@@ -448,14 +519,14 @@ export default class FbChatBot {
 
       const notFound = [];
       for (let idx = 0; idx < places.length; idx++) { // eslint-disable-line
-        const result = await googlePlaces.searchByName(places[idx], location.latitude, location.longitude);
+        const result = await Goog.searchPlacesByName(places[idx], location.latitude, location.longitude);
         if (result.length === 0) {
           notFound.push(places[idx]);
         } else {
           const place = result[0];
-          const details = await googlePlaces.details(place.place_id);
+          const details = await Goog.getPlaceDetailsFromPlaceId(place.place_id);
           await User.UserModel.addToWishList(user.fbId, place.place_id);
-          const photoUrl = place.photos ? googlePlaces.photos(place.photos[0].photo_reference) : null;
+          const photoUrl = place.photos ? Goog.getShortUrlFromPhotoReference(place.photos[0].photo_reference) : null;
           response.pushElement(place.name,
             `${details.formatted_address} - Price Range: ${'$'.repeat(place.price_level)}`, photoUrl);
           response.pushPostbackButton('More Info', this._genPayload(actions.moreInfo, {placeId: place.place_id}));
@@ -463,10 +534,10 @@ export default class FbChatBot {
       }
 
       if (notFound.length === 0) {
-        button = new ButtonMessageData('We have added the following restaurants to your wish list');
+        button = new ButtonMessageData('We have added the above restaurants to your wish list');
       } else {
         button = new ButtonMessageData(`Sorry we could not find anything for ${notFound.join(', ')}, but we have ` +
-          `added the following restaurants to your wish list`);
+          `added the above restaurants to your wish list`);
       }
 
       button.pushPostbackButton('Continue', this._genPayload(actions.search));
@@ -487,22 +558,16 @@ export default class FbChatBot {
     const inputText = event.message.text;
     if (inputText) { /* In this case the input is a zip code */
       try {
-        const location = await googleMapsGeocoding.getLocationFromZipcode(inputText);
+        const location = await Goog.getLocationCoordinatesFromZipcode(inputText);
         await User.UserModel.addLocation(user.fbId, location.lat, location.lng);
       } catch (err) {
         throw new TraceError('Failed to update user location with zipcode', err);
       }
     } else { /* In this case the input is a location attachment sent from mobile */
-      let attachment;
       try {
-        attachment = event.message.attachments[0];
-        if (attachment.type === 'location') {
-          await User.UserModel.addLocation(user.fbId, attachment.payload.coordinates.lat,
-            attachment.payload.coordinates.long);
-        } else {
-          console.tag('libs', 'chat-bot', 'v1', 'fb-chat-bot', 'ATTACHMENT ERROR').log(attachment);
-          throw Error(`Attachment did not contain location`);
-        }
+        const attachment = event.message.attachments[0];
+        await User.UserModel.addLocation(user.fbId, attachment.payload.coordinates.lat,
+          attachment.payload.coordinates.long);
       } catch (err) {
         throw new TraceError('Failed to update user location with attachment', err);
       }
@@ -514,7 +579,14 @@ export default class FbChatBot {
     return [text];
   }
 
-  async _findUser(event) {
+  /**
+   * Finds a user and creates one if the user does not exist
+   *
+   * @param {Object} event: Event corresponding to a user that sent us a message
+   * @returns {Promise}: The user found or created
+   * @private
+   */
+  async _findOrCreateUser(event) {
     const sender = event.sender.id;
     const user = await User.UserModel.findOneByFbId(sender);
 
@@ -571,16 +643,16 @@ export default class FbChatBot {
     return null;
   }
 
-  _genPayload(action, attachment) {
-    return JSON.stringify({action, attachment});
+  _genPayload(action, data) {
+    return {action, data};
   }
 
   _getAction(payload) {
     return payload.action;
   }
 
-  _getAttachment(payload) {
-    return payload.attachment;
+  _getData(payload) {
+    return payload.data;
   }
 
 }

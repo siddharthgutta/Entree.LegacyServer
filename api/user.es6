@@ -173,7 +173,10 @@ export async function addLocation(fbId, latitude, longitude) {
   const user = await findOneByFbId(fbId);
 
   /* Set all other locations to be false */
-  await models.UserLocation.update({default: false}, {where: {UserId: user.id}});
+  const locations = await user.getUserLocations();
+  for (const idx in locations) { // eslint-disable-line
+    await locations[idx].update({default: false});
+  }
 
   const location = await models.UserLocation.create({latitude, longitude, default: true});
   await user.addUserLocation(location);
@@ -191,7 +194,7 @@ export async function getDefaultLocation(fbId) {
   const user = await findOneByFbId(fbId);
   const locations = await user.getUserLocations({where: {default: true}});
   if (locations.length !== 1) {
-    console.tag('api', 'user', 'LOCATION ERROR').log(`User with fbId ${fbId} has duplicate default locaitons`);
+    console.tag('api', 'user', 'LOCATION ERROR').log(`User with fbId ${fbId} has duplicate default locations`);
   }
 
   return locations[0];
