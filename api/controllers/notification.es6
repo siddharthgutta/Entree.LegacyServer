@@ -193,8 +193,12 @@ export async function notifyGods(channel, data) {
  */
 export async function notify(id, channel, data) {
   if (channel === Events.NEW_ORDER) {
-    const order = data;
-    data.notification = {title: `New Order Received`, body: `Order #${order.id2}: ${order.User.firstName}`};
+    try {
+      const order = data;
+      data.notification = {title: `New Order Received`, body: `Order #${order.id2}: ${order.User.firstName}`};
+    } catch (e) {
+      // ignore
+    }
   }
 
   console.tag('notification', 'notify').log(id, channel, data);
