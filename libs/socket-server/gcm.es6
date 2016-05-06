@@ -73,6 +73,22 @@ class GCM extends EventEmitter {
   }
 
   async _send(token, channel, data, awk = true, resolve, reject) {
+    let subscription;
+    const hasToken = await this._tokenStore.has(token);
+
+    if (hasToken) {
+      try {
+        subscription = await this._tokenStore.get(token);
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    if (!subscription || !subscription.id) {
+      reject(new TraceError('No valid subscription assigned to token', subscription));
+      return;
+    }
+
     if (awk) {
       awk = isNaN(awk) ? 2000 : awk;
     }
@@ -86,21 +102,14 @@ class GCM extends EventEmitter {
       timeToLive: 3,
       data: {
         id,
-        ...data.notification,
+        ...(data ? data.notification : {}),
         data: JSON.stringify(data),
         channel,
         'content-available': '1',
         awk
       },
-      notification: {...data.notification, id}
+      notification: {...(data ? data.notification : {}), id}
     });
-
-    const subscription = await this._tokenStore.get(token);
-
-    if (!subscription || !subscription.id) {
-      reject(new TraceError('No valid subscription assigned to token', subscription));
-      return;
-    }
 
     if (awk) {
       let tid;

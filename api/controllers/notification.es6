@@ -8,14 +8,17 @@ import * as Restaurants from './../restaurant.es6';
 import Events from '../constants/client.es6';
 import * as GCMToken from '../gcmToken.es6';
 
-class TokenStore extends GCM.TokenStore {
-
-  async set(token, data) {
+export class TokenStore extends GCM.TokenStore {
+  async set(token, data = {}) {
     await GCMToken.set(token, JSON.stringify(data));
   }
 
   async get(token) {
     const doc = await GCMToken.get(token);
+    if (!doc) {
+      throw Error(`Could not find document by token: ${token}`);
+    }
+
     doc.data = JSON.parse(doc.data);
     return doc;
   }
@@ -33,11 +36,30 @@ class TokenStore extends GCM.TokenStore {
   }
 }
 
+export class MemoryTokenStore extends GCM.TokenStore {
+
+  async set(token, data) {
+    this[token] = data;
+  }
+
+  async get(token) {
+    return this[token];
+  }
+
+  async has(token) {
+    return !!this[token];
+  }
+
+  async delete(token) {
+    delete this[token];
+  }
+}
+
 /**
  * SocketIO context for ease of access
  */
 export const sio = ipc.Client; // sio
-export const gcm = new GCM(ipc, new TokenStore()); // GCM
+export const gcm = new GCM(ipc, new MemoryTokenStore()); // GCM
 
 /**
  * Connect gcm
