@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
-export NODE_ENV=development
+export NODE_ENV=local-production
 grunt build
 grunt cordova

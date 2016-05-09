@@ -25,16 +25,30 @@ class OrderList extends Influx.Component {
     return [
       [OrderStore, OrderStore.Events.ORDER_RECEIVED, this._onOrderStoreOrderReceived],
       [OrderStore, OrderStore.Events.ORDER_UPDATED, this._onOrderStoreOrderReceived],
+      [OrderStore, OrderStore.Events.ORDERS_UPDATED, this._onOrderStoreOrderReceived],
       [OrderStore, OrderStore.Events.HISTORY_UPDATED, this._onOrderStoreHistoryUpdated],
       [OrderStore, OrderStore.Events.READY, this._onOrderStoreReady]
     ];
+  }
+
+
+  _refreshHistory() {
+    OrderStore.fetchOrderHistory();
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+
+    document.removeEventListener('resume', this._refreshHistory);
   }
 
   componentDidMount() {
     super.componentDidMount();
 
     if (this.props.history) {
-      OrderStore.fetchOrderHistory();
+      this._refreshHistory();
+
+      document.addEventListener('resume', this._refreshHistory, false);
     }
   }
 

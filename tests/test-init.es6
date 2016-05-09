@@ -2,7 +2,7 @@ import {initScribe, initErrorHandling, initDatabase, disconnectDatabase} from '.
 import path from 'path';
 import stack from 'callsite';
 import config from 'config';
-import {_disconnect as disconnectPubSub} from '../api/controllers/notification.es6';
+import ipc from '../libs/ipc.es6';
 
 initErrorHandling();
 
@@ -38,7 +38,7 @@ export function doneAt(done, at) {
 }
 
 before(async () => initDatabase()); // auto connect since most tests atm are model stressed
-after(() => disconnectPubSub());
+after(() => ipc.disconnect());
 
 after(async () => {
   try {

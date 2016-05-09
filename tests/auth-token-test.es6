@@ -4,7 +4,7 @@ import * as AuthToken from '../api/authToken.es6';
 
 beforeEach(() => clearDatabase());
 
-describe('Message', () => {
+describe('Auth Token', () => {
   if (console) {
     console.log('true');
   }

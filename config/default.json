@@ -5,7 +5,8 @@
     },
     "Server": {
       "protocol": "https",
-      "port": 3000,
+      "port": 3006,
+      "overridePort": 0,
       "hostname": "localhost"
     }
   },
@@ -97,7 +98,9 @@
     }
   },
   "Google": {
-    "apiKey": "AIzaSyCTRuUGZgHw8hR8Wbegrs0WwJqDJBaMRDU"
+    "apiKey": "AIzaSyCTRuUGZgHw8hR8Wbegrs0WwJqDJBaMRDU",
+    "gcmApiKey": "AIzaSyCjjoBRgyyA9MAvcro8___UNQA_GOHdL1U",
+    "gcmSenderId": "862006285691"
   },
   "Facebook": {
     "production": {
@@ -134,7 +137,7 @@
     "clearOnStart": false,
     "dialect": "mysql",
     "logging": true,
-    "revision": "r14"
+    "revision": "r15"
   },
   "MongoDb": {
     "clearOnStart": false,

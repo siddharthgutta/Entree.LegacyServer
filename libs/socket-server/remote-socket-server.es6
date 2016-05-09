@@ -3,7 +3,7 @@ import config from 'config';
 import * as Runtime from '../runtime.es6';
 
 const remoteSocketServer = config.get('RemoteSocketServer');
-const debug = false;
+const debug = !Runtime.isTest();
 
 class RemoteSocketServer extends Slave {
   constructor(id = '') {

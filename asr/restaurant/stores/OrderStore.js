@@ -5,7 +5,7 @@ import {format} from 'url';
 import config from '../../libs/config';
 import RESTaurant from '../../libs/RESTaurant.es6';
 import _ from 'underscore';
-import * as env from '../../libs/env';
+import * as env from '../../libs/env.es6';
 
 // @formatter:off
 export const Events = keyMirror({
@@ -13,6 +13,7 @@ export const Events = keyMirror({
   ORDER_RECEIVED: null,
   ORDER_UPDATED: null,
   RESTAURANT_UPDATED: null,
+  ORDERS_UPDATED: null,
   HISTORY_UPDATED: null
 });
 
@@ -23,7 +24,8 @@ export const Status = keyMirror({
 });
 // @formatter:on
 
-const SERVER_URL = format(config.get('Server'));
+const server = config.get('Server');
+const SERVER_URL = format({...server, ...{port: server.overridePort || server.port}});
 
 class OrderStore extends Influx.Store {
   constructor() {
@@ -36,6 +38,10 @@ class OrderStore extends Influx.Store {
       restaurant: new RESTaurant(SERVER_URL, localStorage.getItem('token'))
     };
 
+    document.addEventListener('resume', () => {
+      this.fetchRestaurantInfo();
+      this.refreshActiveOrders();
+    }, false);
 
     const {restaurant} = this.data;
 
@@ -55,7 +61,7 @@ class OrderStore extends Influx.Store {
 
       this.emit(Events.READY);
 
-      env.setBackground(true);
+      // env.setBackground(true);
     });
 
     restaurant.on(RESTaurant.Events.DISCONNECTED, () => {
@@ -65,16 +71,20 @@ class OrderStore extends Influx.Store {
 
       this.data.orders = [];
 
-      env.setBackground(false);
+      // env.setBackground(false);
     });
 
     restaurant.on(RESTaurant.Events.NEW_ORDER, order => {
       this._addOrder(order);
       this.emit(Events.ORDER_RECEIVED, order);
 
-      const cost = this.getTotalCost(order).toFixed(2);
+      if (!env.isNative()) {
+        const cost = this.getTotalCost(order).toFixed(2);
 
-      env.notify(`New Order Received`, `Order #${order.id2}: ${order.User.firstName} paid $${cost}`);
+        env.notify(`New Order Received`, `Order #${order.id2}: ${order.User.firstName} paid $${cost}`);
+      } else {
+        env.playSound();
+      }
     });
 
     restaurant.on(RESTaurant.Events.ORDER_UPDATE, order => {
@@ -98,6 +108,16 @@ class OrderStore extends Influx.Store {
       [Dispatcher, Dispatcher.Events.LOGOUT, this._onDispatcherLogout],
       [Dispatcher, Dispatcher.Events.FEEDBACK, this._onDispatcherFeedback]
     ];
+  }
+
+  async refreshActiveOrders() {
+    const orders = await this.data.restaurant.orders();
+
+    this.data.orders = [];
+
+    orders.forEach(order => this._addOrder(order));
+
+    this.emit(Events.ORDERS_UPDATED);
   }
 
   async _onDispatcherLogout() {
@@ -170,11 +190,15 @@ class OrderStore extends Influx.Store {
   }
 
   async setOrderStatus(id, status, {prepTime, message}) {
-    return await this.data.restaurant.order(id, status, {prepTime, message});
+    const order = await this.data.restaurant.order(id, status, {prepTime, message});
+    this._addOrder(order);
+    this.emit(Events.ORDER_UPDATED, order);
+    return order;
   }
 
   getHistory(status) {
-    return status ? this.data.history.filter(order => order.status === status) : this.data.history;
+    return status ? this.data.history.filter(order => order.status === status).sort((a, b) => b.updatedAt - a.updatedAt)
+      : this.data.history;
   }
 
   getOrders(status) {
