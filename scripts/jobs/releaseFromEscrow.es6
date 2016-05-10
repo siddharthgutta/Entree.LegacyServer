@@ -7,6 +7,7 @@ import * as Runtime from '../../libs/runtime.es6';
 import * as Bootstrap from '../../bootstrap.es6';
 
 Bootstrap.initErrorHandling();
+Bootstrap.initScribe();
 console.log('Production: ', Runtime.isProduction());
 
 // Temporary Solution for releasing transactions from escrow until we

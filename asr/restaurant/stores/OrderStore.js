@@ -148,17 +148,17 @@ class OrderStore extends Influx.Store {
     let {orders} = this.data;
 
     if (Array.isArray(order)) {
-      order.forEach(a => a.updatedAt = new Date(a.updatedAt));
+      order.forEach(a => a.createdAt = new Date(a.createdAt));
       orders = orders.concat(order);
     } else if (typeof order === 'object') {
-      order.updatedAt = new Date(order.updatedAt);
+      order.createdAt = new Date(order.createdAt);
       orders.push(order);
     } else {
       return orders;
     }
 
     orders = _.values(_.indexBy(orders, 'id'));
-    orders.sort((a, b) => b.updatedAt - a.updatedAt);
+    orders.sort((a, b) => b.createdAt - a.createdAt);
 
     this.data.orders = orders;
 
@@ -197,8 +197,8 @@ class OrderStore extends Influx.Store {
   }
 
   getHistory(status) {
-    return status ? this.data.history.filter(order => order.status === status).sort((a, b) => b.updatedAt - a.updatedAt)
-      : this.data.history;
+    return (status ? this.data.history.filter(order => order.status === status)
+      : this.data.history).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }
 
   getOrders(status) {
