@@ -60,6 +60,7 @@ describe('Google API', () => {
       const firstPlace = results[0];
       placeCheck(firstPlace);
       placeid = firstPlace.place_id;
+      assert.ok(placeid);
       photoReference = firstPlace.photos[0].photo_reference;
     });
 
