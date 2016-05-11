@@ -392,7 +392,7 @@ const merchant = {
     phone: '5127334014',
     dateOfBirth: '1988-05-05',
     address: {
-      streetAddress: '817 West 5th St.',
+      streetAddress: '817 W 5th St.',
       locality: 'Austin',
       region: 'TX',
       postalCode: '78703'
