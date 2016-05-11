@@ -56,6 +56,8 @@ describe('Google API', () => {
       const name = 'chipotle';
       const results = await GooglePlacesAPI.searchByName(name, lat, lng);
       assert.ok(results);
+      console.log(results);
+      console.log(results.length);
       assert(results.length > 0);
       const firstPlace = results[0];
       placeCheck(firstPlace);
