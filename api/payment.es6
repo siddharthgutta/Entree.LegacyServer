@@ -157,7 +157,7 @@ async function handleParseResult(kind, result) {
           const restaurantId = (await Restaurant.findByMerchantId(merchantId)).get().id;
           await Restaurant.update(restaurantId, {merchantApproved: true});
         } catch (err) {
-          throw new TraceError('Could not update merchant to be approved by merchantId', err);
+          // throw new TraceError('Could not update merchant to be approved by merchantId', err);
         }
       }
       break;
