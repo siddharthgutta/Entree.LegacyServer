@@ -995,8 +995,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       return await this._genOutput(
         chatState,
         response.cart.header,
-        `Your subtotal is $${(subTotal / 100).toFixed(2)}. Your final total (including tax) is ` +
-          `$${(total / 100).toFixed(2)}. ${response.cart.footer}`,
+        `Your total is $${(total / 100).toFixed(2)}. ${response.cart.footer}`,
         orderItems,
         response.cart.dataFormat);
     } catch (err) {
