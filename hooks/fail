@@ -67,9 +67,10 @@ curlResponse=$(curl -F content="$clean" \
      -F token=xoxp-16957148439-17257626929-35351887127-493fceaec8 \
      https://slack.com/api/files.upload)
 
-echo $curlResponse
+curlResponseOut=$(printf "$curlResponse")
+echo $curlResponseOut
 
-curl -F content="$curlResponse" \
+curl -F content="$curlResponseOut" \
      -F channels=\#continous3 \
      -F mode=snippet \
      -F token=xoxp-16957148439-17257626929-35351887127-493fceaec8 \
