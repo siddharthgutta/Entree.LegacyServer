@@ -64,7 +64,7 @@ curl -F content="${#testResults}" \
      -F token=xoxp-16957148439-17257626929-35351887127-493fceaec8 \
      https://slack.com/api/files.upload;
 
-charLimit=200000
+charLimit=175000
 
 for ((i = 0; i < $((${#testResults} / charLimit + 1)); i++)); do
 	testResult="${testResults:$i*charLimit:charLimit}";
