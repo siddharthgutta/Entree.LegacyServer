@@ -22,7 +22,9 @@ export const chatStates = {
   categories: 'Categories',
   mods: 'Mods',
   cart: 'Cart',
-  secondSignup: 'secondSignup'
+  secondSignup: 'SecondSignup',
+  lastOrder: 'LastOrder',
+  lastOrderConfirm: 'LastOrderConfirm'
 };
 
 export const response = {
@@ -77,6 +79,27 @@ export const response = {
     footer: 'Type \"checkout\" to finish and pay, \"menu\" to browse the menu, ' +
     'or \"clear\" to clear your entire cart',
     dataFormat: async (i, data) => `${i + 1}) ${data[i].name} - $${(data[i].price / 100).toFixed(2)}`
+  },
+
+  lastOrder: {
+    header: 'Here are your last 3 orders',
+    footer: 'Type a number to select an order and pay',
+    dataFormat: async (i, data) => {
+      const items = await Order.getItemsFromOrder(data[i].id);
+      const restaurant = await Order.getRestaurantFromOrder(data[i].id);
+      const total = await Order.getOrderTotalById(data[i].id);
+      let output = `${i + 1}) ${restaurant.name} $${(total / 100).toFixed(2)}\n`;
+
+      _.each(items, item => {
+        output += `- ${item.name}\n`;
+      });
+
+      return output;
+    },
+
+    lastOrderSelect: {
+
+    }
   },
 
   help: 'Here is a list of commands:\n' +
@@ -238,6 +261,10 @@ export default class DefaultChatBot extends ChatBotInterface {
         return await this._itemsTransition(chatState, input);
       case chatStates.mods:
         return await this._modsTransition(chatState, input);
+      case chatStates.lastOrder:
+        return await this._handleSelectLastOrder(chatState, input);
+      case chatStates.lastOrderConfirm:
+        return await this._handleSelectLastOrderConfirm(chatState, input);
       default:
         /* If user isn't in above states and command was not stateless or contextual, then it was
          * an invalid command */
@@ -566,6 +593,102 @@ export default class DefaultChatBot extends ChatBotInterface {
   }
 
   /**
+   * Handles when user selects an order to re-order
+   *
+   * @param {Object} chatState: User's chatstate object
+   * @param {String} input: user input
+   * @returns {String}: response to user input
+   * @private
+   */
+  async _handleSelectLastOrder(chatState, input) {
+    /* Cannot make process two orders at once */
+    const orderContext = await chatState.findOrderContext();
+    if (orderContext) {
+      return response.existingOrder;
+    }
+
+    const orderId = await this._translateInputKey(chatState, input);
+
+    if (!orderId) {
+      return response.userError;
+    }
+
+    let order, restaurant, items, total;
+    try {
+      order = await Order.getOrder(orderId);
+      restaurant = await Order.getRestaurantFromOrder(orderId);
+      if (!restaurant.enabled) {
+        return response.restaurantDisabled(restaurant);
+      }
+
+      items = await Order.getItemsFromOrder(orderId);
+      total = await Order.getOrderTotalById(order.id);
+
+      await chatState.updateState(chatStates.lastOrderConfirm);
+      await chatState.setOrderContext(order.resolve());
+
+      let output = `Are you sure you want to place the following order?\n`;
+
+      output += `${restaurant.name} $${(total / 100).toFixed(2)}\n`;
+      _.each(items, item => output += `- ${item.name}\n`);
+
+      output += 'Type \"yes\" to pay or \"no\" to continue browsing the menu';
+
+      return output;
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} ` +
+        `- Failed to find restaurant data when selecting a restaurant`, err);
+    }
+  }
+
+  async _handleSelectLastOrderConfirm(chatState, input) {
+    if (input !== 'yes' && input !== 'no') {
+      return response.userError;
+    }
+
+    if (input === 'no') {
+      return 'Type \"/menu\" to keep browsing the current restaurant or \"restaurant\" to view all restaurants';
+    }
+
+    const order = await chatState.findOrderContext();
+    const restaurant = await Order.getRestaurantFromOrder(order.id);
+    const user = await chatState.findUser();
+    /* Do not create order object unless user has payment. Order will be created in
+     * dispatcher.es6 for first time users */
+    let defaultPayment;
+    try {
+      defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
+    } catch (defaultPaymentError) {
+      console.tag('chatbot').log('No default payment found. Sending user to signup2.');
+      const secret = await User.requestProfileEdit(user.id);
+      const url = await User.resolveProfileEditAddress(secret);
+
+      chatState.updateState(chatStates.secondSignup);
+      return `To complete your order and pay, please go to ${url}`;
+    }
+
+    let total = await Order.getOrderTotalById(order.id);
+
+    // TEMPORARY TAX IMPLEMENTATION - REMOVE AFTER CHICK-FIL-A
+    total *= 1.0825;
+    total = Math.round(total);
+
+    try {
+      const {id: transactionId} = await Payment.paymentWithToken(user.id, restaurant.id, defaultPayment.token, total);
+      await Order.setOrderStatus(order.id, Order.Status.RECEIVED_PAYMENT, {transactionId});
+    } catch (paymentWithTokenError) {
+      console.tag('chatbot').error('Payment failed although customer default payment exists', paymentWithTokenError);
+      throw new TraceError('Payment failed although customer default payment exists', paymentWithTokenError);
+    }
+
+    await chatState.clearOrderItems();
+    await chatState.updateState(chatStates.start);
+
+    return `Your order using ${defaultPayment.cardType} - ${defaultPayment.last4} has been sent to the restaurant. ` +
+      `We'll text you once it's confirmed by the restaurant`;
+  }
+
+  /**
    * Handles commands that are executed within a context
    *
    * @param {Object} chatState: chat state object for this transition
@@ -772,6 +895,8 @@ export default class DefaultChatBot extends ChatBotInterface {
         return await this._handleAtRestaurantInfo(chatState, input.split(' ')[0].substr(1));
       case /^\/help$/.test(input):
         return await this._handleHelp();
+      case /^\/last$/.test(input):
+        return await this._handleLastOrder(chatState);
       default:
         throw new TraceError(`ChatState id ${chatState.id} ` +
           `- Called stateless transition when command was not stateless`);
@@ -925,6 +1050,35 @@ export default class DefaultChatBot extends ChatBotInterface {
    */
   async _handleHelp() {
     return response.help;
+  }
+
+  /**
+   * Handles the case where the user wasts to view previous orders
+   *
+   * @param {Object} chatState: chatState object
+   * @returns {String}: output of the transition
+   * @private
+   */
+  async _handleLastOrder(chatState) {
+    let orders, user;
+    try {
+      user = await chatState.findUser();
+      orders = await User.getRecentOrders(user.id);
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to get previous orders`, err);
+    }
+
+    try {
+      await chatState.updateState(chatStates.lastOrder);
+      return await this._genOutput(
+        chatState,
+        response.lastOrder.header,
+        response.lastOrder.footer,
+        orders,
+        response.lastOrder.dataFormat);
+    } catch (err) {
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot`, err);
+    }
   }
 
   async _getRestaurantInfo(chatState, restaurant) {

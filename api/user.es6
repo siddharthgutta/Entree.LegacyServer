@@ -228,6 +228,17 @@ export async function destroySecret(secret) {
 }
 
 /**
+ * Gets order for a specific user
+ *
+ * @param {string} id: the id of the user
+ * @returns {Promise}: An array of order objects
+ */
+export async function getOrders(id) {
+  const user = await findOne(id);
+  return await user.getOrders();
+}
+
+/**
  * Raw db connection exposed;
  */
 

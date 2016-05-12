@@ -164,4 +164,21 @@ export async function updateUserProfile(secret, attributes) {
   }
 }
 
+/**
+ * Gets the three most recent orders for a specific user
+ *
+ * @param {String} id: ID of the user
+ * @returns {Object}: Array of size 3 of the most recent orders
+ */
+export async function getRecentOrders(id) {
+  let orders;
+  try {
+    orders = await User.getOrders(id);
+  } catch (e) {
+    throw new TraceError(`Could not get recent orders for user id ${id}`, e);
+  }
+
+  return orders.slice(Math.max(orders.length - 3, 0));
+}
+
 export {User as UserModel};
