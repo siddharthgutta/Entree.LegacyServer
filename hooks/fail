@@ -64,8 +64,10 @@ curl -F content="${#testResults}" \
      -F token=xoxp-16957148439-17257626929-35351887127-493fceaec8 \
      https://slack.com/api/files.upload;
 
-for ((i = 0; i < $((${#testResults} / 50000 + 1)); i++)); do
-	testResult="${testResults:$i*50000:50000}";
+charLimit=200000
+
+for ((i = 0; i < $((${#testResults} / charLimit + 1)); i++)); do
+	testResult="${testResults:$i*charLimit:charLimit}";
     curl -F content="$testResult" \
          -F channels=\#continous3 \
          -F mode=snippet \
