@@ -83,7 +83,7 @@ const hours = [
 
 const menu = [
   {
-    category: 'Mac & Cheese',
+    category: 'Recommended',
     mods: [
       {
         name: 'Extra Cheese',
@@ -127,7 +127,42 @@ const menu = [
         name: 'The Funky Chunky',
         description: 'Hamburger, Onion',
         basePrice: 400
+      }
+    ]
+  }, {
+    category: 'Mac & Cheese',
+    mods: [
+      {
+        name: 'Extra Cheese',
+        price: 100
       }, {
+        name: 'Sautéed Jalapeno',
+        price: 100
+      }, {
+        name: 'Extra Panko Crust',
+        price: 100
+      }, {
+        name: 'Zucchini',
+        price: 100
+      }, {
+        name: 'Roasted Garlic',
+        price: 75
+      }
+    ],
+    sizes: [
+      {
+        name: 'Small',
+        price: 0
+      }, {
+        name: 'Medium',
+        price: 200
+      }, {
+        name: 'Large',
+        price: 400
+      }
+    ],
+    items: [
+      {
         name: 'The Vatican',
         description: 'Sauteed Salami, Roasted Bell Peppers',
         basePrice: 400
@@ -135,6 +170,10 @@ const menu = [
         name: 'The Garden',
         description: 'Gluten Free, No Pasta, Veggies',
         basePrice: 400
+      }, {
+        name: 'Just Mac',
+        description: 'simple mac and cheese',
+        basePrice: 350
       }
     ]
   }, {

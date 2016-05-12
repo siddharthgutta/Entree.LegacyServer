@@ -159,7 +159,9 @@ export default class DefaultChatBot extends ChatBotInterface {
     // TODO - Figure out solution for
     let dataFormat = `${i + 1}) ${producer.name}: ${producer.enabled ? `OPEN` : `CLOSED`}`;
     dataFormat += `\n${address}`;
-    dataFormat += `\nHours: ${ await DefaultChatBot._getDayHours(producer, moment().format('dddd'))}`;
+
+    // Hiding Hours for Now because text is too long
+    // dataFormat += `\nHours: ${ await DefaultChatBot._getDayHours(producer, moment().format('dddd'))}`;
     return dataFormat;
   }
 
