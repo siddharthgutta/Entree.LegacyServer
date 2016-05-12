@@ -58,10 +58,6 @@ Emitter.on(Events.USER_PAYMENT_REGISTERED, async({id: userId}) => {
     defaultPayment = await Payment.getCustomerDefaultPayment(userId);
     totalPrice = await Order.getOrderTotalById(orderId);
 
-    // TEMPORARY TAX IMPLEMENTATION - REMOVE AFTER CHICK-FIL-A
-    totalPrice *= 1.0825;
-    totalPrice = Math.round(totalPrice);
-
   } catch (e) {
     const err = new TraceError(`Could not process order`, e);
     sendSMS(user.phoneNumber, 'There was a problem processing your last order. Can you please try again?');

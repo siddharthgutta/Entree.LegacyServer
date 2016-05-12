@@ -700,10 +700,6 @@ export default class DefaultChatBot extends ChatBotInterface {
       total += orderItems[i].price;
     }
 
-    // TEMPORARY TAX IMPLEMENTATION - REMOVE AFTER CHICK-FIL-A
-    total *= 1.0825;
-    total = Math.round(total);
-
     // transform for order to support orders
     const items = orderItems.map(({name, price}) => ({name, price, quantity: 1}));
     let order;
@@ -993,19 +989,13 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     _.each(orderItems, orderItem => total += orderItem.price);
 
-    // TEMPORARY TAX IMPLEMENTATION - REMOVE AFTER CHICK-FIL-A
-    const subTotal = total;
-    total *= 1.0825;
-    total = Math.round(total);
-
     try {
       await chatState.updateState(chatStates.cart);
       await chatState.clearMenuItemContext();
       return await this._genOutput(
         chatState,
         response.cart.header,
-        `Your subtotal is $${(subTotal / 100).toFixed(2)}. Your final total (including tax) is ` +
-          `$${(total / 100).toFixed(2)}. ${response.cart.footer}`,
+        `Your total is $${(total / 100).toFixed(2)}. ${response.cart.footer}`,
         orderItems,
         response.cart.dataFormat);
     } catch (err) {
