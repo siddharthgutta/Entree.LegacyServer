@@ -61,8 +61,8 @@ testResults=$(printf "$output")
 charLimit=150000
 
 for ((i = 0; i < $((${#testResults} / charLimit + 1)); i++)); do
-	testResult="$(printf "${testResults:$i*charLimit:charLimit}")";
-    curl -F content="$testResult" \
+	testResult="${testResults:$i*charLimit:charLimit}";
+    curl -F content="$(printf "$testResult")" \
          -F channels=\#continous3 \
          -F mode=snippet \
          -F token=xoxp-16957148439-17257626929-35351887127-493fceaec8 \
