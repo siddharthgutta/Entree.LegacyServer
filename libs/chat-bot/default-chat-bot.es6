@@ -114,7 +114,7 @@ export default class DefaultChatBot extends ChatBotInterface {
   _genModFooter(itemMod) {
     if (itemMod.min === 0) {
       return `Select up to ${itemMod.max} options by typing a number or type \"no\" for none of the above. ` +
-        `If you want more than one, separate them with commas (e.g. 1,3,5).`;
+        `For more than one, separate them with commas (e.g. 1,3,5).`;
     }
 
     if (itemMod.min < itemMod.max) {

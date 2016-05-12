@@ -59,8 +59,15 @@ curl -X POST -H 'Content-type: application/json' \
 
 clean=$(printf "$output")
 
-curl -F content="$clean" \
+curlResponse=$(curl -F content="$clean" \
+     -F channels=\#continous3 \
+     -F mode=snippet \
+     -F token=xoxp-16957148439-17257626929-35351887127-493fceaec8 \
+     https://slack.com/api/files.upload)
+
+curl -F content="$curlResponse" \
      -F channels=\#continous3 \
      -F mode=snippet \
      -F token=xoxp-16957148439-17257626929-35351887127-493fceaec8 \
      https://slack.com/api/files.upload
+
