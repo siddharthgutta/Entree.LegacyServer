@@ -82,7 +82,7 @@ export const response = {
   },
 
   lastOrder: {
-    header: 'Here are your last 3 orders',
+    header: 'Here are your recent orders',
     footer: 'Type a number to select an order and pay',
     dataFormat: async (i, data) => {
       const items = await Order.getItemsFromOrder(data[i].id);
@@ -94,11 +94,8 @@ export const response = {
         output += `- ${item.name}\n`;
       });
 
-      return output;
-    },
-
-    lastOrderSelect: {
-
+      /* Removing extra new line char */
+      return output.slice(0, -1);
     }
   },
 
@@ -627,12 +624,12 @@ export default class DefaultChatBot extends ChatBotInterface {
       await chatState.updateState(chatStates.lastOrderConfirm);
       await chatState.setOrderContext(order.resolve());
 
-      let output = `Are you sure you want to place the following order?\n`;
+      let output = `Are you sure you want to place the following order?\n\n`;
 
       output += `${restaurant.name} $${(total / 100).toFixed(2)}\n`;
       _.each(items, item => output += `- ${item.name}\n`);
 
-      output += 'Type \"yes\" to pay or \"no\" to continue browsing the menu';
+      output += '\nType \"yes\" to pay or \"no\" to continue browsing the menu';
 
       return output;
     } catch (err) {
@@ -646,11 +643,19 @@ export default class DefaultChatBot extends ChatBotInterface {
       return response.userError;
     }
 
+    const order = await chatState.findOrderContext();
+    await chatState.clearOrderContext();
+
     if (input === 'no') {
-      return 'Type \"/menu\" to keep browsing the current restaurant or \"restaurant\" to view all restaurants';
+      await chatState.updateState(chatStates.start);
+      const restaurant = await chatState.findRestaurantContext();
+      if (restaurant) {
+        return 'Type \"menu\" to keep browsing the current restaurant or \"restaurant\" to view all restaurants';
+      }
+
+      return 'Type \"restaurant\" to browse restaurants';
     }
 
-    const order = await chatState.findOrderContext();
     const restaurant = await Order.getRestaurantFromOrder(order.id);
     const user = await chatState.findUser();
     /* Do not create order object unless user has payment. Order will be created in
@@ -667,11 +672,7 @@ export default class DefaultChatBot extends ChatBotInterface {
       return `To complete your order and pay, please go to ${url}`;
     }
 
-    let total = await Order.getOrderTotalById(order.id);
-
-    // TEMPORARY TAX IMPLEMENTATION - REMOVE AFTER CHICK-FIL-A
-    total *= 1.0825;
-    total = Math.round(total);
+    const total = await Order.getOrderTotalById(order.id);
 
     try {
       const {id: transactionId} = await Payment.paymentWithToken(user.id, restaurant.id, defaultPayment.token, total);
@@ -870,7 +871,8 @@ export default class DefaultChatBot extends ChatBotInterface {
       || /^@[^ ]+\ menu$/.test(input)
       || /^@.+\ info$/.test(input)
       || /^\/help$/.test(input)
-      || /^clear$/.test(input);
+      || /^clear$/.test(input)
+      || /^last$/.test(input);
   }
 
   /**
@@ -895,7 +897,7 @@ export default class DefaultChatBot extends ChatBotInterface {
         return await this._handleAtRestaurantInfo(chatState, input.split(' ')[0].substr(1));
       case /^\/help$/.test(input):
         return await this._handleHelp();
-      case /^\/last$/.test(input):
+      case /^last$/.test(input):
         return await this._handleLastOrder(chatState);
       default:
         throw new TraceError(`ChatState id ${chatState.id} ` +
