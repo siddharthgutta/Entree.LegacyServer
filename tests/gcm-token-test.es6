@@ -13,11 +13,20 @@ describe('GCM Token', () => {
   const data = 'the data';
 
   describe('#set()', () => {
-    it('should set a token correctly', async done => {
+    it('should set a token correctly', async () => {
       const gcmToken = await GcmToken.set(token, data);
       assert.equal(gcmToken.token, token);
       assert.equal(gcmToken.data, data);
-      done();
+    });
+
+    it('should override an existing token correctly', async () => {
+      const gcmToken = await GcmToken.set(token, data);
+      assert.equal(gcmToken.token, token);
+      assert.equal(gcmToken.data, data);
+
+      const newToken = await GcmToken.set(token, 'New Data');
+      assert.equal(newToken.token, token);
+      assert.equal(newToken.data, 'New Data');
     });
 
     it('should not set a gcm token with null token', async () => {
@@ -67,6 +76,17 @@ describe('GCM Token', () => {
       await GcmToken.remove(token);
       const gcmTokenDeleted = await GcmToken.get(token);
       assert.equal(gcmTokenDeleted, null);
+    });
+  });
+
+  describe('#has()', () => {
+    it('should check whether or not a token exists', async () => {
+      const gcmToken = await GcmToken.set(token, data);
+      assert.equal(gcmToken.token, token);
+      assert.equal(gcmToken.data, data);
+
+      assert.equal(await GcmToken.has(token), true);
+      assert.equal(await GcmToken.has('Not a token'), false);
     });
   });
 });

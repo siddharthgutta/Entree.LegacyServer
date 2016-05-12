@@ -5,4 +5,4 @@ id=$(git rev-parse HEAD)
 export IS_RUNNING_TEST=true;
 
 set -e
-npm run test-ci ./tests/google-api-test.compiled.js
+npm run test-ci ./tests/gcm-token-test.compiled.js
