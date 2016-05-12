@@ -58,13 +58,13 @@ curl -X POST -H 'Content-type: application/json' \
 
 testResults=$(printf "%s" "$output")
 
-curl -F content="${#testResults}" \
-     -F channels=\#continous3 \
-     -F mode=snippet \
-     -F token=xoxp-16957148439-17257626929-35351887127-493fceaec8 \
-     https://slack.com/api/files.upload;
+# curl -F content="${#testResults}" \
+#      -F channels=\#continous3 \
+#      -F mode=snippet \
+#      -F token=xoxp-16957148439-17257626929-35351887127-493fceaec8 \
+#      https://slack.com/api/files.upload;
 
-charLimit=175000
+charLimit=100000
 
 for ((i = 0; i < $((${#testResults} / charLimit + 1)); i++)); do
 	testResult="${testResults:$i*charLimit:charLimit}";
