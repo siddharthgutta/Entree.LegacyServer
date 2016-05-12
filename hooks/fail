@@ -60,8 +60,8 @@ for i in
 
 testResults=$(printf "$output")
 
-for ((i = 0; i < $((${#testResults} / 1000000 + 1)); i++)); do
-	testResult="${testResults:$i*1000000:1000000}";
+for ((i = 0; i < $((${#testResults} / 100000 + 1)); i++)); do
+	testResult="${testResults:$i*100000:100000}";
 	echo $testResult
     curl -F content="$clean" \
          -F channels=\#continous3 \
