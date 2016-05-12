@@ -56,22 +56,16 @@ payload=$(echo "{\"channel\":\"#continous3\",\"attachments\":[{\"fallback\":\"Te
 curl -X POST -H 'Content-type: application/json' \
      --data "$payload" https://hooks.slack.com/services/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
 
+for i in 
 
-clean=$(printf "$output")
+testResults=$(printf "$output")
 
-echo $clean
-
-curlResponse=$(curl -F content="$clean" \
-     -F channels=\#continous3 \
-     -F mode=snippet \
-     -F token=xoxp-16957148439-17257626929-35351887127-493fceaec8 \
-     https://slack.com/api/files.upload)
-
-curlResponseOut=$(printf "$curlResponse")
-echo $curlResponseOut
-
-curl -F content="$curlResponseOut" \
-     -F channels=\#continous3 \
-     -F mode=snippet \
-     -F token=xoxp-16957148439-17257626929-35351887127-493fceaec8 \
-     https://slack.com/api/files.upload
+for ((i = 0; i < $((${#testResults} / 1000000 + 1)); i++)); do
+	testResult="${testResults:$i*1000000:1000000}";
+	echo $testResult
+    curl -F content="$clean" \
+         -F channels=\#continous3 \
+         -F mode=snippet \
+         -F token=xoxp-16957148439-17257626929-35351887127-493fceaec8 \
+         https://slack.com/api/files.upload;
+done
