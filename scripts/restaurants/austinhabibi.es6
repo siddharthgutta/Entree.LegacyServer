@@ -476,11 +476,17 @@ async function importMenu() {
 
 async function registerRestaurant() {
   console.log('Registering Restaurant');
-  try {
-    await Payment.registerOrUpdateProducerWithPaymentSystem(restaurantId,
-      merchant.individual, merchant.business, merchant.funding);
-  } catch (err) {
-    throw new TraceError('Failed to register restaurant', err);
+
+  const restaurant = (await Restaurant.findOne(restaurantId)).resolve();
+  if (isEmpty(restaurant.merchantId)) {
+    try {
+      await Payment.registerOrUpdateProducerWithPaymentSystem(restaurantId,
+        merchant.individual, merchant.business, merchant.funding);
+    } catch (err) {
+      throw new TraceError('Failed to register restaurant', err);
+    }
+  } else {
+    console.log('Restaurant has already been submitted as a merchant to Braintree');
   }
 }
 
