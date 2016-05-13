@@ -80,7 +80,6 @@ describe('Google API', () => {
     it('should successfully shorten a url', async () => {
       const shortUrl = await GoogleURLShortenerAPI.shortenUrl(longUrl);
       assert.ok(shortUrl);
-      assert.ok(shortUrl);
       assert(shortUrl.length < longUrl.length, 'Shortened url should be shorter than long url');
     });
   });
