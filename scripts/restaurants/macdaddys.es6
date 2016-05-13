@@ -295,13 +295,14 @@ async function importMenu() {
 }
 
 async function registerRestaurant() {
-  console.log('Registering of Finding Existing Restaurant');
+  console.log('Registering or finding existing restaurant');
 
   const restaurant = (await Restaurant.findOne(restaurantId)).resolve();
   if (isEmpty(restaurant.merchantId)) {
     try {
       await Payment.registerOrUpdateProducerWithPaymentSystem(restaurantId,
         merchant.individual, merchant.business, merchant.funding);
+      console.log('Successfully registered/updated restaurant to merchant account');
     } catch (err) {
       throw new TraceError('Failed to register restaurant', err);
     }
