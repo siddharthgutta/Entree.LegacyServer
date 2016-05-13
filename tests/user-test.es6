@@ -246,7 +246,6 @@ describe('User', () => {
 
   describe('#findOneByPhoneNumber()', () => {
     it('should query from the database correctly', done => {
-      assert.ok(false);
       User.create(phoneNumber, {firstName, email})
           .then(() => {
             User.findOneByPhoneNumber(phoneNumber)
