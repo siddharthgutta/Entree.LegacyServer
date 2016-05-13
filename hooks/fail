@@ -58,7 +58,7 @@ curl -X POST -H 'Content-type: application/json' \
 
 testResults=$(printf "$output")
 
-charLimit=125000
+charLimit=100000
 
 for ((i = 0; i < $((${#testResults} / charLimit + 1)); i++)); do
 	testResult="${testResults:$i*charLimit:charLimit}";
