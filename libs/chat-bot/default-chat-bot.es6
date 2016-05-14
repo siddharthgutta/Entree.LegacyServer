@@ -94,27 +94,29 @@ export default class DefaultChatBot extends ChatBotInterface {
     /* Empty Constructor */
   }
 
+  // Removing orderItem from this to lower length of texts to < 320 characters: ~2 SMS Texts
+  // * @param {OrderItem} orderItem: current order being modified
   /**
    * Generates the header for the mod states using the current item mod and the current order item being modified
    *
    * @param {ItemMod} itemMod: current item mod that the user is making a choice on
-   * @param {OrderItem} orderItem: current order being modified
    * @returns {String} header string for response message
    * @private
    */
-  _genModHeader(itemMod, orderItem) {
+  _genModHeader(itemMod) {
+    // Fixes to reduce add-on texts to below 2 SMS text lengths: ~320 characters
     if (itemMod.max === 1) {
-      return `Type a number to select a ${itemMod.name.toLowerCase()} for` +
-        ` (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})`;
+      return `Type a number to select a ${itemMod.name.toLowerCase()}`;
+      // + `for (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})`;
     }
-    return `Would you like any ${itemMod.name.toLowerCase()} for` +
-      ` (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})?`;
+    return `Would you like any ${itemMod.name.toLowerCase()}`;
+    // + ` for (${orderItem.name} - $${(orderItem.price / 100).toFixed(2)})?`;
   }
 
   _genModFooter(itemMod) {
     if (itemMod.min === 0) {
       return `Select up to ${itemMod.max} options by typing a number or type \"no\" for none of the above. ` +
-        `If you want more than one, separate them with commas (e.g. 1,3,5).`;
+        `For more than one, separate them with commas (e.g. 1,3,5).`;
     }
 
     if (itemMod.min < itemMod.max) {
@@ -159,7 +161,9 @@ export default class DefaultChatBot extends ChatBotInterface {
     // TODO - Figure out solution for
     let dataFormat = `${i + 1}) ${producer.name}: ${producer.enabled ? `OPEN` : `CLOSED`}`;
     dataFormat += `\n${address}`;
-    dataFormat += `\nHours: ${ await DefaultChatBot._getDayHours(producer, moment().format('dddd'))}`;
+
+    // Hiding Hours for Now because text is too long
+    // dataFormat += `\nHours: ${ await DefaultChatBot._getDayHours(producer, moment().format('dddd'))}`;
     return dataFormat;
   }
 
@@ -403,8 +407,10 @@ export default class DefaultChatBot extends ChatBotInterface {
       const footer = this._genModFooter(firstItemMod);
 
       // Generates the header from the current item mod and current order item being modified
-      const orderItem = await chatState.findLastOrderItem();
-      const header = this._genModHeader(firstItemMod, orderItem);
+
+      // Removing orderItem to reduce the length of SMS texts to less than 2 texts: ~320 characters
+      // const orderItem = await chatState.findLastOrderItem();
+      const header = this._genModHeader(firstItemMod);
 
       try {
         await chatState.updateState(chatStates.mods);
@@ -553,8 +559,10 @@ export default class DefaultChatBot extends ChatBotInterface {
     const footer = this._genModFooter(nextItemMod);
 
     // Generates the header from the current item mod and current order item being modified
-    const orderItem = await chatState.findLastOrderItem();
-    const header = this._genModHeader(nextItemMod, orderItem);
+
+    // Removing orderItem to reduce the length of SMS texts to less than 2 texts: ~320 characters
+    // const orderItem = await chatState.findLastOrderItem();
+    const header = this._genModHeader(nextItemMod);
 
     /* Note that we don't update the state here since we have more mods to process */
     return await this._genOutput(

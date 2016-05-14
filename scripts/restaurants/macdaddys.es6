@@ -83,7 +83,7 @@ const hours = [
 
 const menu = [
   {
-    category: 'Mac & Cheese',
+    category: 'Recommended',
     mods: [
       {
         name: 'Extra Cheese',
@@ -127,7 +127,42 @@ const menu = [
         name: 'The Funky Chunky',
         description: 'Hamburger, Onion',
         basePrice: 400
+      }
+    ]
+  }, {
+    category: 'Mac & Cheese',
+    mods: [
+      {
+        name: 'Extra Cheese',
+        price: 100
       }, {
+        name: 'Sautéed Jalapeno',
+        price: 100
+      }, {
+        name: 'Extra Panko Crust',
+        price: 100
+      }, {
+        name: 'Zucchini',
+        price: 100
+      }, {
+        name: 'Roasted Garlic',
+        price: 75
+      }
+    ],
+    sizes: [
+      {
+        name: 'Small',
+        price: 0
+      }, {
+        name: 'Medium',
+        price: 200
+      }, {
+        name: 'Large',
+        price: 400
+      }
+    ],
+    items: [
+      {
         name: 'The Vatican',
         description: 'Sauteed Salami, Roasted Bell Peppers',
         basePrice: 400
@@ -135,6 +170,10 @@ const menu = [
         name: 'The Garden',
         description: 'Gluten Free, No Pasta, Veggies',
         basePrice: 400
+      }, {
+        name: 'Just Mac',
+        description: 'simple mac and cheese',
+        basePrice: 350
       }
     ]
   }, {
@@ -256,12 +295,19 @@ async function importMenu() {
 }
 
 async function registerRestaurant() {
-  console.log('Registering of Finding Existing Restaurant');
-  try {
-    await Payment.registerOrUpdateProducerWithPaymentSystem(restaurantId,
-      merchant.individual, merchant.business, merchant.funding);
-  } catch (err) {
-    throw new TraceError('Failed to register restaurant', err);
+  console.log('Registering or finding existing restaurant');
+
+  const restaurant = (await Restaurant.findOne(restaurantId)).resolve();
+  if (isEmpty(restaurant.merchantId)) {
+    try {
+      await Payment.registerOrUpdateProducerWithPaymentSystem(restaurantId,
+        merchant.individual, merchant.business, merchant.funding);
+      console.log('Successfully registered/updated restaurant to merchant account');
+    } catch (err) {
+      throw new TraceError('Failed to register restaurant', err);
+    }
+  } else {
+    console.log('Restaurant has already been submitted as a merchant to Braintree');
   }
 }
 
