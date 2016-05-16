@@ -626,8 +626,8 @@ export default class DefaultChatBot extends ChatBotInterface {
 
       let output = `Are you sure you want to place the following order?\n\n`;
 
-      output += `${restaurant.name}\'s order for a total of $${(total / 100).toFixed(2)}\n`;
-      for (const idx in items) { // eslint-disable-line
+      output += `${restaurant.name}\ - Total $${(total / 100).toFixed(2)}\n`;
+      for (let idx = 0; idx < items.length; idx++) {
         output += `${idx + 1}) ${items[idx].name} - $${(items[idx].price / 100).toFixed(2)}\n`;
       }
 
