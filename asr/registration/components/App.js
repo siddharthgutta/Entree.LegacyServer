@@ -36,7 +36,7 @@ const conversation = [{
 }, {
   from: 'A',
   to: 'Entrée',
-  content: 'Can I get my usual from Torchies?'
+  content: 'Can I get my usual from Torchy\'s?'
 }, {
   from: 'Entrée',
   to: 'A',
