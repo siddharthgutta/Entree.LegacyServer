@@ -80,6 +80,8 @@ export async function setOrderStatus(id, status, {prepTime, message, transaction
 }
 
 export async function createOrder(userId, restaurantId, items) {
+  console.tag('HEREEEEEEEEEEEEEEE ITEMS').log(items);
+
   try {
     const order = await Order.safelyCreate(userId, restaurantId, items);
 

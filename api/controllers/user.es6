@@ -1,4 +1,5 @@
 import * as User from '../user.es6';
+import * as OrderUtils from '../utils/order.es6';
 import {sendSMS} from './sms.es6';
 import Emitter, {Events} from '../events/index.es6';
 import {format} from 'url';
@@ -168,17 +169,30 @@ export async function updateUserProfile(secret, attributes) {
  * Gets the three most recent orders for a specific user
  *
  * @param {String} id: ID of the user
- * @returns {Object}: Array of size 3 of the most recent orders
+ * @returns {Object}: Array of size 3 of the most recent unique orders
  */
 export async function getRecentOrders(id) {
   let orders;
   try {
     orders = await User.getOrders(id);
+    if (orders.length === 0) {
+      return orders;
+    }
   } catch (e) {
     throw new TraceError(`Could not get recent orders for user id ${id}`, e);
   }
 
-  return orders.slice(Math.max(orders.length - 3, 0));
+  const result = [orders[orders.length - 1]];
+  for (let idx = orders.length - 2; idx >= 0 && result.length < 3; idx--) {
+    const last = result[result.length - 1];
+    const current = orders[idx];
+
+    if (!OrderUtils.isOrderEqual(last, current)) {
+      result.push(current);
+    }
+  }
+
+  return result;
 }
 
 export {User as UserModel};

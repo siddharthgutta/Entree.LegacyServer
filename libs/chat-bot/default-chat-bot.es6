@@ -618,7 +618,7 @@ export default class DefaultChatBot extends ChatBotInterface {
         return response.restaurantDisabled(restaurant);
       }
 
-      items = await Order.getItemsFromOrder(orderId);
+      items = await Order.getItemsFromOrder(order.id);
       total = await Order.getOrderTotalById(order.id);
 
       await chatState.updateState(chatStates.lastOrderConfirm);
@@ -626,8 +626,10 @@ export default class DefaultChatBot extends ChatBotInterface {
 
       let output = `Are you sure you want to place the following order?\n\n`;
 
-      output += `${restaurant.name} $${(total / 100).toFixed(2)}\n`;
-      _.each(items, item => output += `- ${item.name}\n`);
+      output += `${restaurant.name}\'s order for a total of $${(total / 100).toFixed(2)}\n`;
+      for (const idx in items) { // eslint-disable-line
+        output += `${idx + 1}) ${items[idx].name} - $${(items[idx].price / 100).toFixed(2)}\n`;
+      }
 
       output += '\nType \"yes\" to pay or \"no\" to continue browsing the menu';
 
@@ -658,25 +660,24 @@ export default class DefaultChatBot extends ChatBotInterface {
 
     const restaurant = await Order.getRestaurantFromOrder(order.id);
     const user = await chatState.findUser();
+    const items = await Order.getItemsFromOrder(order.id);
+    const itemsCopy = items.map(({name, price}) => ({name, price, quantity: 1}));
+    const newOrder = await Order.createOrder(user.id, restaurant.id, itemsCopy);
+
     /* Do not create order object unless user has payment. Order will be created in
      * dispatcher.es6 for first time users */
     let defaultPayment;
     try {
       defaultPayment = await Payment.getCustomerDefaultPayment(user.id);
     } catch (defaultPaymentError) {
-      console.tag('chatbot').log('No default payment found. Sending user to signup2.');
-      const secret = await User.requestProfileEdit(user.id);
-      const url = await User.resolveProfileEditAddress(secret);
-
-      chatState.updateState(chatStates.secondSignup);
-      return `To complete your order and pay, please go to ${url}`;
+      throw new TraceError('User tried to re-order but did not have default payment', defaultPaymentError);
     }
 
-    const total = await Order.getOrderTotalById(order.id);
+    const total = await Order.getOrderTotalById(newOrder.id);
 
     try {
       const {id: transactionId} = await Payment.paymentWithToken(user.id, restaurant.id, defaultPayment.token, total);
-      await Order.setOrderStatus(order.id, Order.Status.RECEIVED_PAYMENT, {transactionId});
+      await Order.setOrderStatus(newOrder.id, Order.Status.RECEIVED_PAYMENT, {transactionId});
     } catch (paymentWithTokenError) {
       console.tag('chatbot').error('Payment failed although customer default payment exists', paymentWithTokenError);
       throw new TraceError('Payment failed although customer default payment exists', paymentWithTokenError);
@@ -1066,6 +1067,9 @@ export default class DefaultChatBot extends ChatBotInterface {
     try {
       user = await chatState.findUser();
       orders = await User.getRecentOrders(user.id);
+      if (orders.length === 0) {
+        return 'Sorry, you do not have any recent orders to choose from.';
+      }
     } catch (err) {
       throw new TraceError(`ChatState id ${chatState.id} - Failed to get previous orders`, err);
     }
