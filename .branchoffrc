@@ -84,6 +84,9 @@
         "SOCKET_SERVER_PORT": 2998,
         "ENTERPRISE_APP_HOSTNAME": "textentree.com",
         "TWILIO_NUMBER": "+15125200133"
+      },
+      "feature-last-order": {
+        "TWILIO_NUMBER": "+14696152626"
       }
     }
   },
