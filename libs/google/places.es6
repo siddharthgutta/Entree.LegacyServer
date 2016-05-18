@@ -6,6 +6,7 @@ import GoogleAPIStrategy from './strategy.es6';
 import URI from 'urijs';
 
 export default class GooglePlaces extends GoogleAPIStrategy {
+
   /**
    * Constructor for GooglePlaces
    *
@@ -50,25 +51,24 @@ export default class GooglePlaces extends GoogleAPIStrategy {
    * @param {String} name: name of place to search by
    * @param {Number} lat: latitude coordinate value
    * @param {Number} long: longitude coordinate value
+   * @param {Array} types: types of the categories we are searching under
    * @param {Boolean} opennow: search for only opennow places
    * @returns {*}: results with a list of places and their data
    */
-  async searchByName(name, lat, long, opennow = false) {
-    const qs = {
-      key: this.apiKey,
-      name,
-      // 16km ~ 10 mile radius
-      radius: 16000,
-      location: `${lat},${long}`
-    };
-    if (opennow) qs.opennow = true;
+  async searchByName(name, lat, long, opennow = false, types = null) {
+    if (!types || types.length === 0) {
+      return await this._searchWithType(name, lat, long, opennow, null);
+    }
 
-    const responseBody = await this.apiCall(
-      'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
-      'GET',
-      qs
-    );
-    return responseBody.results;
+    for (let idx = 0; idx < types.length; idx++) {
+      const result = await this._searchWithType(name, lat, long, opennow, types[idx]);
+      if (result.length !== 0) {
+        return result;
+      }
+    }
+
+    /* Nothing came up under any type */
+    return [];
   }
 
   /**
@@ -100,5 +100,38 @@ export default class GooglePlaces extends GoogleAPIStrategy {
     });
 
     return url.toString();
+  }
+
+  /**
+   * Search for places by name and a specific type
+   *
+   * @param {String} name: name of place to search by
+   * @param {Number} lat: latitude coordinate value
+   * @param {Number} long: longitude coordinate value
+   * @param {Boolean} opennow: search for only opennow places
+   * @param {String} type: type of the category we are searching under
+   * @returns {*}: results with a list of places and their data
+   */
+  async _searchWithType(name, lat, long, opennow, type = null) {
+    const qs = {
+      key: this.apiKey,
+      name,
+      // 16km ~ 10 mile radius
+      radius: 16000,
+      location: `${lat},${long}`
+    };
+
+    if (type) {
+      qs.type = type;
+    }
+
+    if (opennow) qs.opennow = true;
+
+    const responseBody = await this.apiCall(
+      'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
+      'GET',
+      qs
+    );
+    return responseBody.results;
   }
 }

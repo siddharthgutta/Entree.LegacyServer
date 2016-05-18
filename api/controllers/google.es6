@@ -39,10 +39,11 @@ export async function searchPlacesByKeyword(keyword, lat, lng) {
  * @param {String} name: name to search by
  * @param {Number} lat: latitude coordinates
  * @param {Number} lng: longitude coordinates
+ * @param {Array} types: categories we want to search under
  * @returns {Array} results of places
  */
-export async function searchPlacesByName(name, lat, lng) {
-  return await googlePlaces.searchByName(name, lat, lng);
+export async function searchPlacesByName(name, lat, lng, types) {
+  return await googlePlaces.searchByName(name, lat, lng, types);
 }
 
 /**
