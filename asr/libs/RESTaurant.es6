@@ -88,7 +88,7 @@ class RESTaurant extends EventEmitter {
 
     if (env.isNative() && this._push) {
       await fetch(`${this._server}${this._gcmEndpoints.disconnect.pathname}`,
-                  {method: 'post', query: this._gcmEndpoints.disconnect.query});
+        {method: 'post', query: this._gcmEndpoints.disconnect.query});
 
       this._push.unregister();
       this._push = null;
@@ -262,6 +262,8 @@ class RESTaurant extends EventEmitter {
         method: 'post',
         body: {token: this._token, status, prepTime, message}
       });
+
+    this._emit(RESTaurant.Events.ORDER_UPDATE, order);
 
     return order;
   }

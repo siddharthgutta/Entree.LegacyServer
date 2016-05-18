@@ -45,7 +45,7 @@
         "HTTPS_SSL_CERTIFICATE": "./keys/localhost.crt",
         "HTTPS_SSL_CA": "./keys/localhost.crt",
         "SOCKET_SERVER_USE_REMOTE": true,
-        "ENTERPRISE_APP_HOSTNAME": "e1a78b94.ngrok.io"
+        "ENTERPRISE_APP_HOSTNAME": "localhost"
       },
       "local-stage": {
         "NODE_ENV": "local_staging",
@@ -84,6 +84,9 @@
         "SOCKET_SERVER_PORT": 2998,
         "ENTERPRISE_APP_HOSTNAME": "textentree.com",
         "TWILIO_NUMBER": "+15125200133"
+      },
+      "feature-last-order": {
+        "TWILIO_NUMBER": "+14696152626"
       }
     }
   },

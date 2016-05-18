@@ -417,7 +417,6 @@ export default class FbChatBot {
       }
 
       const details = await Goog.getPlaceDetailsFromPlaceId(placeId);
-
       await User.UserModel.addToWishList(user.fbId, placeId);
 
       button = new ButtonMessageData(`${details.name} has been added to your wishlist. I’ll let you know when ` +
@@ -484,7 +483,8 @@ export default class FbChatBot {
       response = new GenericMessageData();
       for (let idx = 0; idx < 10 && idx < searchResults.length; idx++) {
         const place = searchResults[idx];
-        const photoUrl = place.photos ? Goog.getShortUrlFromPhotoReference(place.photos[0].photo_reference) : null;
+        const photoUrl =
+          place.photos ? await Goog.getShortUrlFromPhotoReference(place.photos[0].photo_reference) : null;
         const details = await Goog.getPlaceDetailsFromPlaceId(place.place_id);
         response.pushElement(place.name,
           `${details.formatted_address} - Price Range: ${'$'.repeat(place.price_level)}`, photoUrl);
@@ -526,7 +526,8 @@ export default class FbChatBot {
           const place = result[0];
           const details = await Goog.getPlaceDetailsFromPlaceId(place.place_id);
           await User.UserModel.addToWishList(user.fbId, place.place_id);
-          const photoUrl = place.photos ? Goog.getShortUrlFromPhotoReference(place.photos[0].photo_reference) : null;
+          const photoUrl =
+            place.photos ? await Goog.getShortUrlFromPhotoReference(place.photos[0].photo_reference) : null;
           response.pushElement(place.name,
             `${details.formatted_address} - Price Range: ${'$'.repeat(place.price_level)}`, photoUrl);
           response.pushPostbackButton('More Info', this._genPayload(actions.moreInfo, {placeId: place.place_id}));
@@ -654,5 +655,4 @@ export default class FbChatBot {
   _getData(payload) {
     return payload.data;
   }
-
 }

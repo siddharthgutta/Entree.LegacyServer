@@ -1,6 +1,6 @@
 {
   "name": "entree-server",
-  "version": "1.0.5",
+  "version": "1.1.1",
   "description": "",
   "main": "index.compiled.js",
   "dependencies": {
@@ -116,7 +116,7 @@
     "benchmarks-ci": "set -e;for f in ./tests/benchmark/*-test.compiled.js ; do npm run benchmark-ci $f; done",
     "lint": "eslint --ext js,.es6,.jsx ./",
     "lint-ci": "set -e; eslint --no-color --quiet --ext js,.es6,.jsx ./",
-    "boss": "export set -e; branch-off start local-stage",
+    "boss": "set -e; branch-off start local-stage",
     "bos": "set -e; branch-off start local-release",
     "bot": "set -e; branch-off trigger test local-stage",
     "bod": "set -e; branch-off trigger dev local-stage",

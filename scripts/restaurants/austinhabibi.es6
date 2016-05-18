@@ -392,7 +392,7 @@ const merchant = {
     phone: '5127334014',
     dateOfBirth: '1988-05-05',
     address: {
-      streetAddress: '817 West 5th St.',
+      streetAddress: '817 W 5th St.',
       locality: 'Austin',
       region: 'TX',
       postalCode: '78703'
@@ -475,12 +475,19 @@ async function importMenu() {
 }
 
 async function registerRestaurant() {
-  console.log('Registering Restaurant');
-  try {
-    await Payment.registerOrUpdateProducerWithPaymentSystem(restaurantId,
-      merchant.individual, merchant.business, merchant.funding);
-  } catch (err) {
-    throw new TraceError('Failed to register restaurant', err);
+  console.log('Registering or finding existing restaurant');
+
+  const restaurant = (await Restaurant.findOne(restaurantId)).resolve();
+  if (isEmpty(restaurant.merchantId)) {
+    try {
+      await Payment.registerOrUpdateProducerWithPaymentSystem(restaurantId,
+        merchant.individual, merchant.business, merchant.funding);
+      console.log('Successfully registered/updated restaurant to merchant account');
+    } catch (err) {
+      throw new TraceError('Failed to register restaurant', err);
+    }
+  } else {
+    console.log('Restaurant has already been submitted as a merchant to Braintree');
   }
 }
 

@@ -39,7 +39,7 @@ export function initScribe(override = true, stdOnly = false, callSite = true) {
     name: 'Entree',
     id,
     expose: {
-      default: stdOnly ? ['bash'] : [
+      default: stdOnly ? [] : [
         'mongo-socket',
         'bash'
       ],

@@ -36,7 +36,7 @@ const conversation = [{
 }, {
   from: 'A',
   to: 'Entrée',
-  content: 'Can I get my usual from Torchies?'
+  content: 'Can I get my usual from Torchy\'s?'
 }, {
   from: 'Entrée',
   to: 'A',
@@ -126,7 +126,7 @@ class App extends Influx.Component {
         <a className='contact' href='mailto:hi@textentree.com'><span className='icon message2'/></a>
         <div className='flex center vertical animate-opacity' ref='brand' style={{width: '100%', height: '50%'}}>
           <div className='main-logo'/>
-          <div className='catchphrase'>Order Ahead with SMS</div>
+          <div className='catchphrase'>Stop Waiting, Start Eating</div>
         </div>
         <div ref='mobile' className='animate-transform phone-wrapper'>
           <div className='animate-opacity secondary-logo-wrapper' ref='icon'>

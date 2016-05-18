@@ -1,8 +1,7 @@
 {
   "Client": {
     "Server": {
-      "protocol": "http",
-      "overridePort": 80
+      "protocol": "http"
     }
   },
   "Server": {
