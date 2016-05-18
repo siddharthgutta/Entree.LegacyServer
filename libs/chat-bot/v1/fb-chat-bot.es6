@@ -467,14 +467,24 @@ export default class FbChatBot {
    * @private
    */
   async _search(event, user) {
-    if (!(await this._hasWishlist(user.fbId))) {
-      return await this._handleInitialWishList(event, user);
+    let location, response;
+
+    try {
+      location = await User.UserModel.getDefaultLocation(user.fbId);
+      if (!location) {
+        const text = new TextMessageData('You can\'t search for places yet since you haven\'t give us your location.' +
+          'The walk through will explain how to later');
+        return [text];
+      }
+    } catch (err) {
+      throw new TraceError('Problem when getting user default location', err);
     }
 
-    let response;
-    try {
-      const location = await User.UserModel.getDefaultLocation(user.fbId);
+    if (!(await this._hasWishlist(user.fbId))) {
+      return await this._handleInitialWishList(event, user, location);
+    }
 
+    try {
       const inputText = event.message.text.trim();
       const searchResults = await Goog.searchPlacesByName(inputText, location.latitude, location.longitude, placeTypes);
       if (searchResults.length === 0) {
@@ -506,9 +516,11 @@ export default class FbChatBot {
    * When the user types in his or her favorite 3 restaurants
    *
    * @param {Object} event: input event from messenger
+   * @param {Object} user: user object that sent this event
+   * @param {Object} location: location of the user
    * @returns {Object}: messengerPlace output
    */
-  async _handleInitialWishList(event, user) {
+  async _handleInitialWishList(event, user, location) {
     const inputText = event.message.text;
     const places = inputText.split(',');
 
@@ -517,12 +529,11 @@ export default class FbChatBot {
 
     let response, button;
     try {
-      const location = await User.UserModel.getDefaultLocation(user.fbId);
       response = new GenericMessageData();
 
       const notFound = [];
       for (let idx = 0; idx < places.length; idx++) { // eslint-disable-line
-        const result = await Goog.searchPlacesByName(places[idx], location.latitude, location.longitude);
+        const result = await Goog.searchPlacesByName(places[idx], location.latitude, location.longitude, placeTypes);
         if (result.length === 0) {
           notFound.push(places[idx]);
         } else {

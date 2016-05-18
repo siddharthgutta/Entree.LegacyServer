@@ -193,7 +193,11 @@ export async function addLocation(fbId, latitude, longitude) {
 export async function getDefaultLocation(fbId) {
   const user = await findOneByFbId(fbId);
   const locations = await user.getUserLocations({where: {default: true}});
-  if (locations.length !== 1) {
+  if (locations.length === 0) {
+    return null;
+  }
+
+  if (locations.length > 1) {
     console.tag('api', 'user', 'LOCATION ERROR').log(`User with fbId ${fbId} has duplicate default locations`);
   }
 
