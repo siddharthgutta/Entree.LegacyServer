@@ -13,8 +13,18 @@ describe('Type Check', () => {
     key3: TYPES.STRING
   };
 
+  const testObjects = {
+    [TYPES.STRING]: {
+      
+    }
+  }
+
   function compare(type, input) {
     return TypeChecker.check(type, input);
+  }
+
+  function testTypes(inputType) {
+
   }
 
   describe('#or', () => {
