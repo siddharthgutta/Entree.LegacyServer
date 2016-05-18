@@ -54,7 +54,7 @@ describe('Google API', () => {
 
     it('should produce search results with name search', async () => {
       const name = 'chipotle';
-      const results = await GooglePlacesAPI.searchByName(name, lat, lng);
+      const results = await GooglePlacesAPI.searchByName(name, lat, lng, null);
       assert.ok(results);
       assert(results.length > 0);
       const firstPlace = results[0];

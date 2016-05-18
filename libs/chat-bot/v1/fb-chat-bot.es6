@@ -4,6 +4,7 @@
 import _ from 'underscore';
 import * as User from '../../../api/controllers/user.es6';
 import * as Goog from '../../../api/controllers/google.es6';
+import {PlaceTypes} from '../../google/placeType.es6';
 import {GenericMessageData, TextMessageData, ReceiptMessageData, ButtonMessageData}
   from '../../msg/facebook/message-data.es6';
 
@@ -95,6 +96,8 @@ export const menus = {
     }
   ]
 };
+
+const placeTypes = [PlaceTypes.restaurant, PlaceTypes.cafe, PlaceTypes.bakery];
 
 export default class FbChatBot {
   constructor(msgPlatform) {
@@ -473,7 +476,7 @@ export default class FbChatBot {
       const location = await User.UserModel.getDefaultLocation(user.fbId);
 
       const inputText = event.message.text.trim();
-      const searchResults = await Goog.searchPlacesByName(inputText, location.latitude, location.longitude);
+      const searchResults = await Goog.searchPlacesByName(inputText, location.latitude, location.longitude, placeTypes);
       if (searchResults.length === 0) {
         const text = new TextMessageData(`Sorry we could not find anything for ${inputText}. ` +
           `Please try something else`);
