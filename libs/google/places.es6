@@ -5,7 +5,10 @@
 import GoogleAPIStrategy from './strategy.es6';
 import URI from 'urijs';
 
+const types = ['restaurant', 'cafe', 'bakery'];
+
 export default class GooglePlaces extends GoogleAPIStrategy {
+
   /**
    * Constructor for GooglePlaces
    *
@@ -54,21 +57,15 @@ export default class GooglePlaces extends GoogleAPIStrategy {
    * @returns {*}: results with a list of places and their data
    */
   async searchByName(name, lat, long, opennow = false) {
-    const qs = {
-      key: this.apiKey,
-      name,
-      // 16km ~ 10 mile radius
-      radius: 16000,
-      location: `${lat},${long}`
-    };
-    if (opennow) qs.opennow = true;
+    for (let idx = 0; idx < types.length; idx++) {
+      const result = await this._searchWithType(name, lat, long, opennow, types[idx]);
+      if (result.length !== 0) {
+        return result;
+      }
+    }
 
-    const responseBody = await this.apiCall(
-      'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
-      'GET',
-      qs
-    );
-    return responseBody.results;
+    /* Nothing came up under any type */
+    return [];
   }
 
   /**
@@ -100,5 +97,34 @@ export default class GooglePlaces extends GoogleAPIStrategy {
     });
 
     return url.toString();
+  }
+
+  /**
+   * Search for places by name and a specific type
+   *
+   * @param {String} name: name of place to search by
+   * @param {Number} lat: latitude coordinate value
+   * @param {Number} long: longitude coordinate value
+   * @param {Boolean} opennow: search for only opennow places
+   * @param {String} type: type of the category we are searching under
+   * @returns {*}: results with a list of places and their data
+   */
+  async _searchWithType(name, lat, long, opennow = false, type) {
+    const qs = {
+      key: this.apiKey,
+      name,
+      // 16km ~ 10 mile radius
+      radius: 16000,
+      location: `${lat},${long}`,
+      type
+    };
+    if (opennow) qs.opennow = true;
+
+    const responseBody = await this.apiCall(
+      'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
+      'GET',
+      qs
+    );
+    return responseBody.results;
   }
 }
