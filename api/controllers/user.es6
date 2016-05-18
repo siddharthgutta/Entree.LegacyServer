@@ -174,7 +174,7 @@ export async function updateUserProfile(secret, attributes) {
 export async function getRecentOrders(id) {
   let orders;
   try {
-    orders = await User.getOrders(id);
+    orders = (await User.getOrders(id)).reverse();
     if (orders.length === 0) {
       return orders;
     }
@@ -182,12 +182,12 @@ export async function getRecentOrders(id) {
     throw new TraceError(`Could not get recent orders for user id ${id}`, e);
   }
 
-  const result = [orders[orders.length - 1]];
-  for (let idx = orders.length - 2; idx >= 0 && result.length < 3; idx--) {
+  const result = [orders[0]];
+  for (let idx = 1; idx < orders.length && result.length < 3; idx++) {
     const last = result[result.length - 1];
     const current = orders[idx];
 
-    if (!OrderUtils.isOrderEqual(last, current)) {
+    if (!(await OrderUtils.isOrderEqual(last, current))) {
       result.push(current);
     }
   }

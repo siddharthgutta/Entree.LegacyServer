@@ -663,6 +663,7 @@ export default class DefaultChatBot extends ChatBotInterface {
     const items = await Order.getItemsFromOrder(order.id);
     const itemsCopy = items.map(({name, price}) => ({name, price, quantity: 1}));
     const newOrder = await Order.createOrder(user.id, restaurant.id, itemsCopy);
+    await chatState.setOrderContext(newOrder.resolve());
 
     /* Do not create order object unless user has payment. Order will be created in
      * dispatcher.es6 for first time users */
@@ -1083,7 +1084,7 @@ export default class DefaultChatBot extends ChatBotInterface {
         orders,
         response.lastOrder.dataFormat);
     } catch (err) {
-      throw new TraceError(`ChatState id ${chatState.id} - Failed to update chatbot`, err);
+      throw new TraceError(`ChatState id ${chatState.id} - Failed to generate output for last order`, err);
     }
   }
 
