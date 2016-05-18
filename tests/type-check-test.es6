@@ -15,16 +15,42 @@ describe('Type Check', () => {
 
   const testObjects = {
     [TYPES.STRING]: {
-      
+      valid: ['test', '!@#$']
+    },
+    [TYPES.NUMBER]: {
+      valid: [1, 2.5, 49506845697]
+    },
+    [TYPES.BOOLEAN]: {
+      valid: [true, false]
+    },
+    [TYPES.ERROR]: {
+      valid: [new Error('WTF'), new Error('BBQ')]
+    },
+    [TYPES.UNDEFINED]: {
+      valid: [undefined]
+    },
+    [TYPES.ARRAY]: {
+      valid: [[1, 'yolo', true], [2.5, 'asjkdf', new Error()]]
     }
-  }
+  };
 
   function compare(type, input) {
     return TypeChecker.check(type, input);
   }
 
   function testTypes(inputType) {
-
+    for (const objType in testObjects) {
+      const objects = testObjects[objType].valid;
+      for (const idx in objects) {
+        const curObj = objects[idx];
+        if (objType === inputType) {
+          assert.ok(compare(inputType, curObj), `A ${objType} object should pass type check for ${objType}`);
+        } else {
+          assert.equal(compare(inputType, curObj), false, `A ${inputType} object should ` +
+            `fail type check for ${objType}`);
+        }
+      }
+    }
   }
 
   describe('#or', () => {
