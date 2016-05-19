@@ -4,5 +4,5 @@
 
 const TYPES = {STRING: 'String', NUMBER: 'Number', BOOLEAN: 'Boolean',
                ERROR: 'Error', UNDEFINED: 'Undefined', ARRAY: 'Array',
-               WILDCARD: '*'};
+               FUNCTION: 'Function', NULL: 'Null'};
 export default TYPES;
