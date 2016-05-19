@@ -52,13 +52,6 @@ describe('Type Check', () => {
     }
   }
 
-  const typesArray = [TYPES.BOOLEAN, TYPES.NUMBER, TYPES.STRING];
-  const obj = {
-    key1: TYPES.BOOLEAN,
-    key2: TYPES.NUMBER,
-    key3: TYPES.STRING
-  };
-
   const compositeTypeObjects = {
     or: {
       msg: 'should properly OR on type strings',
