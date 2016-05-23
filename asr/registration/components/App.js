@@ -165,7 +165,7 @@ class App extends Influx.Component {
           </div>
         </div>
         <div className='modal'>
-          <div className='fb-messengermessageus' messenger_app_id={this.facebookAppId} page_id={this.facebookPageId}
+          <div className='fb-messengermessageus' messengerAppId={this.facebookAppId} pageId={this.facebookPageId}
             color='blue' size='xlarge'></div>
           <div className='input-wrapper'>
             <input type='tel' ref='phone' className='input' placeholder='Your Phone Number'/>
