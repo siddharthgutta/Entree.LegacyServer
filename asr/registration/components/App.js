@@ -106,20 +106,20 @@ class App extends Influx.Component {
 
   _initFacebookButtons() {
     // Facebook's Code for Initializing the Send to Messenger Button
-    window.fbAsyncInit = function() {
-      FB.init({
-        appId      : '1702274500052830',
-        xfbml      : true,
-        version    : 'v2.6'
+    window.fbAsyncInit = () => {
+      FB.init({ // eslint-disable-line
+        appId: '1702274500052830',
+        xfbml: true,
+        version: 'v2.6'
       });
     };
 
-    (function(d, s, id) {
-       var js, fjs = d.getElementsByTagName(s)[0];
-       if (d.getElementById(id)) {return;}
-       js = d.createElement(s); js.id = id;
-       js.src = "https://connect.facebook.net/en_US/sdk.js";
-       fjs.parentNode.insertBefore(js, fjs);
+    ((d, s, id) => {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement(s); js.id = id;
+      js.src = 'https://connect.facebook.net/en_US/sdk.js';
+      fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
   }
 
@@ -163,8 +163,8 @@ class App extends Influx.Component {
           </div>
         </div>
         <div className='modal'>
-          <div className='fb-messengermessageus' messenger_app_id={this.facebookAppId} page_id={this.facebookPageId} color='blue' size='xlarge'>
-          </div>
+          <div className='fb-messengermessageus' messenger_app_id={this.facebookAppId} page_id={this.facebookPageId} 
+            color='blue' size='xlarge'></div>
           <div className='input-wrapper'>
             <input type='tel' ref='phone' className='input' placeholder='Your Phone Number'/>
           </div>
