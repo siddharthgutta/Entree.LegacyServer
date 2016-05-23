@@ -7,6 +7,10 @@
         "__name": "BRANCHOFF_PORT",
         "__format": "json"
       }
+    },
+    "Facebook": {
+      "pageId": "FACEBOOK_PAGE_ID",
+      "appId": "FACEBOOK_APP_ID"
     }
   },
   "UseRemoteSocketServer": {
@@ -47,6 +51,12 @@
   "IsTest": {
     "__name": "IS_RUNNING_TEST",
     "__format": "json"
+  },
+  "Facebook": {
+    "verificationToken": "FACEBOOK_VERIFICATION_TOKEN",
+    "pageAccessToken": "FACEBOOK_PAGE_ACCESS_TOKEN",
+    "pageId": "FACEBOOK_PAGE_ID",
+    "appId": "FACEBOOK_APP_ID"
   },
   "DeveloperNumber": "DEVELOPER_NUMBER",
   "NodeEnv": "NODE_ENV",
