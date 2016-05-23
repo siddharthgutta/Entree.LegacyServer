@@ -12,7 +12,7 @@ const productionOrSandbox = Runtime.isProduction();
 const facebookCreds = config.get(`Facebook`);
 
 console.tag('api', 'controllers', 'messaging').log(`Using Facebook ${config.get('AppBranch')} Credentials`);
-console.tag('api', 'controllers', 'messaging').log(`${facebookCreds}`);
+console.tag('api', 'controllers', 'messaging').log(`${JSON.stringify(facebookCreds})`);
 
 const msgPlatform = new FBMessenger(facebookCreds.pageAccessToken, facebookCreds.verificationToken,
   facebookCreds.pageId, productionOrSandbox);
