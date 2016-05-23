@@ -115,8 +115,10 @@ class App extends Influx.Component {
     };
 
     ((d, s, id) => {
-      var js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) {return;}
+      var js, fjs = d.getElementsByTagName(s)[0]; // eslint-disable-line
+      if (d.getElementById(id)) {
+        return;
+      }
       js = d.createElement(s); js.id = id;
       js.src = 'https://connect.facebook.net/en_US/sdk.js';
       fjs.parentNode.insertBefore(js, fjs);
@@ -163,7 +165,7 @@ class App extends Influx.Component {
           </div>
         </div>
         <div className='modal'>
-          <div className='fb-messengermessageus' messenger_app_id={this.facebookAppId} page_id={this.facebookPageId} 
+          <div className='fb-messengermessageus' messenger_app_id={this.facebookAppId} page_id={this.facebookPageId}
             color='blue' size='xlarge'></div>
           <div className='input-wrapper'>
             <input type='tel' ref='phone' className='input' placeholder='Your Phone Number'/>
