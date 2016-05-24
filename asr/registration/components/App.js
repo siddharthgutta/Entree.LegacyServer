@@ -105,16 +105,21 @@ class App extends Influx.Component {
   }
 
   _initFacebookButtons() {
+    this.refs.messageus.getDOMNode().setAttribute('messenger_app_id', this.facebookAppId);
+    this.refs.messageus.getDOMNode().setAttribute('page_id', this.facebookPageId);
+    this.refs.messageus.getDOMNode().setAttribute('size', 'xlarge');
+    this.refs.messageus.getDOMNode().setAttribute('color', 'blue');
+
     // Facebook's Code for Initializing the Send to Messenger Button
     window.fbAsyncInit = () => {
       FB.init({ // eslint-disable-line
-        appId: '1702274500052830',
+        appId: this.facebookAppId,
         xfbml: true,
         version: 'v2.6'
       });
     };
 
-    ((d, s, id) => {
+    function handleFBButton(d, s, id) {
       var js, fjs = d.getElementsByTagName(s)[0]; // eslint-disable-line
       if (d.getElementById(id)) {
         return;
@@ -122,7 +127,9 @@ class App extends Influx.Component {
       js = d.createElement(s); js.id = id;
       js.src = 'https://connect.facebook.net/en_US/sdk.js';
       fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
+    }
+
+    handleFBButton(document, 'script', 'facebook-jssdk');
   }
 
   componentDidMount() {
@@ -165,8 +172,7 @@ class App extends Influx.Component {
           </div>
         </div>
         <div className='modal'>
-          <div className='fb-messengermessageus' data-messengerAppId={this.facebookAppId}
-            data-pageId={this.facebookPageId} data-color='blue' data-size='xlarge'></div>
+          <div className='fb-messengermessageus' ref='messageus'></div>
           <div className='input-wrapper'>
             <input type='tel' ref='phone' className='input' placeholder='Your Phone Number'/>
           </div>
