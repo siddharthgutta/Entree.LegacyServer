@@ -4,6 +4,7 @@ import {findDOMNode} from 'react-dom';
 import {onClick, type} from '../../libs/utils';
 import fetch from '../../libs/fetch.es6';
 import Messenger from './../../components/Messenger';
+import config from '../../libs/config';
 
 const me = {
   number: 'A'
@@ -46,7 +47,9 @@ const conversation = [{
 class App extends Influx.Component {
   constructor(context, props) {
     super(context, props);
-
+    const facebookIds = config.get('Facebook');
+    this.facebookPageId = facebookIds.pageId;
+    this.facebookAppId = facebookIds.appId;
     this.state = {
       messages: []
     };
@@ -101,8 +104,37 @@ class App extends Influx.Component {
     });
   }
 
+  _initFacebookButtons() {
+    this.refs.messageus.getDOMNode().setAttribute('messenger_app_id', this.facebookAppId);
+    this.refs.messageus.getDOMNode().setAttribute('page_id', this.facebookPageId);
+    this.refs.messageus.getDOMNode().setAttribute('size', 'xlarge');
+    this.refs.messageus.getDOMNode().setAttribute('color', 'blue');
+
+    // Facebook's Code for Initializing the Send to Messenger Button
+    window.fbAsyncInit = () => {
+      FB.init({ // eslint-disable-line
+        appId: this.facebookAppId,
+        xfbml: true,
+        version: 'v2.6'
+      });
+    };
+
+    function handleFBButton(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0]; // eslint-disable-line
+      if (d.getElementById(id)) {
+        return;
+      }
+      js = d.createElement(s); js.id = id;
+      js.src = 'https://connect.facebook.net/en_US/sdk.js';
+      fjs.parentNode.insertBefore(js, fjs);
+    }
+
+    handleFBButton(document, 'script', 'facebook-jssdk');
+  }
+
   componentDidMount() {
     super.componentDidMount();
+    this._initFacebookButtons();
 
     setTimeout(() => {
       const iphone = findDOMNode(this.refs.mobile);
@@ -140,6 +172,7 @@ class App extends Influx.Component {
           </div>
         </div>
         <div className='modal'>
+          <div className='fb-messengermessageus' ref='messageus'></div>
           <div className='input-wrapper'>
             <input type='tel' ref='phone' className='input' placeholder='Your Phone Number'/>
           </div>
