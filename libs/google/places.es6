@@ -57,7 +57,7 @@ export default class GooglePlaces extends GoogleAPIStrategy {
    */
   async searchByName(name, lat, long, opennow = false, types = null) {
     if (!types || types.length === 0) {
-      return await this._searchWithType(name, lat, long, opennow, null);
+      return await this._searchWithType(name, lat, long, opennow);
     }
 
     for (let idx = 0; idx < types.length; idx++) {

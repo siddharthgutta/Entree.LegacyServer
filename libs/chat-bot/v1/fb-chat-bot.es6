@@ -471,13 +471,10 @@ export default class FbChatBot {
 
     try {
       location = await User.UserModel.getDefaultLocation(user.fbId);
-      if (!location) {
-        const text = new TextMessageData('You can\'t search for places yet since you haven\'t give us your location.' +
-          'The walk through will explain how to later');
-        return [text];
-      }
     } catch (err) {
-      throw new TraceError('Problem when getting user default location', err);
+      const text = new TextMessageData('You can\'t search for places yet since you haven\'t give us your location.' +
+        'The walk through will explain how to search later');
+      return [text];
     }
 
     if (!(await this._hasWishlist(user.fbId))) {

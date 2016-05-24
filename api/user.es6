@@ -194,7 +194,7 @@ export async function getDefaultLocation(fbId) {
   const user = await findOneByFbId(fbId);
   const locations = await user.getUserLocations({where: {default: true}});
   if (locations.length === 0) {
-    return null;
+    throw new Error(`User with fbId ${fbId} does not have default location`);
   }
 
   if (locations.length > 1) {
