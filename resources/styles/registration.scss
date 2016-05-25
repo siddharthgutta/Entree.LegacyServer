@@ -164,8 +164,8 @@ video {
 
 .secondary-logo-wrapper {
   position: absolute;
-  top: -60px;
-  height: 50px;
+  top: -120px;
+  height: 65px;
   width: 100%;
   opacity: 0;
 }
@@ -175,6 +175,20 @@ video {
   background-size: cover;
   height: 60px;
   width: 60px;
+  margin: 0 auto;
+}
+
+.fb-messengermessageus-wrapper {
+  position: absolute;
+  top: -41px;
+  height: 41px;
+  width: 100%;
+  text-align: center;
+}
+
+.fb-messengermessageus {
+  height: 35px;
+  display: inline-block;
   margin: 0 auto;
 }
 

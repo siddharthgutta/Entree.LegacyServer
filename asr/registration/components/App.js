@@ -164,6 +164,9 @@ class App extends Influx.Component {
           <div className='animate-opacity secondary-logo-wrapper' ref='icon'>
             <div className='secondary-logo'/>
           </div>
+          <div className='animate-opacity fb-messengermessageus-wrapper'>
+            <div className='fb-messengermessageus' ref='messageus'/>
+          </div>
           <div ref='screen' className='phone'>
             <div className='flex vertical viewport'>
               <div className='status-bar'/>
@@ -172,7 +175,6 @@ class App extends Influx.Component {
           </div>
         </div>
         <div className='modal'>
-          <div className='fb-messengermessageus' ref='messageus'></div>
           <div className='input-wrapper'>
             <input type='tel' ref='phone' className='input' placeholder='Your Phone Number'/>
           </div>
