@@ -472,7 +472,7 @@ export default class FbChatBot {
     try {
       location = await User.UserModel.getDefaultLocation(user.fbId);
     } catch (err) {
-      const text = new TextMessageData('You can\'t search for places yet since you haven\'t give us your location.' +
+      const text = new TextMessageData('You can\'t search for places yet since you haven\'t give us your location. ' +
         'Please continue by pressing the buttons provided. The walkthrough will explain how to search later.');
       return [text];
     }
